@@ -1,5 +1,7 @@
 package tacticshooter;
 
+import com.phyloa.dlib.util.DMath;
+
 public class LevelBuilder 
 {
 	public static void addBorder( Level l )
@@ -41,12 +43,49 @@ public class LevelBuilder
 		for( int x = x1; x <= x2; x++ )
 		{
 			l.tiles[x][y] = 1;
+			if( y == y2 && x == x2 ) break;
 			error += derr;
-			if( error > .5f )
+			while( error > .5f )
 			{
 				y++;
 				error -= 1;
+				if( error > .5f )
+				{
+					l.tiles[x][y] = 1;
+				}
 			}
 		}
+	}
+	
+	public static void addBox( Level l, int x, int y, int width, int height )
+	{
+		addWall( l, x, y, x+width, y );
+		addWall( l, x, y+height, x+width, y+height );
+		addWall( l, x, y, x, y+height );
+		addWall( l, x+width, y, x+width, y+height );	
+	}
+	
+	public static void fillBox( Level l, int x, int y, int width, int height )
+	{
+		for( int yy = y; yy < y+height; yy++ )
+		{
+			for( int xx = x; xx < x+width; xx++ )
+			{
+				l.tiles[xx][yy] = 1;
+			}
+		}
+	}
+	
+	public static void buildLevelA( Level l )
+	{
+		addBorder( l );
+		
+		addBox( l, 5, 5, l.width-10, l.height-10 );
+		l.tiles[l.width/2][5] = 0;
+		l.tiles[l.width/2][l.height-5] = 0;
+		l.tiles[5][l.height/2] = 0;
+		l.tiles[l.width-5][l.height/2] = 0;
+		
+		fillBox( l, 10, 10, l.width-20, l.height-20 );
 	}
 }

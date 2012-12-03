@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -12,7 +13,7 @@ import javax.vecmath.Point2i;
 import com.esotericsoftware.minlog.Log;
 import com.phyloa.dlib.renderer.Graphics2DRenderer;
 
-public class TacticClient extends Graphics2DRenderer implements MouseListener
+public class TacticClient extends Graphics2DRenderer implements MouseListener, MouseMotionListener
 {
 	ClientInterface ci;
 	
@@ -24,15 +25,26 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener
 	
 	Level l;
 	
+	boolean waitingForMoveConfirmation = false;
+	int mx = -1, my = -1;
+	
+	int sx, sy, sw, sh;
+	boolean selecting = false;
+	ArrayList<Integer> selected = new ArrayList<Integer>();
+	
+	int id;
+	int team;
+	
 	public void initialize() 
 	{
 		Log.set( Log.LEVEL_TRACE );
-		ci = new ClientNetworkInterface( "triggerly.com" );
+		ci = new ClientNetworkInterface( "localhost" );
 		
 		size( 800, 600 );
 		
 		ci.sendToServer( new Message( MessageType.CLIENTJOIN, null ) );
 		canvas.addMouseListener( this );
+		canvas.addMouseMotionListener( this );
 	}
 
 	public void update() 
@@ -67,21 +79,29 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener
 					tb = b;
 				}
 				tb.sync( b );
+				break;
+			case MOVESUCCESS:
+				this.waitingForMoveConfirmation = false;
+				break;
+			case SETID:
+				this.id = (Integer)m.message;
+				break;
 			}
 		}
 		
-		g.setColor( Color.WHITE );
-		g.fillRect( 0, 0, 800, 600 );
-		g.setColor( Color.BLACK );
-		
-		if( l != null )
-		{
-			l.render( g );
-		}
-		else
+		if( l == null )
 		{
 			return;
 		}
+		
+		g.setColor( Color.WHITE );
+		g.fillRect( 0, 0, l.width*Level.tileSize, l.height*Level.tileSize );
+		g.setColor( Color.BLACK );
+		
+		l.render( g );
+		
+		g.setColor( this.waitingForMoveConfirmation ? Color.gray : Color.GREEN );
+		g.drawRect( mx * Level.tileSize, my * Level.tileSize, Level.tileSize, Level.tileSize );
 		
 		for( int i = 0; i < units.size(); i++ )
 		{
@@ -93,7 +113,7 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener
 				i--;
 				continue;
 			}
-			u.render( g );
+			u.render( this );
 		}
 		
 		g.setColor( Color.BLACK );
@@ -111,6 +131,12 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener
 			}
 			b.render( g );
 		}
+		
+		if( selecting )
+		{
+			g.setColor( Color.BLUE );
+			g.drawRect( sx, sy, sw, sh );
+		}
 	}
 	
 	public static void main( String[] args )
@@ -121,7 +147,15 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener
 
 	public void mouseClicked( MouseEvent e )
 	{
-		ci.sendToServer( new Message( MessageType.SETATTACKPOINT, new Point2i( e.getX() / Level.tileSize, e.getY() / Level.tileSize ) ) );
+		if( e.getButton() == MouseEvent.BUTTON3 )
+		{
+			int tx = e.getX() / Level.tileSize;
+			int ty = e.getY() / Level.tileSize;
+			ci.sendToServer( new Message( MessageType.SETATTACKPOINT, new Object[]{ new Point2i( tx, ty ), selected } ) );
+			this.waitingForMoveConfirmation = true;
+			mx = tx;
+			my = ty;
+		}
 	}
 
 	public void mouseEntered(MouseEvent arg0) {
@@ -132,11 +166,52 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener
 		
 	}
 
-	public void mousePressed(MouseEvent arg0) {
-		
+	public void mousePressed( MouseEvent e )
+	{
+		if( e.getButton() == MouseEvent.BUTTON1 )
+		{
+			sx = e.getX();
+			sy = e.getY();
+			sw = 0;
+			sh = 0;
+			selecting = true;
+		}
 	}
 
-	public void mouseReleased(MouseEvent arg0) {
-		
+	public void mouseReleased( MouseEvent e ) 
+	{
+		if( e.getButton() == MouseEvent.BUTTON1 )
+		{
+			selected.clear();
+			
+			int x1 = Math.min( sx, e.getX() );
+			int y1 = Math.min( sy, e.getY() );
+			int x2 = Math.max( sx, e.getX() );
+			int y2 = Math.max( sy, e.getY() );
+			for( Unit u : units )
+			{
+				u.selected = u.team == this.id && u.x > x1 && u.x < x2 && u.y > y1 && u.y < y2;
+				if( u.selected )
+				{
+					selected.add( u.id );
+				}
+			}
+			selecting = false;
+		}
+	}
+
+	public void mouseDragged( MouseEvent e )
+	{	
+		sw = e.getX() - sx;
+		sh = e.getY() - sy;			
+	}
+
+	public void mouseMoved( MouseEvent e )
+	{
+		if( e.getButton() == MouseEvent.BUTTON1 )
+		{
+			sw = e.getX() - sx;
+			sh = e.getY() - sy;
+		}
 	}
 }

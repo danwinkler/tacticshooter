@@ -21,5 +21,7 @@ public class KryoHelper
 		k.register( ArrayList.class );
 		k.register( Point2i.class );
 		k.register( Bullet.class );
+		k.register( Unit.UnitState.class );
+		k.register( Object[].class );
 	}
 }

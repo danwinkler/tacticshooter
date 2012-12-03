@@ -13,7 +13,7 @@ import com.phyloa.dlib.util.DMath;
 
 public class Level implements Serializable, TileBasedMap
 {
-	public static int tileSize = 30;
+	public static int tileSize = 20;
 	
 	int[][] tiles;
 	

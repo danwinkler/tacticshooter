@@ -59,7 +59,7 @@ public class Bullet implements Serializable
 			p.y = u.y;
 			if( DMath.pointToLineSegment( l1, dir, p ).lengthSquared() < Unit.radius * Unit.radius )
 			{
-				u.health -= 10;
+				u.hit( this );
 				alive = false;
 			}
 		}

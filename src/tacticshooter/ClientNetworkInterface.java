@@ -14,7 +14,7 @@ public class ClientNetworkInterface implements ClientInterface
 	
 	public ClientNetworkInterface( String address )
 	{
-		client = new Client();
+		client = new Client( 32000, 32000 );
 		KryoHelper.register( client.getKryo() );
 		client.start();
 		try {

@@ -30,16 +30,8 @@ public class TacticServer
 	
 	public void begin()
 	{
-		l = new Level( 20, 20 );
-		LevelBuilder.addBorder( l );
-		LevelBuilder.addWall( l, 3, 5, 5, 5 );
-		LevelBuilder.addWall( l, 5, 3, 5, 5 );
-		
-		LevelBuilder.addWall( l, 16, 14, 14, 14 );
-		LevelBuilder.addWall( l, 14, 16, 14, 14 );
-		
-		LevelBuilder.addWall( l, 10, 0, 10, 7 );
-		LevelBuilder.addWall( l, 9, 19, 9, 12 );
+		l = new Level( 39, 29 );
+		LevelBuilder.buildLevelA( l );
 		
 		finder = new AStarPathFinder( l, 500, false );
 		
@@ -55,7 +47,7 @@ public class TacticServer
 			int y = DMath.randomi( 0, l.height );
 			if( l.tiles[x][y] == 0 )
 			{
-				Unit u = new Unit( x*30+15, y*30+15 );
+				Unit u = new Unit( x*Level.tileSize+Level.tileSize/2, y*Level.tileSize+Level.tileSize/2 );
 				u.team = DMath.randomi( -100, -1 );
 				units.add( u );
 			}
@@ -70,6 +62,7 @@ public class TacticServer
 				Unit u = new Unit( 60, 60 );
 				u.team = m.sender;
 				units.add( u );
+				si.sendToClient( m.sender, new Message( MessageType.SETID, m.sender ) );
 				si.sendToClient( m.sender, new Message( MessageType.LEVELUPDATE, l ) );
 				for( int i = 0; i < units.size(); i++ )
 				{
@@ -77,14 +70,17 @@ public class TacticServer
 				}
 				break;
 			case SETATTACKPOINT:
-				Point2i p = (Point2i)m.message;
+				Object[] oa = (Object[])m.message;
+				Point2i p = (Point2i)oa[0];
+				ArrayList<Integer> selected = (ArrayList<Integer>)oa[1];
 				for( Unit unit : units )
 				{
-					if( unit.team == m.sender )
+					if( unit.team == m.sender && selected.contains( unit.team ) )
 					{
 						unit.pathTo( p.x, p.y, this );
 					}
 				}
+				si.sendToClient( m.sender, new Message( MessageType.MOVESUCCESS, null ) );
 				break;
 			}
 		}
@@ -155,7 +151,6 @@ public class TacticServer
 	
 	public static void main( String[] args )
 	{
-		Log.set( Log.LEVEL_TRACE );
 		TacticServer ts = new TacticServer( new ServerNetworkInterface() );
 		ts.begin();
 	}

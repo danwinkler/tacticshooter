@@ -12,6 +12,7 @@ import javax.vecmath.Vector2f;
 import org.newdawn.slick.util.pathfinding.Path;
 import org.newdawn.slick.util.pathfinding.Path.Step;
 
+import com.phyloa.dlib.renderer.Graphics2DRenderer;
 import com.phyloa.dlib.util.DMath;
 
 public class Unit implements Serializable
@@ -25,6 +26,9 @@ public class Unit implements Serializable
 	int health = 100;
 	boolean alive = true;
 	
+	UnitState state = UnitState.MOVING;
+	float turnToAngle;
+	
 	int team = -1;
 	
 	ArrayList<Point2i> path = new ArrayList<Point2i>();
@@ -33,6 +37,9 @@ public class Unit implements Serializable
 	int destx, desty;
 	
 	int reloadtime = 0;
+	
+	//CLIENT ONLY
+	boolean selected = false;
 	
 	public Unit()
 	{
@@ -62,27 +69,96 @@ public class Unit implements Serializable
 			reloadtime--;
 		}
 		
-		if( team < 0 && onStep >= path.size() )
+		switch( state )
 		{
-			pathTo( DMath.randomi( 0, l.width ), DMath.randomi( 0, l.height ), ts );
+		case MOVING:
+			if( team < 0 && onStep >= path.size() )
+			{
+				pathTo( DMath.randomi( 0, l.width ), DMath.randomi( 0, l.height ), ts );
+			}
+			
+			if( onStep < path.size() )
+			{
+				Point2i s = path.get( onStep );
+				if( s.x == tilex && s.y == tiley )
+				{
+					onStep++;
+				}
+				else
+				{
+					float nx = s.x*l.tileSize + l.tileSize/2;
+					float ny = s.y*l.tileSize + l.tileSize/2;
+					
+					float tangle = (float) Math.atan2( ny - y, nx - x );
+					heading += DMath.turnTowards( heading, tangle ) * .2f;
+					x += Math.cos( heading ) * 3;
+					y += Math.sin( heading ) * 3;
+				}
+			}
+			break;
+		case TURNTO:
+			float turnAmount = DMath.turnTowards( heading, turnToAngle ) * .2f;
+			heading += turnAmount;
+			if( turnAmount < .01f )
+			{
+				int mtx = -1;
+				int mty = -1;
+				for( Unit u : ts.units )
+				{
+					if( u.team != this.team )
+					{
+						float angletoguy = (float)Math.atan2( u.y - y, u.x - x );
+						if( Math.abs( DMath.turnTowards( heading, angletoguy ) ) < Math.PI / 4 )
+						{
+							if( !l.hitwall( new Point2f( x, y ), new Vector2f( u.x - x, u.y - y ) ) )
+							{
+								mtx = l.getTileX( u.x );
+								mty = l.getTileY( u.y );
+								break;
+							}
+						}
+					}
+				}
+				if( mtx != -1 )
+				{
+					pathTo( mtx, mty, ts );
+				}
+				else
+				{
+					onStep = path.size();
+				}
+				state = UnitState.MOVING;
+			}
+			break;
 		}
 		
-		if( onStep < path.size() )
+		//Bounce off walls
+		//@TODO doesn't work well, also is probably sort of computationally expensive. Might not be worth it 
+		int tx = l.getTileX( x );
+		int ty = l.getTileY( y );
+		for( int y = Math.max( ty-1, 0 ); y < Math.min( ty+1, l.height-1 ); y++ )
 		{
-			Point2i s = path.get( onStep );
-			if( s.x == tilex && s.y == tiley )
+			for( int x = Math.max( tx-1, 0 ); x < Math.min( tx+1, l.width-1 ); x++ )
 			{
-				onStep++;
-			}
-			else
-			{
-				float nx = s.x*l.tileSize + l.tileSize/2;
-				float ny = s.y*l.tileSize + l.tileSize/2;
-				
-				float tangle = (float) Math.atan2( ny - y, nx - x );
-				heading += DMath.turnTowards( heading, tangle ) * .2f;
-				x += Math.cos( heading ) * 3;
-				y += Math.sin( heading ) * 3;
+				if( l.tiles[x][y] == 1 )
+				{
+					for( int i = 0; i < 4; i++ )
+					{
+						Vector2f vec = null;
+						switch( i )
+						{
+						case 0: vec = DMath.pointToLineSegment( new Point2f( x*l.tileSize, y*l.tileSize ), new Vector2f( l.tileSize, 0 ), new Point2f( this.x, this.y ) ); break;
+						case 1: vec = DMath.pointToLineSegment( new Point2f( x*l.tileSize, y*l.tileSize ), new Vector2f( 0, l.tileSize ), new Point2f( this.x, this.y ) ); break;
+						case 2: vec = DMath.pointToLineSegment( new Point2f( (x+1)*l.tileSize, y*l.tileSize ), new Vector2f( 0, l.tileSize ), new Point2f( this.x, this.y ) ); break;
+						case 3: vec = DMath.pointToLineSegment( new Point2f( x*l.tileSize, (y+1)*l.tileSize ), new Vector2f( l.tileSize, 0 ), new Point2f( this.x, this.y ) ); break;
+						}
+						if( vec.lengthSquared() < this.radius )
+						{
+							this.x += vec.x;
+							this.y += vec.y;
+						}
+					}
+				}
 			}
 		}
 		
@@ -110,10 +186,22 @@ public class Unit implements Serializable
 		return true;
 	}
 	
-	public void render( Graphics2D g )
+	public void render( Graphics2DRenderer g )
 	{
-		g.setColor( new Color( 1.f - health*.01f, health*.01f, 0 ) );
-		g.fillOval( (int)x - 5, (int)y - 5, 10, 10 );
+		g.pushMatrix();
+		g.translate( x, y );
+		if( selected )
+		{
+			g.color( Color.BLUE );
+			g.g.drawRect( -5, -5, 10, 10 );
+		}
+		g.rotate( heading );
+		g.g.setColor( new Color( 1.f - health*.01f, health*.01f, 0 ) );
+		g.g.fillOval( -5, -5, 10, 10 );
+		g.g.setColor( Color.BLACK );
+		g.g.drawOval( -5, -5, 10, 10 );
+		g.line( 0, 0, 5, 0 );
+		g.popMatrix();
 		/*
 		g.setColor( Color.BLACK );
 		for( int i = 0; i < path.size()-1; i++ )
@@ -155,5 +243,18 @@ public class Unit implements Serializable
 		this.alive = u.alive;
 		this.heading = u.heading;
 		this.health = u.health;
+	}
+
+	public void hit( Bullet bullet )
+	{
+		health -= 10;
+		state = UnitState.TURNTO;
+		turnToAngle = (float) Math.atan2( -bullet.dy, -bullet.dx );
+	}
+	
+	public enum UnitState
+	{
+		MOVING,
+		TURNTO;
 	}
 }
