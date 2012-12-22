@@ -11,6 +11,8 @@ import java.util.HashMap;
 import javax.vecmath.Point2i;
 
 import com.esotericsoftware.minlog.Log;
+import com.phyloa.dlib.dui.DButton;
+import com.phyloa.dlib.dui.DUI;
 import com.phyloa.dlib.renderer.Graphics2DRenderer;
 
 public class TacticClient extends Graphics2DRenderer implements MouseListener, MouseMotionListener
@@ -32,19 +34,26 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 	boolean selecting = false;
 	ArrayList<Integer> selected = new ArrayList<Integer>();
 	
-	int id;
-	int team;
+	Player player;
+	
+	DUI dui;
+	
+	int scrollx = 0;
+	int scrolly = 0;
 	
 	public void initialize() 
 	{
 		Log.set( Log.LEVEL_TRACE );
 		ci = new ClientNetworkInterface( "localhost" );
 		
-		size( 800, 600 );
+		size( 1200, 800 );
 		
 		ci.sendToServer( new Message( MessageType.CLIENTJOIN, null ) );
 		canvas.addMouseListener( this );
 		canvas.addMouseMotionListener( this );
+		
+		dui = new DUI( canvas );
+		//dui.add( new DButton( "test", 0, 550, 70, 50 ) );
 	}
 
 	public void update() 
@@ -83,8 +92,8 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 			case MOVESUCCESS:
 				this.waitingForMoveConfirmation = false;
 				break;
-			case SETID:
-				this.id = (Integer)m.message;
+			case PLAYERUPDATE:
+				this.player = (Player)m.message;
 				break;
 			}
 		}
@@ -94,11 +103,19 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 			return;
 		}
 		
+		if( scrolly > 0 && (k.up || (m.y < 40 && m.inside)) ) scrolly-=5;
+		if( scrolly+getHeight() < l.height*l.tileSize && (k.down || (m.y > getHeight()-40 && m.inside)) ) scrolly+=5;
+		if( scrollx > 0 && (k.left || (m.x < 40 && m.inside)) ) scrollx-=5;
+		if( scrollx+getWidth() < l.width*l.tileSize && (k.right || (m.x > getWidth()-40 && m.inside)) ) scrollx+=5;
+		
 		g.setColor( Color.WHITE );
-		g.fillRect( 0, 0, l.width*Level.tileSize, l.height*Level.tileSize );
+		g.fillRect( 0, 0, getWidth(), getHeight() );
 		g.setColor( Color.BLACK );
 		
-		l.render( g );
+		pushMatrix();
+		translate( -scrollx, -scrolly );
+		
+		l.render( this );
 		
 		g.setColor( this.waitingForMoveConfirmation ? Color.gray : Color.GREEN );
 		g.drawRect( mx * Level.tileSize, my * Level.tileSize, Level.tileSize, Level.tileSize );
@@ -137,6 +154,16 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 			g.setColor( Color.BLUE );
 			g.drawRect( sx, sy, sw, sh );
 		}
+		
+		popMatrix();
+		
+		g.setColor( Color.red );
+		if( player != null )
+		{
+			g.drawString( "Money: " + player.money, 10, 10 );
+		}
+		
+		dui.render( this );
 	}
 	
 	public static void main( String[] args )
@@ -149,8 +176,8 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 	{
 		if( e.getButton() == MouseEvent.BUTTON3 )
 		{
-			int tx = e.getX() / Level.tileSize;
-			int ty = e.getY() / Level.tileSize;
+			int tx = (e.getX()+scrollx) / Level.tileSize;
+			int ty = (e.getY()+scrolly) / Level.tileSize;
 			ci.sendToServer( new Message( MessageType.SETATTACKPOINT, new Object[]{ new Point2i( tx, ty ), selected } ) );
 			this.waitingForMoveConfirmation = true;
 			mx = tx;
@@ -170,8 +197,8 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 	{
 		if( e.getButton() == MouseEvent.BUTTON1 )
 		{
-			sx = e.getX();
-			sy = e.getY();
+			sx = e.getX() + scrollx;
+			sy = e.getY() + scrolly;
 			sw = 0;
 			sh = 0;
 			selecting = true;
@@ -184,13 +211,13 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 		{
 			selected.clear();
 			
-			int x1 = Math.min( sx, e.getX() );
-			int y1 = Math.min( sy, e.getY() );
-			int x2 = Math.max( sx, e.getX() );
-			int y2 = Math.max( sy, e.getY() );
+			int x1 = Math.min( sx, e.getX()+scrollx );
+			int y1 = Math.min( sy, e.getY()+scrolly );
+			int x2 = Math.max( sx, e.getX()+scrollx );
+			int y2 = Math.max( sy, e.getY()+scrolly );
 			for( Unit u : units )
 			{
-				u.selected = u.team == this.id && u.x > x1 && u.x < x2 && u.y > y1 && u.y < y2;
+				u.selected = u.owner.id == this.player.id && u.x > x1 && u.x < x2 && u.y > y1 && u.y < y2;
 				if( u.selected )
 				{
 					selected.add( u.id );
@@ -202,16 +229,16 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 
 	public void mouseDragged( MouseEvent e )
 	{	
-		sw = e.getX() - sx;
-		sh = e.getY() - sy;			
+		sw = e.getX()+scrollx - sx;
+		sh = e.getY()+scrolly - sy;			
 	}
 
 	public void mouseMoved( MouseEvent e )
 	{
 		if( e.getButton() == MouseEvent.BUTTON1 )
 		{
-			sw = e.getX() - sx;
-			sh = e.getY() - sy;
+			sw = e.getX()+scrollx - sx;
+			sh = e.getY()+scrolly - sy;
 		}
 	}
 }

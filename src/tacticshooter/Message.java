@@ -7,14 +7,14 @@ public class Message implements Serializable
 {
 	public int sender = -1;
 	public MessageType messageType;
-	public Serializable message;
+	public Object message;
 	
 	public Message()
 	{
 		
 	}
 	
-	public Message( MessageType messageType, Serializable message )
+	public Message( MessageType messageType, Object message )
 	{
 		this.messageType = messageType;
 		this.message = message;

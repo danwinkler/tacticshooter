@@ -23,5 +23,9 @@ public class KryoHelper
 		k.register( Bullet.class );
 		k.register( Unit.UnitState.class );
 		k.register( Object[].class );
+		k.register( Team.class );
+		k.register( Player.class );
+		k.register( Building.class );
+		k.register( Building.BuildingType.class );
 	}
 }

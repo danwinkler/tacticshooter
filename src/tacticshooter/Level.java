@@ -2,6 +2,7 @@ package tacticshooter;
 
 import java.awt.Graphics2D;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import javax.vecmath.Point2f;
 import javax.vecmath.Vector2f;
@@ -9,11 +10,14 @@ import javax.vecmath.Vector2f;
 import org.newdawn.slick.util.pathfinding.Mover;
 import org.newdawn.slick.util.pathfinding.TileBasedMap;
 
+import com.phyloa.dlib.renderer.Graphics2DRenderer;
 import com.phyloa.dlib.util.DMath;
 
 public class Level implements Serializable, TileBasedMap
 {
 	public static int tileSize = 20;
+	
+	public ArrayList<Building> buildings = new ArrayList<Building>();
 	
 	int[][] tiles;
 	
@@ -35,7 +39,7 @@ public class Level implements Serializable, TileBasedMap
 		visited = new int[width][height];
 	}
 	
-	public void render( Graphics2D g )
+	public void render( Graphics2DRenderer g )
 	{
 		for( int y = 0; y < height; y++ )
 		{
@@ -51,6 +55,11 @@ public class Level implements Serializable, TileBasedMap
 				break;
 				}
 			}
+		}
+		
+		for( Building b : buildings )
+		{
+			b.render( g );
 		}
 	}
 	

@@ -21,6 +21,8 @@ public class Bullet implements Serializable
 	
 	boolean alive = true;
 	
+	Player owner;
+	
 	public Bullet()
 	{
 		
@@ -55,12 +57,15 @@ public class Bullet implements Serializable
 		Vector2f dir = new Vector2f( x - lx, y - ly );
 		for( Unit u : ts.units )
 		{
-			p.x = u.x;
-			p.y = u.y;
-			if( DMath.pointToLineSegment( l1, dir, p ).lengthSquared() < Unit.radius * Unit.radius )
+			if( u.owner.team.id != owner.team.id )
 			{
-				u.hit( this );
-				alive = false;
+				p.x = u.x;
+				p.y = u.y;
+				if( DMath.pointToLineSegment( l1, dir, p ).lengthSquared() < Unit.radius * Unit.radius )
+				{
+					u.hit( this );
+					alive = false;
+				}
 			}
 		}
 		
@@ -91,11 +96,14 @@ public class Bullet implements Serializable
 		Vector2f dir = new Vector2f( x - lx, y - ly );
 		for( Unit u : ts.units )
 		{
-			p.x = u.x;
-			p.y = u.y;
-			if( DMath.pointToLineSegment( l1, dir, p ).lengthSquared() < Unit.radius * Unit.radius )
+			if( u.owner.team.id != owner.team.id )
 			{
-				alive = false;
+				p.x = u.x;
+				p.y = u.y;
+				if( DMath.pointToLineSegment( l1, dir, p ).lengthSquared() < Unit.radius * Unit.radius )
+				{
+					alive = false;
+				}
 			}
 		}
 		

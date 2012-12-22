@@ -42,12 +42,27 @@ public class ServerNetworkInterface implements ServerInterface
 					}
 				}
 			}
+			
+			public void disconnected( Connection c )
+			{
+				synchronized( messages )
+				{
+					Message m = new Message();
+					m.message = c.getID();
+					m.sender = c.getID();
+					m.messageType = MessageType.DISCONNECTED;
+					messages.push( m );
+					connections.remove( c.getID() );
+				}
+			}
 		});
 	}
 	
 	public void sendToClient( int id, Message m )
 	{
-		connections.get( id ).sendTCP( m );
+		Connection c = connections.get( id );
+		if( c != null )
+			c.sendTCP( m );
 	}
 
 	public void sendToAllClients( Message m ) 

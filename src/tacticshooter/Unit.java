@@ -29,7 +29,7 @@ public class Unit implements Serializable
 	UnitState state = UnitState.MOVING;
 	float turnToAngle;
 	
-	int team = -1;
+	Player owner;
 	
 	ArrayList<Point2i> path = new ArrayList<Point2i>();
 	int onStep = 0;
@@ -37,6 +37,8 @@ public class Unit implements Serializable
 	int destx, desty;
 	
 	int reloadtime = 0;
+	
+	Player killer;
 	
 	//CLIENT ONLY
 	boolean selected = false;
@@ -48,8 +50,15 @@ public class Unit implements Serializable
 	
 	public Unit( float x, float y )
 	{
+		this();
 		this.x = x;
 		this.y = y;
+	}
+	
+	public Unit( float x, float y, Player owner )
+	{
+		this( x, y );
+		this.owner = owner;
 	}
 	
 	public boolean update( TacticServer ts )
@@ -72,7 +81,7 @@ public class Unit implements Serializable
 		switch( state )
 		{
 		case MOVING:
-			if( team < 0 && onStep >= path.size() )
+			if( owner == null && onStep >= path.size() )
 			{
 				pathTo( DMath.randomi( 0, l.width ), DMath.randomi( 0, l.height ), ts );
 			}
@@ -105,7 +114,7 @@ public class Unit implements Serializable
 				int mty = -1;
 				for( Unit u : ts.units )
 				{
-					if( u.team != this.team )
+					if( !u.owner.team.equals( this.owner.team ) )
 					{
 						float angletoguy = (float)Math.atan2( u.y - y, u.x - x );
 						if( Math.abs( DMath.turnTowards( heading, angletoguy ) ) < Math.PI / 4 )
@@ -166,7 +175,7 @@ public class Unit implements Serializable
 		{
 			for( Unit u : ts.units )
 			{
-				if( u.team != this.team )
+				if( !u.owner.team.equals( this.owner.team ) )
 				{
 					float angletoguy = (float)Math.atan2( u.y - y, u.x - x );
 					if( Math.abs( DMath.turnTowards( heading, angletoguy ) ) < Math.PI / 4 )
@@ -174,7 +183,7 @@ public class Unit implements Serializable
 						if( !l.hitwall( new Point2f( x, y ), new Vector2f( u.x - x, u.y - y ) ) )
 						{
 							float bangle = angletoguy + DMath.randomf( -.1f, .1f );
-							ts.addBullet( x + DMath.cosf( bangle ) * (radius+5), y + DMath.sinf( bangle ) * (radius+5), bangle );
+							ts.addBullet( this, bangle );
 							reloadtime = 5;
 							break;
 						}
@@ -186,10 +195,12 @@ public class Unit implements Serializable
 		return true;
 	}
 	
-	public void render( Graphics2DRenderer g )
+	public void render( TacticClient g )
 	{
 		g.pushMatrix();
 		g.translate( x, y );
+		g.g.setColor( Color.BLACK );
+		g.g.drawString( owner.id + "", 0, -10 );
 		if( selected )
 		{
 			g.color( Color.BLUE );
@@ -248,6 +259,11 @@ public class Unit implements Serializable
 	public void hit( Bullet bullet )
 	{
 		health -= 10;
+		if( health <= 0 && health > -10 )
+		{
+			alive = false;
+			killer = bullet.owner;
+		}
 		state = UnitState.TURNTO;
 		turnToAngle = (float) Math.atan2( -bullet.dy, -bullet.dx );
 	}

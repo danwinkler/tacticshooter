@@ -34,6 +34,11 @@ public class ClientNetworkInterface implements ClientInterface
 					}
 				}
 			}
+			
+			public void disconnected( Connection c )
+			{
+				
+			}
 		});
 	}
 	
