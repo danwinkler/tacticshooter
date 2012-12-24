@@ -1,6 +1,7 @@
 package tacticshooter;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -13,7 +14,17 @@ import javax.vecmath.Point2i;
 import com.esotericsoftware.minlog.Log;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DUI;
+import com.phyloa.dlib.dui.DUIElement;
+import com.phyloa.dlib.dui.DUIEvent;
+import com.phyloa.dlib.dui.DUIListener;
 import com.phyloa.dlib.renderer.Graphics2DRenderer;
+
+import de.lessvoid.nifty.Nifty;
+import de.lessvoid.nifty.java2d.input.InputSystemAwtImpl;
+import de.lessvoid.nifty.java2d.renderer.GraphicsWrapper;
+import de.lessvoid.nifty.java2d.renderer.RenderDeviceJava2dImpl;
+import de.lessvoid.nifty.sound.SoundSystem;
+import de.lessvoid.nifty.tools.TimeProvider;
 
 public class TacticClient extends Graphics2DRenderer implements MouseListener, MouseMotionListener
 {
@@ -36,10 +47,10 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 	
 	Player player;
 	
-	DUI dui;
-	
 	int scrollx = 0;
 	int scrolly = 0;
+	
+	Nifty nifty;
 	
 	public void initialize() 
 	{
@@ -52,8 +63,21 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 		canvas.addMouseListener( this );
 		canvas.addMouseMotionListener( this );
 		
-		dui = new DUI( canvas );
-		//dui.add( new DButton( "test", 0, 550, 70, 50 ) );
+		nifty = new Nifty( new RenderDeviceJava2dImpl( new GraphicsWrapper() {
+			public Graphics2D getGraphics2d()
+			{
+				return TacticClient.this.g;
+			}
+
+			public int getHeight()
+			{
+				return TacticClient.this.getHeight();
+			}
+
+			public int getWidth()
+			{
+				return TacticClient.this.getWidth();
+			} } ), null, new InputSystemAwtImpl(), new TimeProvider() );
 	}
 
 	public void update() 
@@ -103,10 +127,17 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 			return;
 		}
 		
+		/*
 		if( scrolly > 0 && (k.up || (m.y < 40 && m.inside)) ) scrolly-=5;
 		if( scrolly+getHeight() < l.height*l.tileSize && (k.down || (m.y > getHeight()-40 && m.inside)) ) scrolly+=5;
 		if( scrollx > 0 && (k.left || (m.x < 40 && m.inside)) ) scrollx-=5;
 		if( scrollx+getWidth() < l.width*l.tileSize && (k.right || (m.x > getWidth()-40 && m.inside)) ) scrollx+=5;
+		*/
+		
+		if( scrolly > 0 && (k.up || k.w) ) scrolly-=5;
+		if( scrolly+getHeight() - 50 < l.height*l.tileSize && (k.down || k.s) ) scrolly+=5;
+		if( scrollx > 0 && (k.left || k.a) ) scrollx-=5;
+		if( scrollx+getWidth() < l.width*l.tileSize && (k.right || k.d) ) scrollx+=5;
 		
 		g.setColor( Color.WHITE );
 		g.fillRect( 0, 0, getWidth(), getHeight() );
@@ -162,8 +193,6 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 		{
 			g.drawString( "Money: " + player.money, 10, 10 );
 		}
-		
-		dui.render( this );
 	}
 	
 	public static void main( String[] args )

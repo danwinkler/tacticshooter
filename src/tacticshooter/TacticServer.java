@@ -108,6 +108,7 @@ public class TacticServer
 			switch( m.messageType )
 			{
 			case CLIENTJOIN:
+			{
 				Player player = new Player( m.sender );
 				player.team = Math.random() > .5 ? a : b;
 				players.put( m.sender, player );
@@ -119,7 +120,9 @@ public class TacticServer
 					si.sendToClient( m.sender, new Message( MessageType.UNITUPDATE, units.get( i ) ) );
 				}
 				break;
+			}
 			case SETATTACKPOINT:
+			{
 				Object[] oa = (Object[])m.message;
 				Point2i p = (Point2i)oa[0];
 				ArrayList<Integer> selected = (ArrayList<Integer>)oa[1];
@@ -132,6 +135,37 @@ public class TacticServer
 				}
 				si.sendToClient( m.sender, new Message( MessageType.MOVESUCCESS, null ) );
 				break;
+			}
+			case SWITCHTEAMS:
+			{
+				Team t = (Team)m.message;
+				Player player = players.get( m.sender );
+				player.team = t.id == a.id ? b : a;
+				
+				for( Unit u : units )
+				{
+					if( u.owner.id == player.id )
+					{
+						u.alive = false;
+					}
+				}
+				
+				si.sendToClient( m.sender, new Message( MessageType.PLAYERUPDATE, player ) );
+				break;
+			}
+			case DISCONNECTED:
+			{
+				Player player = players.get( m.sender );
+				for( Unit u : units )
+				{
+					if( u.owner.id == player.id )
+					{
+						u.alive = false;
+					}
+				}
+				players.remove( m.sender );
+				break;
+			}
 			}
 		}
 		
