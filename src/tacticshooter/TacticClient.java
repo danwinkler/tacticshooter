@@ -19,14 +19,7 @@ import com.phyloa.dlib.dui.DUIEvent;
 import com.phyloa.dlib.dui.DUIListener;
 import com.phyloa.dlib.renderer.Graphics2DRenderer;
 
-import de.lessvoid.nifty.Nifty;
-import de.lessvoid.nifty.java2d.input.InputSystemAwtImpl;
-import de.lessvoid.nifty.java2d.renderer.GraphicsWrapper;
-import de.lessvoid.nifty.java2d.renderer.RenderDeviceJava2dImpl;
-import de.lessvoid.nifty.sound.SoundSystem;
-import de.lessvoid.nifty.tools.TimeProvider;
-
-public class TacticClient extends Graphics2DRenderer implements MouseListener, MouseMotionListener
+public class TacticClient extends Graphics2DRenderer implements MouseListener, MouseMotionListener, DUIListener
 {
 	ClientInterface ci;
 	
@@ -50,7 +43,9 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 	int scrollx = 0;
 	int scrolly = 0;
 	
-	Nifty nifty;
+	DUI dui;
+	DButton switchTeams;
+	DButton buildUnit;
 	
 	public void initialize() 
 	{
@@ -63,21 +58,14 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 		canvas.addMouseListener( this );
 		canvas.addMouseMotionListener( this );
 		
-		nifty = new Nifty( new RenderDeviceJava2dImpl( new GraphicsWrapper() {
-			public Graphics2D getGraphics2d()
-			{
-				return TacticClient.this.g;
-			}
-
-			public int getHeight()
-			{
-				return TacticClient.this.getHeight();
-			}
-
-			public int getWidth()
-			{
-				return TacticClient.this.getWidth();
-			} } ), null, new InputSystemAwtImpl(), new TimeProvider() );
+		dui = new DUI( canvas );
+		dui.addDUIListener( this );
+		
+		switchTeams = new DButton( "Switch Teams", 0, getHeight()-50, 100, 50 );
+		dui.add( switchTeams );
+		
+		buildUnit = new DButton( "Build Unit", 100, getHeight()-50, 100, 50 );
+		dui.add( buildUnit );
 	}
 
 	public void update() 
@@ -193,6 +181,9 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 		{
 			g.drawString( "Money: " + player.money, 10, 10 );
 		}
+		
+		dui.update();
+		dui.render( this );
 	}
 	
 	public static void main( String[] args )
@@ -214,11 +205,13 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 		}
 	}
 
-	public void mouseEntered(MouseEvent arg0) {
+	public void mouseEntered( MouseEvent e )
+	{
 		
 	}
 
-	public void mouseExited(MouseEvent arg0) {
+	public void mouseExited( MouseEvent e ) 
+	{
 		
 	}
 
@@ -268,6 +261,18 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 		{
 			sw = e.getX()+scrollx - sx;
 			sh = e.getY()+scrolly - sy;
+		}
+	}
+
+	public void event( DUIEvent event )
+	{
+		DUIElement e = event.getElement();
+		if( e == switchTeams )
+		{
+			ci.sendToServer( new Message( MessageType.SWITCHTEAMS, player.team ) );
+		} else if( e == buildUnit )
+		{
+			ci.sendToServer( new Message( MessageType.BUILDUNIT, null ) );
 		}
 	}
 }

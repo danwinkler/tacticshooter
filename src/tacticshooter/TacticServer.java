@@ -153,6 +153,26 @@ public class TacticServer
 				si.sendToClient( m.sender, new Message( MessageType.PLAYERUPDATE, player ) );
 				break;
 			}
+			case BUILDUNIT:
+			{
+				Player player = players.get( m.sender );
+				if( player.money >= 100 )
+				{
+					player.money -= 100;
+					si.sendToClient( m.sender, new Message( MessageType.PLAYERUPDATE, player ) );
+					Building base = null;
+					for( Building bu : l.buildings )
+					{
+						if( bu.bt == BuildingType.CENTER && bu.t == player.team )
+						{
+							base = bu;
+						}
+					}
+					if( base != null )
+						units.add( new Unit( base.x, base.y, player ) );
+				}
+				break;
+			}
 			case DISCONNECTED:
 			{
 				Player player = players.get( m.sender );
