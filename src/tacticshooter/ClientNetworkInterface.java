@@ -1,6 +1,7 @@
 package tacticshooter;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.LinkedList;
 
 import com.esotericsoftware.kryonet.Client;
@@ -12,16 +13,13 @@ public class ClientNetworkInterface implements ClientInterface
 	Client client;
 	LinkedList<Message> messages = new LinkedList<Message>();
 	
-	public ClientNetworkInterface( String address )
+	public ClientNetworkInterface( String address ) throws IOException
 	{
-		client = new Client( 32000, 32000 );
+		client = new Client( 128000, 32000 );
 		KryoHelper.register( client.getKryo() );
 		client.start();
-		try {
-			client.connect(5000, address, 54555, 54777);
-		} catch (IOException e) {
-			e.printStackTrace(); //TODO actually handle that shit
-		}
+		client.connect( 500, address, 54555, 54777 );
+		
 		
 		client.addListener( new Listener() {
 			public void received( Connection c, Object o ) 
@@ -41,7 +39,7 @@ public class ClientNetworkInterface implements ClientInterface
 			}
 		});
 	}
-	
+
 	public void sendToServer( Message m ) 
 	{
 		client.sendTCP( m );

@@ -45,7 +45,7 @@ public class TacticServer
 	
 	public void begin()
 	{
-		l = new Level( 50, 50 );
+		l = new Level( 100, 100 );
 		LevelBuilder.buildLevelB( l, a, b );
 		
 		finder = new AStarPathFinder( l, 500, false );
@@ -63,13 +63,23 @@ public class TacticServer
 			lastTick += 100;
 			tick++;
 			
-			//Every 1000 ticks
-			if( tick % 1000 == 0 )
+			
+			//Every 100 ticks
+			if( tick % 100 == 0 )
 			{
 				for( Entry<Integer, Player> e : players.entrySet() )
 				{
 					Player p = e.getValue();
-					p.money += 100;
+					int bc = 0;
+					for( int i = 0; i < l.buildings.size(); i++ )
+					{
+						Building b = l.buildings.get( i );
+						if( b.t != null && b.t.id == p.team.id )
+						{
+							bc++;
+						}
+					}
+					p.money += bc;
 					si.sendToClient( p.id, new Message( MessageType.PLAYERUPDATE, p ) );
 				}
 			}
@@ -100,6 +110,13 @@ public class TacticServer
 					if( base != null )
 						units.add( new Unit( base.x, base.y, p ) );
 				}
+			}
+			for( int i = 0; i < l.buildings.size(); i++ )
+			{
+				Building b = l.buildings.get( i );
+				b.update( this );
+				b.index = i;
+				si.sendToAllClients( new Message( MessageType.BUILDINGUPDATE, b ) );
 			}
 		}
 		while( si.hasServerMessages() )
@@ -144,7 +161,7 @@ public class TacticServer
 				
 				for( Unit u : units )
 				{
-					if( u.owner.id == player.id )
+					if( u.owner == null || u.owner.id == player.id )
 					{
 						u.alive = false;
 					}
@@ -176,9 +193,10 @@ public class TacticServer
 			case DISCONNECTED:
 			{
 				Player player = players.get( m.sender );
-				for( Unit u : units )
+				for( int i = 0; i < units.size(); i++ )
 				{
-					if( u.owner.id == player.id )
+					Unit u = units.get( i );
+					if( u.owner == null || u.owner.id == player.id )
 					{
 						u.alive = false;
 					}

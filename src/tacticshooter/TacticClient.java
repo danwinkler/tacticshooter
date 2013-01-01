@@ -9,6 +9,7 @@ import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.swing.JOptionPane;
 import javax.vecmath.Point2i;
 
 import com.esotericsoftware.minlog.Log;
@@ -50,7 +51,20 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 	public void initialize() 
 	{
 		Log.set( Log.LEVEL_TRACE );
-		ci = new ClientNetworkInterface( "localhost" );
+		
+		String[] addressesToTry = { "localhost", "triggerly.com" };
+		
+		for( String s : addressesToTry )
+		{
+			try
+			{
+				ci = new ClientNetworkInterface( s );
+			} catch( Exception e )
+			{
+				continue;
+			}
+			break;
+		}
 		
 		size( 1200, 800 );
 		
@@ -107,6 +121,12 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 			case PLAYERUPDATE:
 				this.player = (Player)m.message;
 				break;
+			case BUILDINGUPDATE:
+				if( l != null )
+				{
+					Building building = (Building)m.message;
+					l.buildings.set( building.index, building );
+				}
 			}
 		}
 		
@@ -122,10 +142,10 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 		if( scrollx+getWidth() < l.width*l.tileSize && (k.right || (m.x > getWidth()-40 && m.inside)) ) scrollx+=5;
 		*/
 		
-		if( scrolly > 0 && (k.up || k.w) ) scrolly-=5;
-		if( scrolly+getHeight() - 50 < l.height*l.tileSize && (k.down || k.s) ) scrolly+=5;
-		if( scrollx > 0 && (k.left || k.a) ) scrollx-=5;
-		if( scrollx+getWidth() < l.width*l.tileSize && (k.right || k.d) ) scrollx+=5;
+		if( scrolly > 0 && (k.up || k.w) ) scrolly-=10;
+		if( scrolly+getHeight() - 50 < l.height*l.tileSize && (k.down || k.s) ) scrolly+=10;
+		if( scrollx > 0 && (k.left || k.a) ) scrollx-=10;
+		if( scrollx+getWidth() < l.width*l.tileSize && (k.right || k.d) ) scrollx+=10;
 		
 		g.setColor( Color.WHITE );
 		g.fillRect( 0, 0, getWidth(), getHeight() );
@@ -189,7 +209,14 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 	public static void main( String[] args )
 	{
 		TacticClient tc = new TacticClient();
-		tc.begin();
+		try
+		{
+			tc.begin();
+		}
+		catch( Exception ex )
+		{
+			JOptionPane.showMessageDialog( tc.container, ex.getMessage() );
+		}
 	}
 
 	public void mouseClicked( MouseEvent e )

@@ -104,6 +104,10 @@ public class Unit implements Serializable
 					y += Math.sin( heading ) * 3;
 				}
 			}
+			else
+			{
+				state = UnitState.STOPPED;
+			}
 			break;
 		case TURNTO:
 			float turnAmount = DMath.turnTowards( heading, turnToAngle ) * .2f;
@@ -192,7 +196,7 @@ public class Unit implements Serializable
 			}
 		}
 		
-		return true;
+		return state != UnitState.STOPPED;
 	}
 	
 	public void render( TacticClient g )
@@ -239,6 +243,7 @@ public class Unit implements Serializable
 			destx = tx;
 			desty = ty;
 			onStep = 0;
+			state = UnitState.MOVING;
 		}
 	}
 	
@@ -271,6 +276,7 @@ public class Unit implements Serializable
 	public enum UnitState
 	{
 		MOVING,
-		TURNTO;
+		TURNTO,
+		STOPPED;
 	}
 }

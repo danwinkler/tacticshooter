@@ -19,6 +19,6 @@ public class Player
 	
 	public void reset()
 	{
-		money = 100;
+		money = 0;
 	}
 }
