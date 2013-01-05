@@ -27,6 +27,7 @@ public class Unit implements Serializable
 	boolean alive = true;
 	
 	UnitState state = UnitState.MOVING;
+	UnitState lastState = state;
 	float turnToAngle;
 	
 	Player owner;
@@ -196,7 +197,9 @@ public class Unit implements Serializable
 			}
 		}
 		
-		return state != UnitState.STOPPED;
+		boolean sendToClient = state != UnitState.STOPPED || lastState == state;
+		lastState = state;
+		return sendToClient;
 	}
 	
 	public void render( TacticClient g )

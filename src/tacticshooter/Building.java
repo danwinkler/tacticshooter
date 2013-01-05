@@ -52,8 +52,9 @@ public class Building
 		g.popMatrix();
 	}
 	
-	public void update( TacticServer ts )
+	public boolean update( TacticServer ts )
 	{
+		boolean updateClient = false;
 		bt.update( ts, this );
 		int[] teamcount = new int[32];
 		Team[] teams = new Team[32]; //ugh ugly
@@ -63,9 +64,9 @@ public class Building
 		{
 			float dx = u.x - x;
 			float dy = u.y - y;
-			float dist = (float) Math.sqrt( dx*dx + dy*dy );
+			float dist = (float) /*Math.sqrt*/( dx*dx + dy*dy );
 			
-			if( dist < 50 )
+			if( dist < 50 * 50 )
 			{
 				teamcount[u.owner.team.id]++;
 				teams[u.owner.team.id] = u.owner.team;
@@ -80,6 +81,7 @@ public class Building
 						oc++;
 					}
 				}
+				updateClient = true;
 			}
 		}
 		
@@ -119,6 +121,7 @@ public class Building
 				t = teams[index];
 			}
 		}
+		return updateClient;
 	}
 	
 	public enum BuildingType

@@ -215,6 +215,7 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 		}
 		catch( Exception ex )
 		{
+			ex.printStackTrace();
 			JOptionPane.showMessageDialog( tc.container, ex.getMessage() );
 		}
 	}

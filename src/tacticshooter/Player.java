@@ -2,9 +2,12 @@ package tacticshooter;
 
 public class Player
 {
+	public static final int MAX_RESPAWN = 60;
+	
 	int id;
 	Team team;
 	int money;
+	int respawn = MAX_RESPAWN;
 	
 	public Player()
 	{

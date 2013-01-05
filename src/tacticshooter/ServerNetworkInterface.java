@@ -1,6 +1,7 @@
 package tacticshooter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -13,6 +14,8 @@ public class ServerNetworkInterface implements ServerInterface
 	Server server;
 	LinkedList<Message> messages = new LinkedList<Message>();
 	HashMap<Integer, Connection> connections = new HashMap<Integer, Connection>();
+	ArrayList<Connection> connectionsArr = new ArrayList<Connection>();
+	ServerListener sl;
 	
 	public ServerNetworkInterface()
 	{
@@ -24,38 +27,8 @@ public class ServerNetworkInterface implements ServerInterface
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		server.addListener( new Listener() {
-			public void received( Connection c, Object o ) 
-			{
-				if( connections.get( c.getID() ) == null )
-				{
-					connections.put( c.getID(), c );
-				}
-				if( o instanceof Message )
-				{
-					synchronized( messages )
-					{
-						Message m = (Message)o;
-						m.sender = c.getID();
-						messages.push( m );
-					}
-				}
-			}
-			
-			public void disconnected( Connection c )
-			{
-				synchronized( messages )
-				{
-					Message m = new Message();
-					m.message = c.getID();
-					m.sender = c.getID();
-					m.messageType = MessageType.DISCONNECTED;
-					messages.push( m );
-					connections.remove( c.getID() );
-				}
-			}
-		});
+		sl = new ServerListener();
+		server.addListener( sl );
 	}
 	
 	public void sendToClient( int id, Message m )
@@ -67,7 +40,10 @@ public class ServerNetworkInterface implements ServerInterface
 
 	public void sendToAllClients( Message m ) 
 	{
-		server.sendToAllTCP( m );
+		for( int i = 0; i < connectionsArr.size(); i++ )
+		{
+			connectionsArr.get( i ).sendTCP( m );
+		}
 	}
 
 	public Message getNextServerMessage()
@@ -82,5 +58,39 @@ public class ServerNetworkInterface implements ServerInterface
 	{
 		return !messages.isEmpty();
 	}
-
+	
+	class ServerListener extends Listener
+	{
+		public void received( Connection c, Object o ) 
+		{
+			if( connections.get( c.getID() ) == null )
+			{
+				connections.put( c.getID(), c );
+				connectionsArr.add( c );
+			}
+			if( o instanceof Message )
+			{
+				synchronized( messages )
+				{
+					Message m = (Message)o;
+					m.sender = c.getID();
+					messages.push( m );
+				}
+			}
+		}
+		
+		public void disconnected( Connection c )
+		{
+			synchronized( messages )
+			{
+				Message m = new Message();
+				m.message = c.getID();
+				m.sender = c.getID();
+				m.messageType = MessageType.DISCONNECTED;
+				messages.push( m );
+				connections.remove( c.getID() );
+				connectionsArr.remove( c );
+			}
+		}
+	}
 }

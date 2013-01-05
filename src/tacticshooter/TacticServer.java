@@ -54,6 +54,12 @@ public class TacticServer
 		t = new Thread( sl );
 		t.start();
 		lastTick = System.currentTimeMillis();
+		
+		for( int i = 0; i < 8; i++ )
+		{
+			Thread ct = new Thread( new ComputerPlayer( (ServerNetworkInterface)si ) );
+			ct.start();
+		}
 	}
 	
 	public void update()
@@ -99,24 +105,38 @@ public class TacticServer
 				}
 				if( !contains )
 				{
-					Building base = null;
-					for( Building bu : l.buildings )
+					if( p.respawn > 0 )
 					{
-						if( bu.bt == BuildingType.CENTER && bu.t == p.team )
+						p.respawn--;
+					}
+					else
+					{
+						p.respawn = Player.MAX_RESPAWN;
+						Building base = null;
+						for( Building bu : l.buildings )
 						{
-							base = bu;
+							if( bu.bt == BuildingType.CENTER && bu.t == p.team )
+							{
+								base = bu;
+							}
+						}
+						if( base != null )
+						{
+							Unit u = new Unit( base.x, base.y, p );
+							units.add( u );
+							si.sendToAllClients( new Message( MessageType.UNITUPDATE, u ) );
 						}
 					}
-					if( base != null )
-						units.add( new Unit( base.x, base.y, p ) );
 				}
 			}
 			for( int i = 0; i < l.buildings.size(); i++ )
 			{
 				Building b = l.buildings.get( i );
-				b.update( this );
 				b.index = i;
-				si.sendToAllClients( new Message( MessageType.BUILDINGUPDATE, b ) );
+				if( b.update( this ) )
+				{
+					si.sendToAllClients( new Message( MessageType.BUILDINGUPDATE, b ) );
+				}
 			}
 		}
 		while( si.hasServerMessages() )
@@ -173,9 +193,9 @@ public class TacticServer
 			case BUILDUNIT:
 			{
 				Player player = players.get( m.sender );
-				if( player.money >= 100 )
+				if( player.money >= 10 )
 				{
-					player.money -= 100;
+					player.money -= 10;
 					si.sendToClient( m.sender, new Message( MessageType.PLAYERUPDATE, player ) );
 					Building base = null;
 					for( Building bu : l.buildings )
@@ -186,22 +206,29 @@ public class TacticServer
 						}
 					}
 					if( base != null )
-						units.add( new Unit( base.x, base.y, player ) );
+					{
+						Unit u = new Unit( base.x, base.y, player );
+						units.add( u );
+						si.sendToAllClients( new Message( MessageType.UNITUPDATE, u ) );
+					}
 				}
 				break;
 			}
 			case DISCONNECTED:
 			{
 				Player player = players.get( m.sender );
-				for( int i = 0; i < units.size(); i++ )
+				if( player != null )
 				{
-					Unit u = units.get( i );
-					if( u.owner == null || u.owner.id == player.id )
+					for( int i = 0; i < units.size(); i++ )
 					{
-						u.alive = false;
+						Unit u = units.get( i );
+						if( u.owner == null || u.owner.id == player.id )
+						{
+							u.alive = false;
+						}
 					}
+					players.remove( m.sender );
 				}
-				players.remove( m.sender );
 				break;
 			}
 			}
