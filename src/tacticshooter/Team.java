@@ -1,7 +1,11 @@
 package tacticshooter;
 
+import java.awt.Color;
+
 public class Team
 {
+	public static final Color[] teamColors = { Color.RED, Color.GREEN, Color.BLUE, Color.ORANGE };
+	
 	private static int onID = -1;
 	
 	private static int getID()
@@ -21,5 +25,10 @@ public class Team
 	public boolean equals( Team t )
 	{
 		return this.id == t.id;
+	}
+
+	public Color getColor() 
+	{
+		return teamColors[id];
 	}
 }

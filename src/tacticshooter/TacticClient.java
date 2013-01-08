@@ -12,6 +12,8 @@ import java.util.HashMap;
 import javax.swing.JOptionPane;
 import javax.vecmath.Point2i;
 
+import tacticshooter.Unit.UnitType;
+
 import com.esotericsoftware.minlog.Log;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DUI;
@@ -46,7 +48,9 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 	
 	DUI dui;
 	DButton switchTeams;
-	DButton buildUnit;
+	DButton buildLightUnit;
+	DButton buildHeavyUnit;
+	DButton buildSupplyUnit;
 	
 	public void initialize() 
 	{
@@ -78,8 +82,14 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 		switchTeams = new DButton( "Switch Teams", 0, getHeight()-50, 100, 50 );
 		dui.add( switchTeams );
 		
-		buildUnit = new DButton( "Build Unit", 100, getHeight()-50, 100, 50 );
-		dui.add( buildUnit );
+		buildLightUnit = new DButton( "Build Light Unit", 100, getHeight()-50, 100, 50 );
+		dui.add( buildLightUnit );
+		
+		buildHeavyUnit = new DButton( "Build Heavy Unit", 200, getHeight()-50, 100, 50 );
+		dui.add( buildHeavyUnit );
+		
+		buildSupplyUnit = new DButton( "Build Supply Unit", 300, getHeight()-50, 100, 50 );
+		dui.add( buildSupplyUnit );
 	}
 
 	public void update() 
@@ -298,9 +308,15 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 		if( e == switchTeams )
 		{
 			ci.sendToServer( new Message( MessageType.SWITCHTEAMS, player.team ) );
-		} else if( e == buildUnit )
+		} else if( e == buildLightUnit )
 		{
-			ci.sendToServer( new Message( MessageType.BUILDUNIT, null ) );
+			ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.LIGHT ) );
+		} else if( e == buildHeavyUnit )
+		{
+			ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.HEAVY ) );
+		} else if( e == buildSupplyUnit )
+		{
+			ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.SUPPLY ) );
 		}
 	}
 }

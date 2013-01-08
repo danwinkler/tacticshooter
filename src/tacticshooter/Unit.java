@@ -26,6 +26,7 @@ public class Unit implements Serializable
 	int health = 100;
 	boolean alive = true;
 	
+	UnitType type = UnitType.LIGHT;
 	UnitState state = UnitState.MOVING;
 	UnitState lastState = state;
 	float turnToAngle;
@@ -101,8 +102,8 @@ public class Unit implements Serializable
 					
 					float tangle = (float) Math.atan2( ny - y, nx - x );
 					heading += DMath.turnTowards( heading, tangle ) * .2f;
-					x += Math.cos( heading ) * 3;
-					y += Math.sin( heading ) * 3;
+					x += Math.cos( heading ) * type.speed;
+					y += Math.sin( heading ) * type.speed;
 				}
 			}
 			else
@@ -187,9 +188,9 @@ public class Unit implements Serializable
 					{
 						if( !l.hitwall( new Point2f( x, y ), new Vector2f( u.x - x, u.y - y ) ) )
 						{
-							float bangle = angletoguy + DMath.randomf( -.1f, .1f );
+							float bangle = angletoguy + DMath.randomf( -type.bulletSpread, type.bulletSpread );
 							ts.addBullet( this, bangle );
-							reloadtime = 5;
+							reloadtime = type.timeBetweenBullets;
 							break;
 						}
 					}
@@ -213,8 +214,12 @@ public class Unit implements Serializable
 			g.color( Color.BLUE );
 			g.g.drawRect( -5, -5, 10, 10 );
 		}
-		g.rotate( heading );
 		g.g.setColor( new Color( 1.f - health*.01f, health*.01f, 0 ) );
+		g.g.fillRect( -8, -8, (int)(16.f * health*.01f), 2 );
+		
+		g.rotate( heading );
+		
+		g.g.setColor( this.owner.team.getColor() );
 		g.g.fillOval( -5, -5, 10, 10 );
 		g.g.setColor( Color.BLACK );
 		g.g.drawOval( -5, -5, 10, 10 );
@@ -276,10 +281,35 @@ public class Unit implements Serializable
 		turnToAngle = (float) Math.atan2( -bullet.dy, -bullet.dx );
 	}
 	
+	public void setType( UnitType type )
+	{
+		this.type = type;
+	}
+	
 	public enum UnitState
 	{
 		MOVING,
 		TURNTO,
 		STOPPED;
+	}
+	
+	public enum UnitType
+	{
+		LIGHT( 3, 10, .05f, 10 ),
+		HEAVY( 1.5f, 3, .1f, 20  ),
+		SUPPLY( 2.5f, 10, .15f, 20 );
+		
+		float speed;
+		int timeBetweenBullets;
+		float bulletSpread;
+		int price;
+		
+		UnitType( float speed, int timeBetweenBullets, float bulletSpread, int price )
+		{
+			this.speed = speed;
+			this.timeBetweenBullets = timeBetweenBullets;
+			this.bulletSpread = bulletSpread;
+			this.price = price;
+		}
 	}
 }

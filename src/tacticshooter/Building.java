@@ -60,65 +60,69 @@ public class Building
 		Team[] teams = new Team[32]; //ugh ugly
 		int cc = 0;
 		int oc = 0;
-		for( Unit u : ts.units )
+		
+		if( isCapturable( ts.l ) )
 		{
-			float dx = u.x - x;
-			float dy = u.y - y;
-			float dist = (float) /*Math.sqrt*/( dx*dx + dy*dy );
+			for( Unit u : ts.units )
+			{
+				float dx = u.x - x;
+				float dy = u.y - y;
+				float dist = (float) /*Math.sqrt*/( dx*dx + dy*dy );
+				
+				if( dist < 50 * 50 )
+				{
+					teamcount[u.owner.team.id]++;
+					teams[u.owner.team.id] = u.owner.team;
+					if( t != null )
+					{
+						if( u.owner.team.id == t.id )
+						{
+							cc++;
+						}
+						else
+						{
+							oc++;
+						}
+					}
+					updateClient = true;
+				}
+			}
 			
-			if( dist < 50 * 50 )
+			if( cc > oc )
 			{
-				teamcount[u.owner.team.id]++;
-				teams[u.owner.team.id] = u.owner.team;
-				if( t != null )
+				if( hold < HOLDMAX )
 				{
-					if( u.owner.team.id == t.id )
-					{
-						cc++;
-					}
-					else
-					{
-						oc++;
-					}
+					hold += cc-oc;
+					if( hold > HOLDMAX )
+						hold = HOLDMAX;
 				}
-				updateClient = true;
-			}
-		}
-		
-		if( cc > oc )
-		{
-			if( hold < HOLDMAX )
+			} else if( oc > cc )
 			{
-				hold += cc-oc;
-				if( hold > HOLDMAX )
-					hold = HOLDMAX;
-			}
-		} else if( oc > cc )
-		{
-			hold -= oc-cc;
-			if( hold <= 0 )
-			{
-				t = null;
-			}
-		}
-		
-		if( t == null )
-		{
-			int max = DMath.max( teamcount );
-			int count = 0;
-			int index = 0;
-			for( int i = 0; i < teamcount.length; i++ )
-			{
-				if( teamcount[i] == max )
+				hold -= oc-cc;
+				if( hold <= 0 )
 				{
-					count++;
-					index = i;
+					t = null;
 				}
 			}
-			//Make sure there isn't a tie for number of people at the position.
-			if( count == 1 )
+			
+			if( t == null )
 			{
-				t = teams[index];
+				int max = DMath.max( teamcount );
+				int count = 0;
+				int index = 0;
+				for( int i = 0; i < teamcount.length; i++ )
+				{
+					if( teamcount[i] == max )
+					{
+						count++;
+						index = i;
+					}
+				}
+				//Make sure there isn't a tie for number of people at the position.
+				if( count == 1 )
+				{
+					t = teams[index];
+				}
 			}
 		}
 		return updateClient;
@@ -161,5 +165,20 @@ public class Building
 		{
 		
 		}
+	}
+
+	public boolean isCapturable( Level l ) 
+	{	
+		if( this.bt == BuildingType.CENTER )
+		{
+			for( Building b : l.buildings )
+			{
+				if( b.t != null && b.t.id == this.t.id && b.bt == BuildingType.POINT )
+				{
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 }

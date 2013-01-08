@@ -10,6 +10,7 @@ import org.newdawn.slick.util.pathfinding.AStarPathFinder;
 import org.newdawn.slick.util.pathfinding.PathFinder;
 
 import tacticshooter.Building.BuildingType;
+import tacticshooter.Unit.UnitType;
 
 import com.phyloa.dlib.util.DMath;
 
@@ -87,6 +88,30 @@ public class TacticServer
 					}
 					p.money += bc;
 					si.sendToClient( p.id, new Message( MessageType.PLAYERUPDATE, p ) );
+				}
+				
+				Building first = l.buildings.get( 0 );
+				boolean won = true;
+				for( int i = 1; i < l.buildings.size(); i++ )
+				{
+					if( l.buildings.get( i ).t.id != first.t.id )
+					{
+						won = false;
+						break;
+					}
+				}
+				
+				if( won )
+				{
+					//reset
+					//kill all guys
+					for( int i = 0; i < units.size(); i++ )
+					{
+						units.get( i ).alive = false;
+					}
+					//make new level
+					LevelBuilder.buildLevelB( l, a, b );
+					si.sendToAllClients( new Message( MessageType.LEVELUPDATE, l ) );
 				}
 			}
 			
@@ -193,9 +218,10 @@ public class TacticServer
 			case BUILDUNIT:
 			{
 				Player player = players.get( m.sender );
-				if( player.money >= 10 )
+				UnitType type = (UnitType)m.message;
+				if( player.money >= type.price )
 				{
-					player.money -= 10;
+					player.money -= type.price;
 					si.sendToClient( m.sender, new Message( MessageType.PLAYERUPDATE, player ) );
 					Building base = null;
 					for( Building bu : l.buildings )
@@ -208,6 +234,7 @@ public class TacticServer
 					if( base != null )
 					{
 						Unit u = new Unit( base.x, base.y, player );
+						u.setType( type );
 						units.add( u );
 						si.sendToAllClients( new Message( MessageType.UNITUPDATE, u ) );
 					}

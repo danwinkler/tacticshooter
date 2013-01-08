@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import javax.vecmath.Point2i;
 
-import org.newdawn.slick.util.pathfinding.Path;
+import tacticshooter.Unit.UnitType;
 
 import com.esotericsoftware.kryo.Kryo;
 
@@ -27,5 +27,6 @@ public class KryoHelper
 		k.register( Player.class );
 		k.register( Building.class );
 		k.register( Building.BuildingType.class );
+		k.register( UnitType.class );
 	}
 }

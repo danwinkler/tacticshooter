@@ -10,6 +10,7 @@ import com.esotericsoftware.kryonet.Connection;
 import com.phyloa.dlib.util.DMath;
 
 import tacticshooter.Unit.UnitState;
+import tacticshooter.Unit.UnitType;
 
 public class ComputerPlayer implements Runnable 
 {
@@ -75,7 +76,7 @@ public class ComputerPlayer implements Runnable
 						float closed2 = Float.MAX_VALUE;
 						for( Building b : l.buildings )
 						{
-							if( b.t == null || b.t.id != player.team.id )
+							if( b.t == null || b.t.id != player.team.id && b.isCapturable( l ) )
 							{
 								float dx = u.x-b.x;
 								float dy = u.y-b.y;
@@ -96,9 +97,9 @@ public class ComputerPlayer implements Runnable
 					}
 				}
 				
-				if( player.money > 10 )
+				if( player.money > 20 )
 				{
-					ci.sl.received( fc, new Message( MessageType.BUILDUNIT, null ) );
+					ci.sl.received( fc, new Message( MessageType.BUILDUNIT, UnitType.values()[DMath.randomi(0, UnitType.values().length)] ) );
 				}
 			}
 			
