@@ -34,7 +34,7 @@ public class LevelBuilder
 		{
 			for( int y = y1; y <= y2; y++ )
 			{
-				l.tiles[x1][y] = val;
+				setTile( l, x1, y, val );
 			}
 			return;
 		}
@@ -44,7 +44,7 @@ public class LevelBuilder
 		int y = y1;
 		for( int x = x1; x <= x2; x++ )
 		{
-			l.tiles[x][y] = val;
+			setTile( l, x, y, val );
 			if( y == y2 && x == x2 ) break;
 			error += derr;
 			while( error > .5f )
@@ -53,7 +53,7 @@ public class LevelBuilder
 				error -= 1;
 				if( error > .5f )
 				{
-					l.tiles[x][y] = val;
+					setTile( l, x, y, val );
 				}
 			}
 		}
@@ -87,7 +87,7 @@ public class LevelBuilder
 		{
 			for( int xx = x; xx < x+width; xx++ )
 			{
-				l.tiles[xx][yy] = val;
+				setTile( l, xx, yy, val );
 			}
 		}
 	}
@@ -105,8 +105,15 @@ public class LevelBuilder
 		fillBox( l, 10, 10, l.width-20, l.height-20, 1 );
 	}
 	
+	public static void setTile( Level l, int x, int y, int val )
+	{
+		if( x > 0 && x < l.width && y > 0 && y < l.height )
+			l.tiles[x][y] = val;
+	}
+	
 	public static void buildLevelB( Level l, Team a, Team b )
 	{
+		l.buildings.clear();
 		for( int y = 0; y < l.height; y++ )
 		{
 			for( int x = 0; x < l.width; x++ )
@@ -123,7 +130,7 @@ public class LevelBuilder
 		
 		int roomcount = 5;
 		
-		int[][] boxes = new int[roomcount][4];
+		int[][] boxes = new int[roomcount*2][4];
 		for( int i = 0; i < roomcount; i++ )
 		{
 			boxes[i][2] = DMath.randomi( 6, 15 ); //width
@@ -133,12 +140,21 @@ public class LevelBuilder
 			
 			l.buildings.add( new Building( (boxes[i][0]+boxes[i][2]/2) * l.tileSize, (boxes[i][1]+boxes[i][3]/2) * l.tileSize, BuildingType.POINT, null ) );
 		}
+		for( int i = roomcount; i < roomcount*2; i++ )
+		{
+			boxes[i][2] = boxes[i-roomcount][2]; //width
+			boxes[i][3] = boxes[i-roomcount][3]; //height
+			boxes[i][0] = l.width - boxes[i-roomcount][0]; //x
+			boxes[i][1] = l.height - boxes[i-roomcount][1]; //y
+			
+			l.buildings.add( new Building( (boxes[i][0]+boxes[i][2]/2) * l.tileSize, (boxes[i][1]+boxes[i][3]/2) * l.tileSize, BuildingType.POINT, null ) );
+		}
 		
-		for( int i = 0; i < roomcount; i++ )
+		for( int i = 0; i < boxes.length; i++ )
 		{
 			fillBox( l, boxes[i][0], boxes[i][1], boxes[i][2], boxes[i][3], 0 );
 			int j = i+1;
-			if( j < roomcount )
+			if( j < boxes.length )
 			{
 				for( int y = 0; y < 2; y++ )
 				{

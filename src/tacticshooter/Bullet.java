@@ -65,6 +65,7 @@ public class Bullet implements Serializable
 				{
 					u.hit( this );
 					alive = false;
+					break;
 				}
 			}
 		}
@@ -100,9 +101,13 @@ public class Bullet implements Serializable
 			{
 				p.x = u.x;
 				p.y = u.y;
-				if( DMath.pointToLineSegment( l1, dir, p ).lengthSquared() < Unit.radius * Unit.radius )
+				Vector2f sect = DMath.pointToLineSegment( l1, dir, p );
+				if( sect.lengthSquared() < Unit.radius * Unit.radius )
 				{
 					alive = false;
+					for( int i = 0; i < 5; i++ )
+						ts.ps.add( new TacticClient.BloodParticle( p.x, p.y, dx, dy ) );
+					break;
 				}
 			}
 		}

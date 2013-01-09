@@ -7,7 +7,7 @@ public class Player
 	int id;
 	Team team;
 	int money;
-	int respawn = MAX_RESPAWN;
+	int respawn = 0;
 	
 	public Player()
 	{

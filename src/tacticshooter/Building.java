@@ -2,6 +2,7 @@ package tacticshooter;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 
 import tacticshooter.Building.BuildingType;
@@ -60,6 +61,33 @@ public class Building
 		Team[] teams = new Team[32]; //ugh ugly
 		int cc = 0;
 		int oc = 0;
+		
+		//FOR HEALZ
+		if( bt == BuildingType.POINT )
+		{
+			for( Unit u : ts.units )
+			{
+				float dx = u.x - x;
+				float dy = u.y - y;
+				float dist = (float) /*Math.sqrt*/( dx*dx + dy*dy );
+				
+				if( dist < 50 * 50 )
+				{
+					teamcount[u.owner.team.id]++;
+					teams[u.owner.team.id] = u.owner.team;
+					if( t != null )
+					{
+						if( u.owner.team.id == t.id )
+						{
+							if( u.health < 100 )
+							{
+								u.health += .1f;
+							}
+						}
+					}
+				}
+			}
+		}
 		
 		if( isCapturable( ts.l ) )
 		{

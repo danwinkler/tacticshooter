@@ -39,6 +39,8 @@ public class TacticServer
 	Team a = new Team();
 	Team b = new Team();
 	
+	boolean onTeam = false;
+	
 	public TacticServer( ServerInterface si )
 	{
 		this.si = si;
@@ -91,27 +93,37 @@ public class TacticServer
 				}
 				
 				Building first = l.buildings.get( 0 );
-				boolean won = true;
-				for( int i = 1; i < l.buildings.size(); i++ )
+				if( first.t != null )
 				{
-					if( l.buildings.get( i ).t.id != first.t.id )
+					boolean won = true;
+					for( int i = 1; i < l.buildings.size(); i++ )
 					{
-						won = false;
-						break;
+						Team test = l.buildings.get( i ).t;
+						if( test != null && test.id != first.t.id )
+						{
+							won = false;
+							break;
+						}
 					}
-				}
-				
-				if( won )
-				{
-					//reset
-					//kill all guys
-					for( int i = 0; i < units.size(); i++ )
+					
+					if( won )
 					{
-						units.get( i ).alive = false;
+						//reset
+						//kill all guys
+						for( int i = 0; i < units.size(); i++ )
+						{
+							units.get( i ).alive = false;
+						}
+						for( Entry<Integer, Player> e : players.entrySet() )
+						{
+							Player p = e.getValue();
+							p.money = 0;
+							si.sendToClient( p.id, new Message( MessageType.PLAYERUPDATE, p ) );
+						}
+						//make new level
+						LevelBuilder.buildLevelB( l, a, b );
+						si.sendToAllClients( new Message( MessageType.LEVELUPDATE, l ) );
 					}
-					//make new level
-					LevelBuilder.buildLevelB( l, a, b );
-					si.sendToAllClients( new Message( MessageType.LEVELUPDATE, l ) );
 				}
 			}
 			
@@ -172,7 +184,8 @@ public class TacticServer
 			case CLIENTJOIN:
 			{
 				Player player = new Player( m.sender );
-				player.team = Math.random() > .5 ? a : b;
+				player.team = onTeam ? a : b;
+				onTeam = !onTeam;
 				players.put( m.sender, player );
 				
 				si.sendToClient( m.sender, new Message( MessageType.PLAYERUPDATE, player ) );
@@ -202,6 +215,7 @@ public class TacticServer
 			{
 				Team t = (Team)m.message;
 				Player player = players.get( m.sender );
+				player.respawn = 0;
 				player.team = t.id == a.id ? b : a;
 				
 				for( Unit u : units )

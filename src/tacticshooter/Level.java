@@ -86,7 +86,7 @@ public class Level implements Serializable, TileBasedMap
 
 	public boolean blocked( Mover m, int x, int y ) 
 	{
-		return tiles[x][y] == 1;
+		return getTile( x, y ) == 1;
 	}
 
 	public float getCost( Mover m, int x, int y, int tx, int ty ) 
@@ -209,7 +209,7 @@ public class Level implements Serializable, TileBasedMap
 			if( tMaxX < tMaxY )
 			{
 				cx = cx + stepX;
-				if( l.tiles[cx][cy] != 0 )
+				if( getTile( cx, cy ) != 0 )
 				{
 					hitTile = true;
 					break;
@@ -224,7 +224,7 @@ public class Level implements Serializable, TileBasedMap
 			else
 			{
 				cy = cy + stepY;
-				if( l.tiles[cx][cy] != 0 )
+				if( getTile( cx, cy ) != 0 )
 				{
 					hitTile = true;
 					break;
@@ -248,5 +248,14 @@ public class Level implements Serializable, TileBasedMap
 		 */
 
 		return hitTile && tResult < 1;
+	}
+	
+	public int getTile( int x, int y )
+	{
+		if( x < 0 || x >= width || y < 0 || y >= height )
+		{
+			return 1;
+		}
+		return tiles[x][y];
 	}
 }

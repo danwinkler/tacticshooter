@@ -23,7 +23,7 @@ public class Unit implements Serializable
 	float x;
 	float y; 
 	float heading;
-	int health = 100;
+	float health = 100;
 	boolean alive = true;
 	
 	UnitType type = UnitType.LIGHT;
@@ -41,6 +41,8 @@ public class Unit implements Serializable
 	int reloadtime = 0;
 	
 	Player killer;
+	
+	boolean update = false;
 	
 	//CLIENT ONLY
 	boolean selected = false;
@@ -198,8 +200,9 @@ public class Unit implements Serializable
 			}
 		}
 		
-		boolean sendToClient = state != UnitState.STOPPED || lastState == state;
+		boolean sendToClient = state != UnitState.STOPPED || lastState == state || update;
 		lastState = state;
+		update = false;
 		return sendToClient;
 	}
 	
@@ -214,7 +217,7 @@ public class Unit implements Serializable
 			g.color( Color.BLUE );
 			g.g.drawRect( -5, -5, 10, 10 );
 		}
-		g.g.setColor( new Color( 1.f - health*.01f, health*.01f, 0 ) );
+		g.g.setColor( new Color( DMath.bound( 1.f - health*.01f, 0, 1 ), DMath.bound(health*.01f, 0, 1 ), 0 ) );
 		g.g.fillRect( -8, -8, (int)(16.f * health*.01f), 2 );
 		
 		g.rotate( heading );
@@ -276,6 +279,7 @@ public class Unit implements Serializable
 		{
 			alive = false;
 			killer = bullet.owner;
+			bullet.owner.money++;
 		}
 		state = UnitState.TURNTO;
 		turnToAngle = (float) Math.atan2( -bullet.dy, -bullet.dx );

@@ -21,6 +21,7 @@ import com.phyloa.dlib.dui.DUIElement;
 import com.phyloa.dlib.dui.DUIEvent;
 import com.phyloa.dlib.dui.DUIListener;
 import com.phyloa.dlib.renderer.Graphics2DRenderer;
+import com.phyloa.dlib.util.DMath;
 
 public class TacticClient extends Graphics2DRenderer implements MouseListener, MouseMotionListener, DUIListener
 {
@@ -51,6 +52,8 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 	DButton buildLightUnit;
 	DButton buildHeavyUnit;
 	DButton buildSupplyUnit;
+	
+	ParticleSystem ps = new ParticleSystem();
 	
 	public void initialize() 
 	{
@@ -198,6 +201,9 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 			b.render( g );
 		}
 		
+		ps.update();
+		ps.render( this );
+		
 		if( selecting )
 		{
 			g.setColor( Color.BLUE );
@@ -318,5 +324,26 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 		{
 			ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.SUPPLY ) );
 		}
+	}
+	
+	public static class BloodParticle extends Particle
+	{
+		public BloodParticle( float x, float y, float dx, float dy )
+		{
+			this.x = x;
+			this.y = y;
+			float angle = (float)Math.atan2( dy, dx ) + DMath.PIF;
+			angle += DMath.randomf( -.5f, .5f );
+			this.dx = DMath.cosf( angle ) * 2;
+			this.dy = DMath.sinf( angle ) * 2;
+			life = 10;
+		}
+
+		public void render( Graphics2DRenderer g )
+		{
+			g.g.setColor( Color.red );
+			g.line( x - dx*3, y-dy*3, x+dx*3, y+dy*3 );
+		}
+		
 	}
 }
