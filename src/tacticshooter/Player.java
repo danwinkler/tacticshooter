@@ -8,6 +8,7 @@ public class Player
 	Team team;
 	int money;
 	int respawn = 0;
+	boolean isBot = false;
 	
 	public Player()
 	{

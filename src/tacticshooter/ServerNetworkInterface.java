@@ -11,6 +11,16 @@ import com.esotericsoftware.kryonet.Server;
 
 public class ServerNetworkInterface implements ServerInterface 
 {
+	public static final boolean DEBUG = true;
+	static int[] messageCount;
+	
+	static {
+		if( DEBUG )
+		{
+			messageCount = new int[MessageType.values().length];
+		}
+	}
+	
 	Server server;
 	LinkedList<Message> messages = new LinkedList<Message>();
 	HashMap<Integer, Connection> connections = new HashMap<Integer, Connection>();
@@ -19,7 +29,7 @@ public class ServerNetworkInterface implements ServerInterface
 	
 	public ServerNetworkInterface()
 	{
-		server = new Server( 128000, 32000 );
+		server = new Server( 256000, 32000 );
 		KryoHelper.register( server.getKryo() );
 		server.start();
 		try {
@@ -35,7 +45,13 @@ public class ServerNetworkInterface implements ServerInterface
 	{
 		Connection c = connections.get( id );
 		if( c != null )
+		{
 			c.sendTCP( m );
+			if( DEBUG )
+			{
+				messageCount[m.messageType.ordinal()]++;
+			}
+		}
 	}
 
 	public void sendToAllClients( Message m ) 
@@ -43,6 +59,10 @@ public class ServerNetworkInterface implements ServerInterface
 		for( int i = 0; i < connectionsArr.size(); i++ )
 		{
 			connectionsArr.get( i ).sendTCP( m );
+			if( DEBUG )
+			{
+				messageCount[m.messageType.ordinal()]++;
+			}
 		}
 	}
 
@@ -91,6 +111,20 @@ public class ServerNetworkInterface implements ServerInterface
 				connections.remove( c.getID() );
 				connectionsArr.remove( c );
 			}
+		}
+	}
+	
+	public void printDebug()
+	{
+		if( DEBUG )
+		{
+			System.out.println( "MESSAGETYPE BREAKDOWN" );
+			for( MessageType t : MessageType.values() )
+			{
+				System.out.println( t.name() + " " + messageCount[t.ordinal()] );
+			}
+			System.out.println( "-------------------------" );
+			System.out.println( "" );
 		}
 	}
 }

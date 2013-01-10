@@ -1,8 +1,12 @@
 package tacticshooter;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map.Entry;
 
 import javax.vecmath.Point2i;
 
@@ -31,7 +35,7 @@ public class ComputerPlayer implements Runnable
 	
 	public void run() 
 	{
-		ci.sl.received( fc, new Message( MessageType.CLIENTJOIN, null ) );
+		ci.sl.received( fc, new Message( MessageType.CLIENTJOIN, "BOT_A" ) );
 		while( true )
 		{
 			while( fc.hasClientMessages() )
@@ -62,6 +66,8 @@ public class ComputerPlayer implements Runnable
 						Building building = (Building)m.message;
 						l.buildings.set( building.index, building );
 					}
+					break;
+				case PLAYERLIST:
 					break;
 				}
 			}

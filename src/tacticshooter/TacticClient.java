@@ -175,6 +175,7 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 		for( int i = 0; i < units.size(); i++ )
 		{
 			Unit u = units.get( i );
+			u.clientUpdate( this );
 			if( !u.alive )
 			{
 				units.remove( i );

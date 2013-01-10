@@ -28,5 +28,6 @@ public class KryoHelper
 		k.register( Building.class );
 		k.register( Building.BuildingType.class );
 		k.register( UnitType.class );
+		k.register( Player[].class );
 	}
 }

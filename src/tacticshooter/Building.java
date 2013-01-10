@@ -12,6 +12,8 @@ import com.phyloa.dlib.util.DMath;
 
 public class Building
 {
+	public static final int UPDATE_TIME = 5;
+	
 	Team t;
 	BuildingType bt;
 	int x;
@@ -24,6 +26,8 @@ public class Building
 	int hold = 0;
 	
 	int index;
+	
+	int updateCountdown = 0;
 	
 	public Building()
 	{
@@ -153,6 +157,19 @@ public class Building
 				}
 			}
 		}
+		
+		//To keep Unit updates from getting out of hand
+		if( updateCountdown > 0 )
+		{
+			updateCountdown--;
+			return false;
+		}
+		
+		if( updateClient )
+		{
+			updateCountdown = UPDATE_TIME;
+		}
+		
 		return updateClient;
 	}
 	

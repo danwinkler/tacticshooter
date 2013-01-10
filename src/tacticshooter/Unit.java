@@ -18,8 +18,12 @@ import com.phyloa.dlib.util.DMath;
 public class Unit implements Serializable
 {
 	public static int radius = 10;
+	public static final int UPDATE_TIME = 3;
 	
 	int id = (int) (Math.random() * Integer.MAX_VALUE);
+	
+	float sx, sy;
+	
 	float x;
 	float y; 
 	float heading;
@@ -41,6 +45,8 @@ public class Unit implements Serializable
 	int reloadtime = 0;
 	
 	Player killer;
+	
+	int updateCountdown = 0;
 	
 	boolean update = false;
 	
@@ -200,10 +206,37 @@ public class Unit implements Serializable
 			}
 		}
 		
+		//To keep Unit updates from getting out of hand
+		if( updateCountdown > 0 )
+		{
+			updateCountdown--;
+			return false;
+		}
+		
 		boolean sendToClient = state != UnitState.STOPPED || lastState == state || update;
 		lastState = state;
 		update = false;
+		if( sendToClient )
+		{
+			updateCountdown = UPDATE_TIME;
+		}
 		return sendToClient;
+	}
+	
+	public void clientUpdate( TacticClient tc )
+	{
+		//Predictive Movement
+		if( state == UnitState.MOVING )
+		{
+			x += DMath.cosf( heading ) * type.speed;
+			y += DMath.sinf( heading ) * type.speed;
+		}
+		
+		//Movement Smoothing
+		float dsx = sx - x;
+		float dsy = sy - y;
+		x += dsx * .2f;
+		y += dsy * .2f;
 	}
 	
 	public void render( TacticClient g )
@@ -228,15 +261,6 @@ public class Unit implements Serializable
 		g.g.drawOval( -5, -5, 10, 10 );
 		g.line( 0, 0, 5, 0 );
 		g.popMatrix();
-		/*
-		g.setColor( Color.BLACK );
-		for( int i = 0; i < path.size()-1; i++ )
-		{
-			Point2i p1 = path.get( i );
-			Point2i p2 = path.get( i+1 );
-			g.drawLine( p1.x*Level.tileSize+15, p1.y*Level.tileSize+15, p2.x*Level.tileSize+15, p2.y*Level.tileSize+15 );
-		}
-		*/
 	}
 	
 	public void pathTo( int tx, int ty, TacticServer ts )
@@ -262,14 +286,16 @@ public class Unit implements Serializable
 	{
 		assert( u.id == this.id );
 		
-		this.x = u.x;
-		this.y = u.y;
+		this.sx = u.x;
+		this.sy = u.y;
 		this.destx = u.destx;
 		this.desty = u.desty;
 		this.path = u.path;
 		this.alive = u.alive;
 		this.heading = u.heading;
 		this.health = u.health;
+		this.type = u.type;
+		this.state = u.state;
 	}
 
 	public void hit( Bullet bullet )

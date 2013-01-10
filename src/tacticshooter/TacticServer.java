@@ -1,6 +1,8 @@
 package tacticshooter;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -72,13 +74,16 @@ public class TacticServer
 			lastTick += 100;
 			tick++;
 			
-			
 			//Every 100 ticks
 			if( tick % 100 == 0 )
 			{
+				((ServerNetworkInterface)si).printDebug();
+				Player[] playerArr = new Player[players.entrySet().size()];
+				int pi = 0;
 				for( Entry<Integer, Player> e : players.entrySet() )
 				{
 					Player p = e.getValue();
+					playerArr[pi++] = p;
 					int bc = 0;
 					for( int i = 0; i < l.buildings.size(); i++ )
 					{
@@ -91,6 +96,56 @@ public class TacticServer
 					p.money += bc;
 					si.sendToClient( p.id, new Message( MessageType.PLAYERUPDATE, p ) );
 				}
+				
+				HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
+				for( int i = 0; i < playerArr.length; i++ )
+				{
+					Player p = playerArr[i];
+					if( !map.containsKey( p.team.id ) )
+					{
+						map.put( p.team.id, 0 );
+					}
+					int a = map.get( p.team.id );
+					a++;
+					map.put( p.team.id, a );
+				}
+				ArrayList<Entry<Integer, Integer>> list = new ArrayList<Entry<Integer, Integer>>();
+				for( Entry<Integer, Integer> e : map.entrySet() )
+				{
+					list.add( e );
+				}
+				Collections.sort( list, new Comparator<Entry<Integer, Integer>>() {
+					public int compare( Entry<Integer, Integer> arg0, Entry<Integer, Integer> arg1 )
+					{
+						return arg1.getValue() - arg0.getValue();
+					} 
+				} );
+				System.out.println( list );
+				if( list.get( 0 ).getValue() - list.get( 1 ).getValue() > 1 )
+				{
+					for( int i = 0; i < playerArr.length; i++ )
+					{
+						Player player = playerArr[i];
+						if( player.isBot && player.team.id == list.get( 0 ).getKey() )
+						{
+							player.respawn = 0;
+							player.team = player.team.id == a.id ? b : a;
+							
+							for( Unit u : units )
+							{
+								if( u.owner == null || u.owner.id == player.id )
+								{
+									u.alive = false;
+								}
+							}
+							
+							si.sendToClient( player.id, new Message( MessageType.PLAYERUPDATE, player ) );
+							break;
+						}
+					}
+				}
+				
+				si.sendToAllClients( new Message( MessageType.PLAYERLIST, playerArr ) );
 				
 				Building first = l.buildings.get( 0 );
 				if( first.t != null )
@@ -184,6 +239,14 @@ public class TacticServer
 			case CLIENTJOIN:
 			{
 				Player player = new Player( m.sender );
+				if( m.message != null )
+				{
+					String name = (String)m.message;
+					if( name.startsWith( "BOT" ) )
+					{
+						player.isBot = true;
+					}
+				}
 				player.team = onTeam ? a : b;
 				onTeam = !onTeam;
 				players.put( m.sender, player );
@@ -278,7 +341,7 @@ public class TacticServer
 		for( int i = 0; i < units.size(); i++ )
 		{
 			Unit u = units.get( i );
-			if( u.update( this ) )
+			if( u.update( this ) || !u.alive )
 			{
 				si.sendToAllClients( new Message( MessageType.UNITUPDATE, u ) );
 			}
