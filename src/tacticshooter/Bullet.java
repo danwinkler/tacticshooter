@@ -8,6 +8,7 @@ import javax.vecmath.Point2f;
 import javax.vecmath.Point2i;
 import javax.vecmath.Vector2f;
 
+import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
 import com.phyloa.dlib.util.DMath;
@@ -79,7 +80,7 @@ public class Bullet implements Serializable
 		}
 	}
 	
-	public void clientUpdate( TacticClient ts, float d )
+	public void clientUpdate( TacticClient ts, float d, GameContainer gc )
 	{
 		Level l = ts.l;
 		lx = x;
@@ -109,6 +110,7 @@ public class Bullet implements Serializable
 					alive = false;
 					//for( int i = 0; i < 5; i++ )
 						//ts.ps.add( new TacticClient.BloodParticle( p.x, p.y, dx, dy ) );
+					ts.hit1.play( DMath.randomf( .9f, 1.1f ), ts.getSoundMag( gc, x, y ) );
 					break;
 				}
 			}

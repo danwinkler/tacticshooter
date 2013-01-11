@@ -20,6 +20,7 @@ import tacticshooter.Unit.UnitType;
 import com.aem.sticky.StickyListener;
 import com.aem.sticky.button.Button;
 import com.aem.sticky.button.SimpleButton;
+import com.aem.sticky.button.events.ButtonListener;
 import com.aem.sticky.button.events.ClickListener;
 import com.esotericsoftware.minlog.Log;
 import com.phyloa.dlib.dui.DUI;
@@ -61,7 +62,7 @@ public class TacticClient extends BasicGame
 
     StickyListener listener;
 	
-	Sound bullet1, bullet2, ping1, death1, death2;
+	Sound bullet1, bullet2, ping1, death1, death2, hit1;
 	
 	Input input;
 	
@@ -98,16 +99,23 @@ public class TacticClient extends BasicGame
 		ping1 = new Sound( "sound/ping1.wav" );
 		death1 = new Sound( "sound/death1.wav" );
 		death2 = new Sound( "sound/death2.wav" );
+		hit1 = new Sound( "sound/hit1.wav" );
 		
 		switchTeams = new SimpleButton( new Rectangle(0, gc.getHeight()-100, 200, 100), button, button, ping1 );
 		buildLightUnit = new SimpleButton( new Rectangle(200, gc.getHeight()-100, 200, 100), button, button, ping1 );
 		buildHeavyUnit = new SimpleButton( new Rectangle(400, gc.getHeight()-100, 200, 100), button, button, ping1 );
 		buildSupplyUnit = new SimpleButton( new Rectangle(600, gc.getHeight()-100, 200, 100), button, button, ping1 );
 		
+		listener.add( switchTeams );
+		listener.add( buildLightUnit );
+		listener.add( buildHeavyUnit );
+		listener.add( buildSupplyUnit );
+		
 		switchTeams.addListener( new ClickListener() {
 			public void onClick( Button b, float mx, float my )
 			{
 				ci.sendToServer( new Message( MessageType.SWITCHTEAMS, player.team ) );
+				System.out.println( "Button occupied" );
 			}
 			public void onDoubleClick( Button b, float mx, float my )
 			{
@@ -242,7 +250,7 @@ public class TacticClient extends BasicGame
 		for( int i = 0; i < bullets.size(); i++ )
 		{
 			Bullet b = bullets.get( i );
-			b.clientUpdate( this, d );
+			b.clientUpdate( this, d, gc );
 			if( !b.alive )
 			{
 				bulletMap.remove( b );
@@ -331,6 +339,7 @@ public class TacticClient extends BasicGame
 
 	public void mousePressed( int button, int x, int y )
 	{
+		super.mousePressed( button, x, y );
 		if( button == Input.MOUSE_LEFT_BUTTON )
 		{
 			sx = x + scrollx;
@@ -352,6 +361,7 @@ public class TacticClient extends BasicGame
 
 	public void mouseReleased( int button, int x, int y )
 	{
+		super.mouseReleased( button, x, y );
 		if( button == Input.MOUSE_LEFT_BUTTON )
 		{
 			selected.clear();
@@ -374,6 +384,7 @@ public class TacticClient extends BasicGame
 
 	public void mouseDragged( int oldx, int oldy, int newx, int newy )
 	{
+		super.mouseDragged( oldx, oldy, newx, newy );
 		if( input.isMouseButtonDown( Input.MOUSE_LEFT_BUTTON ) )
 		{
 			sx2 = newx+scrollx;
