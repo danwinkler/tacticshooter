@@ -50,6 +50,11 @@ public class Building
 		g.translate( x, y );
 		g.color( 0, 255, 0 );
 		g.drawRect( -width/2, -height/2, width, height );
+		
+		g.color( 0, 0, 255, 128 );
+		
+		g.drawOval( -50, -50, 100, 100 );
+		
 		g.color( Color.black );
 		g.g.drawString( "Team: " + (t != null ? t.id : "empty"), -15, -15 );
 		g.g.drawString( "Hold: " + hold, -15, 0 );

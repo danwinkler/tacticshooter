@@ -305,7 +305,7 @@ public class Unit implements Serializable
 		{
 			alive = false;
 			killer = bullet.owner;
-			bullet.owner.money++;
+			bullet.owner.money += 2;
 		}
 		state = UnitState.TURNTO;
 		turnToAngle = (float) Math.atan2( -bullet.dy, -bullet.dx );

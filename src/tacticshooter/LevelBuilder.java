@@ -135,8 +135,8 @@ public class LevelBuilder
 		{
 			boxes[i][2] = DMath.randomi( 6, 15 ); //width
 			boxes[i][3] = DMath.randomi( 6, 15 ); //height
-			boxes[i][0] = DMath.randomi( 1, l.width - boxes[i][2] ); //x
-			boxes[i][1] = DMath.randomi( 1, l.height - boxes[i][3] ); //y
+			boxes[i][0] = DMath.randomi( 5, (l.width - boxes[i][2]) - 5 ); //x
+			boxes[i][1] = DMath.randomi( 5, (l.height - boxes[i][3]) - 5 ); //y
 			
 			l.buildings.add( new Building( (boxes[i][0]+boxes[i][2]/2) * l.tileSize, (boxes[i][1]+boxes[i][3]/2) * l.tileSize, BuildingType.POINT, null ) );
 		}

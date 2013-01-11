@@ -1,14 +1,16 @@
 package tacticshooter;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JOptionPane;
 import javax.vecmath.Point2i;
 
@@ -55,6 +57,8 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 	
 	ParticleSystem ps = new ParticleSystem();
 	
+	int b1s, b2s;
+	
 	public void initialize() 
 	{
 		Log.set( Log.LEVEL_TRACE );
@@ -93,6 +97,9 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 		
 		buildSupplyUnit = new DButton( "Build Supply Unit", 300, getHeight()-50, 100, 50 );
 		dui.add( buildSupplyUnit );
+		
+		b1s = SoundPlayer.load( "sound/bullet1.wav" );
+		b2s = SoundPlayer.load( "sound/bullet2.wav" );
 	}
 
 	public void update() 
@@ -124,6 +131,9 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 				{
 					bulletMap.put( b.id, b );
 					bullets.add( b );
+					float dx = b.x - (scrollx+getWidth()/2);
+					float dy = b.y - (scrolly+getHeight()/2);
+					SoundPlayer.play( Math.random() > .5 ? b1s : b2s, dx, 0, dy );
 					tb = b;
 				}
 				tb.sync( b );
@@ -159,6 +169,8 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 		if( scrolly+getHeight() - 50 < l.height*l.tileSize && (k.down || k.s) ) scrolly+=10;
 		if( scrollx > 0 && (k.left || k.a) ) scrollx-=10;
 		if( scrollx+getWidth() < l.width*l.tileSize && (k.right || k.d) ) scrollx+=10;
+		
+		SoundPlayer.setPosition( scrollx, 0, scrolly );
 		
 		g.setColor( Color.WHITE );
 		g.fillRect( 0, 0, getWidth(), getHeight() );
