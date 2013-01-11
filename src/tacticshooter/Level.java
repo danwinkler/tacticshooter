@@ -7,9 +7,11 @@ import java.util.ArrayList;
 import javax.vecmath.Point2f;
 import javax.vecmath.Vector2f;
 
+import org.newdawn.slick.Graphics;
 import org.newdawn.slick.util.pathfinding.Mover;
 import org.newdawn.slick.util.pathfinding.TileBasedMap;
 
+import com.phyloa.dlib.renderer.Graphics2DIRenderer;
 import com.phyloa.dlib.renderer.Graphics2DRenderer;
 import com.phyloa.dlib.util.DMath;
 
@@ -39,7 +41,7 @@ public class Level implements Serializable, TileBasedMap
 		visited = new int[width][height];
 	}
 	
-	public void render( Graphics2DRenderer g )
+	public void render( Graphics g )
 	{
 		for( int y = 0; y < height; y++ )
 		{

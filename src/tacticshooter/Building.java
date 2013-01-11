@@ -1,12 +1,15 @@
 package tacticshooter;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 
+import org.newdawn.slick.Color;
+import org.newdawn.slick.Graphics;
+
 import tacticshooter.Building.BuildingType;
 
+import com.phyloa.dlib.renderer.Graphics2DIRenderer;
 import com.phyloa.dlib.renderer.Graphics2DRenderer;
 import com.phyloa.dlib.util.DMath;
 
@@ -44,22 +47,22 @@ public class Building
 			hold = HOLDMAX;
 	}
 
-	public void render( Graphics2DRenderer g )
+	public void render( Graphics g )
 	{
-		g.pushMatrix();
+		g.pushTransform();
 		g.translate( x, y );
-		g.color( 0, 255, 0 );
+		g.setColor( Color.green );
 		g.drawRect( -width/2, -height/2, width, height );
 		
-		g.color( 0, 0, 255, 128 );
+		g.setColor( new Color( 0, 0, 255, 128 ) );
 		
 		g.drawOval( -50, -50, 100, 100 );
 		
-		g.color( Color.black );
-		g.g.drawString( "Team: " + (t != null ? t.id : "empty"), -15, -15 );
-		g.g.drawString( "Hold: " + hold, -15, 0 );
-		g.g.drawString( bt.name(), -15, 15 );
-		g.popMatrix();
+		g.setColor( Color.black );
+		g.drawString( "Team: " + (t != null ? t.id : "empty"), -15, -15 );
+		g.drawString( "Hold: " + hold, -15, 0 );
+		g.drawString( bt.name(), -15, 15 );
+		g.popTransform();
 	}
 	
 	public boolean update( TacticServer ts )

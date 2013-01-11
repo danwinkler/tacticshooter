@@ -1,7 +1,5 @@
 package tacticshooter;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -9,6 +7,8 @@ import javax.vecmath.Point2f;
 import javax.vecmath.Point2i;
 import javax.vecmath.Vector2f;
 
+import org.newdawn.slick.Color;
+import org.newdawn.slick.Graphics;
 import org.newdawn.slick.util.pathfinding.Path;
 import org.newdawn.slick.util.pathfinding.Path.Step;
 
@@ -223,44 +223,45 @@ public class Unit implements Serializable
 		return sendToClient;
 	}
 	
-	public void clientUpdate( TacticClient tc )
+	public void clientUpdate( TacticClient tc, float d )
 	{
+		
 		//Predictive Movement
 		if( state == UnitState.MOVING )
 		{
-			x += DMath.cosf( heading ) * type.speed;
-			y += DMath.sinf( heading ) * type.speed;
+			x += DMath.cosf( heading ) * type.speed * d;
+			y += DMath.sinf( heading ) * type.speed * d;
 		}
 		
 		//Movement Smoothing
 		float dsx = sx - x;
 		float dsy = sy - y;
-		x += dsx * .2f;
-		y += dsy * .2f;
+		x += dsx * .2f * d;
+		y += dsy * .2f * d;
 	}
 	
-	public void render( TacticClient g )
+	public void render( Graphics g )
 	{
-		g.pushMatrix();
+		g.pushTransform();
 		g.translate( x, y );
-		g.g.setColor( Color.BLACK );
-		g.g.drawString( owner.id + "", 0, -10 );
+		g.setColor( Color.black );
+		g.drawString( owner.id + "", 0, -10 );
 		if( selected )
 		{
-			g.color( Color.BLUE );
-			g.g.drawRect( -5, -5, 10, 10 );
+			g.setColor( Color.blue );
+			g.drawRect( -5, -5, 10, 10 );
 		}
-		g.g.setColor( new Color( DMath.bound( 1.f - health*.01f, 0, 1 ), DMath.bound(health*.01f, 0, 1 ), 0 ) );
-		g.g.fillRect( -8, -8, (int)(16.f * health*.01f), 2 );
+		g.setColor( new Color( DMath.bound( 1.f - health*.01f, 0, 1 ), DMath.bound(health*.01f, 0, 1 ), 0 ) );
+		g.fillRect( -8, -8, (int)(16.f * health*.01f), 2 );
 		
-		g.rotate( heading );
+		g.rotate( 0, 0, heading );
 		
-		g.g.setColor( this.owner.team.getColor() );
-		g.g.fillOval( -5, -5, 10, 10 );
-		g.g.setColor( Color.BLACK );
-		g.g.drawOval( -5, -5, 10, 10 );
-		g.line( 0, 0, 5, 0 );
-		g.popMatrix();
+		g.setColor( this.owner.team.getColor() );
+		g.fillOval( -5, -5, 10, 10 );
+		g.setColor( Color.black );
+		g.drawOval( -5, -5, 10, 10 );
+		g.drawLine( 0, 0, 5, 0 );
+		g.popTransform();
 	}
 	
 	public void pathTo( int tx, int ty, TacticServer ts )

@@ -8,6 +8,8 @@ import javax.vecmath.Point2f;
 import javax.vecmath.Point2i;
 import javax.vecmath.Vector2f;
 
+import org.newdawn.slick.Graphics;
+
 import com.phyloa.dlib.util.DMath;
 
 public class Bullet implements Serializable
@@ -77,13 +79,13 @@ public class Bullet implements Serializable
 		}
 	}
 	
-	public void clientUpdate( TacticClient ts )
+	public void clientUpdate( TacticClient ts, float d )
 	{
 		Level l = ts.l;
 		lx = x;
 		ly = y;
-		x += dx;
-		y += dy;
+		x += dx * d;
+		y += dy * d;
 		
 		// Test if hits wall
 		if( l.hitwall( new Point2f( lx, ly ), new Vector2f( dx, dy ) ) )
@@ -105,24 +107,25 @@ public class Bullet implements Serializable
 				if( sect.lengthSquared() < Unit.radius * Unit.radius )
 				{
 					alive = false;
-					for( int i = 0; i < 5; i++ )
-						ts.ps.add( new TacticClient.BloodParticle( p.x, p.y, dx, dy ) );
+					//for( int i = 0; i < 5; i++ )
+						//ts.ps.add( new TacticClient.BloodParticle( p.x, p.y, dx, dy ) );
 					break;
 				}
 			}
 		}
 		
-		if( x > l.width * l.tileSize || x < 0 || y > l.height * l.tileSize
-				|| y < 0 )
+		if( x > l.width * l.tileSize || x < 0 || y > l.height * l.tileSize || y < 0 )
 		{
 			alive = false;
 		}
 	}
 	
-	public void render( Graphics2D g )
+	public void render( Graphics g )
 	{
 		// g.setColor( Color.YELLOW );
-		g.drawLine( (int)x, (int)y, (int)lx, (int)ly );
+		Vector2f vec = new Vector2f( x-lx, y-ly );
+		vec.normalize();
+		g.drawLine( x, y, x+vec.x*10, y+vec.y*10 );
 	}
 	
 	public void sync( Bullet b )

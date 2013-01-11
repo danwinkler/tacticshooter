@@ -1,32 +1,36 @@
 package tacticshooter;
 
-import java.awt.Color;
-import java.awt.RenderingHints;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
-import javax.swing.JOptionPane;
 import javax.vecmath.Point2i;
 
+import org.newdawn.slick.AppGameContainer;
+import org.newdawn.slick.BasicGame;
+import org.newdawn.slick.Color;
+import org.newdawn.slick.GameContainer;
+import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
+import org.newdawn.slick.Input;
+import org.newdawn.slick.SlickException;
+import org.newdawn.slick.Sound;
+import org.newdawn.slick.geom.Rectangle;
 import tacticshooter.Unit.UnitType;
 
+import com.aem.sticky.StickyListener;
+import com.aem.sticky.button.Button;
+import com.aem.sticky.button.SimpleButton;
+import com.aem.sticky.button.events.ClickListener;
 import com.esotericsoftware.minlog.Log;
-import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DUI;
-import com.phyloa.dlib.dui.DUIElement;
-import com.phyloa.dlib.dui.DUIEvent;
-import com.phyloa.dlib.dui.DUIListener;
-import com.phyloa.dlib.renderer.Graphics2DRenderer;
-import com.phyloa.dlib.util.DMath;
 
-public class TacticClient extends Graphics2DRenderer implements MouseListener, MouseMotionListener, DUIListener
+public class TacticClient extends BasicGame
 {
+	public TacticClient( String title )
+	{
+		super( title );
+	}
+
 	ClientInterface ci;
 	
 	HashMap<Integer, Unit> unitMap = new HashMap<Integer, Unit>();
@@ -38,29 +42,34 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 	Level l;
 	
 	boolean waitingForMoveConfirmation = false;
-	int mx = -1, my = -1;
+	float mx = -1, my = -1;
 	
-	int sx, sy, sw, sh;
+	float sx, sy, sx2, sy2;
 	boolean selecting = false;
 	ArrayList<Integer> selected = new ArrayList<Integer>();
 	
 	Player player;
 	
-	int scrollx = 0;
-	int scrolly = 0;
+	float scrollx = 0;
+	float scrolly = 0;
 	
 	DUI dui;
-	DButton switchTeams;
-	DButton buildLightUnit;
-	DButton buildHeavyUnit;
-	DButton buildSupplyUnit;
+	Button switchTeams;
+	Button buildLightUnit;
+	Button buildHeavyUnit;
+	Button buildSupplyUnit;
+
+    StickyListener listener;
 	
-	ParticleSystem ps = new ParticleSystem();
+	Sound bullet1, bullet2, ping1, death1, death2;
 	
-	int b1s, b2s;
+	Input input;
 	
-	public void initialize() 
+	float soundFadeDist = 1000;
+	
+	public void init( GameContainer gc ) throws SlickException
 	{
+		input = gc.getInput();
 		Log.set( Log.LEVEL_TRACE );
 		
 		String[] addressesToTry = { "localhost", "triggerly.com" };
@@ -77,34 +86,86 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 			break;
 		}
 		
-		size( 1200, 800 );
-		
 		ci.sendToServer( new Message( MessageType.CLIENTJOIN, null ) );
-		canvas.addMouseListener( this );
-		canvas.addMouseMotionListener( this );
 		
-		dui = new DUI( canvas );
-		dui.addDUIListener( this );
+		listener = new StickyListener();
+		gc.getInput().addListener( listener );
 		
-		switchTeams = new DButton( "Switch Teams", 0, getHeight()-50, 100, 50 );
-		dui.add( switchTeams );
+		Image button = new Image( "img/buttontemp.png" );
 		
-		buildLightUnit = new DButton( "Build Light Unit", 100, getHeight()-50, 100, 50 );
-		dui.add( buildLightUnit );
+		bullet1 = new Sound( "sound/bullet1.wav" );
+		bullet2 = new Sound( "sound/bullet2.wav" );
+		ping1 = new Sound( "sound/ping1.wav" );
+		death1 = new Sound( "sound/death1.wav" );
+		death2 = new Sound( "sound/death2.wav" );
 		
-		buildHeavyUnit = new DButton( "Build Heavy Unit", 200, getHeight()-50, 100, 50 );
-		dui.add( buildHeavyUnit );
+		switchTeams = new SimpleButton( new Rectangle(0, gc.getHeight()-100, 200, 100), button, button, ping1 );
+		buildLightUnit = new SimpleButton( new Rectangle(200, gc.getHeight()-100, 200, 100), button, button, ping1 );
+		buildHeavyUnit = new SimpleButton( new Rectangle(400, gc.getHeight()-100, 200, 100), button, button, ping1 );
+		buildSupplyUnit = new SimpleButton( new Rectangle(600, gc.getHeight()-100, 200, 100), button, button, ping1 );
 		
-		buildSupplyUnit = new DButton( "Build Supply Unit", 300, getHeight()-50, 100, 50 );
-		dui.add( buildSupplyUnit );
-		
-		b1s = SoundPlayer.load( "sound/bullet1.wav" );
-		b2s = SoundPlayer.load( "sound/bullet2.wav" );
+		switchTeams.addListener( new ClickListener() {
+			public void onClick( Button b, float mx, float my )
+			{
+				ci.sendToServer( new Message( MessageType.SWITCHTEAMS, player.team ) );
+			}
+			public void onDoubleClick( Button b, float mx, float my )
+			{
+				
+			}
+			public void onRightClick( Button b, float mx, float my )
+			{
+				
+			}
+		});
+		buildLightUnit.addListener( new ClickListener() {
+			public void onClick( Button b, float mx, float my )
+			{
+				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.LIGHT) );
+			}
+			public void onDoubleClick( Button b, float mx, float my )
+			{
+				
+			}
+			public void onRightClick( Button b, float mx, float my )
+			{
+				
+			}
+		});
+		buildHeavyUnit.addListener( new ClickListener() {
+			public void onClick( Button b, float mx, float my )
+			{
+				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.HEAVY) );
+			}
+			public void onDoubleClick( Button b, float mx, float my )
+			{
+				
+			}
+			public void onRightClick( Button b, float mx, float my )
+			{
+				
+			}
+		});
+		buildSupplyUnit.addListener( new ClickListener() {
+			public void onClick( Button b, float mx, float my )
+			{
+				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.SUPPLY) );
+			}
+			public void onDoubleClick( Button b, float mx, float my )
+			{
+				
+			}
+			public void onRightClick( Button b, float mx, float my )
+			{
+				
+			}
+		});
 	}
-
-	public void update() 
+	
+	public void update( GameContainer gc, int delta ) throws SlickException
 	{
-		g.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
+		float d = delta / 60.f;
+		
 		while( ci.hasClientMessages() )
 		{
 			Message m = ci.getNextClientMessage();
@@ -117,6 +178,7 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 				{
 					unitMap.put( u.id, u );
 					units.add( u );
+					ping1.play( 1.f, getSoundMag( gc, u.x, u.y ) );
 					tu = u;
 				}
 				tu.sync( u );
@@ -131,9 +193,7 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 				{
 					bulletMap.put( b.id, b );
 					bullets.add( b );
-					float dx = b.x - (scrollx+getWidth()/2);
-					float dy = b.y - (scrolly+getHeight()/2);
-					SoundPlayer.play( Math.random() > .5 ? b1s : b2s, dx, 0, dy );
+					(Math.random() > .5 ? bullet1 : bullet2).play( 1.f, getSoundMag( gc, b.x, b.y ) * .2f );
 					tb = b;
 				}
 				tb.sync( b );
@@ -158,52 +218,31 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 			return;
 		}
 		
-		/*
-		if( scrolly > 0 && (k.up || (m.y < 40 && m.inside)) ) scrolly-=5;
-		if( scrolly+getHeight() < l.height*l.tileSize && (k.down || (m.y > getHeight()-40 && m.inside)) ) scrolly+=5;
-		if( scrollx > 0 && (k.left || (m.x < 40 && m.inside)) ) scrollx-=5;
-		if( scrollx+getWidth() < l.width*l.tileSize && (k.right || (m.x > getWidth()-40 && m.inside)) ) scrollx+=5;
-		*/
+		float scrollSpeed = 20;
 		
-		if( scrolly > 0 && (k.up || k.w) ) scrolly-=10;
-		if( scrolly+getHeight() - 50 < l.height*l.tileSize && (k.down || k.s) ) scrolly+=10;
-		if( scrollx > 0 && (k.left || k.a) ) scrollx-=10;
-		if( scrollx+getWidth() < l.width*l.tileSize && (k.right || k.d) ) scrollx+=10;
-		
-		SoundPlayer.setPosition( scrollx, 0, scrolly );
-		
-		g.setColor( Color.WHITE );
-		g.fillRect( 0, 0, getWidth(), getHeight() );
-		g.setColor( Color.BLACK );
-		
-		pushMatrix();
-		translate( -scrollx, -scrolly );
-		
-		l.render( this );
-		
-		g.setColor( this.waitingForMoveConfirmation ? Color.gray : Color.GREEN );
-		g.drawRect( mx * Level.tileSize, my * Level.tileSize, Level.tileSize, Level.tileSize );
+		if( scrolly > 0 && (input.isKeyDown( Input.KEY_UP ) || input.isKeyDown( Input.KEY_W )) ) scrolly-=scrollSpeed*d;
+		if( scrolly+gc.getHeight() - 50 < l.height*l.tileSize && (input.isKeyDown( Input.KEY_DOWN ) || input.isKeyDown( Input.KEY_S )) ) scrolly+=scrollSpeed*d;
+		if( scrollx > 0 && (input.isKeyDown( Input.KEY_LEFT ) || input.isKeyDown( Input.KEY_A )) ) scrollx-=scrollSpeed*d;
+		if( scrollx+gc.getWidth() < l.width*l.tileSize && (input.isKeyDown( Input.KEY_RIGHT ) || input.isKeyDown( Input.KEY_D )) ) scrollx+=scrollSpeed*d;
 		
 		for( int i = 0; i < units.size(); i++ )
 		{
 			Unit u = units.get( i );
-			u.clientUpdate( this );
+			u.clientUpdate( this, d );
 			if( !u.alive )
 			{
 				units.remove( i );
 				unitMap.remove( u );
+				(Math.random() > .5 ? death1 : death2).play( 1.f, getSoundMag( gc, u.x, u.y ) );
 				i--;
 				continue;
 			}
-			u.render( this );
 		}
-		
-		g.setColor( Color.BLACK );
 		
 		for( int i = 0; i < bullets.size(); i++ )
 		{
 			Bullet b = bullets.get( i );
-			b.clientUpdate( this );
+			b.clientUpdate( this, d );
 			if( !b.alive )
 			{
 				bulletMap.remove( b );
@@ -211,50 +250,99 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 				i--;
 				continue;
 			}
+		}
+		
+		switchTeams.update( gc, delta );
+		buildLightUnit.update( gc, delta );
+		buildHeavyUnit.update( gc, delta );
+		buildSupplyUnit.update( gc, delta );
+	}
+
+	public void render( GameContainer gc, Graphics g ) throws SlickException 
+	{
+		if( l == null )
+		{
+			return;
+		}
+		
+		g.setColor( Color.white );
+		g.fillRect( 0, 0, gc.getWidth(), gc.getHeight() );
+		g.setColor( Color.black );
+		
+		g.pushTransform();
+		g.translate( -scrollx, -scrolly );
+		
+		l.render( g );
+		
+		g.setColor( this.waitingForMoveConfirmation ? Color.gray : Color.green );
+		g.drawRect( mx * Level.tileSize, my * Level.tileSize, Level.tileSize, Level.tileSize );
+		
+		for( int i = 0; i < units.size(); i++ )
+		{
+			Unit u = units.get( i );
+			u.render( g );
+		}
+		
+		g.setColor( Color.black );
+		
+		for( int i = 0; i < bullets.size(); i++ )
+		{
+			Bullet b = bullets.get( i );
 			b.render( g );
 		}
 		
-		ps.update();
-		ps.render( this );
-		
 		if( selecting )
 		{
-			g.setColor( Color.BLUE );
-			g.drawRect( sx, sy, sw, sh );
+			g.setColor( Color.blue );
+			float x1 = Math.min( sx, sx2 );
+			float y1 = Math.min( sy, sy2 );
+			float x2 = Math.max( sx, sx2 );
+			float y2 = Math.max( sy, sy2 );
+			g.drawRect( x1, y1, x2-x1, y2-y1 );
 		}
 		
-		popMatrix();
+		g.popTransform();
 		
 		g.setColor( Color.red );
 		if( player != null )
 		{
-			g.drawString( "Money: " + player.money, 10, 10 );
+			g.drawString( "Money: " + player.money, 100, 10 );
 		}
 		
-		dui.update();
-		dui.render( this );
+		switchTeams.render( gc, g );
+		buildLightUnit.render( gc, g );
+		buildHeavyUnit.render( gc, g );
+		buildSupplyUnit.render( gc, g );
 	}
 	
-	public static void main( String[] args )
+	public static void main( String[] args ) throws SlickException
 	{
-		TacticClient tc = new TacticClient();
-		try
-		{
-			tc.begin();
-		}
-		catch( Exception ex )
-		{
-			ex.printStackTrace();
-			JOptionPane.showMessageDialog( tc.container, ex.getMessage() );
-		}
+		AppGameContainer app = new AppGameContainer( new TacticClient( "Tactic Client" ) );
+		app.setDisplayMode(1024, 768, false);
+		app.start();
+	}
+	
+	public float getSoundMag( GameContainer gc, float x, float y )
+	{
+		float dx = (scrollx+gc.getWidth()/2) - x;
+		float dy = (scrolly+gc.getHeight()/2) - y;
+		return (float)((soundFadeDist - Math.sqrt( dx*dx+dy*dy )) / soundFadeDist);
 	}
 
-	public void mouseClicked( MouseEvent e )
+	public void mousePressed( int button, int x, int y )
 	{
-		if( e.getButton() == MouseEvent.BUTTON3 )
+		if( button == Input.MOUSE_LEFT_BUTTON )
 		{
-			int tx = (e.getX()+scrollx) / Level.tileSize;
-			int ty = (e.getY()+scrolly) / Level.tileSize;
+			sx = x + scrollx;
+			sy = y + scrolly;
+			sx2 = sx;
+			sy2 = sy;
+			selecting = true;
+		} 
+		else if( button == Input.MOUSE_RIGHT_BUTTON )
+		{
+			int tx = (int)((x+scrollx) / Level.tileSize);
+			int ty = (int)((y+scrolly) / Level.tileSize);
 			ci.sendToServer( new Message( MessageType.SETATTACKPOINT, new Object[]{ new Point2i( tx, ty ), selected } ) );
 			this.waitingForMoveConfirmation = true;
 			mx = tx;
@@ -262,38 +350,16 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 		}
 	}
 
-	public void mouseEntered( MouseEvent e )
+	public void mouseReleased( int button, int x, int y )
 	{
-		
-	}
-
-	public void mouseExited( MouseEvent e ) 
-	{
-		
-	}
-
-	public void mousePressed( MouseEvent e )
-	{
-		if( e.getButton() == MouseEvent.BUTTON1 )
-		{
-			sx = e.getX() + scrollx;
-			sy = e.getY() + scrolly;
-			sw = 0;
-			sh = 0;
-			selecting = true;
-		}
-	}
-
-	public void mouseReleased( MouseEvent e ) 
-	{
-		if( e.getButton() == MouseEvent.BUTTON1 )
+		if( button == Input.MOUSE_LEFT_BUTTON )
 		{
 			selected.clear();
 			
-			int x1 = Math.min( sx, e.getX()+scrollx );
-			int y1 = Math.min( sy, e.getY()+scrolly );
-			int x2 = Math.max( sx, e.getX()+scrollx );
-			int y2 = Math.max( sy, e.getY()+scrolly );
+			float x1 = Math.min( sx, x+scrollx );
+			float y1 = Math.min( sy, y+scrolly );
+			float x2 = Math.max( sx, x+scrollx );
+			float y2 = Math.max( sy, y+scrolly );
 			for( Unit u : units )
 			{
 				u.selected = u.owner.id == this.player.id && u.x > x1 && u.x < x2 && u.y > y1 && u.y < y2;
@@ -306,57 +372,12 @@ public class TacticClient extends Graphics2DRenderer implements MouseListener, M
 		}
 	}
 
-	public void mouseDragged( MouseEvent e )
-	{	
-		sw = e.getX()+scrollx - sx;
-		sh = e.getY()+scrolly - sy;			
-	}
-
-	public void mouseMoved( MouseEvent e )
+	public void mouseDragged( int oldx, int oldy, int newx, int newy )
 	{
-		if( e.getButton() == MouseEvent.BUTTON1 )
+		if( input.isMouseButtonDown( Input.MOUSE_LEFT_BUTTON ) )
 		{
-			sw = e.getX()+scrollx - sx;
-			sh = e.getY()+scrolly - sy;
+			sx2 = newx+scrollx;
+			sy2 = newy+scrolly;
 		}
-	}
-
-	public void event( DUIEvent event )
-	{
-		DUIElement e = event.getElement();
-		if( e == switchTeams )
-		{
-			ci.sendToServer( new Message( MessageType.SWITCHTEAMS, player.team ) );
-		} else if( e == buildLightUnit )
-		{
-			ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.LIGHT ) );
-		} else if( e == buildHeavyUnit )
-		{
-			ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.HEAVY ) );
-		} else if( e == buildSupplyUnit )
-		{
-			ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.SUPPLY ) );
-		}
-	}
-	
-	public static class BloodParticle extends Particle
-	{
-		public BloodParticle( float x, float y, float dx, float dy )
-		{
-			this.x = x;
-			this.y = y;
-			float angle = (float)Math.atan2( dy, dx ) + DMath.PIF;
-			angle += DMath.randomf( -.5f, .5f );
-			this.dx = DMath.cosf( angle ) * 2;
-			this.dy = DMath.sinf( angle ) * 2;
-			life = 10;
-		}
-
-		public void render( Graphics2DRenderer g )
-		{
-			g.g.setColor( Color.red );
-			g.line( x - dx*3, y-dy*3, x+dx*3, y+dy*3 );
-		}
-		
 	}
 }

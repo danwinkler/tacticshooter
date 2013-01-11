@@ -1,10 +1,10 @@
 package tacticshooter;
 
-import java.awt.Color;
+import org.newdawn.slick.Color;
 
 public class Team
 {
-	public static final Color[] teamColors = { Color.RED, Color.GREEN, Color.BLUE, Color.ORANGE };
+	public static final Color[] teamColors = { Color.red, Color.green, Color.blue, Color.orange };
 	
 	private static int onID = -1;
 	

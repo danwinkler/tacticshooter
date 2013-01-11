@@ -2,6 +2,7 @@ package tacticshooter;
 
 import java.util.ArrayList;
 
+import javax.vecmath.Point2f;
 import javax.vecmath.Point2i;
 
 import tacticshooter.Unit.UnitType;
@@ -29,5 +30,6 @@ public class KryoHelper
 		k.register( Building.BuildingType.class );
 		k.register( UnitType.class );
 		k.register( Player[].class );
+		k.register( Point2f.class );
 	}
 }
