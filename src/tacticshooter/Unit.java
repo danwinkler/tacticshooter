@@ -10,9 +10,6 @@ import javax.vecmath.Vector2f;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.util.pathfinding.Path;
-import org.newdawn.slick.util.pathfinding.Path.Step;
-
-import com.phyloa.dlib.renderer.Graphics2DRenderer;
 import com.phyloa.dlib.util.DMath;
 
 public class Unit implements Serializable
@@ -223,9 +220,8 @@ public class Unit implements Serializable
 		return sendToClient;
 	}
 	
-	public void clientUpdate( TacticClient tc, float d )
+	public void clientUpdate( ClientState tc, float d )
 	{
-		
 		//Predictive Movement
 		if( state == UnitState.MOVING )
 		{
@@ -249,12 +245,12 @@ public class Unit implements Serializable
 		if( selected )
 		{
 			g.setColor( Color.blue );
-			g.drawRect( -5, -5, 10, 10 );
+			g.drawRect( -10, -10, 20, 20 );
 		}
 		g.setColor( new Color( DMath.bound( 1.f - health*.01f, 0, 1 ), DMath.bound(health*.01f, 0, 1 ), 0 ) );
 		g.fillRect( -8, -8, (int)(16.f * health*.01f), 2 );
 		
-		g.rotate( 0, 0, heading );
+		g.rotate( 0, 0, heading / DMath.PI2F * 360 );
 		
 		g.setColor( this.owner.team.getColor() );
 		g.fillOval( -5, -5, 10, 10 );

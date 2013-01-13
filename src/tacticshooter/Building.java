@@ -1,16 +1,7 @@
 package tacticshooter;
 
-import java.awt.Graphics2D;
-import java.lang.reflect.Type;
-import java.util.HashMap;
-
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
-
-import tacticshooter.Building.BuildingType;
-
-import com.phyloa.dlib.renderer.Graphics2DIRenderer;
-import com.phyloa.dlib.renderer.Graphics2DRenderer;
 import com.phyloa.dlib.util.DMath;
 
 public class Building
@@ -59,6 +50,9 @@ public class Building
 		g.drawOval( -50, -50, 100, 100 );
 		
 		g.setColor( Color.black );
+		//Font awtFont = new Font( "Arial", Font.BOLD, 10 );
+		//TrueTypeFont font = new TrueTypeFont(awtFont, false);
+		//.setFont( font );
 		g.drawString( "Team: " + (t != null ? t.id : "empty"), -15, -15 );
 		g.drawString( "Hold: " + hold, -15, 0 );
 		g.drawString( bt.name(), -15, 15 );

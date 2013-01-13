@@ -80,7 +80,7 @@ public class Bullet implements Serializable
 		}
 	}
 	
-	public void clientUpdate( TacticClient ts, float d, GameContainer gc )
+	public void clientUpdate( ClientState ts, float d, GameContainer gc )
 	{
 		Level l = ts.l;
 		lx = x;
@@ -110,7 +110,7 @@ public class Bullet implements Serializable
 					alive = false;
 					//for( int i = 0; i < 5; i++ )
 						//ts.ps.add( new TacticClient.BloodParticle( p.x, p.y, dx, dy ) );
-					ts.hit1.play( DMath.randomf( .9f, 1.1f ), ts.getSoundMag( gc, x, y ) );
+					ts.hit1.play( DMath.randomf( .9f, 1.1f ), ts.getSoundMag( gc, x, y ) * .2f );
 					break;
 				}
 			}

@@ -18,7 +18,7 @@ public class ClientNetworkInterface implements ClientInterface
 		client = new Client( 128000, 32000 );
 		KryoHelper.register( client.getKryo() );
 		client.start();
-		client.connect( 500, address, 54555, 54777 );
+		client.connect( 2500, address, 54555, 54777 );
 		
 		
 		client.addListener( new Listener() {

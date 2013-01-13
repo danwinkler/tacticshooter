@@ -164,6 +164,7 @@ public class TacticServer
 					if( won )
 					{
 						//reset
+						si.sendToAllClients( new Message( MessageType.GAMEOVER, l ) );
 						//kill all guys
 						for( int i = 0; i < units.size(); i++ )
 						{
@@ -176,6 +177,7 @@ public class TacticServer
 							si.sendToClient( p.id, new Message( MessageType.PLAYERUPDATE, p ) );
 						}
 						//make new level
+						l = new Level( 100, 100 );
 						LevelBuilder.buildLevelB( l, a, b );
 						si.sendToAllClients( new Message( MessageType.LEVELUPDATE, l ) );
 					}
