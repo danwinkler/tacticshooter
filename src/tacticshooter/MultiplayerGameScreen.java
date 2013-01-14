@@ -14,11 +14,12 @@ import org.newdawn.slick.geom.Rectangle;
 
 import tacticshooter.Unit.UnitType;
 
-import com.aem.sticky.StickyListener;
-import com.aem.sticky.button.Button;
-import com.aem.sticky.button.SimpleButton;
-import com.aem.sticky.button.events.ClickListener;
 import com.esotericsoftware.minlog.Log;
+import com.phyloa.dlib.dui.DButton;
+import com.phyloa.dlib.dui.DUI;
+import com.phyloa.dlib.dui.DUIElement;
+import com.phyloa.dlib.dui.DUIEvent;
+import com.phyloa.dlib.dui.DUIListener;
 import com.phyloa.dlib.renderer.DScreen;
 import com.phyloa.dlib.renderer.DScreenHandler;
 
@@ -32,16 +33,18 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 	float sx, sy, sx2, sy2;
 	boolean selecting = false;
 	
-	Button switchTeams;
-	Button buildLightUnit;
-	Button buildHeavyUnit;
-	Button buildSupplyUnit;
+	DButton switchTeams;
+	DButton buildLightUnit;
+	DButton buildHeavyUnit;
+	DButton buildSupplyUnit;
 
-    StickyListener listener;
+    DUI dui;
 	
 	Input input;
 	
 	DScreenHandler<GameContainer, Graphics> dsh;
+	
+	Slick2DRenderer renderer = new Slick2DRenderer();
 	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
@@ -65,8 +68,7 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 		
 		ci.sendToServer( new Message( MessageType.CLIENTJOIN, null ) );
 		
-		listener = new StickyListener();
-		gc.getInput().addListener( listener );
+		dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
 		
 		Image button = null;
 		try
@@ -87,70 +89,35 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 		}
 		
 		
-		switchTeams = new SimpleButton( new Rectangle(0, gc.getHeight()-100, 200, 100), button, button, ping1 );
-		buildLightUnit = new SimpleButton( new Rectangle(200, gc.getHeight()-100, 200, 100), button, button, ping1 );
-		buildHeavyUnit = new SimpleButton( new Rectangle(400, gc.getHeight()-100, 200, 100), button, button, ping1 );
-		buildSupplyUnit = new SimpleButton( new Rectangle(600, gc.getHeight()-100, 200, 100), button, button, ping1 );
+		switchTeams = new DButton( "Switch Teams", 0, gc.getHeight()-100, 200, 100 );
+		buildLightUnit = new DButton( "Build Light Unit", 200, gc.getHeight()-100, 200, 100 );
+		buildHeavyUnit = new DButton( "Build Heavy Unit", 400, gc.getHeight()-100, 200, 100 );
+		buildSupplyUnit = new DButton( "Build Supply Unit", 600, gc.getHeight()-100, 200, 100 );
 		
-		listener.add( switchTeams );
-		listener.add( buildLightUnit );
-		listener.add( buildHeavyUnit );
-		listener.add( buildSupplyUnit );
+		dui.add( switchTeams );
+		dui.add( buildLightUnit );
+		dui.add( buildHeavyUnit );
+		dui.add( buildSupplyUnit );
 		
-		switchTeams.addListener( new ClickListener() {
-			public void onClick( Button b, float mx, float my )
+		dui.addDUIListener( new DUIListener() {
+			@Override
+			public void event( DUIEvent event )
 			{
-				ci.sendToServer( new Message( MessageType.SWITCHTEAMS, player.team ) );
-			}
-			public void onDoubleClick( Button b, float mx, float my )
-			{
-				
-			}
-			public void onRightClick( Button b, float mx, float my )
-			{
-				
-			}
-		});
-		buildLightUnit.addListener( new ClickListener() {
-			public void onClick( Button b, float mx, float my )
-			{
-				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.LIGHT) );
-			}
-			public void onDoubleClick( Button b, float mx, float my )
-			{
-				
-			}
-			public void onRightClick( Button b, float mx, float my )
-			{
-				
-			}
-		});
-		buildHeavyUnit.addListener( new ClickListener() {
-			public void onClick( Button b, float mx, float my )
-			{
-				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.HEAVY) );
-			}
-			public void onDoubleClick( Button b, float mx, float my )
-			{
-				
-			}
-			public void onRightClick( Button b, float mx, float my )
-			{
-				
-			}
-		});
-		buildSupplyUnit.addListener( new ClickListener() {
-			public void onClick( Button b, float mx, float my )
-			{
-				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.SUPPLY) );
-			}
-			public void onDoubleClick( Button b, float mx, float my )
-			{
-				
-			}
-			public void onRightClick( Button b, float mx, float my )
-			{
-				
+				DUIElement e = event.getElement();
+				if( e instanceof DButton && event.getType() == DButton.MOUSE_UP )
+				if( e == switchTeams )
+				{
+					ci.sendToServer( new Message( MessageType.SWITCHTEAMS, player.team ) );
+				} else if( e == buildLightUnit )
+				{
+					ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.LIGHT) );
+				} else if( e == buildHeavyUnit )
+				{
+					ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.HEAVY) );
+				} else if( e == buildSupplyUnit )
+				{
+					ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.SUPPLY) );
+				}
 			}
 		});
 	}
@@ -245,15 +212,12 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 			}
 		}
 		
-		switchTeams.update( gc, delta );
-		buildLightUnit.update( gc, delta );
-		buildHeavyUnit.update( gc, delta );
-		buildSupplyUnit.update( gc, delta );
+		dui.update();
 	}
 
 	public void render( GameContainer gc, Graphics g )
 	{
-g.setAntiAlias( true );
+		g.setAntiAlias( true );
 		
 		if( l == null )
 		{
@@ -304,10 +268,7 @@ g.setAntiAlias( true );
 			g.drawString( "Money: " + player.money, 100, 10 );
 		}
 		
-		switchTeams.render( gc, g );
-		buildLightUnit.render( gc, g );
-		buildHeavyUnit.render( gc, g );
-		buildSupplyUnit.render( gc, g );
+		dui.render( renderer.renderTo( g ) );
 	}
 
 	public void onExit()
