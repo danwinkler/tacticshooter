@@ -70,6 +70,8 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 	
 	Image miniMap;
 	
+	int bottomOffset = 200;
+	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
 		this.dsh = dsh;
@@ -220,7 +222,7 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 		float scrollSpeed = 20;
 		
 		if( scrolly > 0 && (input.isKeyDown( Input.KEY_UP ) || input.isKeyDown( Input.KEY_W )) ) scrolly-=scrollSpeed*d;
-		if( scrolly+gc.getHeight() - 100 < l.height*l.tileSize && (input.isKeyDown( Input.KEY_DOWN ) || input.isKeyDown( Input.KEY_S )) ) scrolly+=scrollSpeed*d;
+		if( scrolly+gc.getHeight() - bottomOffset < l.height*l.tileSize && (input.isKeyDown( Input.KEY_DOWN ) || input.isKeyDown( Input.KEY_S )) ) scrolly+=scrollSpeed*d;
 		if( scrollx > 0 && (input.isKeyDown( Input.KEY_LEFT ) || input.isKeyDown( Input.KEY_A )) ) scrollx-=scrollSpeed*d;
 		if( scrollx+gc.getWidth() < l.width*l.tileSize && (input.isKeyDown( Input.KEY_RIGHT ) || input.isKeyDown( Input.KEY_D )) ) scrollx+=scrollSpeed*d;
 		
@@ -363,6 +365,7 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 	{
 		ci.stop();
 		resetState();
+		miniMap = null;
 		dui.setEnabled( false );
 	}
 	
@@ -384,7 +387,7 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 		System.out.println( destX + " " + destY );
 		
 		scrollx = DMath.bound( destX-gc.getWidth()/2, 0, l.width*Level.tileSize - gc.getWidth() );
-		scrolly = DMath.bound( destY-gc.getHeight()/2, 0, l.height*Level.tileSize - gc.getHeight() );
+		scrolly = DMath.bound( destY-gc.getHeight()/2, 0, l.height*Level.tileSize - gc.getHeight() + bottomOffset );
 	}
 
 	public void mousePressed( int button, int x, int y )
