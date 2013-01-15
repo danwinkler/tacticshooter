@@ -35,20 +35,21 @@ public class MultiplayerSetupScreen implements DScreen<GameContainer, Graphics>,
 		this.dsh = dsh;
 		this.gc = e;
 		if( dui == null )
+		{
 			dui = new DUI( new Slick2DEventMapper( e.getInput() ) );
+			address = new DTextBox( e.getWidth() / 2 - 200, e.getHeight()/2 - 120, 400, 100 );
+			back = new DButton( "Back", e.getWidth() / 2 - 200, e.getHeight()/2 + 20, 200, 100 );
+			enter = new DButton( "Join", e.getWidth() / 2, e.getHeight()/2 + 20, 200, 100 );
+			
+			dui.add( address );
+			dui.add( enter );
+			dui.add( back );
+			
+			dui.setFocus( address );
+			
+			dui.addDUIListener( this );
+		}
 		dui.setEnabled( true );
-		
-		address = new DTextBox( e.getWidth() / 2 - 200, e.getHeight()/2 - 120, 400, 100 );
-		back = new DButton( "Back", e.getWidth() / 2 - 200, e.getHeight()/2 + 20, 200, 100 );
-		enter = new DButton( "Join", e.getWidth() / 2, e.getHeight()/2 + 20, 200, 100 );
-		
-		dui.add( address );
-		dui.add( enter );
-		dui.add( back );
-		
-		dui.setFocus( address );
-		
-		dui.addDUIListener( this );
 	}
 	
 	public void update( GameContainer gc, int delta )

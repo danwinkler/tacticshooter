@@ -33,9 +33,7 @@ public class MessageScreen implements DScreen<GameContainer, Graphics>, DUIListe
 	{
 		this.dsh = dsh;
 		this.gc = e;
-		if( dui == null )
-			dui = new DUI( new Slick2DEventMapper( e.getInput() ) );
-		dui.setEnabled( true );
+		dui = new DUI( new Slick2DEventMapper( e.getInput() ) );
 		
 		okay = new DButton( "Okay", e.getWidth() / 2 - 100, e.getHeight()/2, 200, 100 );
 		text = new DText( message, e.getWidth()/2 - 100, e.getHeight()/2-100 );
@@ -60,6 +58,7 @@ public class MessageScreen implements DScreen<GameContainer, Graphics>, DUIListe
 	public void onExit()
 	{
 		dui.setEnabled( false );
+		dui = null;
 	}
 	
 	public void event( DUIEvent event )

@@ -75,6 +75,7 @@ public class PostGameScreen implements DScreen<GameContainer, Graphics>, DUIList
 		public void onExit()
 		{
 			dui.setEnabled( false );
+			dui = null;
 		}
 		
 		public void event( DUIEvent event )

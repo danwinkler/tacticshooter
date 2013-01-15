@@ -34,21 +34,24 @@ public class HomeScreen implements DScreen<GameContainer, Graphics>, DUIListener
 		this.dsh = dsh;
 		this.gc = e;
 		if( dui == null )
+		{
 			dui = new DUI( new Slick2DEventMapper( e.getInput() ) );
+			
+			singlePlayer = new DButton( "Singleplayer", e.getWidth() / 2 - 200, e.getHeight()/2 - 200, 400, 100 );
+			multiPlayer = new DButton( "Multiplayer", e.getWidth() / 2 - 200, e.getHeight()/2 - 100, 400, 100 );
+			settings = new DButton( "Settings", e.getWidth() / 2 - 200, e.getHeight()/2, 400, 100 );
+			exit = new DButton( "Exit", e.getWidth() / 2 - 200, e.getHeight()/2 + 100, 400, 100 );
+			
+			
+			dui.add( singlePlayer );
+			dui.add( multiPlayer );
+			dui.add( settings );
+			dui.add( exit );
+			
+			dui.addDUIListener( this );
+		}
+		
 		dui.setEnabled( true );
-		
-		singlePlayer = new DButton( "Singleplayer", e.getWidth() / 2 - 200, e.getHeight()/2 - 200, 400, 100 );
-		multiPlayer = new DButton( "Multiplayer", e.getWidth() / 2 - 200, e.getHeight()/2 - 100, 400, 100 );
-		settings = new DButton( "Settings", e.getWidth() / 2 - 200, e.getHeight()/2, 400, 100 );
-		exit = new DButton( "Exit", e.getWidth() / 2 - 200, e.getHeight()/2 + 100, 400, 100 );
-		
-		
-		dui.add( singlePlayer );
-		dui.add( multiPlayer );
-		dui.add( settings );
-		dui.add( exit );
-		
-		dui.addDUIListener( this );
 	}
 	
 	public void update( GameContainer gc, int delta )

@@ -78,7 +78,40 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 		this.gc = gc;
 		
 		if( dui == null )
+		{
 			dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
+			switchTeams = new DButton( "Switch Teams", 0, gc.getHeight()-100, 200, 100 );
+			buildLightUnit = new DButton( "Build Light Unit\n10", 200, gc.getHeight()-100, 200, 100 );
+			buildHeavyUnit = new DButton( "Build Heavy Unit\n20", 400, gc.getHeight()-100, 200, 100 );
+			buildSupplyUnit = new DButton( "Build Supply Unit\n20", 600, gc.getHeight()-100, 200, 100 );
+			
+			dui.add( switchTeams );
+			dui.add( buildLightUnit );
+			dui.add( buildHeavyUnit );
+			dui.add( buildSupplyUnit );
+			
+			dui.addDUIListener( new DUIListener() {
+				@Override
+				public void event( DUIEvent event )
+				{
+					DUIElement e = event.getElement();
+					if( e instanceof DButton && event.getType() == DButton.MOUSE_UP )
+					if( e == switchTeams )
+					{
+						ci.sendToServer( new Message( MessageType.SWITCHTEAMS, player.team ) );
+					} else if( e == buildLightUnit )
+					{
+						ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.LIGHT) );
+					} else if( e == buildHeavyUnit )
+					{
+						ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.HEAVY) );
+					} else if( e == buildSupplyUnit )
+					{
+						ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.SUPPLY) );
+					}
+				}
+			});
+		}
 		dui.setEnabled( true );
 		
 		
@@ -110,39 +143,6 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
-		switchTeams = new DButton( "Switch Teams", 0, gc.getHeight()-100, 200, 100 );
-		buildLightUnit = new DButton( "Build Light Unit\n10", 200, gc.getHeight()-100, 200, 100 );
-		buildHeavyUnit = new DButton( "Build Heavy Unit\n20", 400, gc.getHeight()-100, 200, 100 );
-		buildSupplyUnit = new DButton( "Build Supply Unit\n20", 600, gc.getHeight()-100, 200, 100 );
-		
-		dui.add( switchTeams );
-		dui.add( buildLightUnit );
-		dui.add( buildHeavyUnit );
-		dui.add( buildSupplyUnit );
-		
-		dui.addDUIListener( new DUIListener() {
-			@Override
-			public void event( DUIEvent event )
-			{
-				DUIElement e = event.getElement();
-				if( e instanceof DButton && event.getType() == DButton.MOUSE_UP )
-				if( e == switchTeams )
-				{
-					ci.sendToServer( new Message( MessageType.SWITCHTEAMS, player.team ) );
-				} else if( e == buildLightUnit )
-				{
-					ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.LIGHT) );
-				} else if( e == buildHeavyUnit )
-				{
-					ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.HEAVY) );
-				} else if( e == buildSupplyUnit )
-				{
-					ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.SUPPLY) );
-				}
-			}
-		});
 	}
 	
 	public void update( GameContainer gc, int delta )
