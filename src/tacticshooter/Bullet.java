@@ -17,14 +17,14 @@ public class Bullet implements Serializable
 {
 	public static float bulletSpeed = 30;
 	
-	int id = (int)(Math.random() * Integer.MAX_VALUE);
+	public int id = (int)(Math.random() * Integer.MAX_VALUE);
 	
-	float x, y, lx, ly;
-	float dx, dy;
+	public float x, y, lx, ly;
+	public float dx, dy;
 	
-	boolean alive = true;
+	public boolean alive = true;
 	
-	Player owner;
+	public Player owner;
 	
 	public Bullet()
 	{

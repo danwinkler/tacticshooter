@@ -127,4 +127,10 @@ public class ServerNetworkInterface implements ServerInterface
 			System.out.println( "" );
 		}
 	}
+
+	@Override
+	public void stop()
+	{
+		server.stop();
+	}
 }

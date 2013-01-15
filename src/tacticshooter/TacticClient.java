@@ -5,6 +5,12 @@ import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
+
+import com.danwink.tacticshooter.screens.HomeScreen;
+import com.danwink.tacticshooter.screens.MessageScreen;
+import com.danwink.tacticshooter.screens.MultiplayerGameScreen;
+import com.danwink.tacticshooter.screens.MultiplayerSetupScreen;
+import com.danwink.tacticshooter.screens.PostGameScreen;
 import com.phyloa.dlib.renderer.DScreenHandler;
 
 public class TacticClient extends BasicGame
@@ -19,9 +25,12 @@ public class TacticClient extends BasicGame
 	public void init( GameContainer gc ) throws SlickException
 	{
 		dsh.register( "home", new HomeScreen() );
-		dsh.register( "mpg", new MultiplayerGameScreen() );
+		dsh.register( "multiplayersetup", new MultiplayerSetupScreen() );
+		dsh.register( "multiplayergame", new MultiplayerGameScreen() );
+		dsh.register( "message", new MessageScreen() );
+		dsh.register( "postgame", new PostGameScreen() );
 		
-		dsh.activate( "mpg", gc );
+		dsh.activate( "home", gc );
 	}
 	
 	public void update( GameContainer gc, int delta ) throws SlickException

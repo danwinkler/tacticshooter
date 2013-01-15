@@ -4,10 +4,10 @@ public class Player
 {
 	public static final int MAX_RESPAWN = 60;
 	
-	int id;
-	Team team;
-	int money;
-	int respawn = 0;
+	public int id;
+	public Team team;
+	public int money;
+	public int respawn = 0;
 	boolean isBot = false;
 	
 	public Player()

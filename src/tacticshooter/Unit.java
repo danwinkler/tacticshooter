@@ -17,38 +17,38 @@ public class Unit implements Serializable
 	public static int radius = 10;
 	public static final int UPDATE_TIME = 3;
 	
-	int id = (int) (Math.random() * Integer.MAX_VALUE);
+	public int id = (int) (Math.random() * Integer.MAX_VALUE);
 	
-	float sx, sy;
+	public float sx, sy;
 	
-	float x;
-	float y; 
-	float heading;
-	float health = 100;
-	boolean alive = true;
+	public float x;
+	public float y; 
+	public float heading;
+	public float health = 100;
+	public boolean alive = true;
 	
-	UnitType type = UnitType.LIGHT;
-	UnitState state = UnitState.MOVING;
-	UnitState lastState = state;
-	float turnToAngle;
+	public UnitType type = UnitType.LIGHT;
+	public UnitState state = UnitState.MOVING;
+	public UnitState lastState = state;
+	public float turnToAngle;
 	
-	Player owner;
+	public Player owner;
 	
-	ArrayList<Point2i> path = new ArrayList<Point2i>();
-	int onStep = 0;
+	public ArrayList<Point2i> path = new ArrayList<Point2i>();
+	public int onStep = 0;
 	
-	int destx, desty;
+	public int destx, desty;
 	
-	int reloadtime = 0;
+	public int reloadtime = 0;
 	
-	Player killer;
+	public Player killer;
 	
-	int updateCountdown = 0;
+	public int updateCountdown = 0;
 	
-	boolean update = false;
+	public boolean update = false;
 	
 	//CLIENT ONLY
-	boolean selected = false;
+	public boolean selected = false;
 	
 	public Unit()
 	{

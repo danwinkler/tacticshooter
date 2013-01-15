@@ -8,24 +8,24 @@ import org.newdawn.slick.Sound;
 
 public class ClientState
 {
-	HashMap<Integer, Unit> unitMap = new HashMap<Integer, Unit>();
-	ArrayList<Unit> units = new ArrayList<Unit>();
+	public HashMap<Integer, Unit> unitMap = new HashMap<Integer, Unit>();
+	public ArrayList<Unit> units = new ArrayList<Unit>();
 	
-	HashMap<Integer, Bullet> bulletMap = new HashMap<Integer, Bullet>();
-	ArrayList<Bullet> bullets = new ArrayList<Bullet>();
+	public HashMap<Integer, Bullet> bulletMap = new HashMap<Integer, Bullet>();
+	public ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 	
-	Level l;
+	public Level l;
 	
-	ArrayList<Integer> selected = new ArrayList<Integer>();
+	public ArrayList<Integer> selected = new ArrayList<Integer>();
 	
-	Player player;
+	public Player player;
 	
-	Sound bullet1, bullet2, ping1, death1, death2, hit1;
+	public Sound bullet1, bullet2, ping1, death1, death2, hit1;
 	
-	float scrollx = 0;
-	float scrolly = 0;
+	public float scrollx = 0;
+	public float scrolly = 0;
 	
-	float soundFadeDist = 1000;
+	public float soundFadeDist = 1000;
 	
 	public void resetState()
 	{

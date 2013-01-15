@@ -1,6 +1,7 @@
 package tacticshooter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.vecmath.Point2f;
 import javax.vecmath.Point2i;
@@ -31,5 +32,8 @@ public class KryoHelper
 		k.register( UnitType.class );
 		k.register( Player[].class );
 		k.register( Point2f.class );
+		k.register( GameStats.class );
+		k.register( GameStats.TeamStats.class );
+		k.register( GameStats.TeamStats[].class );
 	}
 }

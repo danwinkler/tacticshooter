@@ -43,6 +43,8 @@ public class TacticServer
 	
 	boolean onTeam = false;
 	
+	GameStats gs = new GameStats();
+	
 	public TacticServer( ServerInterface si )
 	{
 		this.si = si;
@@ -50,6 +52,7 @@ public class TacticServer
 	
 	public void begin()
 	{
+		gs.setup( a, b );
 		l = new Level( 100, 100 );
 		LevelBuilder.buildLevelB( l, a, b );
 		
@@ -94,6 +97,7 @@ public class TacticServer
 						}
 					}
 					p.money += bc;
+					gs.get( p.team ).moneyEarned += bc;
 					si.sendToClient( p.id, new Message( MessageType.PLAYERUPDATE, p ) );
 				}
 				
@@ -164,7 +168,8 @@ public class TacticServer
 					if( won )
 					{
 						//reset
-						si.sendToAllClients( new Message( MessageType.GAMEOVER, l ) );
+						si.sendToAllClients( new Message( MessageType.GAMEOVER, gs ) );
+						/*
 						//kill all guys
 						for( int i = 0; i < units.size(); i++ )
 						{
@@ -177,9 +182,17 @@ public class TacticServer
 							si.sendToClient( p.id, new Message( MessageType.PLAYERUPDATE, p ) );
 						}
 						//make new level
+						gs.setup( a, b );
 						l = new Level( 100, 100 );
 						LevelBuilder.buildLevelB( l, a, b );
-						si.sendToAllClients( new Message( MessageType.LEVELUPDATE, l ) );
+						for( int i = 0; i < 8; i++ )
+						{
+							Thread ct = new Thread( new ComputerPlayer( (ServerNetworkInterface)si ) );
+							ct.start();
+						}
+						*/
+						sl.running = false;
+						return;
 					}
 				}
 			}
@@ -219,6 +232,7 @@ public class TacticServer
 							Unit u = new Unit( base.x, base.y, p );
 							units.add( u );
 							si.sendToAllClients( new Message( MessageType.UNITUPDATE, u ) );
+							gs.get( u.owner.team ).unitsCreated++;
 						}
 					}
 				}
@@ -316,6 +330,7 @@ public class TacticServer
 						u.setType( type );
 						units.add( u );
 						si.sendToAllClients( new Message( MessageType.UNITUPDATE, u ) );
+						gs.get( u.owner.team ).unitsCreated++;
 					}
 				}
 				break;
@@ -349,6 +364,7 @@ public class TacticServer
 			}
 			if( !u.alive )
 			{
+				gs.get( u.owner.team ).unitsLost++;
 				units.remove( i );
 				i--;
 			}
@@ -370,6 +386,7 @@ public class TacticServer
 	{
 		Bullet b = new Bullet( u.x + DMath.cosf( angle ) * (Unit.radius+5), u.y + DMath.sinf( angle ) * (Unit.radius+5), angle );
 		b.owner = u.owner;
+		gs.get( b.owner.team ).bulletsShot++;
 		bullets.add( b );
 		si.sendToAllClients( new Message( MessageType.BULLETUPDATE, b ) );
 	}
@@ -379,6 +396,7 @@ public class TacticServer
 		long lastTime;
 		long frameTime = (1000 / 30);
 		long timeDiff;
+		boolean running = true;
 		public ServerLoop()
 		{
 			
@@ -387,7 +405,7 @@ public class TacticServer
 		public void run() 
 		{
 			lastTime = System.currentTimeMillis();
-			while( true )
+			while( running )
 			{
 				update();
 				long time = System.currentTimeMillis();
@@ -403,6 +421,7 @@ public class TacticServer
 				}
 				lastTime = System.currentTimeMillis();
 			}
+			si.stop();
 		}	
 	}
 	
@@ -410,5 +429,21 @@ public class TacticServer
 	{
 		TacticServer ts = new TacticServer( new ServerNetworkInterface() );
 		ts.begin();
+		while( true )
+		{
+			try
+			{
+				Thread.sleep( 1000 );
+			} catch( InterruptedException e )
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if( !ts.sl.running )
+			{
+				ts = new TacticServer( new ServerNetworkInterface() );
+				ts.begin();
+			}
+		}
 	}
 }

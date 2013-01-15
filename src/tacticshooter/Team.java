@@ -14,8 +14,8 @@ public class Team
 		return onID;
 	}
 	
-	int id = getID();
-	int cash = 1000;
+	public int id = getID();
+	public int cash = 1000;
 	
 	public void update( TacticServer ts )
 	{

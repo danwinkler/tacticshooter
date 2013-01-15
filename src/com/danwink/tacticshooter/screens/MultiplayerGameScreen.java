@@ -1,4 +1,7 @@
-package tacticshooter;
+package com.danwink.tacticshooter.screens;
+
+import java.io.IOException;
+import java.nio.BufferOverflowException;
 
 import javax.vecmath.Point2i;
 
@@ -12,6 +15,18 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.Sound;
 import org.newdawn.slick.geom.Rectangle;
 
+import tacticshooter.Building;
+import tacticshooter.Bullet;
+import tacticshooter.ClientInterface;
+import tacticshooter.ClientNetworkInterface;
+import tacticshooter.ClientState;
+import tacticshooter.Level;
+import tacticshooter.Message;
+import tacticshooter.MessageType;
+import tacticshooter.Player;
+import tacticshooter.Slick2DEventMapper;
+import tacticshooter.Slick2DRenderer;
+import tacticshooter.Unit;
 import tacticshooter.Unit.UnitType;
 
 import com.esotericsoftware.minlog.Log;
@@ -46,35 +61,33 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 	
 	Slick2DRenderer renderer = new Slick2DRenderer();
 	
+	String address;
+	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
-		input = gc.getInput();
-		input.addListener( this );
-		Log.set( Log.LEVEL_TRACE );
+		this.dsh = dsh;
+	
+		if( dui == null )
+			dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
+		dui.setEnabled( true );
 		
-		String[] addressesToTry = { "localhost", "triggerly.com" };
 		
-		for( String s : addressesToTry )
+		try 
 		{
-			try
-			{
-				ci = new ClientNetworkInterface( s );
-			} catch( Exception e )
-			{
-				continue;
-			}
-			break;
+			ci = new ClientNetworkInterface( address );	
+		} catch( IOException e )
+		{
+			dsh.message( "message", "Could not connect to: " + address );
+			dsh.activate( "message", gc );
+			return;
 		}
-		
 		ci.sendToServer( new Message( MessageType.CLIENTJOIN, null ) );
 		
-		dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
+		input = gc.getInput();
+		input.addListener( this );
 		
-		Image button = null;
 		try
 		{
-			button = new Image( "img/buttontemp.png" );
-			
 			bullet1 = new Sound( "sound/bullet1.wav" );
 			bullet2 = new Sound( "sound/bullet2.wav" );
 			ping1 = new Sound( "sound/ping1.wav" );
@@ -170,6 +183,11 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 					Building building = (Building)m.message;
 					l.buildings.set( building.index, building );
 				}
+				break;
+			case GAMEOVER:
+				dsh.message( "postgame", m.message );
+				dsh.activate( "postgame", gc );
+				return;
 			}
 		}
 		
@@ -274,6 +292,7 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 	public void onExit()
 	{
 		resetState();
+		dui.setEnabled( false );
 	}
 
 	public void mousePressed( int button, int x, int y )
@@ -456,5 +475,11 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 	{
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void message( Object o )
+	{
+		address = (String)o;
 	}
 }

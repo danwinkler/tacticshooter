@@ -8,20 +8,20 @@ public class Building
 {
 	public static final int UPDATE_TIME = 5;
 	
-	Team t;
-	BuildingType bt;
-	int x;
-	int y;
-	int width = 50;
-	int height = 50;
+	public Team t;
+	public BuildingType bt;
+	public int x;
+	public int y;
+	public int width = 50;
+	public int height = 50;
 	
 	public static final int HOLDMAX = 500;
 	
-	int hold = 0;
+	public int hold = 0;
 	
-	int index;
+	public int index;
 	
-	int updateCountdown = 0;
+	public int updateCountdown = 0;
 	
 	public Building()
 	{
@@ -156,6 +156,7 @@ public class Building
 				if( count == 1 )
 				{
 					t = teams[index];
+					ts.gs.get( t ).pointsTaken++;
 				}
 			}
 		}

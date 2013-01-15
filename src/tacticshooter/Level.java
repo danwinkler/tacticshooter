@@ -9,6 +9,7 @@ import javax.vecmath.Vector2f;
 
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.util.pathfinding.Mover;
+import org.newdawn.slick.util.pathfinding.PathFindingContext;
 import org.newdawn.slick.util.pathfinding.TileBasedMap;
 
 import com.phyloa.dlib.renderer.Graphics2DIRenderer;
@@ -21,12 +22,12 @@ public class Level implements Serializable, TileBasedMap
 	
 	public ArrayList<Building> buildings = new ArrayList<Building>();
 	
-	int[][] tiles;
+	public int[][] tiles;
 	
-	int[][] visited;
+	public int[][] visited;
 	
-	int width;
-	int height;
+	public int width;
+	public int height;
 	
 	public Level()
 	{
@@ -259,5 +260,17 @@ public class Level implements Serializable, TileBasedMap
 			return 1;
 		}
 		return tiles[x][y];
+	}
+
+	@Override
+	public boolean blocked( PathFindingContext arg0, int x, int y )
+	{
+		return tiles[x][y] == 1;
+	}
+
+	@Override
+	public float getCost( PathFindingContext arg0, int x, int y )
+	{
+		return DMath.randomf( .1f, .9f );
 	}
 }

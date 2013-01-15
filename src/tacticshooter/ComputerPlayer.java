@@ -27,6 +27,8 @@ public class ComputerPlayer implements Runnable
 	ArrayList<Unit> units = new ArrayList<Unit>();
 	FakeConnection fc;
 	
+	boolean playing = true;
+	
 	public ComputerPlayer( ServerNetworkInterface si )
 	{
 		fc = new FakeConnection();
@@ -68,6 +70,10 @@ public class ComputerPlayer implements Runnable
 					}
 					break;
 				case PLAYERLIST:
+					break;
+				case GAMEOVER:
+					ci.sl.disconnected( fc );
+					playing = false;
 					break;
 				}
 			}

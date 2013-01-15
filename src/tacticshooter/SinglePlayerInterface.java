@@ -56,4 +56,11 @@ public class SinglePlayerInterface implements ServerInterface, ClientInterface
 	{
 		return !messagesForClient.isEmpty();
 	}
+
+	@Override
+	public void stop()
+	{
+		// TODO Auto-generated method stub
+		
+	}
 }
