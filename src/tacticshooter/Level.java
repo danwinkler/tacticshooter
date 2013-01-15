@@ -1,19 +1,17 @@
 package tacticshooter;
 
-import java.awt.Graphics2D;
 import java.io.Serializable;
 import java.util.ArrayList;
 
 import javax.vecmath.Point2f;
 import javax.vecmath.Vector2f;
 
+import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.util.pathfinding.Mover;
 import org.newdawn.slick.util.pathfinding.PathFindingContext;
 import org.newdawn.slick.util.pathfinding.TileBasedMap;
 
-import com.phyloa.dlib.renderer.Graphics2DIRenderer;
-import com.phyloa.dlib.renderer.Graphics2DRenderer;
 import com.phyloa.dlib.util.DMath;
 
 public class Level implements Serializable, TileBasedMap
@@ -44,6 +42,7 @@ public class Level implements Serializable, TileBasedMap
 	
 	public void render( Graphics g )
 	{
+		g.setLineWidth( 1 );
 		for( int y = 0; y < height; y++ )
 		{
 			for( int x = 0; x < width; x++ )
@@ -54,12 +53,46 @@ public class Level implements Serializable, TileBasedMap
 					//g.drawRect( x*tileSize, y*tileSize, tileSize, tileSize ); 
 					break;
 				case 1: 
+					g.setColor( Color.gray );
 					g.fillRect( x*tileSize, y*tileSize, tileSize, tileSize ); 
+					g.setColor( Color.black );
+					if( getTile( x-1, y) == 0 )
+					{
+						g.drawLine( x*tileSize, y*tileSize, x*tileSize, y*tileSize+tileSize );
+					}
+					if( getTile( x+1, y) == 0 )
+					{
+						g.drawLine( x*tileSize+tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize );
+					}
+					if( getTile( x, y-1) == 0 )
+					{
+						g.drawLine( x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize );
+					}
+					if( getTile( x, y+1) == 0 )
+					{
+						g.drawLine( x*tileSize, y*tileSize+tileSize, x*tileSize+tileSize, y*tileSize+tileSize );
+					}
+					
+					if( (x+y) % 4 == 0 )
+					{
+						g.setColor( Color.darkGray );
+						g.drawLine( x*tileSize, y*tileSize+tileSize, x*tileSize+tileSize, y*tileSize );
+					}
+					
+					if( (x-y) % 6 == 0 )
+					{
+						g.setColor( Color.darkGray );
+						g.drawLine( x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize );
+					}
 				break;
 				}
 			}
 		}
-		
+		g.setLineWidth( 1 );
+	}
+	
+	public void renderBuildings( Graphics g )
+	{
 		for( Building b : buildings )
 		{
 			b.render( g );

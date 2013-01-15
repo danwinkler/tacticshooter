@@ -42,20 +42,21 @@ public class Building
 	{
 		g.pushTransform();
 		g.translate( x, y );
-		g.setColor( Color.green );
-		g.drawRect( -width/2, -height/2, width, height );
+		if( t != null )
+		{
+			Color teamColor = t.getColor();
+			g.setColor( new Color( teamColor.r, teamColor.g, teamColor.b, .3f ) );
+			float rad = ((float)hold / (float)HOLDMAX) * 50;
+			g.fillOval( -rad, -rad, rad*2, rad*2 );
+			g.setColor( teamColor );
+			g.drawOval( -rad, -rad, rad*2, rad*2 );
+		}
 		
-		g.setColor( new Color( 0, 0, 255, 128 ) );
+		g.setColor( new Color( 0, 0, 0 ) );
 		
 		g.drawOval( -50, -50, 100, 100 );
 		
 		g.setColor( Color.black );
-		//Font awtFont = new Font( "Arial", Font.BOLD, 10 );
-		//TrueTypeFont font = new TrueTypeFont(awtFont, false);
-		//.setFont( font );
-		g.drawString( "Team: " + (t != null ? t.id : "empty"), -15, -15 );
-		g.drawString( "Hold: " + hold, -15, 0 );
-		g.drawString( bt.name(), -15, 15 );
 		g.popTransform();
 	}
 	

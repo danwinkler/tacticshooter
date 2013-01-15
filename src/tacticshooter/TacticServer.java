@@ -55,7 +55,6 @@ public class TacticServer
 		gs.setup( a, b );
 		l = new Level( 100, 100 );
 		LevelBuilder.buildLevelB( l, a, b );
-		
 		finder = new AStarPathFinder( l, 500, false );
 		
 		sl = new ServerLoop();
@@ -169,7 +168,7 @@ public class TacticServer
 					{
 						//reset
 						si.sendToAllClients( new Message( MessageType.GAMEOVER, gs ) );
-						/*
+						
 						//kill all guys
 						for( int i = 0; i < units.size(); i++ )
 						{
@@ -185,13 +184,13 @@ public class TacticServer
 						gs.setup( a, b );
 						l = new Level( 100, 100 );
 						LevelBuilder.buildLevelB( l, a, b );
+						finder = new AStarPathFinder( l, 500, false );
 						for( int i = 0; i < 8; i++ )
 						{
 							Thread ct = new Thread( new ComputerPlayer( (ServerNetworkInterface)si ) );
 							ct.start();
 						}
-						*/
-						sl.running = false;
+						
 						return;
 					}
 				}
@@ -296,6 +295,7 @@ public class TacticServer
 				Player player = players.get( m.sender );
 				player.respawn = 0;
 				player.team = t.id == a.id ? b : a;
+				player.money = 0;
 				
 				for( Unit u : units )
 				{

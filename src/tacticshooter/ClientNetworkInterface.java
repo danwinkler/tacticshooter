@@ -57,4 +57,10 @@ public class ClientNetworkInterface implements ClientInterface
 	{
 		return !messages.isEmpty();
 	}
+
+	@Override
+	public void stop()
+	{
+		client.close();
+	}
 }

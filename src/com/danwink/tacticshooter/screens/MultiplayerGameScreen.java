@@ -16,6 +16,7 @@ import org.newdawn.slick.Sound;
 import org.newdawn.slick.geom.Rectangle;
 
 import tacticshooter.Building;
+import tacticshooter.Building.BuildingType;
 import tacticshooter.Bullet;
 import tacticshooter.ClientInterface;
 import tacticshooter.ClientNetworkInterface;
@@ -26,6 +27,7 @@ import tacticshooter.MessageType;
 import tacticshooter.Player;
 import tacticshooter.Slick2DEventMapper;
 import tacticshooter.Slick2DRenderer;
+import tacticshooter.Team;
 import tacticshooter.Unit;
 import tacticshooter.Unit.UnitType;
 
@@ -37,6 +39,7 @@ import com.phyloa.dlib.dui.DUIEvent;
 import com.phyloa.dlib.dui.DUIListener;
 import com.phyloa.dlib.renderer.DScreen;
 import com.phyloa.dlib.renderer.DScreenHandler;
+import com.phyloa.dlib.util.DMath;
 
 public class MultiplayerGameScreen extends ClientState implements DScreen<GameContainer, Graphics>, InputListener
 {
@@ -63,10 +66,15 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 	
 	String address;
 	
+	GameContainer gc;
+	
+	Image miniMap;
+	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
 		this.dsh = dsh;
-	
+		this.gc = gc;
+		
 		if( dui == null )
 			dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
 		dui.setEnabled( true );
@@ -103,9 +111,9 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 		
 		
 		switchTeams = new DButton( "Switch Teams", 0, gc.getHeight()-100, 200, 100 );
-		buildLightUnit = new DButton( "Build Light Unit", 200, gc.getHeight()-100, 200, 100 );
-		buildHeavyUnit = new DButton( "Build Heavy Unit", 400, gc.getHeight()-100, 200, 100 );
-		buildSupplyUnit = new DButton( "Build Supply Unit", 600, gc.getHeight()-100, 200, 100 );
+		buildLightUnit = new DButton( "Build Light Unit\n10", 200, gc.getHeight()-100, 200, 100 );
+		buildHeavyUnit = new DButton( "Build Heavy Unit\n20", 400, gc.getHeight()-100, 200, 100 );
+		buildSupplyUnit = new DButton( "Build Supply Unit\n20", 600, gc.getHeight()-100, 200, 100 );
 		
 		dui.add( switchTeams );
 		dui.add( buildLightUnit );
@@ -157,7 +165,15 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 				tu.sync( u );
 				break;
 			case LEVELUPDATE:
-				l = (Level)m.message;
+				if( l == null && player != null )
+				{
+					l = (Level)m.message;
+					scrollToTeamBase( player.team );
+				}
+				else
+				{
+					l = (Level)m.message;
+				}
 				break;
 			case BULLETUPDATE:
 				Bullet b = (Bullet)m.message;
@@ -175,7 +191,12 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 				this.waitingForMoveConfirmation = false;
 				break;
 			case PLAYERUPDATE:
-				this.player = (Player)m.message;
+				Player newPlayer = (Player)m.message;
+				if( (player == null || newPlayer.team.id != player.team.id) && l != null )
+				{
+					scrollToTeamBase( newPlayer.team );
+				}
+				this.player = newPlayer;
 				break;
 			case BUILDINGUPDATE:
 				if( l != null )
@@ -202,6 +223,8 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 		if( scrolly+gc.getHeight() - 100 < l.height*l.tileSize && (input.isKeyDown( Input.KEY_DOWN ) || input.isKeyDown( Input.KEY_S )) ) scrolly+=scrollSpeed*d;
 		if( scrollx > 0 && (input.isKeyDown( Input.KEY_LEFT ) || input.isKeyDown( Input.KEY_A )) ) scrollx-=scrollSpeed*d;
 		if( scrollx+gc.getWidth() < l.width*l.tileSize && (input.isKeyDown( Input.KEY_RIGHT ) || input.isKeyDown( Input.KEY_D )) ) scrollx+=scrollSpeed*d;
+		
+		
 		
 		for( int i = 0; i < units.size(); i++ )
 		{
@@ -250,6 +273,7 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 		g.translate( -scrollx, -scrolly );
 		
 		l.render( g );
+		l.renderBuildings( g );
 		
 		g.setColor( this.waitingForMoveConfirmation ? Color.gray : Color.green );
 		g.drawRect( mx * Level.tileSize, my * Level.tileSize, Level.tileSize, Level.tileSize );
@@ -257,7 +281,7 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 		for( int i = 0; i < units.size(); i++ )
 		{
 			Unit u = units.get( i );
-			u.render( g );
+			u.render( g, player );
 		}
 		
 		g.setColor( Color.black );
@@ -287,12 +311,80 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 		}
 		
 		dui.render( renderer.renderTo( g ) );
+		
+		//Draw minimap
+		
+		float xScale = 200.f / (l.width*l.tileSize);
+		float yScale = 200.f / (l.height*l.tileSize);
+		g.pushTransform();
+		g.translate( gc.getWidth()-200, gc.getHeight()-200 );
+		g.setColor( Color.white );
+		g.fillRect( 0, 0, 200, 300 );
+		g.pushTransform();
+		if( miniMap == null )
+		{
+			g.scale( xScale, yScale );
+			l.render( g );
+			try
+			{
+				miniMap = new Image( 200, 200 );
+			} catch( SlickException e )
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			g.copyArea( miniMap, gc.getWidth()-200, gc.getHeight()-200 );
+		}
+		else
+		{
+			g.drawImage( miniMap, 0, 0 );
+			g.scale( xScale, yScale );
+		}
+		l.renderBuildings( g );
+		for( int i = 0; i < units.size(); i++ )
+		{
+			Unit u = units.get( i );
+			u.renderMinimap( g, player );
+		}
+		
+		g.setColor( Color.blue );
+		g.drawRect( scrollx, scrolly, gc.getWidth(), gc.getHeight() );
+		
+		g.popTransform();
+		
+		g.setColor( Color.black );
+		g.setLineWidth( 2 );
+		g.drawRect( 0, 0, 200, 300 );
+		g.setLineWidth( 1 );
+		g.popTransform();
 	}
 
 	public void onExit()
 	{
+		ci.stop();
 		resetState();
 		dui.setEnabled( false );
+	}
+	
+	public void scrollToTeamBase( Team t )
+	{
+		int destX = 0;
+		int destY = 0;
+		for( int i = 0; i < l.buildings.size(); i++ )
+		{
+			Building b = l.buildings.get( i );
+			if( b.bt == BuildingType.CENTER && b.t.id == t.id )
+			{
+				destX = b.x;
+				destY = b.y;
+				break;
+			}
+		}
+		
+		System.out.println( destX + " " + destY );
+		
+		scrollx = DMath.bound( destX-gc.getWidth()/2, 0, l.width*Level.tileSize - gc.getWidth() );
+		scrolly = DMath.bound( destY-gc.getHeight()/2, 0, l.height*Level.tileSize - gc.getHeight() );
 	}
 
 	public void mousePressed( int button, int x, int y )

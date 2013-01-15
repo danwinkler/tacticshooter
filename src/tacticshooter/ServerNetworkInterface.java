@@ -131,6 +131,6 @@ public class ServerNetworkInterface implements ServerInterface
 	@Override
 	public void stop()
 	{
-		server.stop();
+		server.close();
 	}
 }

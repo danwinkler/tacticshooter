@@ -236,19 +236,26 @@ public class Unit implements Serializable
 		y += dsy * .2f * d;
 	}
 	
-	public void render( Graphics g )
+	public void render( Graphics g, Player p )
 	{
 		g.pushTransform();
 		g.translate( x, y );
-		g.setColor( Color.black );
-		g.drawString( owner.id + "", 0, -10 );
+		
 		if( selected )
 		{
 			g.setColor( Color.blue );
 			g.drawRect( -10, -10, 20, 20 );
 		}
-		g.setColor( new Color( DMath.bound( 1.f - health*.01f, 0, 1 ), DMath.bound(health*.01f, 0, 1 ), 0 ) );
-		g.fillRect( -8, -8, (int)(16.f * health*.01f), 2 );
+		
+		if( owner.id == p.id )
+		{
+			g.setColor( Color.white );
+			g.fillOval( -7, -7, 14, 14 );
+			g.setColor( Color.black );
+			g.drawOval( -7, -7, 14, 14 );
+		}
+		
+		g.pushTransform();
 		
 		g.rotate( 0, 0, heading / DMath.PI2F * 360 );
 		
@@ -257,6 +264,16 @@ public class Unit implements Serializable
 		g.setColor( Color.black );
 		g.drawOval( -5, -5, 10, 10 );
 		g.drawLine( 0, 0, 5, 0 );
+		
+		g.popTransform();
+		
+		g.setColor( Color.black );
+		g.fillRect( -9, -9, (int)(18.f * health*.01f), 4 );
+		
+		g.setColor( new Color( DMath.bound( 1.f - health*.01f, 0, 1 ), DMath.bound(health*.01f, 0, 1 ), 0 ) );
+		g.fillRect( -8, -8, (int)(16.f * health*.01f), 2 );
+		
+		
 		g.popTransform();
 	}
 	
@@ -338,5 +355,11 @@ public class Unit implements Serializable
 			this.bulletSpread = bulletSpread;
 			this.price = price;
 		}
+	}
+
+	public void renderMinimap( Graphics g, Player player )
+	{
+		g.setColor( this.owner.team.getColor() );
+		g.fillOval( x-20, y-20, 40, 40 );
 	}
 }

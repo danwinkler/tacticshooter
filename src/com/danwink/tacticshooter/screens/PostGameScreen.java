@@ -25,6 +25,7 @@ public class PostGameScreen implements DScreen<GameContainer, Graphics>, DUIList
 		
 		DUI dui;
 		DButton okay;
+		DButton rejoin;
 		
 		Slick2DRenderer r = new Slick2DRenderer();
 		
@@ -52,9 +53,11 @@ public class PostGameScreen implements DScreen<GameContainer, Graphics>, DUIList
 				y += 200;
 			}
 			
-			okay = new DButton( "Okay", e.getWidth() / 2 - 100, e.getHeight() - 200, 200, 100 );
+			okay = new DButton( "Okay", e.getWidth() / 2 - 200, e.getHeight() - 200, 200, 100 );
+			rejoin = new DButton( "Rejoin", e.getWidth() / 2, e.getHeight() - 200, 200, 100 );
 			
 			dui.add( okay );
+			dui.add( rejoin );
 			
 			dui.addDUIListener( this );
 		}
@@ -81,7 +84,10 @@ public class PostGameScreen implements DScreen<GameContainer, Graphics>, DUIList
 			if( e == okay )
 			{
 				dsh.activate( "home", gc );
-			} 	
+			} else if( e == rejoin )
+			{
+				dsh.activate( "multiplayergame", gc );
+			}
 		}
 
 		@Override

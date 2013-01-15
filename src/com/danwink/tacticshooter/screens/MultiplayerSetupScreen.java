@@ -1,5 +1,7 @@
 package com.danwink.tacticshooter.screens;
 
+import java.awt.event.KeyEvent;
+
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
@@ -68,15 +70,24 @@ public class MultiplayerSetupScreen implements DScreen<GameContainer, Graphics>,
 	{
 		DUIElement e = event.getElement();
 		if( e instanceof DButton && event.getType() == DButton.MOUSE_UP )
-		if( e == enter )
 		{
-			dsh.message( "multiplayergame", address.getText().trim() );
-			dsh.activate( "multiplayergame", gc );
-		} 
-		else if( e == back )
+			if( e == enter )
+			{
+				dsh.message( "multiplayergame", address.getText().trim() );
+				dsh.activate( "multiplayergame", gc );
+			} 
+			else if( e == back )
+			{
+				dsh.activate( "home", gc );
+			}
+		} else if( e instanceof DTextBox )
 		{
-			dsh.activate( "home", gc );
-		} 
+			if( event.getType() == KeyEvent.VK_ENTER )
+			{
+				dsh.message( "multiplayergame", address.getText().trim() );
+				dsh.activate( "multiplayergame", gc );
+			}
+		}
 	}
 
 	@Override
