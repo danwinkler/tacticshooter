@@ -9,6 +9,7 @@ import tacticshooter.GameStats;
 import tacticshooter.GameStats.TeamStats;
 import tacticshooter.Slick2DEventMapper;
 import tacticshooter.Slick2DRenderer;
+import tacticshooter.StaticFiles;
 
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DText;
@@ -55,6 +56,8 @@ public class PostGameScreen implements DScreen<GameContainer, Graphics>, DUIList
 			
 			okay = new DButton( "Okay", e.getWidth() / 2 - 200, e.getHeight() - 200, 200, 100 );
 			rejoin = new DButton( "Rejoin", e.getWidth() / 2, e.getHeight() - 200, 200, 100 );
+			
+			StaticFiles.getMusic( "menu" ).loop();
 			
 			dui.add( okay );
 			dui.add( rejoin );

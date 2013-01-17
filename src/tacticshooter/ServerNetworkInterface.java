@@ -43,25 +43,31 @@ public class ServerNetworkInterface implements ServerInterface
 	
 	public void sendToClient( int id, Message m )
 	{
-		Connection c = connections.get( id );
-		if( c != null )
+		synchronized( messages )
 		{
-			c.sendTCP( m );
-			if( DEBUG )
+			Connection c = connections.get( id );
+			if( c != null )
 			{
-				messageCount[m.messageType.ordinal()]++;
+				c.sendTCP( m );
+				if( DEBUG )
+				{
+					messageCount[m.messageType.ordinal()]++;
+				}
 			}
 		}
 	}
 
 	public void sendToAllClients( Message m ) 
 	{
-		for( int i = 0; i < connectionsArr.size(); i++ )
+		synchronized( connectionsArr )
 		{
-			connectionsArr.get( i ).sendTCP( m );
-			if( DEBUG )
+			for( int i = 0; i < connectionsArr.size(); i++ )
 			{
-				messageCount[m.messageType.ordinal()]++;
+				connectionsArr.get( i ).sendTCP( m );
+				if( DEBUG )
+				{
+					messageCount[m.messageType.ordinal()]++;
+				}
 			}
 		}
 	}
@@ -103,13 +109,16 @@ public class ServerNetworkInterface implements ServerInterface
 		{
 			synchronized( messages )
 			{
-				Message m = new Message();
-				m.message = c.getID();
-				m.sender = c.getID();
-				m.messageType = MessageType.DISCONNECTED;
-				messages.push( m );
-				connections.remove( c.getID() );
-				connectionsArr.remove( c );
+				synchronized( connectionsArr )
+				{
+					Message m = new Message();
+					m.message = c.getID();
+					m.sender = c.getID();
+					m.messageType = MessageType.DISCONNECTED;
+					messages.push( m );
+					connections.remove( c.getID() );
+					connectionsArr.remove( c );
+				}
 			}
 		}
 	}

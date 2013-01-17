@@ -33,7 +33,7 @@ public class TacticServer
 	
 	Thread t;
 	
-	ServerLoop sl;
+	public ServerLoop sl;
 	
 	long lastTick;
 	int tick = 0;
@@ -203,7 +203,7 @@ public class TacticServer
 				boolean contains = false;
 				for( Unit u : units )
 				{
-					if( u.owner == p )
+					if( u.owner.id == p.id )
 					{
 						contains = true;
 						break;
@@ -391,12 +391,12 @@ public class TacticServer
 		si.sendToAllClients( new Message( MessageType.BULLETUPDATE, b ) );
 	}
 	
-	private class ServerLoop implements Runnable 
+	public class ServerLoop implements Runnable 
 	{
 		long lastTime;
 		long frameTime = (1000 / 30);
 		long timeDiff;
-		boolean running = true;
+		public boolean running = true;
 		public ServerLoop()
 		{
 			
@@ -429,21 +429,5 @@ public class TacticServer
 	{
 		TacticServer ts = new TacticServer( new ServerNetworkInterface() );
 		ts.begin();
-		while( true )
-		{
-			try
-			{
-				Thread.sleep( 1000 );
-			} catch( InterruptedException e )
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			if( !ts.sl.running )
-			{
-				ts = new TacticServer( new ServerNetworkInterface() );
-				ts.begin();
-			}
-		}
 	}
 }

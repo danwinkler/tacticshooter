@@ -11,6 +11,8 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.InputListener;
+import org.newdawn.slick.Music;
+import org.newdawn.slick.MusicListener;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.Sound;
 import org.newdawn.slick.geom.Rectangle;
@@ -24,15 +26,18 @@ import tacticshooter.ClientState;
 import tacticshooter.Level;
 import tacticshooter.Message;
 import tacticshooter.MessageType;
+import tacticshooter.MusicQueuer;
 import tacticshooter.Player;
 import tacticshooter.Slick2DEventMapper;
 import tacticshooter.Slick2DRenderer;
+import tacticshooter.StaticFiles;
 import tacticshooter.Team;
 import tacticshooter.Unit;
 import tacticshooter.Unit.UnitType;
 
 import com.esotericsoftware.minlog.Log;
 import com.phyloa.dlib.dui.DButton;
+import com.phyloa.dlib.dui.DPanel;
 import com.phyloa.dlib.dui.DUI;
 import com.phyloa.dlib.dui.DUIElement;
 import com.phyloa.dlib.dui.DUIEvent;
@@ -41,7 +46,7 @@ import com.phyloa.dlib.renderer.DScreen;
 import com.phyloa.dlib.renderer.DScreenHandler;
 import com.phyloa.dlib.util.DMath;
 
-public class MultiplayerGameScreen extends ClientState implements DScreen<GameContainer, Graphics>, InputListener
+public class MultiplayerGameScreen extends ClientState implements DScreen<GameContainer, Graphics>, InputListener, DUIListener
 {
 	ClientInterface ci;
 	
@@ -55,6 +60,10 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 	DButton buildLightUnit;
 	DButton buildHeavyUnit;
 	DButton buildSupplyUnit;
+	
+	DPanel escapeMenu;
+	DButton quit;
+	DButton returnToGame;
 
     DUI dui;
 	
@@ -85,32 +94,20 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 			buildHeavyUnit = new DButton( "Build Heavy Unit\n20", 400, gc.getHeight()-100, 200, 100 );
 			buildSupplyUnit = new DButton( "Build Supply Unit\n20", 600, gc.getHeight()-100, 200, 100 );
 			
+			escapeMenu = new DPanel( gc.getWidth() / 2 - 100, gc.getHeight()/2 - 100, 200, 200 );
+			quit = new DButton( "Quit Game", 0, 0, 200, 100 );
+			escapeMenu.add( quit );
+			returnToGame = new DButton( "Return to Game", 0, 100, 200, 100 );
+			escapeMenu.add( returnToGame );
+			escapeMenu.setVisible( false );
+			
 			dui.add( switchTeams );
 			dui.add( buildLightUnit );
 			dui.add( buildHeavyUnit );
 			dui.add( buildSupplyUnit );
+			dui.add( escapeMenu );
 			
-			dui.addDUIListener( new DUIListener() {
-				@Override
-				public void event( DUIEvent event )
-				{
-					DUIElement e = event.getElement();
-					if( e instanceof DButton && event.getType() == DButton.MOUSE_UP )
-					if( e == switchTeams )
-					{
-						ci.sendToServer( new Message( MessageType.SWITCHTEAMS, player.team ) );
-					} else if( e == buildLightUnit )
-					{
-						ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.LIGHT) );
-					} else if( e == buildHeavyUnit )
-					{
-						ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.HEAVY) );
-					} else if( e == buildSupplyUnit )
-					{
-						ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.SUPPLY) );
-					}
-				}
-			});
+			dui.addDUIListener( this );
 		}
 		dui.setEnabled( true );
 		
@@ -128,6 +125,12 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 		
 		input = gc.getInput();
 		input.addListener( this );
+		
+		Music music;
+		int musicChoice = DMath.randomi( 1, 3 );
+		while( (music = StaticFiles.getMusic( "play" + musicChoice )) == null ){};
+		music.play();
+		music.addListener( new MusicQueuer( DMath.randomi( 0, 2 ), "play1", "play2", "play3" ) );
 		
 		try
 		{
@@ -220,11 +223,11 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 		}
 		
 		float scrollSpeed = 20;
-		
-		if( scrolly > 0 && (input.isKeyDown( Input.KEY_UP ) || input.isKeyDown( Input.KEY_W )) ) scrolly-=scrollSpeed*d;
-		if( scrolly+gc.getHeight() - bottomOffset < l.height*l.tileSize && (input.isKeyDown( Input.KEY_DOWN ) || input.isKeyDown( Input.KEY_S )) ) scrolly+=scrollSpeed*d;
-		if( scrollx > 0 && (input.isKeyDown( Input.KEY_LEFT ) || input.isKeyDown( Input.KEY_A )) ) scrollx-=scrollSpeed*d;
-		if( scrollx+gc.getWidth() < l.width*l.tileSize && (input.isKeyDown( Input.KEY_RIGHT ) || input.isKeyDown( Input.KEY_D )) ) scrollx+=scrollSpeed*d;
+		Rectangle screenBounds = getScreenBounds();
+		if( scrolly > screenBounds.getMinY() && (input.isKeyDown( Input.KEY_UP ) || input.isKeyDown( Input.KEY_W )) ) scrolly-=scrollSpeed*d;
+		if( scrolly+gc.getHeight() < screenBounds.getMaxY() && (input.isKeyDown( Input.KEY_DOWN ) || input.isKeyDown( Input.KEY_S )) ) scrolly+=scrollSpeed*d;
+		if( scrollx > screenBounds.getMinX() && (input.isKeyDown( Input.KEY_LEFT ) || input.isKeyDown( Input.KEY_A )) ) scrollx-=scrollSpeed*d;
+		if( scrollx+gc.getWidth() < screenBounds.getMaxX() && (input.isKeyDown( Input.KEY_RIGHT ) || input.isKeyDown( Input.KEY_D )) ) scrollx+=scrollSpeed*d;
 		
 		
 		
@@ -306,7 +309,9 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 		
 		g.popTransform();
 		
-		g.setColor( Color.red );
+		g.setColor( new Color( 0, 0, 0, 128 ) );
+		g.fillRect( 0, 0, gc.getWidth(), 30 );
+		g.setColor( Color.white );
 		if( player != null )
 		{
 			g.drawString( "Money: " + player.money, 100, 10 );
@@ -315,7 +320,7 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 		dui.render( renderer.renderTo( g ) );
 		
 		//Draw minimap
-		
+		g.setClip( gc.getWidth()-200, gc.getHeight()-200, 200, 200 );
 		float xScale = 200.f / (l.width*l.tileSize);
 		float yScale = 200.f / (l.height*l.tileSize);
 		g.pushTransform();
@@ -359,11 +364,32 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 		g.drawRect( 0, 0, 200, 300 );
 		g.setLineWidth( 1 );
 		g.popTransform();
+		
+		g.clearClip();
+		
+		if( escapeMenu.isVisible() )
+		{
+			g.setColor( new Color( 0, 0, 0, 128 ) );
+			//Left side
+			g.fillRect( 0, 0, gc.getWidth()/2 - 100, gc.getHeight() );
+			
+			//Right side
+			g.fillRect( gc.getWidth()/2 + 100, 0, gc.getWidth()/2 - 100, gc.getHeight() );
+			
+			//Top
+			g.fillRect( gc.getWidth()/2 - 100, 0, 200, gc.getHeight()/2-100 );
+			
+			//bottom
+			g.fillRect( gc.getWidth()/2 - 100, gc.getHeight()/2 + 100, 200, gc.getHeight()/2-100 );
+		}
 	}
 
 	public void onExit()
 	{
-		ci.stop();
+		if( ci != null )
+		{
+			ci.stop();
+		}
 		resetState();
 		miniMap = null;
 		dui.setEnabled( false );
@@ -384,30 +410,46 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 			}
 		}
 		
-		System.out.println( destX + " " + destY );
-		
-		scrollx = DMath.bound( destX-gc.getWidth()/2, 0, l.width*Level.tileSize - gc.getWidth() );
-		scrolly = DMath.bound( destY-gc.getHeight()/2, 0, l.height*Level.tileSize - gc.getHeight() + bottomOffset );
+		Rectangle screenBounds = getScreenBounds();
+		scrollx = DMath.bound( destX-gc.getWidth()/2, screenBounds.getMinX(), screenBounds.getMaxX() );
+		scrolly = DMath.bound( destY-gc.getHeight()/2, screenBounds.getMinY(), screenBounds.getMaxY() );
+	}
+	
+	public Rectangle getScreenBounds()
+	{
+		return new Rectangle( -gc.getWidth()/2, -gc.getHeight()/2, l.width*Level.tileSize + gc.getWidth(), l.height*Level.tileSize + gc.getHeight() );
 	}
 
 	public void mousePressed( int button, int x, int y )
 	{
-		if( button == Input.MOUSE_LEFT_BUTTON )
+		if( x > gc.getWidth()-200 && y > gc.getHeight()-200 )
+		{	
+			//miniMap
+			float minimapX = x - (gc.getWidth()-200);
+			float minimapY = y - (gc.getHeight()-200);
+			Rectangle screenBounds = getScreenBounds();
+			scrollx = DMath.bound( (minimapX / 200.f) * l.width*Level.tileSize - gc.getWidth()/2, screenBounds.getMinX(), screenBounds.getMaxX() );
+			scrolly = DMath.bound( (minimapY / 200.f) * l.height*Level.tileSize - gc.getHeight()/2, screenBounds.getMinY(), screenBounds.getMaxY() );
+		}	
+		else
 		{
-			sx = x + scrollx;
-			sy = y + scrolly;
-			sx2 = sx;
-			sy2 = sy;
-			selecting = true;
-		} 
-		else if( button == Input.MOUSE_RIGHT_BUTTON )
-		{
-			int tx = (int)((x+scrollx) / Level.tileSize);
-			int ty = (int)((y+scrolly) / Level.tileSize);
-			ci.sendToServer( new Message( MessageType.SETATTACKPOINT, new Object[]{ new Point2i( tx, ty ), selected } ) );
-			this.waitingForMoveConfirmation = true;
-			mx = tx;
-			my = ty;
+			if( button == Input.MOUSE_LEFT_BUTTON )
+			{
+				sx = x + scrollx;
+				sy = y + scrolly;
+				sx2 = sx;
+				sy2 = sy;
+				selecting = true;
+			} 
+			else if( button == Input.MOUSE_RIGHT_BUTTON )
+			{
+				int tx = (int)((x+scrollx) / Level.tileSize);
+				int ty = (int)((y+scrolly) / Level.tileSize);
+				ci.sendToServer( new Message( MessageType.SETATTACKPOINT, new Object[]{ new Point2i( tx, ty ), selected } ) );
+				this.waitingForMoveConfirmation = true;
+				mx = tx;
+				my = ty;
+			}
 		}
 	}
 
@@ -435,10 +477,22 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 
 	public void mouseDragged( int oldx, int oldy, int newx, int newy )
 	{
-		if( input.isMouseButtonDown( Input.MOUSE_LEFT_BUTTON ) )
+		if( newx > gc.getWidth()-200 && newy > gc.getHeight()-200 )
+		{	
+			//miniMap
+			float minimapX = newx - (gc.getWidth()-200);
+			float minimapY = newy - (gc.getHeight()-200);
+			Rectangle screenBounds = getScreenBounds();
+			scrollx = DMath.bound( (minimapX / 200.f) * l.width*Level.tileSize - gc.getWidth()/2, screenBounds.getMinX(), screenBounds.getMaxX() );
+			scrolly = DMath.bound( (minimapY / 200.f) * l.height*Level.tileSize - gc.getHeight()/2, screenBounds.getMinY(), screenBounds.getMaxY() );
+		}	
+		else
 		{
-			sx2 = newx+scrollx;
-			sy2 = newy+scrolly;
+			if( input.isMouseButtonDown( Input.MOUSE_LEFT_BUTTON ) )
+			{
+				sx2 = newx+scrollx;
+				sy2 = newy+scrolly;
+			}
 		}
 	}
 
@@ -490,9 +544,12 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 	}
 
 	@Override
-	public void keyPressed( int arg0, char arg1 )
+	public void keyPressed( int keyCode, char arg1 )
 	{
-		// TODO Auto-generated method stub
+		if( keyCode == Input.KEY_ESCAPE )
+		{
+			escapeMenu.setVisible( !escapeMenu.isVisible() );
+		}
 	}
 
 	@Override
@@ -576,5 +633,32 @@ public class MultiplayerGameScreen extends ClientState implements DScreen<GameCo
 	public void message( Object o )
 	{
 		address = (String)o;
+	}
+	
+	public void event( DUIEvent event )
+	{
+		DUIElement e = event.getElement();
+		if( e instanceof DButton && event.getType() == DButton.MOUSE_UP )
+		{
+			if( e == switchTeams )
+			{
+				ci.sendToServer( new Message( MessageType.SWITCHTEAMS, player.team ) );
+			} else if( e == buildLightUnit )
+			{
+				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.LIGHT) );
+			} else if( e == buildHeavyUnit )
+			{
+				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.HEAVY) );
+			} else if( e == buildSupplyUnit )
+			{
+				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.SUPPLY) );
+			} else if( e == quit )
+			{
+				dsh.activate( "home", gc );
+			} else if( e == returnToGame )
+			{
+				escapeMenu.setVisible( false );
+			}
+		}
 	}
 }

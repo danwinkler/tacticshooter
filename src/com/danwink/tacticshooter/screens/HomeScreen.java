@@ -2,9 +2,14 @@ package com.danwink.tacticshooter.screens;
 
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Music;
+import org.newdawn.slick.SlickException;
 
+import tacticshooter.ServerNetworkInterface;
 import tacticshooter.Slick2DEventMapper;
 import tacticshooter.Slick2DRenderer;
+import tacticshooter.StaticFiles;
+import tacticshooter.TacticServer;
 import tacticshooter.Unit.UnitType;
 
 import com.phyloa.dlib.dui.DButton;
@@ -18,6 +23,8 @@ import com.phyloa.dlib.renderer.DScreenHandler;
 public class HomeScreen implements DScreen<GameContainer, Graphics>, DUIListener
 {
 	DScreenHandler<GameContainer, Graphics> dsh;
+	
+	TacticServer server;
 	
 	DUI dui;
 	DButton singlePlayer;
@@ -37,7 +44,7 @@ public class HomeScreen implements DScreen<GameContainer, Graphics>, DUIListener
 		{
 			dui = new DUI( new Slick2DEventMapper( e.getInput() ) );
 			
-			singlePlayer = new DButton( "Singleplayer", e.getWidth() / 2 - 200, e.getHeight()/2 - 200, 400, 100 );
+			singlePlayer = new DButton( "Start Local Server", e.getWidth() / 2 - 200, e.getHeight()/2 - 200, 400, 100 );
 			multiPlayer = new DButton( "Multiplayer", e.getWidth() / 2 - 200, e.getHeight()/2 - 100, 400, 100 );
 			settings = new DButton( "Settings", e.getWidth() / 2 - 200, e.getHeight()/2, 400, 100 );
 			exit = new DButton( "Exit", e.getWidth() / 2 - 200, e.getHeight()/2 + 100, 400, 100 );
@@ -50,6 +57,9 @@ public class HomeScreen implements DScreen<GameContainer, Graphics>, DUIListener
 			
 			dui.addDUIListener( this );
 		}
+		
+		StaticFiles.loadAllMusic();
+		StaticFiles.loopWhenReady( "menu" );
 		
 		dui.setEnabled( true );
 	}
@@ -75,7 +85,17 @@ public class HomeScreen implements DScreen<GameContainer, Graphics>, DUIListener
 		if( e instanceof DButton && event.getType() == DButton.MOUSE_UP )
 		if( e == singlePlayer )
 		{
-			
+			if( server == null )
+			{
+				singlePlayer.setText( "Stop Local Server" );
+				server = new TacticServer( new ServerNetworkInterface() );
+				server.begin();
+			}
+			else
+			{
+				singlePlayer.setText( "Start Local Server" );
+				server.sl.running = false;
+			}
 		} 
 		else if( e == multiPlayer )
 		{
