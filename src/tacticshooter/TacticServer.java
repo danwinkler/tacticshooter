@@ -1,5 +1,6 @@
 package tacticshooter;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -38,12 +39,15 @@ public class TacticServer
 	long lastTick;
 	int tick = 0;
 	
-	Team a = new Team();
-	Team b = new Team();
+	Team a = Team.a;
+	Team b = Team.b;
 	
 	boolean onTeam = false;
 	
 	GameStats gs = new GameStats();
+	
+	String[] maps = { "map1", "map2" };
+	int onMap = 1;
 	
 	public TacticServer( ServerInterface si )
 	{
@@ -53,8 +57,16 @@ public class TacticServer
 	public void begin()
 	{
 		gs.setup( a, b );
-		l = new Level( 100, 100 );
-		LevelBuilder.buildLevelB( l, a, b );
+		//l = new Level( 100, 100 );
+		//LevelBuilder.buildLevelB( l, a, b );
+		try
+		{
+			l = LevelFileHelper.loadLevel( maps[onMap] );
+		} catch( IOException e )
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		finder = new AStarPathFinder( l, 500, false );
 		
 		sl = new ServerLoop();
@@ -182,8 +194,17 @@ public class TacticServer
 						}
 						//make new level
 						gs.setup( a, b );
-						l = new Level( 100, 100 );
-						LevelBuilder.buildLevelB( l, a, b );
+						//l = new Level( 100, 100 );
+						//LevelBuilder.buildLevelB( l, a, b );
+						onMap = (onMap + 1) % maps.length;
+						try
+						{
+							l = LevelFileHelper.loadLevel( maps[onMap] );
+						} catch( IOException e1 )
+						{
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
 						finder = new AStarPathFinder( l, 500, false );
 						for( int i = 0; i < 8; i++ )
 						{
@@ -221,7 +242,7 @@ public class TacticServer
 						Building base = null;
 						for( Building bu : l.buildings )
 						{
-							if( bu.bt == BuildingType.CENTER && bu.t == p.team )
+							if( bu.bt == BuildingType.CENTER && bu.t.id == p.team.id )
 							{
 								base = bu;
 							}
@@ -319,7 +340,7 @@ public class TacticServer
 					Building base = null;
 					for( Building bu : l.buildings )
 					{
-						if( bu.bt == BuildingType.CENTER && bu.t == player.team )
+						if( bu.bt == BuildingType.CENTER && bu.t.id == player.team.id )
 						{
 							base = bu;
 						}

@@ -275,6 +275,14 @@ public class Unit implements Serializable
 		
 		
 		g.popTransform();
+		
+		g.setColor( Color.lightGray );
+		for( int i = 0; i < path.size()-1; i++ )
+		{
+			Point2i p1 = path.get( i );
+			Point2i p2 = path.get( i+1 );
+			g.drawLine( (p1.x+.5f) * Level.tileSize, (p1.y+.5f) * Level.tileSize, (p2.x+.5f) * Level.tileSize, (p2.y+.5f) * Level.tileSize );
+		}
 	}
 	
 	public void pathTo( int tx, int ty, TacticServer ts )

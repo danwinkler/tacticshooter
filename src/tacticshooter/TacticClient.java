@@ -7,6 +7,8 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
 
 import com.danwink.tacticshooter.screens.HomeScreen;
+import com.danwink.tacticshooter.screens.LevelEditor;
+import com.danwink.tacticshooter.screens.LevelEditorSetup;
 import com.danwink.tacticshooter.screens.MessageScreen;
 import com.danwink.tacticshooter.screens.MultiplayerGameScreen;
 import com.danwink.tacticshooter.screens.MultiplayerSetupScreen;
@@ -29,6 +31,9 @@ public class TacticClient extends BasicGame
 		dsh.register( "multiplayergame", new MultiplayerGameScreen() );
 		dsh.register( "message", new MessageScreen() );
 		dsh.register( "postgame", new PostGameScreen() );
+		
+		dsh.register( "editorsetup", new LevelEditorSetup() );
+		dsh.register( "editor", new LevelEditor() );
 		
 		dsh.activate( "home", gc );
 	}

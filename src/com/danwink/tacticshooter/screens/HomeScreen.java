@@ -29,6 +29,7 @@ public class HomeScreen implements DScreen<GameContainer, Graphics>, DUIListener
 	DUI dui;
 	DButton singlePlayer;
 	DButton multiPlayer;
+	DButton levelEditor;
 	DButton settings;
 	DButton exit;
 	
@@ -46,12 +47,14 @@ public class HomeScreen implements DScreen<GameContainer, Graphics>, DUIListener
 			
 			singlePlayer = new DButton( "Start Local Server", e.getWidth() / 2 - 200, e.getHeight()/2 - 200, 400, 100 );
 			multiPlayer = new DButton( "Multiplayer", e.getWidth() / 2 - 200, e.getHeight()/2 - 100, 400, 100 );
-			settings = new DButton( "Settings", e.getWidth() / 2 - 200, e.getHeight()/2, 400, 100 );
-			exit = new DButton( "Exit", e.getWidth() / 2 - 200, e.getHeight()/2 + 100, 400, 100 );
+			levelEditor = new DButton( "Level Editor", e.getWidth() / 2 - 200, e.getHeight()/2, 400, 100 );
+			settings = new DButton( "Settings", e.getWidth() / 2 - 200, e.getHeight()/2 + 100, 400, 100 );
+			exit = new DButton( "Exit", e.getWidth() / 2 - 200, e.getHeight()/2 + 200, 400, 100 );
 			
 			
 			dui.add( singlePlayer );
 			dui.add( multiPlayer );
+			dui.add( levelEditor );
 			dui.add( settings );
 			dui.add( exit );
 			
@@ -101,6 +104,10 @@ public class HomeScreen implements DScreen<GameContainer, Graphics>, DUIListener
 		{
 			dsh.activate( "multiplayersetup", gc );
 		} 
+		else if( e == levelEditor )
+		{
+			dsh.activate( "editorsetup", gc );
+		}
 		else if( e == settings )
 		{
 			

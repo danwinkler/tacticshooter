@@ -294,11 +294,20 @@ public class Level implements Serializable, TileBasedMap
 		}
 		return tiles[x][y];
 	}
+	
+	public void setTile( int x, int y, int val )
+	{
+		if( x < 0 || x >= width || y < 0 || y >= height )
+		{
+			return;
+		}
+		tiles[x][y] = val;
+	}
 
 	@Override
 	public boolean blocked( PathFindingContext arg0, int x, int y )
 	{
-		return tiles[x][y] == 1;
+		return getTile( x, y ) == 1;
 	}
 
 	@Override

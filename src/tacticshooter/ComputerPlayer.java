@@ -82,7 +82,7 @@ public class ComputerPlayer implements Runnable
 			{
 				for( Unit u : units )
 				{
-					if( u.owner.id == player.id && u.state == UnitState.STOPPED )
+					if( u.owner.id == player.id && (u.state == UnitState.STOPPED || Math.random() < .1f) )
 					{
 						Building closeb = null;
 						float closed2 = Float.MAX_VALUE;
