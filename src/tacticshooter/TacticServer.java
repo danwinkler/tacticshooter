@@ -47,7 +47,7 @@ public class TacticServer
 	GameStats gs = new GameStats();
 	
 	String[] maps = { "map1", "map2" };
-	int onMap = 1;
+	int onMap = DMath.randomi( 0, maps.length-1 );
 	
 	public TacticServer( ServerInterface si )
 	{
@@ -407,6 +407,7 @@ public class TacticServer
 	{
 		Bullet b = new Bullet( u.x + DMath.cosf( angle ) * (Unit.radius+5), u.y + DMath.sinf( angle ) * (Unit.radius+5), angle );
 		b.owner = u.owner;
+		b.shooter = u;
 		gs.get( b.owner.team ).bulletsShot++;
 		bullets.add( b );
 		si.sendToAllClients( new Message( MessageType.BULLETUPDATE, b ) );

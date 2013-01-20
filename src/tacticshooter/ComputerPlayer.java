@@ -38,7 +38,7 @@ public class ComputerPlayer implements Runnable
 	public void run() 
 	{
 		ci.sl.received( fc, new Message( MessageType.CLIENTJOIN, "BOT_A" ) );
-		while( true )
+		while( playing )
 		{
 			while( fc.hasClientMessages() )
 			{

@@ -23,6 +23,8 @@ public class Building
 	
 	public int updateCountdown = 0;
 	
+	//public float radius = 50.f;
+	
 	public Building()
 	{
 		

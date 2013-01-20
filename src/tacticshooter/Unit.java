@@ -121,6 +121,7 @@ public class Unit implements Serializable
 			heading += turnAmount;
 			if( turnAmount < .01f )
 			{
+				/*
 				int mtx = -1;
 				int mty = -1;
 				for( Unit u : ts.units )
@@ -148,6 +149,8 @@ public class Unit implements Serializable
 					onStep = path.size();
 				}
 				state = UnitState.MOVING;
+				*/
+				state = UnitState.STOPPED;
 			}
 			break;
 		}
@@ -268,20 +271,23 @@ public class Unit implements Serializable
 		g.popTransform();
 		
 		g.setColor( Color.black );
-		g.fillRect( -9, -9, (int)(18.f * health*.01f), 4 );
+		g.fillRect( -9, -9, (int)(18.f * health/type.health), 4 );
 		
-		g.setColor( new Color( DMath.bound( 1.f - health*.01f, 0, 1 ), DMath.bound(health*.01f, 0, 1 ), 0 ) );
-		g.fillRect( -8, -8, (int)(16.f * health*.01f), 2 );
+		g.setColor( new Color( DMath.bound( 1.f - health/type.health, 0, 1 ), DMath.bound(health/type.health, 0, 1 ), 0 ) );
+		g.fillRect( -8, -8, (int)(16.f * health/type.health), 2 );
 		
 		
 		g.popTransform();
 		
-		g.setColor( Color.lightGray );
-		for( int i = 0; i < path.size()-1; i++ )
+		if( selected )
 		{
-			Point2i p1 = path.get( i );
-			Point2i p2 = path.get( i+1 );
-			g.drawLine( (p1.x+.5f) * Level.tileSize, (p1.y+.5f) * Level.tileSize, (p2.x+.5f) * Level.tileSize, (p2.y+.5f) * Level.tileSize );
+			g.setColor( Color.lightGray );
+			for( int i = 0; i < path.size()-1; i++ )
+			{
+				Point2i p1 = path.get( i );
+				Point2i p2 = path.get( i+1 );
+				g.drawLine( (p1.x+.5f) * Level.tileSize, (p1.y+.5f) * Level.tileSize, (p2.x+.5f) * Level.tileSize, (p2.y+.5f) * Level.tileSize );
+			}
 		}
 	}
 	
@@ -320,8 +326,9 @@ public class Unit implements Serializable
 		this.state = u.state;
 	}
 
-	public void hit( Bullet bullet )
+	public void hit( Bullet bullet, TacticServer ts )
 	{
+		Level l = ts.l;
 		health -= 10;
 		if( health <= 0 && health > -10 )
 		{
@@ -329,13 +336,37 @@ public class Unit implements Serializable
 			killer = bullet.owner;
 			bullet.owner.money += 2;
 		}
-		state = UnitState.TURNTO;
-		turnToAngle = (float) Math.atan2( -bullet.dy, -bullet.dx );
+		
+		Building b = null;
+		if( state == UnitState.STOPPED )
+		{
+			for( int i = 0; i < l.buildings.size(); i++ )
+			{
+				Building tb = l.buildings.get( i );
+				float dx = x - tb.x;
+				float dy = y - tb.y;
+				if( (dx*dx + dy*dy) < 50*50 )
+				{
+					b = tb;
+				}
+			}
+		}
+		
+		if( b != null )
+		{
+			state = UnitState.TURNTO;
+			turnToAngle = (float) Math.atan2( -bullet.dy, -bullet.dx );
+		}
+		else
+		{
+			pathTo( l.getTileX( bullet.shooter.x ), l.getTileY( bullet.shooter.y ), ts );
+		}
 	}
 	
 	public void setType( UnitType type )
 	{
 		this.type = type;
+		this.health = type.health;
 	}
 	
 	public enum UnitState
@@ -347,21 +378,23 @@ public class Unit implements Serializable
 	
 	public enum UnitType
 	{
-		LIGHT( 3, 10, .05f, 10 ),
-		HEAVY( 1.5f, 3, .1f, 20  ),
-		SUPPLY( 2.5f, 10, .15f, 20 );
+		LIGHT( 3, 10, .05f, 10, 100 ),
+		HEAVY( 1.5f, 3, .1f, 20, 200  ),
+		SUPPLY( 2.5f, 10, .15f, 20, 100 );
 		
 		float speed;
 		int timeBetweenBullets;
 		float bulletSpread;
 		int price;
+		float health;
 		
-		UnitType( float speed, int timeBetweenBullets, float bulletSpread, int price )
+		UnitType( float speed, int timeBetweenBullets, float bulletSpread, int price, float health )
 		{
 			this.speed = speed;
 			this.timeBetweenBullets = timeBetweenBullets;
 			this.bulletSpread = bulletSpread;
 			this.price = price;
+			this.health = health;
 		}
 	}
 

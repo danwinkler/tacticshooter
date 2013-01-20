@@ -98,6 +98,7 @@ public class HomeScreen implements DScreen<GameContainer, Graphics>, DUIListener
 			{
 				singlePlayer.setText( "Start Local Server" );
 				server.sl.running = false;
+				server = null;
 			}
 		} 
 		else if( e == multiPlayer )

@@ -25,6 +25,7 @@ public class Bullet implements Serializable
 	public boolean alive = true;
 	
 	public Player owner;
+	public Unit shooter;
 	
 	public Bullet()
 	{
@@ -66,7 +67,7 @@ public class Bullet implements Serializable
 				p.y = u.y;
 				if( DMath.pointToLineSegment( l1, dir, p ).lengthSquared() < Unit.radius * Unit.radius )
 				{
-					u.hit( this );
+					u.hit( this, ts );
 					alive = false;
 					break;
 				}
