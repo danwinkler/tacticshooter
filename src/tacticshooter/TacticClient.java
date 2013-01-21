@@ -48,8 +48,11 @@ public class TacticClient extends BasicGame
 		dsh.render( gc, g );
 	}
 	
-	public static void main( String[] args ) throws SlickException
+	public static void main( String[] args ) throws SlickException, ClassNotFoundException
 	{
+		//Attempt to avoid sealed exception errors on zoe's mac
+		Class.forName( "javax.vecmath.Point2i" );
+		
 		AppGameContainer app = new AppGameContainer( new TacticClient() );
 		app.setDisplayMode(1024, 768, false);
 		app.start();

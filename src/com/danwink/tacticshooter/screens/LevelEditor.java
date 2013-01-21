@@ -38,7 +38,6 @@ public class LevelEditor implements DScreen<GameContainer, Graphics>, DUIListene
 	DButton teamACenter;
 	DButton teamBCenter;
 	DButton point;
-	DButton deleteBuilding;
 	
 	DButton save;
 	DButton saveAndExit;
@@ -65,8 +64,6 @@ public class LevelEditor implements DScreen<GameContainer, Graphics>, DUIListene
 		teamACenter = new DButton( "A Center", 200, gc.getHeight()-50, 100, 50 );
 		teamBCenter = new DButton( "B Center", 300, gc.getHeight()-50, 100, 50 );
 		point = new DButton( "Point", 400, gc.getHeight()-50, 100, 50 );
-		deleteBuilding = new DButton( "Delete Building", 0, gc.getHeight()-100, 100, 50 );
-		
 		
 		save = new DButton( "Save", 500, gc.getHeight()-50, 100, 50 );
 		saveAndExit = new DButton( "Save & Exit", 600, gc.getHeight()-50, 100, 50 );
@@ -78,7 +75,6 @@ public class LevelEditor implements DScreen<GameContainer, Graphics>, DUIListene
 		dui.add( teamACenter );
 		dui.add( teamBCenter );
 		dui.add( point );
-		dui.add( deleteBuilding );
 		
 		dui.add( save );
 		dui.add( saveAndExit );
@@ -108,67 +104,84 @@ public class LevelEditor implements DScreen<GameContainer, Graphics>, DUIListene
 			scrollx += 1;
 		}
 		
-		if( input.isMouseButtonDown( Input.MOUSE_LEFT_BUTTON ) && input.getMouseY() < gc.getHeight()-100 )
+		if( input.getMouseY() < gc.getHeight()-100 )
 		{
-			int x = l.getTileX( input.getMouseX() + scrollx );
-			int y = l.getTileY( input.getMouseY() + scrolly );
-			switch( brush )
+			if( input.isMouseButtonDown( Input.MOUSE_RIGHT_BUTTON ) )
 			{
-			case WALL:
-				l.setTile( x, y, 1 );
-				break;
-			case FLOOR:
-				l.setTile( x, y, 0 );
-				break;
-			}
-		}
-			
-		if( input.isMousePressed( Input.MOUSE_LEFT_BUTTON ) && input.getMouseY() < gc.getHeight()-100 )
-		{
-			int x = (int)((input.getMouseX() + scrollx) / l.tileSize) * l.tileSize;
-			int y = (int)((input.getMouseY() + scrolly) / l.tileSize) * l.tileSize;
-			
-			boolean addBuilding = true;
-			
-			for( int i = 0; i < l.buildings.size(); i++ )
-			{
-				Building b = l.buildings.get( i );
-				int dx = b.x-x;
-				int dy = b.y-y;
-				if( dx*dx + dy*dy < 10 )
+				int x = (int)((input.getMouseX() + scrollx) / l.tileSize) * l.tileSize + l.tileSize/2;
+				int y = (int)((input.getMouseY() + scrolly) / l.tileSize) * l.tileSize + l.tileSize/2;
+				
+				for( int i = 0; i < l.buildings.size(); i++ )
 				{
-					addBuilding = false;
-					if( brush == Brush.DELETEBUILDING )
+					Building b = l.buildings.get( i );
+					int dx = b.x-x;
+					int dy = b.y-y;
+					if( dx*dx + dy*dy < 10 )
 					{
 						l.buildings.remove( i );
+						i--;
 					}
+				}
+			}
+			
+			if( input.isMouseButtonDown( Input.MOUSE_LEFT_BUTTON ) )
+			{
+				int x = l.getTileX( input.getMouseX() + scrollx );
+				int y = l.getTileY( input.getMouseY() + scrolly );
+				switch( brush )
+				{
+				case WALL:
+					l.setTile( x, y, 1 );
+					break;
+				case FLOOR:
+					l.setTile( x, y, 0 );
 					break;
 				}
 			}
-			if( addBuilding )
+				
+			if( input.isMousePressed( Input.MOUSE_LEFT_BUTTON ) )
 			{
-			switch( brush )
-			{
-				case CENTERTEAMA:
-				case CENTERTEAMB:
-					Team t = (brush == Brush.CENTERTEAMA) ? Team.a : Team.b;
-					for( int i = 0; i < l.buildings.size(); i++ )
+				int x = (int)((input.getMouseX() + scrollx) / l.tileSize) * l.tileSize + l.tileSize/2;
+				int y = (int)((input.getMouseY() + scrolly) / l.tileSize) * l.tileSize + l.tileSize/2;
+				
+				boolean addBuilding = true;
+				
+				for( int i = 0; i < l.buildings.size(); i++ )
+				{
+					Building b = l.buildings.get( i );
+					int dx = b.x-x;
+					int dy = b.y-y;
+					if( dx*dx + dy*dy < 10 )
 					{
-						Building b = l.buildings.get( i );
-						if( b.bt == BuildingType.CENTER && b.t.id == t.id )
-						{
-							l.buildings.remove( i );
-							i--;
-						}
+						addBuilding = false;
+						break;
 					}
-					Building b = new Building( x, y, BuildingType.CENTER, t );
-					l.buildings.add( b );
-					break;
-				case POINT:
-					Building pointBuilding = new Building( x, y, BuildingType.POINT, null );
-					pointBuilding.hold = 0;
-					l.buildings.add( pointBuilding );
-					break;
+				}
+				if( addBuilding )
+				{
+				switch( brush )
+				{
+					case CENTERTEAMA:
+					case CENTERTEAMB:
+						Team t = (brush == Brush.CENTERTEAMA) ? Team.a : Team.b;
+						for( int i = 0; i < l.buildings.size(); i++ )
+						{
+							Building b = l.buildings.get( i );
+							if( b.bt == BuildingType.CENTER && b.t.id == t.id )
+							{
+								l.buildings.remove( i );
+								i--;
+							}
+						}
+						Building b = new Building( x, y, BuildingType.CENTER, t );
+						l.buildings.add( b );
+						break;
+					case POINT:
+						Building pointBuilding = new Building( x, y, BuildingType.POINT, null );
+						pointBuilding.hold = 0;
+						l.buildings.add( pointBuilding );
+						break;
+					}
 				}
 			}
 		}
@@ -190,7 +203,14 @@ public class LevelEditor implements DScreen<GameContainer, Graphics>, DUIListene
 		
 		int x = l.getTileX( gc.getInput().getMouseX() + scrollx );
 		int y = l.getTileY( gc.getInput().getMouseY() + scrolly );
-		g.drawRect( x*l.tileSize, y*l.tileSize, l.tileSize, l.tileSize );
+		if( brush == Brush.POINT || brush == Brush.CENTERTEAMA || brush == Brush.CENTERTEAMB )
+		{
+			g.drawOval( x*l.tileSize-50 + l.tileSize/2, y*l.tileSize-50 + l.tileSize/2, 100, 100 );
+		}
+		else
+		{
+			g.drawRect( x*l.tileSize, y*l.tileSize, l.tileSize, l.tileSize );
+		}
 		
 		g.popTransform();
 		
@@ -217,8 +237,7 @@ public class LevelEditor implements DScreen<GameContainer, Graphics>, DUIListene
 		FLOOR,
 		CENTERTEAMA,
 		CENTERTEAMB,
-		POINT,
-		DELETEBUILDING;
+		POINT;
 	}
 	
 	public void event( DUIEvent event )
@@ -245,10 +264,6 @@ public class LevelEditor implements DScreen<GameContainer, Graphics>, DUIListene
 			else if( e == point )
 			{
 				brush = Brush.POINT;
-			}
-			else if( e == deleteBuilding )
-			{
-				brush = Brush.DELETEBUILDING;
 			}
 			else if( e == save )
 			{

@@ -15,6 +15,7 @@ import org.newdawn.slick.util.pathfinding.PathFinder;
 import tacticshooter.Building.BuildingType;
 import tacticshooter.Unit.UnitType;
 
+import com.phyloa.dlib.util.DFile;
 import com.phyloa.dlib.util.DMath;
 
 public class TacticServer 
@@ -46,8 +47,8 @@ public class TacticServer
 	
 	GameStats gs = new GameStats();
 	
-	String[] maps = { "map1", "map2" };
-	int onMap = DMath.randomi( 0, maps.length-1 );
+	ArrayList<String> maps = new ArrayList<String>();
+	int onMap = 0;
 	
 	public TacticServer( ServerInterface si )
 	{
@@ -56,12 +57,20 @@ public class TacticServer
 	
 	public void begin()
 	{
+		Collections.shuffle( maps );
 		gs.setup( a, b );
 		//l = new Level( 100, 100 );
 		//LevelBuilder.buildLevelB( l, a, b );
 		try
 		{
-			l = LevelFileHelper.loadLevel( maps[onMap] );
+			String mapFile = DFile.loadText( "mapList.txt" );
+			String[] mapArr = mapFile.split( "\n" );
+			for( String s : mapArr )
+			{
+				maps.add( s );
+			}
+			Collections.shuffle( maps );
+			l = LevelFileHelper.loadLevel( maps.get( onMap ) );
 		} catch( IOException e )
 		{
 			// TODO Auto-generated catch block
@@ -196,10 +205,10 @@ public class TacticServer
 						gs.setup( a, b );
 						//l = new Level( 100, 100 );
 						//LevelBuilder.buildLevelB( l, a, b );
-						onMap = (onMap + 1) % maps.length;
+						onMap = (onMap + 1) % maps.size();
 						try
 						{
-							l = LevelFileHelper.loadLevel( maps[onMap] );
+							l = LevelFileHelper.loadLevel( maps.get( onMap ) );
 						} catch( IOException e1 )
 						{
 							// TODO Auto-generated catch block

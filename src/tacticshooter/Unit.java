@@ -52,7 +52,7 @@ public class Unit implements Serializable
 	
 	public Unit()
 	{
-		
+		heading = DMath.randomf( 0, DMath.PI2F );
 	}
 	
 	public Unit( float x, float y )
