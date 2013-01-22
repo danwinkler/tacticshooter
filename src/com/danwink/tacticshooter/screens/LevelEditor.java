@@ -17,6 +17,7 @@ import tacticshooter.StaticFiles;
 import tacticshooter.Team;
 
 import com.phyloa.dlib.dui.DButton;
+import com.phyloa.dlib.dui.DText;
 import com.phyloa.dlib.dui.DTextBox;
 import com.phyloa.dlib.dui.DUI;
 import com.phyloa.dlib.dui.DUIElement;
@@ -25,11 +26,8 @@ import com.phyloa.dlib.dui.DUIListener;
 import com.phyloa.dlib.renderer.DScreen;
 import com.phyloa.dlib.renderer.DScreenHandler;
 
-public class LevelEditor implements DScreen<GameContainer, Graphics>, DUIListener
+public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUIListener
 {
-	DScreenHandler<GameContainer, Graphics> dsh;
-	GameContainer gc;
-	
 	Level l;
 	
 	DUI dui;
@@ -42,6 +40,8 @@ public class LevelEditor implements DScreen<GameContainer, Graphics>, DUIListene
 	DButton save;
 	DButton saveAndExit;
 	DButton exitWithoutSaving;
+	
+	DText fileNameText;
 	DTextBox name;
 	
 	float scrollx, scrolly;
@@ -52,36 +52,45 @@ public class LevelEditor implements DScreen<GameContainer, Graphics>, DUIListene
 
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
-		this.dsh = dsh;
-		this.gc = gc;
-		
+		//Wait until menu music is loaded, then make sure its already started before you stop it
+		while( StaticFiles.getMusic( "menu" ) == null ){}
+		StaticFiles.getMusic( "menu" ).play();
 		StaticFiles.getMusic( "menu" ).stop();
-		
-		dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
-		
-		wall = new DButton( "Wall", 0, gc.getHeight()-50, 100, 50 );
-		floor = new DButton( "Floor", 100, gc.getHeight()-50, 100, 50 );
-		teamACenter = new DButton( "A Center", 200, gc.getHeight()-50, 100, 50 );
-		teamBCenter = new DButton( "B Center", 300, gc.getHeight()-50, 100, 50 );
-		point = new DButton( "Point", 400, gc.getHeight()-50, 100, 50 );
-		
-		save = new DButton( "Save", 500, gc.getHeight()-50, 100, 50 );
-		saveAndExit = new DButton( "Save & Exit", 600, gc.getHeight()-50, 100, 50 );
-		exitWithoutSaving = new DButton( "Exit", 700, gc.getHeight()-50, 100, 50 );
-		name = new DTextBox( 800, gc.getHeight()-50, 200, 50 );
-		
-		dui.add( wall );
-		dui.add( floor );
-		dui.add( teamACenter );
-		dui.add( teamBCenter );
-		dui.add( point );
-		
-		dui.add( save );
-		dui.add( saveAndExit );
-		dui.add( exitWithoutSaving );
-		dui.add( name );
-		
-		dui.addDUIListener( this );
+
+		if( dui == null )
+		{
+			dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
+			
+			wall = new DButton( "Wall", 0, gc.getHeight()-100, 150, 50 );
+			floor = new DButton( "Floor", 150, gc.getHeight()-100, 150, 50 );
+			teamACenter = new DButton( "A Center", 300, gc.getHeight()-100, 150, 50 );
+			teamBCenter = new DButton( "B Center", 450, gc.getHeight()-100, 150, 50 );
+			point = new DButton( "Point", 600, gc.getHeight()-100, 150, 50 );
+			
+			save = new DButton( "Save", 0, gc.getHeight()-50, 200, 50 );
+			saveAndExit = new DButton( "Save & Exit", 200, gc.getHeight()-50, 200, 50 );
+			exitWithoutSaving = new DButton( "Exit", 400, gc.getHeight()-50, 200, 50 );
+			
+			fileNameText = new DText( "Map Name:", gc.getWidth()-350, gc.getHeight()-50 );
+			fileNameText.setColor( java.awt.Color.BLACK );
+			name = new DTextBox( gc.getWidth()-250, gc.getHeight()-50, 250, 50 );
+			
+			dui.add( wall );
+			dui.add( floor );
+			dui.add( teamACenter );
+			dui.add( teamBCenter );
+			dui.add( point );
+			
+			dui.add( save );
+			dui.add( saveAndExit );
+			dui.add( exitWithoutSaving );
+			
+			dui.add( fileNameText );
+			dui.add( name );
+			
+			dui.addDUIListener( this );
+		}
+		dui.setEnabled( true );
 	}
 	
 	public void update( GameContainer gc, int delta )
@@ -214,6 +223,9 @@ public class LevelEditor implements DScreen<GameContainer, Graphics>, DUIListene
 		
 		g.popTransform();
 		
+		g.setColor( new Color( 0, 0, 0, 128 ) );
+		g.fillRect( 0, gc.getHeight()-100, gc.getWidth(), 100 );
+		
 		dui.render( renderer.renderTo( g ) );
 		
 		g.setColor( Color.black );
@@ -223,12 +235,18 @@ public class LevelEditor implements DScreen<GameContainer, Graphics>, DUIListene
 	public void onExit()
 	{
 		dui.setEnabled( false );
-		dui = null;
 	}
 
 	public void message( Object o )
 	{
-		l = (Level)o;
+		if( o instanceof Level )
+		{
+			l = (Level)o;
+		}
+		else if( o instanceof String )
+		{
+			name.setText( (String)o );
+		}
 	}
 	
 	enum Brush

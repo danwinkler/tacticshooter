@@ -8,6 +8,8 @@ import org.newdawn.slick.SlickException;
 
 import com.danwink.tacticshooter.screens.HomeScreen;
 import com.danwink.tacticshooter.screens.LevelEditor;
+import com.danwink.tacticshooter.screens.LevelEditorLoadMap;
+import com.danwink.tacticshooter.screens.LevelEditorNewMapSetup;
 import com.danwink.tacticshooter.screens.LevelEditorSetup;
 import com.danwink.tacticshooter.screens.MessageScreen;
 import com.danwink.tacticshooter.screens.MultiplayerGameScreen;
@@ -33,6 +35,8 @@ public class TacticClient extends BasicGame
 		dsh.register( "postgame", new PostGameScreen() );
 		
 		dsh.register( "editorsetup", new LevelEditorSetup() );
+		dsh.register( "newmap", new LevelEditorNewMapSetup() );
+		dsh.register( "loadmap", new LevelEditorLoadMap() );
 		dsh.register( "editor", new LevelEditor() );
 		
 		dsh.activate( "home", gc );

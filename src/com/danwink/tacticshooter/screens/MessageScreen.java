@@ -15,24 +15,18 @@ import com.phyloa.dlib.dui.DUIListener;
 import com.phyloa.dlib.renderer.DScreen;
 import com.phyloa.dlib.renderer.DScreenHandler;
 
-public class MessageScreen implements DScreen<GameContainer, Graphics>, DUIListener
+public class MessageScreen extends DScreen<GameContainer, Graphics> implements DUIListener
 {
-	DScreenHandler<GameContainer, Graphics> dsh;
-	
 	DUI dui;
 	DButton okay;
 	DText text;
 	
 	Slick2DRenderer r = new Slick2DRenderer();
-	
-	GameContainer gc;
-	
+		
 	String message;
 	
 	public void onActivate( GameContainer e, DScreenHandler<GameContainer, Graphics> dsh )
 	{
-		this.dsh = dsh;
-		this.gc = e;
 		dui = new DUI( new Slick2DEventMapper( e.getInput() ) );
 		
 		okay = new DButton( "Okay", e.getWidth() / 2 - 100, e.getHeight()/2, 200, 100 );

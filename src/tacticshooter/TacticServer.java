@@ -76,7 +76,7 @@ public class TacticServer
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		finder = new AStarPathFinder( l, 500, false );
+		finder = new AStarPathFinder( l, 500, true );
 		
 		sl = new ServerLoop();
 		t = new Thread( sl );
@@ -214,7 +214,7 @@ public class TacticServer
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
-						finder = new AStarPathFinder( l, 500, false );
+						finder = new AStarPathFinder( l, 500, true );
 						for( int i = 0; i < 8; i++ )
 						{
 							Thread ct = new Thread( new ComputerPlayer( (ServerNetworkInterface)si ) );

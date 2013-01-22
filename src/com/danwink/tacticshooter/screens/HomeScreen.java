@@ -20,10 +20,8 @@ import com.phyloa.dlib.dui.DUIListener;
 import com.phyloa.dlib.renderer.DScreen;
 import com.phyloa.dlib.renderer.DScreenHandler;
 
-public class HomeScreen implements DScreen<GameContainer, Graphics>, DUIListener
+public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIListener
 {
-	DScreenHandler<GameContainer, Graphics> dsh;
-	
 	TacticServer server;
 	
 	DUI dui;
@@ -35,12 +33,8 @@ public class HomeScreen implements DScreen<GameContainer, Graphics>, DUIListener
 	
 	Slick2DRenderer r = new Slick2DRenderer();
 	
-	GameContainer gc;
-	
 	public void onActivate( GameContainer e, DScreenHandler<GameContainer, Graphics> dsh )
 	{
-		this.dsh = dsh;
-		this.gc = e;
 		if( dui == null )
 		{
 			dui = new DUI( new Slick2DEventMapper( e.getInput() ) );
@@ -115,7 +109,7 @@ public class HomeScreen implements DScreen<GameContainer, Graphics>, DUIListener
 		} 
 		else if( e == exit )
 		{
-			System.exit( 0 );
+			gc.exit();
 		}
 	}
 

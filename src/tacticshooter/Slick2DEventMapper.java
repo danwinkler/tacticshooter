@@ -370,10 +370,20 @@ public class Slick2DEventMapper implements DEventMapper, InputListener
 	}
 
 	@Override
-	public void mouseWheelMoved( int arg0 )
+	public void mouseWheelMoved( int a )
 	{
-		// TODO Auto-generated method stub
-		
+		synchronized( mouseListeners )
+		{
+			DMouseEvent dme = new DMouseEvent();
+			dme.wheel = a;
+			dme.x = input.getMouseX();
+			dme.y = input.getMouseY();
+			for( int i = 0; i < mouseListeners.size(); i++ )
+			{
+				DMouseListener l = mouseListeners.get( i );
+				l.mouseWheel( dme );
+			}
+		}
 	}
 
 	@Override

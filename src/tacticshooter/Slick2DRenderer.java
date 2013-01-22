@@ -257,5 +257,17 @@ public class Slick2DRenderer implements Renderer2D
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void setClip( int x, int y, int width, int height )
+	{
+		gc.setClip( x, y, width, height );
+	}
+
+	@Override
+	public void clearClip()
+	{
+		gc.clearClip();
+	}
 	
 }
