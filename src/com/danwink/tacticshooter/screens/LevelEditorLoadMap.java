@@ -35,7 +35,7 @@ public class LevelEditorLoadMap extends DScreen<GameContainer, Graphics> impleme
 		{
 			dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
 			
-			scrollPane = new DScrollPane( gc.getWidth()/2-200, 50, 400, 600 );
+			scrollPane = new DScrollPane( gc.getWidth()/2-200, 50, 400, 500 );
 			File[] files = new File( "levels" ).listFiles();
 			if( files != null )
 			{

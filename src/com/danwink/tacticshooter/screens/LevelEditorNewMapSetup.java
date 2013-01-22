@@ -88,7 +88,7 @@ public class LevelEditorNewMapSetup extends DScreen<GameContainer, Graphics> imp
 		{
 			if( e == back )
 			{
-				dsh.activate( "home", gc );
+				dsh.activate( "editorsetup", gc );
 			}
 			else if( e == okay )
 			{

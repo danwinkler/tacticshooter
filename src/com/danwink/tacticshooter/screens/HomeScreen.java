@@ -1,5 +1,6 @@
 package com.danwink.tacticshooter.screens;
 
+import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Music;
@@ -69,6 +70,12 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 	public void render( GameContainer gc, Graphics g )
 	{
 		dui.render( r.renderTo( g ) );
+		
+		if( server != null )
+		{
+			g.setColor( Color.white );
+			g.drawString( "Server status" + server.running, 50, 50 );
+		}
 	}
 
 	public void onExit()

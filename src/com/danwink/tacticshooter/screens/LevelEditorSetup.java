@@ -68,17 +68,19 @@ public class LevelEditorSetup extends DScreen<GameContainer, Graphics> implement
 	{
 		DUIElement e = event.getElement();
 		if( e instanceof DButton && event.getType() == DButton.MOUSE_UP )
-		if( e == newMap )
 		{
-			dsh.activate( "newmap", gc );
-		} 
-		else if( e == loadMap )
-		{
-			dsh.activate( "loadmap", gc );
-		} 
-		else if( e == back )
-		{
-			dsh.activate( "home", gc );
+			if( e == newMap )
+			{
+				dsh.activate( "newmap", gc );
+			} 
+			else if( e == loadMap )
+			{
+				dsh.activate( "loadmap", gc );
+			} 
+			else if( e == back )
+			{
+				dsh.activate( "home", gc );
+			}
 		}
 	}
 }

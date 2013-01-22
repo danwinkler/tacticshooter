@@ -13,13 +13,16 @@ public class StaticFiles
 	
 	static boolean ready = false;
 	
+	private static boolean started = false;
+	
 	public static void loadAllMusic()
 	{
-		if( !ready )
+		if( !ready && !started )
 		{
 			new Thread( new Runnable() {
 				public void run()
 				{
+					started = true;
 					loadMusic( "menu", "sound/Deliberate Thought.ogg" );
 					loadMusic( "play1", "sound/Decisions.ogg" );
 					loadMusic( "play2", "sound/Finding the Balance.ogg" );
