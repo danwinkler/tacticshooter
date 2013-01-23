@@ -90,7 +90,7 @@ public class Building
 						{
 							if( u.health < 100 )
 							{
-								u.health += .2f;
+								u.health += .4f;
 							}
 						}
 					}

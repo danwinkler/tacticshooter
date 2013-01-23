@@ -82,6 +82,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	
 	int bottomOffset = 200;
 	
+	boolean running = false;
+	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
 		this.dsh = dsh;
@@ -147,10 +149,14 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		running = true;
 	}
 	
 	public void update( GameContainer gc, int delta )
 	{
+		if( !running ) return;
+		
 		float d = delta / 60.f;
 		
 		while( ci.hasClientMessages() )
@@ -264,6 +270,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 
 	public void render( GameContainer gc, Graphics g )
 	{
+		if( !running ) return;
+		
 		g.setAntiAlias( true );
 		
 		if( cs.l == null )
@@ -387,6 +395,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 
 	public void onExit()
 	{
+		running = false;
 		if( ci != null )
 		{
 			ci.stop();
@@ -655,6 +664,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.SUPPLY) );
 			} else if( e == quit )
 			{
+				running = false;
 				dsh.activate( "home", gc );
 			} else if( e == returnToGame )
 			{

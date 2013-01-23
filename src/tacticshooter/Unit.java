@@ -119,7 +119,7 @@ public class Unit implements Serializable
 		case TURNTO:
 			float turnAmount = DMath.turnTowards( heading, turnToAngle ) * .2f;
 			heading += turnAmount;
-			if( turnAmount < .01f )
+			if( turnAmount < .001f )
 			{
 				/*
 				int mtx = -1;
@@ -343,7 +343,7 @@ public class Unit implements Serializable
 		}
 		
 		Building b = null;
-		if( state == UnitState.STOPPED )
+		if( state != UnitState.MOVING )
 		{
 			for( int i = 0; i < l.buildings.size(); i++ )
 			{
@@ -353,6 +353,7 @@ public class Unit implements Serializable
 				if( (dx*dx + dy*dy) < 50*50 )
 				{
 					b = tb;
+					break;
 				}
 			}
 		}
