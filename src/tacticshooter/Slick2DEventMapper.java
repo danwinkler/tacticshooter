@@ -13,6 +13,7 @@ import com.phyloa.dlib.dui.DKeyEvent;
 import com.phyloa.dlib.dui.DKeyListener;
 import com.phyloa.dlib.dui.DMouseEvent;
 import com.phyloa.dlib.dui.DMouseListener;
+import com.phyloa.dlib.util.DMath;
 
 public class Slick2DEventMapper implements DEventMapper, InputListener
 {
@@ -243,13 +244,14 @@ public class Slick2DEventMapper implements DEventMapper, InputListener
 		KeyEvent.VK_UNDEFINED,		// KEY_POWER
 	};
 	
-	
 	ArrayList<DKeyListener> keyListeners = new ArrayList<DKeyListener>();
 	ArrayList<DMouseListener> mouseListeners = new ArrayList<DMouseListener>();
 	
 	Input input;
 	
 	int lastButton;
+
+	private boolean enabled;
 	
 	public Slick2DEventMapper( Input input )
 	{
@@ -258,6 +260,7 @@ public class Slick2DEventMapper implements DEventMapper, InputListener
 	
 	public void register( Input input )
 	{
+		input.removeAllListeners();
 		this.input = input;
 		input.addListener( this );
 	}
@@ -306,83 +309,102 @@ public class Slick2DEventMapper implements DEventMapper, InputListener
 	@Override
 	public void mouseDragged( int oldx, int oldy, int newx, int newy )
 	{
+		if( !enabled ) return;
+		ArrayList<DMouseListener> tempMLs;
 		synchronized( mouseListeners )
 		{
-			DMouseEvent dme = new DMouseEvent();
-			dme.x = newx;
-			dme.y = newy;
-			for( int i = 0; i < mouseListeners.size(); i++ )
-			{
-				DMouseListener l = mouseListeners.get( i );
-				l.mouseDragged( dme );
-			}
+			tempMLs = new ArrayList<DMouseListener>( mouseListeners );
+		}
+		
+		DMouseEvent dme = new DMouseEvent();
+		dme.x = newx;
+		dme.y = newy;
+		for( int i = 0; i < tempMLs.size(); i++ )
+		{
+			DMouseListener l = tempMLs.get( i );
+			l.mouseDragged( dme );
 		}
 	}
 
 	@Override
 	public void mouseMoved( int oldx, int oldy, int newx, int newy )
 	{
+		if( !enabled ) return;
+		ArrayList<DMouseListener> tempMLs;
 		synchronized( mouseListeners )
 		{
-			DMouseEvent dme = new DMouseEvent();
-			dme.x = newx;
-			dme.y = newy;
-			for( int i = 0; i < mouseListeners.size(); i++ )
-			{
-				DMouseListener l = mouseListeners.get( i );
-				l.mouseMoved( dme );
-			}
+			tempMLs = new ArrayList<DMouseListener>( mouseListeners );
+		}
+		
+		DMouseEvent dme = new DMouseEvent();
+		dme.x = newx;
+		dme.y = newy;
+		for( int i = 0; i < tempMLs.size(); i++ )
+		{
+			DMouseListener l = tempMLs.get( i );
+			l.mouseMoved( dme );
 		}
 	}
 
 	@Override
 	public void mousePressed( int button, int x, int y )
 	{
+		if( !enabled ) return;
+		ArrayList<DMouseListener> tempMLs;
 		synchronized( mouseListeners )
 		{
-			DMouseEvent dme = new DMouseEvent();
-			dme.x = x;
-			dme.y = y;
-			dme.button = button;
-			for( int i = 0; i < mouseListeners.size(); i++ )
-			{
-				DMouseListener l = mouseListeners.get( i );
-				l.mousePressed( dme );
-			}
+			tempMLs = new ArrayList<DMouseListener>( mouseListeners );
+		}
+		
+		DMouseEvent dme = new DMouseEvent();
+		dme.x = x;
+		dme.y = y;
+		dme.button = button;
+		for( int i = 0; i < tempMLs.size(); i++ )
+		{
+			DMouseListener l = tempMLs.get( i );
+			l.mousePressed( dme );
 		}
 	}
 
 	@Override
 	public void mouseReleased( int button, int x, int y )
 	{
+		if( !enabled ) return;
+		ArrayList<DMouseListener> tempMLs;
 		synchronized( mouseListeners )
 		{
-			DMouseEvent dme = new DMouseEvent();
-			dme.x = x;
-			dme.y = y;
-			dme.button = button;
-			for( int i = 0; i < mouseListeners.size(); i++ )
-			{
-				DMouseListener l = mouseListeners.get( i );
-				l.mouseReleased( dme );
-			}
+			tempMLs = new ArrayList<DMouseListener>( mouseListeners );
+		}
+		DMouseEvent dme = new DMouseEvent();
+		dme.x = x;
+		dme.y = y;
+		dme.button = button;
+		for( int i = 0; i < tempMLs.size(); i++ )
+		{
+			DMouseListener l = tempMLs.get( i );
+			l.mouseReleased( dme );
 		}
 	}
 
 	@Override
 	public void mouseWheelMoved( int a )
 	{
+		if( !enabled ) return;
+		ArrayList<DMouseListener> tempMLs;
 		synchronized( mouseListeners )
 		{
-			DMouseEvent dme = new DMouseEvent();
-			dme.wheel = a;
-			dme.x = input.getMouseX();
-			dme.y = input.getMouseY();
-			for( int i = 0; i < mouseListeners.size(); i++ )
-			{
-				DMouseListener l = mouseListeners.get( i );
-				l.mouseWheel( dme );
-			}
+			tempMLs = new ArrayList<DMouseListener>( mouseListeners );
+		}
+		
+		DMouseEvent dme = new DMouseEvent();
+		dme.wheel = a;
+		dme.x = input.getMouseX();
+		dme.y = input.getMouseY();
+		for( int i = 0; i < tempMLs.size(); i++ )
+		{
+			DMouseListener l = tempMLs.get( i );
+			l.mouseWheel( dme );
 		}
 	}
 
@@ -415,13 +437,14 @@ public class Slick2DEventMapper implements DEventMapper, InputListener
 	@Override
 	public void keyPressed( int key, char c )
 	{
+		ArrayList<DKeyListener> tempKLs = new ArrayList<DKeyListener>( keyListeners );
 		DKeyEvent dke = new DKeyEvent();
 		dke.keyCode = KEYTABLE[key];
 		dke.keyChar = c;
 		dke.isActionKey = false;
-		for( int i = 0; i < keyListeners.size(); i++ )
+		for( int i = 0; i < tempKLs.size(); i++ )
 		{
-			DKeyListener l = keyListeners.get( i );
+			DKeyListener l = tempKLs.get( i );
 			l.keyPressed( dke );
 		}
 	}
@@ -429,13 +452,14 @@ public class Slick2DEventMapper implements DEventMapper, InputListener
 	@Override
 	public void keyReleased( int key, char c )
 	{
+		ArrayList<DKeyListener> tempKLs = new ArrayList<DKeyListener>( keyListeners );
 		DKeyEvent dke = new DKeyEvent();
 		dke.keyCode = KEYTABLE[key];
 		dke.keyChar = c;
 		dke.isActionKey = false;
-		for( int i = 0; i < keyListeners.size(); i++ )
+		for( int i = 0; i < tempKLs.size(); i++ )
 		{
-			DKeyListener l = keyListeners.get( i );
+			DKeyListener l = tempKLs.get( i );
 			l.keyReleased( dke );
 		}
 	}
@@ -508,5 +532,16 @@ public class Slick2DEventMapper implements DEventMapper, InputListener
 	{
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void setEnabled( boolean enabled )
+	{
+		this.enabled = enabled;
+		if( enabled )
+		{
+			input.removeAllListeners();
+			input.addListener( this );
+		}
 	}
 }

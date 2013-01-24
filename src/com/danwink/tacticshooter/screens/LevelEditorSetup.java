@@ -26,6 +26,12 @@ public class LevelEditorSetup extends DScreen<GameContainer, Graphics> implement
 	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
+		if( dui != null )
+			dui.setEnabled( true );
+	}
+	
+	public void update( GameContainer gc, int delta )
+	{
 		if( dui == null )
 		{
 			dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
@@ -39,19 +45,16 @@ public class LevelEditorSetup extends DScreen<GameContainer, Graphics> implement
 			dui.add( back );
 			
 			dui.addDUIListener( this );
+			dui.setEnabled( true );
 		}
 		
-		dui.setEnabled( true );
-	}
-	
-	public void update( GameContainer gc, int delta )
-	{
 		dui.update();
 	}
 
 	public void render( GameContainer gc, Graphics g )
 	{
-		dui.render( r.renderTo( g ) );
+		if( dui != null )
+			dui.render( r.renderTo( g ) );
 	}
 
 	public void onExit()
