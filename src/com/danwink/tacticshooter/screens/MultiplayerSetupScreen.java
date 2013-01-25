@@ -44,6 +44,11 @@ public class MultiplayerSetupScreen extends DScreen<GameContainer, Graphics> imp
 			dui.addDUIListener( this );
 		}
 		dui.setEnabled( true );
+		
+		if( ((HomeScreen)dsh.get( "home" )).server != null )
+		{
+			address.setText( "localhost" );
+		}
 	}
 	
 	public void update( GameContainer gc, int delta )

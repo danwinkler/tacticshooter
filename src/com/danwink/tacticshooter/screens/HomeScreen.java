@@ -70,12 +70,6 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 	public void render( GameContainer gc, Graphics g )
 	{
 		dui.render( r.renderTo( g ) );
-		
-		if( server != null )
-		{
-			g.setColor( Color.white );
-			g.drawString( "Server status" + server.running, 50, 50 );
-		}
 	}
 
 	public void onExit()
@@ -112,7 +106,7 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 		}
 		else if( e == settings )
 		{
-			
+			dsh.activate( "settings", gc );
 		} 
 		else if( e == exit )
 		{

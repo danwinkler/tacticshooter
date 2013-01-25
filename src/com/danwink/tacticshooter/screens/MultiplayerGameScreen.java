@@ -231,11 +231,16 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		
 		float scrollSpeed = 20;
 		Rectangle screenBounds = getScreenBounds();
-		if( cs.scrolly > screenBounds.getMinY() && (input.isKeyDown( Input.KEY_UP ) || input.isKeyDown( Input.KEY_W )) ) cs.scrolly-=scrollSpeed*d;
-		if( cs.scrolly+gc.getHeight() < screenBounds.getMaxY() && (input.isKeyDown( Input.KEY_DOWN ) || input.isKeyDown( Input.KEY_S )) ) cs.scrolly+=scrollSpeed*d;
-		if( cs.scrollx > screenBounds.getMinX() && (input.isKeyDown( Input.KEY_LEFT ) || input.isKeyDown( Input.KEY_A )) ) cs.scrollx-=scrollSpeed*d;
-		if( cs.scrollx+gc.getWidth() < screenBounds.getMaxX() && (input.isKeyDown( Input.KEY_RIGHT ) || input.isKeyDown( Input.KEY_D )) ) cs.scrollx+=scrollSpeed*d;
 		
+		boolean scrollup = cs.scrolly > screenBounds.getMinY() && (input.isKeyDown( Input.KEY_UP ) || input.isKeyDown( Input.KEY_W ) || (gc.isFullscreen() && input.getMouseY() < 10 ));
+		boolean scrolldown = cs.scrolly+gc.getHeight() < screenBounds.getMaxY() && (input.isKeyDown( Input.KEY_DOWN ) || input.isKeyDown( Input.KEY_S ) || (gc.isFullscreen() && input.getMouseY() > gc.getHeight()-10));
+		boolean scrollleft = cs.scrollx > screenBounds.getMinX() && (input.isKeyDown( Input.KEY_LEFT ) || input.isKeyDown( Input.KEY_A ) || (gc.isFullscreen() && input.getMouseX() < 10));
+		boolean scrollright = cs.scrollx+gc.getWidth() < screenBounds.getMaxX() && (input.isKeyDown( Input.KEY_RIGHT ) || input.isKeyDown( Input.KEY_D ) || (gc.isFullscreen() && input.getMouseX() > gc.getWidth()-10));
+		
+		if( scrollup ) cs.scrolly-=scrollSpeed*d;
+		if( scrolldown ) cs.scrolly+=scrollSpeed*d;
+		if( scrollleft ) cs.scrollx-=scrollSpeed*d;
+		if( scrollright ) cs.scrollx+=scrollSpeed*d;
 		
 		
 		for( int i = 0; i < cs.units.size(); i++ )
@@ -665,6 +670,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			} else if( e == quit )
 			{
 				running = false;
+				escapeMenu.setVisible( false );
 				dsh.activate( "home", gc );
 			} else if( e == returnToGame )
 			{
