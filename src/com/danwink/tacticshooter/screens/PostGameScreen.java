@@ -20,13 +20,11 @@ import com.phyloa.dlib.renderer.DScreenHandler;
 
 public class PostGameScreen extends DScreen<GameContainer, Graphics> implements DUIListener
 {
-	
 	DUI dui;
 	DButton okay;
 	DButton rejoin;
 	
 	Slick2DRenderer r = new Slick2DRenderer();
-	
 	
 	GameStats stats;
 	
@@ -57,6 +55,8 @@ public class PostGameScreen extends DScreen<GameContainer, Graphics> implements 
 		dui.add( rejoin );
 		
 		dui.addDUIListener( this );
+		
+		dui.setEnabled( true );
 	}
 	
 	public void update( GameContainer gc, int delta )
@@ -79,12 +79,14 @@ public class PostGameScreen extends DScreen<GameContainer, Graphics> implements 
 	{
 		DUIElement e = event.getElement();
 		if( e instanceof DButton && event.getType() == DButton.MOUSE_UP )
-		if( e == okay )
 		{
-			dsh.activate( "home", gc );
-		} else if( e == rejoin )
-		{
-			dsh.activate( "multiplayergame", gc );
+			if( e == okay )
+			{
+				dsh.activate( "home", gc );
+			} else if( e == rejoin )
+			{
+				dsh.activate( "multiplayergame", gc );
+			}
 		}
 	}
 

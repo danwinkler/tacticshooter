@@ -251,7 +251,7 @@ public class Slick2DEventMapper implements DEventMapper, InputListener
 	
 	int lastButton;
 
-	private boolean enabled;
+	private boolean enabled = true;
 	
 	public Slick2DEventMapper( Input input )
 	{

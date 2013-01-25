@@ -37,6 +37,8 @@ public class MessageScreen extends DScreen<GameContainer, Graphics> implements D
 		dui.add( text );
 		
 		dui.addDUIListener( this );
+		
+		dui.setEnabled( true );
 	}
 	
 	public void update( GameContainer gc, int delta )

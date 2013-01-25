@@ -21,15 +21,10 @@ public class SettingsScreen extends DScreen<GameContainer, Graphics> implements 
 	DButton toggleFullscreen;
 	DButton back;
 	
-	GameContainer gc;
-	DScreenHandler<GameContainer, Graphics> dsh;
-	
 	Slick2DRenderer r = new Slick2DRenderer();
 	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
-		this.gc = gc;
-		this.dsh = dsh;
 		if( dui == null )
 		{
 			dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
