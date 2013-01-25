@@ -72,7 +72,7 @@ public class Building
 		int oc = 0;
 		
 		//FOR HEALZ
-		if( bt == BuildingType.POINT )
+		if( bt == BuildingType.POINT || bt == BuildingType.CENTER )
 		{
 			for( Unit u : ts.units )
 			{
@@ -90,7 +90,7 @@ public class Building
 						{
 							if( u.health < 100 )
 							{
-								u.health += .4f;
+								u.health += hold / (float)HOLDMAX;
 							}
 						}
 					}

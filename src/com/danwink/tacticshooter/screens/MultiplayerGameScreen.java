@@ -49,7 +49,7 @@ import com.phyloa.dlib.util.DMath;
 public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> implements InputListener, DUIListener
 {
 	ClientInterface ci;
-	ClientState cs = new ClientState();
+	public ClientState cs = new ClientState();
 	
 	boolean waitingForMoveConfirmation = false;
 	float mx = -1, my = -1;
@@ -83,6 +83,9 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	int bottomOffset = 200;
 	
 	boolean running = false;
+	
+	Image bloodTexture;
+	Graphics btg;
 	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
@@ -252,6 +255,10 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				cs.units.remove( i );
 				cs.unitMap.remove( u );
 				(Math.random() > .5 ? cs.death1 : cs.death2).play( 1.f, cs.getSoundMag( gc, u.x, u.y ) );
+				for( int j = 0; j < 10; j++ )
+				{
+					drawBlood( u.x, u.y );
+				}
 				i--;
 				continue;
 			}
@@ -260,7 +267,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		for( int i = 0; i < cs.bullets.size(); i++ )
 		{
 			Bullet b = cs.bullets.get( i );
-			b.clientUpdate( cs, d, gc );
+			b.clientUpdate( this, d, gc );
 			if( !b.alive )
 			{
 				cs.bulletMap.remove( b );
@@ -282,6 +289,17 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		if( cs.l == null )
 		{
 			return;
+		} else if( bloodTexture == null )
+		{
+			try
+			{
+				bloodTexture = new Image( cs.l.width * Level.tileSize, cs.l.height * Level.tileSize );
+				btg = bloodTexture.getGraphics();
+				btg.setColor( new Color( 255, 0, 0, 200 ) );
+			} catch( SlickException e )
+			{
+				e.printStackTrace();
+			}
 		}
 		
 		g.setColor( Color.white );
@@ -291,8 +309,10 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		g.pushTransform();
 		g.translate( -cs.scrollx, -cs.scrolly );
 		
-		cs.l.render( g );
 		cs.l.renderBuildings( g );
+		g.drawImage( bloodTexture, 0, 0 );
+		cs.l.render( g );
+		
 		
 		g.setColor( this.waitingForMoveConfirmation ? Color.gray : Color.green );
 		g.drawRect( mx * Level.tileSize, my * Level.tileSize, Level.tileSize, Level.tileSize );
@@ -407,6 +427,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		}
 		cs.resetState();
 		miniMap = null;
+		bloodTexture = null;
 		dui.setEnabled( false );
 	}
 	
@@ -428,6 +449,15 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		Rectangle screenBounds = getScreenBounds();
 		cs.scrollx = DMath.bound( destX-gc.getWidth()/2, screenBounds.getMinX(), screenBounds.getMaxX() );
 		cs.scrolly = DMath.bound( destY-gc.getHeight()/2, screenBounds.getMinY(), screenBounds.getMaxY() );
+	}
+	
+	public void drawBlood( float x, float y )
+	{
+		//btg.setColor( Color.red );
+		x += DMath.randomf( -8, 8 );
+		y += DMath.randomf( -8, 8 );
+		btg.fillOval( x-2, y-2, 4, 4 );
+		btg.flush();
 	}
 	
 	public Rectangle getScreenBounds()

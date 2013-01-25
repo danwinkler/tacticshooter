@@ -22,6 +22,8 @@ public class TacticServer
 {
 	ServerInterface si;
 	
+	int botCount = 7;
+	
 	ArrayList<Team> teams = new ArrayList<Team>();
 	
 	ArrayList<Unit> units = new ArrayList<Unit>();
@@ -83,7 +85,7 @@ public class TacticServer
 		t.start();
 		lastTick = System.currentTimeMillis();
 		
-		for( int i = 0; i < 8; i++ )
+		for( int i = 0; i < botCount; i++ )
 		{
 			Thread ct = new Thread( new ComputerPlayer( (ServerNetworkInterface)si ) );
 			ct.start();
@@ -215,7 +217,7 @@ public class TacticServer
 							e1.printStackTrace();
 						}
 						finder = new AStarPathFinder( l, 500, true );
-						for( int i = 0; i < 8; i++ )
+						for( int i = 0; i < botCount; i++ )
 						{
 							Thread ct = new Thread( new ComputerPlayer( (ServerNetworkInterface)si ) );
 							ct.start();
