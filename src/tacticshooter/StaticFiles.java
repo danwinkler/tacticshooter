@@ -13,7 +13,7 @@ public class StaticFiles
 	static HashMap<String, Music> music = new HashMap<String, Music>(); 
 	static HashMap<String, Sound> sound = new HashMap<String, Sound>(); 
 	
-	static DOptions options = new DOptions( "options.txt" );
+	public static DOptions options = new DOptions( "options.txt" );
 	
 	static boolean ready = false;
 	

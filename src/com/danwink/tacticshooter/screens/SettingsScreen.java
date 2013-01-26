@@ -20,6 +20,7 @@ public class SettingsScreen extends DScreen<GameContainer, Graphics> implements 
 	DUI dui;
 	DButton toggleFullscreen;
 	DButton selectMaps;
+	DButton options;
 	DButton back;
 	
 	Slick2DRenderer r = new Slick2DRenderer();
@@ -32,10 +33,12 @@ public class SettingsScreen extends DScreen<GameContainer, Graphics> implements 
 			
 			toggleFullscreen = new DButton( "Toggle Fullscreen", gc.getWidth()/2-100, gc.getHeight()/2-100, 200, 100 );
 			selectMaps = new DButton( "Select Maps", gc.getWidth()/2-100, gc.getHeight()/2, 200, 100 );
-			back = new DButton( "Back", gc.getWidth()/2-100, gc.getHeight()/2+100, 200, 100 );
+			options = new DButton( "Options", gc.getWidth()/2-100, gc.getHeight()/2+100, 200, 100 );
+			back = new DButton( "Back", gc.getWidth()/2-100, gc.getHeight()/2+200, 200, 100 );
 			
 			dui.add( toggleFullscreen );
 			dui.add( selectMaps );
+			dui.add( options );
 			dui.add( back );
 			
 			dui.addDUIListener( this );
@@ -96,6 +99,10 @@ public class SettingsScreen extends DScreen<GameContainer, Graphics> implements 
 			else if( e == selectMaps )
 			{
 				dsh.activate( "selectMaps", gc );
+			}
+			else if( e == options )
+			{
+				dsh.activate( "options", gc );
 			}
 			else if( e == back )
 			{
