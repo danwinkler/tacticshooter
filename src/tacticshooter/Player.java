@@ -8,7 +8,7 @@ public class Player
 	public Team team;
 	public int money;
 	public int respawn = 0;
-	boolean isBot = false;
+	public boolean isBot = false;
 	
 	public Player()
 	{

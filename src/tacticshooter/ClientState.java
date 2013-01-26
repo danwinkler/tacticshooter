@@ -26,6 +26,7 @@ public class ClientState
 	public float scrolly = 0;
 	
 	public float soundFadeDist = 1000;
+	public Player[] players;
 	
 	public void resetState()
 	{

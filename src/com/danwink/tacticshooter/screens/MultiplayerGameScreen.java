@@ -220,6 +220,9 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 					cs.l.buildings.set( building.index, building );
 				}
 				break;
+			case PLAYERLIST:
+				cs.players = (Player[])m.message;
+				break;
 			case GAMEOVER:
 				dsh.message( "postgame", m.message );
 				dsh.activate( "postgame", gc );
@@ -416,6 +419,18 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			//bottom
 			g.fillRect( gc.getWidth()/2 - 100, gc.getHeight()/2 + 100, 200, gc.getHeight()/2-100 );
 		}
+		
+		if( input.isKeyDown( Input.KEY_TAB ) && cs.players != null )
+		{
+			g.setColor( new Color( 128, 128, 128, 200 ) );
+			g.fillRect( gc.getWidth()/2 - 200, gc.getHeight()/2-300, 400, 500 );
+			g.setColor( Color.black );
+			g.drawRect( gc.getWidth()/2 - 200, gc.getHeight()/2-300, 400, 500 );
+			for( int i = 0; i < cs.players.length; i++ )
+			{
+				g.drawString( cs.players[i].id + " " + (cs.players[i].isBot ? "BOT" : "HUMAN"), gc.getWidth()/2 - 190, gc.getHeight()/2-270 + i*30 );
+			}
+		}
 	}
 
 	public void onExit()
@@ -467,7 +482,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 
 	public void mousePressed( int button, int x, int y )
 	{
-		if( x > gc.getWidth()-200 && y > gc.getHeight()-200 )
+		if( x > gc.getWidth()-200 && y > gc.getHeight()-200 && !selecting )
 		{	
 			//miniMap
 			float minimapX = x - (gc.getWidth()-200);
@@ -522,7 +537,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 
 	public void mouseDragged( int oldx, int oldy, int newx, int newy )
 	{
-		if( newx > gc.getWidth()-200 && newy > gc.getHeight()-200 )
+		if( newx > gc.getWidth()-200 && newy > gc.getHeight()-200 && !selecting )
 		{	
 			//miniMap
 			float minimapX = newx - (gc.getWidth()-200);
