@@ -63,6 +63,7 @@ public class ServerNetworkInterface implements ServerInterface
 		{
 			for( int i = 0; i < connectionsArr.size(); i++ )
 			{
+				if( connectionsArr.get( i ) == null ) break;
 				connectionsArr.get( i ).sendTCP( m );
 				if( DEBUG )
 				{

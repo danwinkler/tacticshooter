@@ -41,6 +41,8 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 	DButton saveAndExit;
 	DButton exitWithoutSaving;
 	
+	DButton toggleMirrorBrush;
+	
 	DText fileNameText;
 	DTextBox name;
 	
@@ -49,6 +51,9 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 	Brush brush = Brush.WALL;
 	
 	Slick2DRenderer renderer = new Slick2DRenderer();
+	
+	MirrorType mirrorType = MirrorType.NONE;
+	int nextMirror = 1;
 
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
@@ -75,6 +80,8 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			fileNameText.setColor( java.awt.Color.BLACK );
 			name = new DTextBox( gc.getWidth()-250, gc.getHeight()-50, 250, 50 );
 			
+			toggleMirrorBrush = new DButton( "Toggle Mirror Brush", gc.getWidth()-200, gc.getHeight()-100, 200, 50 );
+			
 			dui.add( wall );
 			dui.add( floor );
 			dui.add( teamACenter );
@@ -87,6 +94,8 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			
 			dui.add( fileNameText );
 			dui.add( name );
+			
+			dui.add( toggleMirrorBrush );
 			
 			dui.addDUIListener( this );
 		}
@@ -137,14 +146,22 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			{
 				int x = l.getTileX( input.getMouseX() + scrollx );
 				int y = l.getTileY( input.getMouseY() + scrolly );
+				int tile = 0;
+				int x2 = mirrorType == MirrorType.X || mirrorType == MirrorType.XY ? (l.width-1)-x : x;
+				int y2 = mirrorType == MirrorType.Y || mirrorType == MirrorType.XY ? (l.height-1)-y : y;
 				switch( brush )
 				{
 				case WALL:
-					l.setTile( x, y, 1 );
+					tile = 1;
 					break;
 				case FLOOR:
-					l.setTile( x, y, 0 );
+					tile = 0;
 					break;
+				}
+				l.setTile( x, y, tile );
+				if( mirrorType != MirrorType.NONE )
+				{
+					l.setTile( x2, y2, tile );
 				}
 			}
 				
@@ -230,6 +247,7 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 		
 		g.setColor( Color.black );
 		g.drawString( x + ", " + y, 100, 25 );
+		g.drawString( "Mirror Brush: " + mirrorType.name(), 300, 25 );
 	}
 
 	public void onExit()
@@ -282,6 +300,10 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			else if( e == point )
 			{
 				brush = Brush.POINT;
+			} else if( e == toggleMirrorBrush )
+			{
+				mirrorType = MirrorType.values()[nextMirror];
+				nextMirror = (nextMirror+1) % MirrorType.values().length;
 			}
 			else if( e == save )
 			{
@@ -309,5 +331,13 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 				dsh.activate( "home", gc );
 			}
 		}
+	}
+	
+	public enum MirrorType
+	{
+		NONE,
+		X,
+		Y,
+		XY;
 	}
 }

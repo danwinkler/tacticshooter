@@ -88,7 +88,7 @@ public class Building
 					{
 						if( u.owner.team.id == t.id )
 						{
-							if( u.health < 100 )
+							if( u.health < u.type.health )
 							{
 								u.health += hold / (float)HOLDMAX;
 							}

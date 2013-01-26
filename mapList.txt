@@ -2,3 +2,5 @@ map1
 map2
 map3
 Battlefield1
+kenji
+levar
