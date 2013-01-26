@@ -1,5 +1,8 @@
 package com.danwink.tacticshooter.screens;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -33,6 +36,8 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 	DButton exit;
 	
 	Slick2DRenderer r = new Slick2DRenderer();
+	
+	String ip;
 	
 	public void onActivate( GameContainer e, DScreenHandler<GameContainer, Graphics> dsh )
 	{
@@ -70,6 +75,11 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 	public void render( GameContainer gc, Graphics g )
 	{
 		dui.render( r.renderTo( g ) );
+		if( ip != null )
+		{
+			g.setColor( Color.white );
+			g.drawString( "Server Address: " + ip, 200, 15 );
+		}
 	}
 
 	public void onExit()
@@ -88,12 +98,20 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 				singlePlayer.setText( "Stop Local Server" );
 				server = new TacticServer( new ServerNetworkInterface() );
 				server.begin();
+				try
+				{
+					InetAddress thisIp = InetAddress.getLocalHost();
+					ip = thisIp.getHostAddress();
+				} catch( UnknownHostException e1 )
+				{
+				}
 			}
 			else
 			{
 				singlePlayer.setText( "Start Local Server" );
 				server.sl.running = false;
 				server = null;
+				ip = null;
 			}
 		} 
 		else if( e == multiPlayer )

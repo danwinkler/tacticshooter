@@ -15,6 +15,7 @@ import com.danwink.tacticshooter.screens.MessageScreen;
 import com.danwink.tacticshooter.screens.MultiplayerGameScreen;
 import com.danwink.tacticshooter.screens.MultiplayerSetupScreen;
 import com.danwink.tacticshooter.screens.PostGameScreen;
+import com.danwink.tacticshooter.screens.SelectMapScreen;
 import com.danwink.tacticshooter.screens.SettingsScreen;
 import com.phyloa.dlib.renderer.DScreenHandler;
 
@@ -41,6 +42,7 @@ public class TacticClient extends BasicGame
 		dsh.register( "editor", new LevelEditor() );
 		
 		dsh.register( "settings", new SettingsScreen() );
+		dsh.register( "selectMaps", new SelectMapScreen() );
 		
 		dsh.activate( "home", gc );
 	}
