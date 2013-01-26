@@ -22,7 +22,7 @@ public class TacticServer
 {
 	ServerInterface si;
 	
-	int botCount = 7;
+	int botCount = StaticFiles.options.getI( "botCount" );
 	
 	ArrayList<Team> teams = new ArrayList<Team>();
 	
