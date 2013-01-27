@@ -62,7 +62,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	DButton switchTeams;
 	DButton buildLightUnit;
 	DButton buildHeavyUnit;
-	DButton buildSupplyUnit;
+	DButton buildShotgunUnit;
 	
 	DPanel escapeMenu;
 	DButton quit;
@@ -104,7 +104,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			switchTeams = new DButton( "Switch Teams", 0, gc.getHeight()-100, 200, 100 );
 			buildLightUnit = new DButton( "Build Light Unit\n10", 200, gc.getHeight()-100, 200, 100 );
 			buildHeavyUnit = new DButton( "Build Heavy Unit\n20", 400, gc.getHeight()-100, 200, 100 );
-			buildSupplyUnit = new DButton( "Build Supply Unit\n20", 600, gc.getHeight()-100, 200, 100 );
+			buildShotgunUnit = new DButton( "Build Shotgun Unit\n15", 600, gc.getHeight()-100, 200, 100 );
 			
 			escapeMenu = new DPanel( gc.getWidth() / 2 - 100, gc.getHeight()/2 - 100, 200, 200 );
 			quit = new DButton( "Quit Game", 0, 0, 200, 100 );
@@ -119,7 +119,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			dui.add( switchTeams );
 			dui.add( buildLightUnit );
 			dui.add( buildHeavyUnit );
-			dui.add( buildSupplyUnit );
+			dui.add( buildShotgunUnit );
 			dui.add( escapeMenu );
 			dui.add( chatBox );
 			
@@ -274,6 +274,11 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		{
 			Unit u = cs.units.get( i );
 			u.clientUpdate( cs, d );
+			if( u.timeSinceUpdate > 100 )
+			{
+				ci.sendToServer( new Message( MessageType.UNITUPDATE, u ) );
+				u.timeSinceUpdate = 0;
+			}
 			if( !u.alive )
 			{
 				cs.units.remove( i );
@@ -474,6 +479,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		miniMap = null;
 		bloodTexture = null;
 		dui.setEnabled( false );
+		messages.clear();
 	}
 	
 	public void scrollToTeamBase( Team t )
@@ -749,13 +755,13 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				ci.sendToServer( new Message( MessageType.SWITCHTEAMS, cs.player.team ) );
 			} else if( e == buildLightUnit )
 			{
-				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.LIGHT) );
+				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.LIGHT ) );
 			} else if( e == buildHeavyUnit )
 			{
-				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.HEAVY) );
-			} else if( e == buildSupplyUnit )
+				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.HEAVY ) );
+			} else if( e == buildShotgunUnit )
 			{
-				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.SUPPLY) );
+				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.SHOTGUN ) );
 			} else if( e == quit )
 			{
 				running = false;

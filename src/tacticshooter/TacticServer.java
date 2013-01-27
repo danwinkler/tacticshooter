@@ -391,6 +391,27 @@ public class TacticServer
 				si.sendToAllClients( new Message( MessageType.MESSAGE, m.message ) );
 				break;
 			}
+			case UNITUPDATE:
+			{
+				Unit u = (Unit)m.message;
+				Unit find = null;
+				for( int i = 0; i < units.size(); i++ )
+				{
+					Unit tu = units.get( i );
+					if( tu.id == u.id )
+					{
+						si.sendToClient( m.sender, new Message( MessageType.UNITUPDATE, tu ) );
+						find = tu;
+						break;
+					}
+				}
+				if( find == null )
+				{
+					u.alive = false;
+					u.health = 0;
+					si.sendToClient( m.sender, new Message( MessageType.UNITUPDATE, u ) );
+				}
+			}
 			}
 		}
 		

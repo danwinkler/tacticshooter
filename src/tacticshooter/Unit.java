@@ -49,6 +49,7 @@ public class Unit implements Serializable
 	
 	//CLIENT ONLY
 	public boolean selected = false;
+	public int timeSinceUpdate = 0;
 	
 	public Unit()
 	{
@@ -201,8 +202,11 @@ public class Unit implements Serializable
 					{
 						if( !l.hitwall( new Point2f( x, y ), new Vector2f( u.x - x, u.y - y ) ) )
 						{
-							float bangle = angletoguy + DMath.randomf( -type.bulletSpread, type.bulletSpread );
-							ts.addBullet( this, bangle );
+							for( int i = 0; i < type.bulletsAtOnce; i++ )
+							{
+								float bangle = angletoguy + DMath.randomf( -type.bulletSpread, type.bulletSpread );
+								ts.addBullet( this, bangle );
+							}
 							reloadtime = type.timeBetweenBullets;
 							break;
 						}
@@ -247,6 +251,8 @@ public class Unit implements Serializable
 		{
 			alive = false;
 		}
+		
+		timeSinceUpdate++;
 	}
 	
 	public void render( Graphics g, Player p )
@@ -334,6 +340,7 @@ public class Unit implements Serializable
 		this.health = u.health;
 		this.type = u.type;
 		this.state = u.state;
+		timeSinceUpdate = 0;
 	}
 
 	public void hit( Bullet bullet, TacticServer ts )
@@ -389,23 +396,25 @@ public class Unit implements Serializable
 	
 	public enum UnitType
 	{
-		LIGHT( 3, 10, .05f, 10, 100 ),
-		HEAVY( 1.5f, 3, .1f, 20, 200  ),
-		SUPPLY( 2.5f, 10, .15f, 20, 100 );
+		LIGHT( 3, 10, .05f, 10, 100, 1 ),
+		HEAVY( 1.5f, 3, .1f, 20, 200, 1  ),
+		SHOTGUN( 3.0f, 30, .3f, 15, 150, 5 );
 		
 		float speed;
 		int timeBetweenBullets;
 		float bulletSpread;
 		int price;
 		float health;
+		int bulletsAtOnce;
 		
-		UnitType( float speed, int timeBetweenBullets, float bulletSpread, int price, float health )
+		UnitType( float speed, int timeBetweenBullets, float bulletSpread, int price, float health, int bulletsAtOnce )
 		{
 			this.speed = speed;
 			this.timeBetweenBullets = timeBetweenBullets;
 			this.bulletSpread = bulletSpread;
 			this.price = price;
 			this.health = health;
+			this.bulletsAtOnce = bulletsAtOnce;
 		}
 	}
 
