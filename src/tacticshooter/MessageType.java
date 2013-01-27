@@ -14,5 +14,6 @@ public enum MessageType
 	SWITCHTEAMS, 
 	BUILDUNIT,
 	PLAYERLIST, 
-	GAMEOVER;
+	GAMEOVER,
+	MESSAGE;
 }

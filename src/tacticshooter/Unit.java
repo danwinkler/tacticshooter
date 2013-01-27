@@ -242,6 +242,11 @@ public class Unit implements Serializable
 		float dsy = sy - y;
 		x += dsx * .2f * d;
 		y += dsy * .2f * d;
+		
+		if( health <= 0 )
+		{
+			alive = false;
+		}
 	}
 	
 	public void render( Graphics g, Player p )

@@ -289,6 +289,7 @@ public class TacticServer
 				if( m.message != null )
 				{
 					String name = (String)m.message;
+					player.name = name;
 					if( name.startsWith( "BOT" ) )
 					{
 						player.isBot = true;
@@ -304,6 +305,7 @@ public class TacticServer
 				{
 					si.sendToClient( m.sender, new Message( MessageType.UNITUPDATE, units.get( i ) ) );
 				}
+				si.sendToAllClients( new Message( MessageType.MESSAGE, player.name + " has joined the game." ) );
 				break;
 			}
 			case SETATTACKPOINT:
@@ -382,6 +384,11 @@ public class TacticServer
 					}
 					players.remove( m.sender );
 				}
+				break;
+			}
+			case MESSAGE:
+			{
+				si.sendToAllClients( new Message( MessageType.MESSAGE, m.message ) );
 				break;
 			}
 			}

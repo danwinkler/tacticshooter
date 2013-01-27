@@ -50,7 +50,7 @@ public class SelectMapScreen extends DScreen<GameContainer, Graphics> implements
 			e.printStackTrace();
 		}
 		
-		scrollPane = new DScrollPane( gc.getWidth()/2-200, 50, 400, 500 );
+		scrollPane = new DScrollPane( gc.getWidth()/2-200, 50, 410, 500 );
 		File[] files = new File( "levels" ).listFiles();
 		if( files != null )
 		{
@@ -71,6 +71,7 @@ public class SelectMapScreen extends DScreen<GameContainer, Graphics> implements
 				scrollPane.add( box );
 			}
 		}
+		scrollPane.setInnerPaneHeight( files.length*50+30 );
 		
 		back = new DButton( "Back", gc.getWidth()/2 - 100, gc.getHeight() - 150, 200, 100 );
 		

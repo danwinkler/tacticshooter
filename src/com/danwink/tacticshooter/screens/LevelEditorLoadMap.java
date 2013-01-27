@@ -33,7 +33,7 @@ public class LevelEditorLoadMap extends DScreen<GameContainer, Graphics> impleme
 	{
 		dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
 		
-		scrollPane = new DScrollPane( gc.getWidth()/2-200, 50, 400, 500 );
+		scrollPane = new DScrollPane( gc.getWidth()/2-200, 50, 410, 500 );
 		File[] files = new File( "levels" ).listFiles();
 		if( files != null )
 		{
@@ -42,7 +42,7 @@ public class LevelEditorLoadMap extends DScreen<GameContainer, Graphics> impleme
 				scrollPane.add( new DButton( files[i].getName(), 0, i*100, 400, 100 ) );
 			}
 		}
-		
+		scrollPane.setInnerPaneHeight( files.length*100 );
 		back = new DButton( "Back", gc.getWidth()/2 - 100, gc.getHeight() - 150, 200, 100 );
 		
 		dui.add( scrollPane );

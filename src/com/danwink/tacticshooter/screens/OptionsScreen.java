@@ -44,7 +44,7 @@ public class OptionsScreen extends DScreen<GameContainer, Graphics> implements D
 		
 		DOptions options = new DOptions( "options.txt" );
 		
-		scrollPane = new DScrollPane( gc.getWidth()/2-200, 50, 400, 500 );
+		scrollPane = new DScrollPane( gc.getWidth()/2-200, 50, 410, 500 );
 		
 		int i = 0;
 		for( Entry<String, String> e : options.options.entrySet() )
@@ -57,6 +57,7 @@ public class OptionsScreen extends DScreen<GameContainer, Graphics> implements D
 			scrollPane.add( box );
 			i++;
 		}
+		scrollPane.setInnerPaneHeight( options.options.entrySet().size()*50 );
 		
 		back = new DButton( "Back", gc.getWidth()/2 - 100, gc.getHeight() - 150, 200, 100 );
 		
@@ -115,6 +116,8 @@ public class OptionsScreen extends DScreen<GameContainer, Graphics> implements D
 					e1.printStackTrace();
 				}
 				StaticFiles.options = new DOptions( "options.txt" );
+				
+				gc.setVSync( StaticFiles.options.getB( "vsync" ) );
 				dsh.activate( "settings", gc );
 			} 
 		}

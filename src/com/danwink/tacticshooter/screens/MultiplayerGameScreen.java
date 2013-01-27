@@ -2,6 +2,7 @@ package com.danwink.tacticshooter.screens;
 
 import java.io.IOException;
 import java.nio.BufferOverflowException;
+import java.util.ArrayList;
 
 import javax.vecmath.Point2i;
 
@@ -38,6 +39,7 @@ import tacticshooter.Unit.UnitType;
 import com.esotericsoftware.minlog.Log;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DPanel;
+import com.phyloa.dlib.dui.DTextBox;
 import com.phyloa.dlib.dui.DUI;
 import com.phyloa.dlib.dui.DUIElement;
 import com.phyloa.dlib.dui.DUIEvent;
@@ -65,6 +67,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	DPanel escapeMenu;
 	DButton quit;
 	DButton returnToGame;
+	
+	DTextBox chatBox;
 
     DUI dui;
 	
@@ -87,6 +91,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	Image bloodTexture;
 	Graphics btg;
 	
+	ArrayList<String> messages = new ArrayList<String>();
+	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
 		this.dsh = dsh;
@@ -107,11 +113,15 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			escapeMenu.add( returnToGame );
 			escapeMenu.setVisible( false );
 			
+			chatBox = new DTextBox( gc.getWidth()/2-200, gc.getHeight()/2-50, 400, 100 );
+			chatBox.setVisible( false );
+			
 			dui.add( switchTeams );
 			dui.add( buildLightUnit );
 			dui.add( buildHeavyUnit );
 			dui.add( buildSupplyUnit );
 			dui.add( escapeMenu );
+			dui.add( chatBox );
 			
 			dui.addDUIListener( this );
 		}
@@ -127,8 +137,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			dsh.activate( "message", gc );
 			return;
 		}
-		ci.sendToServer( new Message( MessageType.CLIENTJOIN, null ) );
-		
+		ci.sendToServer( new Message( MessageType.CLIENTJOIN, StaticFiles.options.getS( "name" ) ) );
 		input = gc.getInput();
 		input.addListener( this );
 		
@@ -223,6 +232,16 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			case PLAYERLIST:
 				cs.players = (Player[])m.message;
 				break;
+			case MESSAGE:
+				String mess = (String)m.message;
+				int lineLength = 32;
+				do
+				{
+					String p1 = mess.substring( 0, Math.min( lineLength, mess.length() ) );
+					mess = mess.substring( Math.min( lineLength, mess.length() ), mess.length() );
+					messages.add( p1 + (mess.length() > 0 ? "-" : "") );
+				} while( mess.length() > 0 );
+				break;
 			case GAMEOVER:
 				dsh.message( "postgame", m.message );
 				dsh.activate( "postgame", gc );
@@ -235,19 +254,21 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			return;
 		}
 		
-		float scrollSpeed = 20;
-		Rectangle screenBounds = getScreenBounds();
-		
-		boolean scrollup = cs.scrolly > screenBounds.getMinY() && (input.isKeyDown( Input.KEY_UP ) || input.isKeyDown( Input.KEY_W ) || (gc.isFullscreen() && input.getMouseY() < 10 ));
-		boolean scrolldown = cs.scrolly+gc.getHeight() < screenBounds.getMaxY() && (input.isKeyDown( Input.KEY_DOWN ) || input.isKeyDown( Input.KEY_S ) || (gc.isFullscreen() && input.getMouseY() > gc.getHeight()-10));
-		boolean scrollleft = cs.scrollx > screenBounds.getMinX() && (input.isKeyDown( Input.KEY_LEFT ) || input.isKeyDown( Input.KEY_A ) || (gc.isFullscreen() && input.getMouseX() < 10));
-		boolean scrollright = cs.scrollx+gc.getWidth() < screenBounds.getMaxX() && (input.isKeyDown( Input.KEY_RIGHT ) || input.isKeyDown( Input.KEY_D ) || (gc.isFullscreen() && input.getMouseX() > gc.getWidth()-10));
-		
-		if( scrollup ) cs.scrolly-=scrollSpeed*d;
-		if( scrolldown ) cs.scrolly+=scrollSpeed*d;
-		if( scrollleft ) cs.scrollx-=scrollSpeed*d;
-		if( scrollright ) cs.scrollx+=scrollSpeed*d;
-		
+		if( !chatBox.isVisible() && !escapeMenu.isVisible() )
+		{
+			float scrollSpeed = 20;
+			Rectangle screenBounds = getScreenBounds();
+			
+			boolean scrollup = cs.scrolly > screenBounds.getMinY() && (input.isKeyDown( Input.KEY_UP ) || input.isKeyDown( Input.KEY_W ) || (gc.isFullscreen() && input.getMouseY() < 10 ));
+			boolean scrolldown = cs.scrolly+gc.getHeight() < screenBounds.getMaxY() && (input.isKeyDown( Input.KEY_DOWN ) || input.isKeyDown( Input.KEY_S ) || (gc.isFullscreen() && input.getMouseY() > gc.getHeight()-10));
+			boolean scrollleft = cs.scrollx > screenBounds.getMinX() && (input.isKeyDown( Input.KEY_LEFT ) || input.isKeyDown( Input.KEY_A ) || (gc.isFullscreen() && input.getMouseX() < 10));
+			boolean scrollright = cs.scrollx+gc.getWidth() < screenBounds.getMaxX() && (input.isKeyDown( Input.KEY_RIGHT ) || input.isKeyDown( Input.KEY_D ) || (gc.isFullscreen() && input.getMouseX() > gc.getWidth()-10));
+			
+			if( scrollup ) cs.scrolly-=scrollSpeed*d;
+			if( scrolldown ) cs.scrolly+=scrollSpeed*d;
+			if( scrollleft ) cs.scrollx-=scrollSpeed*d;
+			if( scrollright ) cs.scrollx+=scrollSpeed*d;
+		}
 		
 		for( int i = 0; i < cs.units.size(); i++ )
 		{
@@ -352,6 +373,15 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		if( cs.player != null )
 		{
 			g.drawString( "Money: " + cs.player.money, 100, 10 );
+			g.drawString( "Selected: " + cs.selected.size(), 200, 10 );
+			g.setColor( Color.black );
+			if( messages.size() > 0 )
+			{
+				for( int i = messages.size()-1; i >= Math.max( messages.size()-12, 0 ); i-- )
+				{
+					g.drawString( messages.get( i ), gc.getWidth()-295, 300 - (messages.size()-1-i)*25 );
+				}
+			}
 		}
 		
 		dui.render( renderer.renderTo( g ) );
@@ -609,6 +639,20 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		if( keyCode == Input.KEY_ESCAPE )
 		{
 			escapeMenu.setVisible( !escapeMenu.isVisible() );
+		}
+		else if( keyCode == Input.KEY_ENTER )
+		{
+			if( chatBox.isVisible() )
+			{
+				chatBox.setVisible( false );
+				ci.sendToServer( new Message( MessageType.MESSAGE, cs.player.name + ": " + chatBox.getText() ) );
+				chatBox.setText( "" );
+			}
+			else
+			{
+				chatBox.setVisible( true );
+				dui.setFocus( chatBox );
+			}
 		}
 	}
 

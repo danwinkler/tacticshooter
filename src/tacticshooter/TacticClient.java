@@ -72,6 +72,7 @@ public class TacticClient extends BasicGame
 			
 			AppGameContainer app = new AppGameContainer( new TacticClient() );
 			app.setDisplayMode( StaticFiles.options.getI( "windowWidth" ), StaticFiles.options.getI( "windowHeight" ), StaticFiles.options.getB( "fullscreen" ) );
+			app.setVSync( StaticFiles.options.getB( "vsync" ) );
 			app.start();
 		} catch( Exception ex )
 		{
