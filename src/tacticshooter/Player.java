@@ -9,6 +9,7 @@ public class Player
 	public int money;
 	public int respawn = 0;
 	public boolean isBot = false;
+	String name;
 	
 	public Player()
 	{

@@ -1,5 +1,8 @@
 package tacticshooter;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.GameContainer;
@@ -19,6 +22,7 @@ import com.danwink.tacticshooter.screens.PostGameScreen;
 import com.danwink.tacticshooter.screens.SelectMapScreen;
 import com.danwink.tacticshooter.screens.SettingsScreen;
 import com.phyloa.dlib.renderer.DScreenHandler;
+import com.phyloa.dlib.util.DFile;
 
 public class TacticClient extends BasicGame
 {
@@ -59,13 +63,26 @@ public class TacticClient extends BasicGame
 		dsh.render( gc, g );
 	}
 	
-	public static void main( String[] args ) throws SlickException, ClassNotFoundException
+	public static void main( String[] args ) throws FileNotFoundException
 	{
 		//Attempt to avoid sealed exception errors on zoe's mac
-		Class.forName( "javax.vecmath.Point2i" );
-		
-		AppGameContainer app = new AppGameContainer( new TacticClient() );
-		app.setDisplayMode(1024, 768, false);
-		app.start();
+		try
+		{
+			Class.forName( "javax.vecmath.Point2i" );
+			
+			AppGameContainer app = new AppGameContainer( new TacticClient() );
+			app.setDisplayMode( StaticFiles.options.getI( "windowWidth" ), StaticFiles.options.getI( "windowHeight" ), StaticFiles.options.getB( "fullscreen" ) );
+			app.start();
+		} catch( Exception ex )
+		{
+			PrintWriter pw = new PrintWriter( "tmp/error.log" );
+			ex.printStackTrace( pw );
+			ex.printStackTrace();
+			
+			pw.flush();
+			pw.close();
+			
+			System.exit( 1 );
+		}
 	}
 }

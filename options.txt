@@ -1,1 +1,4 @@
+fullscreen true
 botCount 11
+windowHeight 1080
+windowWidth 1920

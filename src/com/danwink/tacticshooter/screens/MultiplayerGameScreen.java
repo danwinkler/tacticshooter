@@ -515,7 +515,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 
 	public void mouseReleased( int button, int x, int y )
 	{
-		if( button == Input.MOUSE_LEFT_BUTTON )
+		if( button == Input.MOUSE_LEFT_BUTTON && selecting )
 		{
 			cs.selected.clear();
 			

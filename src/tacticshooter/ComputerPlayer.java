@@ -29,6 +29,8 @@ public class ComputerPlayer implements Runnable
 	
 	boolean playing = true;
 	
+	PlayType playType = PlayType.values()[DMath.randomi(0, PlayType.values().length)];
+	
 	public ComputerPlayer( ServerNetworkInterface si )
 	{
 		fc = new FakeConnection();
@@ -88,7 +90,17 @@ public class ComputerPlayer implements Runnable
 						float closed2 = Float.MAX_VALUE;
 						for( Building b : l.buildings )
 						{
-							if( b.t == null || b.t.id != player.team.id && b.isCapturable( l ) )
+							boolean wantToTake = false;
+							switch( playType )
+							{
+							case AGGRESSIVE:
+								wantToTake = b.t == null || b.t.id != player.team.id && b.isCapturable( l );
+								break;
+							case MODERATE:
+								wantToTake = b.t == null || (b.t.id != player.team.id && b.isCapturable( l )) || (b.t.id == player.team.id && b.hold < Building.HOLDMAX);
+								break;
+							}
+							if( wantToTake )
 							{
 								float dx = u.x-b.x;
 								float dy = u.y-b.y;
@@ -159,4 +171,9 @@ public class ComputerPlayer implements Runnable
 		}
 	}
 
+	public enum PlayType
+	{
+		AGGRESSIVE,
+		MODERATE;
+	}
 }
