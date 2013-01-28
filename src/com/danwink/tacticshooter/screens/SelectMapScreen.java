@@ -56,17 +56,18 @@ public class SelectMapScreen extends DScreen<GameContainer, Graphics> implements
 		{
 			for( int i = 0; i < files.length; i++ )
 			{
-				scrollPane.add( new DText( files[i].getName(), 30, i*50 + 12 ) );
+				String name = files[i].getName().replace( ".xml", "" );
+				scrollPane.add( new DText( name, 30, i*50 + 12 ) );
 				DCheckBox box = new DCheckBox( 10, i*50+30, 20, 20 );
 				for( int j = 0; j < selectedFiles.length; j++ )
 				{
-					if( selectedFiles[j].equals( files[i].getName() ) )
+					if( selectedFiles[j].equals( name ) )
 					{
 						box.checked = true;
 						break;
 					}
 				}
-				box.setName( files[i].getName() );
+				box.setName( name );
 				boxes.add( box );
 				scrollPane.add( box );
 			}

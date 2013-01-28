@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 
 import javax.vecmath.Point2i;
 
+import org.dom4j.DocumentException;
 import org.newdawn.slick.util.pathfinding.AStarPathFinder;
 import org.newdawn.slick.util.pathfinding.PathFinder;
 
@@ -74,6 +75,10 @@ public class TacticServer
 			Collections.shuffle( maps );
 			l = LevelFileHelper.loadLevel( maps.get( onMap ) );
 		} catch( IOException e )
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch( DocumentException e )
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -211,10 +216,10 @@ public class TacticServer
 						try
 						{
 							l = LevelFileHelper.loadLevel( maps.get( onMap ) );
-						} catch( IOException e1 )
+						} catch( DocumentException e )
 						{
 							// TODO Auto-generated catch block
-							e1.printStackTrace();
+							e.printStackTrace();
 						}
 						finder = new AStarPathFinder( l, 500, true );
 						for( int i = 0; i < botCount; i++ )

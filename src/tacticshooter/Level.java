@@ -1,6 +1,5 @@
 package tacticshooter;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 import javax.vecmath.Point2f;
@@ -8,21 +7,21 @@ import javax.vecmath.Vector2f;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.geom.Polygon;
+import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.util.pathfinding.Mover;
 import org.newdawn.slick.util.pathfinding.PathFindingContext;
 import org.newdawn.slick.util.pathfinding.TileBasedMap;
 
 import com.phyloa.dlib.util.DMath;
 
-public class Level implements Serializable, TileBasedMap
+public class Level implements TileBasedMap
 {
 	public static int tileSize = 20;
 	
 	public ArrayList<Building> buildings = new ArrayList<Building>();
 	
-	public int[][] tiles;
-	
-	public int[][] visited;
+	public TileType[][] tiles;
 	
 	public int width;
 	public int height;
@@ -36,8 +35,14 @@ public class Level implements Serializable, TileBasedMap
 	{
 		this.width = width;
 		this.height = height;
-		tiles = new int[width][height];
-		visited = new int[width][height];
+		tiles = new TileType[width][height];
+		for( int y = 0; y < height; y++ )
+		{
+			for( int x = 0; x < width; x++ )
+			{
+				tiles[x][y] = TileType.FLOOR;
+			}
+		}
 	}
 	
 	public void render( Graphics g )
@@ -49,26 +54,26 @@ public class Level implements Serializable, TileBasedMap
 			{
 				switch( tiles[x][y] )
 				{
-				case 0: 
+				case FLOOR: 
 					//g.drawRect( x*tileSize, y*tileSize, tileSize, tileSize ); 
 					break;
-				case 1: 
+				case WALL: 
 					g.setColor( Color.gray );
 					g.fillRect( x*tileSize, y*tileSize, tileSize, tileSize ); 
 					g.setColor( Color.black );
-					if( getTile( x-1, y) == 0 )
+					if( getTile( x-1, y ) == TileType.FLOOR )
 					{
 						g.drawLine( x*tileSize, y*tileSize, x*tileSize, y*tileSize+tileSize );
 					}
-					if( getTile( x+1, y) == 0 )
+					if( getTile( x+1, y ) == TileType.FLOOR )
 					{
 						g.drawLine( x*tileSize+tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize );
 					}
-					if( getTile( x, y-1) == 0 )
+					if( getTile( x, y-1 ) == TileType.FLOOR )
 					{
 						g.drawLine( x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize );
 					}
-					if( getTile( x, y+1) == 0 )
+					if( getTile( x, y+1 ) == TileType.FLOOR )
 					{
 						g.drawLine( x*tileSize, y*tileSize+tileSize, x*tileSize+tileSize, y*tileSize+tileSize );
 					}
@@ -84,7 +89,71 @@ public class Level implements Serializable, TileBasedMap
 						g.setColor( Color.darkGray );
 						g.drawLine( x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize );
 					}
-				break;
+					break;
+				case TRIANGLENE:
+					g.setColor( Color.gray );
+					Polygon nep = new Polygon();
+					nep.addPoint( x*tileSize, y*tileSize );
+					nep.addPoint( x*tileSize+tileSize, y*tileSize );
+					nep.addPoint( x*tileSize+tileSize, y*tileSize+tileSize );
+					g.fill( nep );
+					g.setColor( Color.black );
+					g.drawLine( x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize );
+					
+					if( (x+y) % 4 == 0 )
+					{
+						g.setColor( Color.darkGray );
+						g.drawLine( x*tileSize+tileSize*.5f, y*tileSize+tileSize*.5f, x*tileSize+tileSize, y*tileSize );
+					}
+					break;
+				case TRIANGLENW:
+					g.setColor( Color.gray );
+					Polygon nwp = new Polygon();
+					nwp.addPoint( x*tileSize, y*tileSize );
+					nwp.addPoint( x*tileSize, y*tileSize+tileSize );
+					nwp.addPoint( x*tileSize+tileSize, y*tileSize );
+					g.fill( nwp );
+					g.setColor( Color.black );
+					g.drawLine( x*tileSize, y*tileSize+tileSize, x*tileSize+tileSize, y*tileSize );
+					
+					if( (x-y) % 6 == 0 )
+					{
+						g.setColor( Color.darkGray );
+						g.drawLine( x*tileSize, y*tileSize, x*tileSize+tileSize*.5f, y*tileSize+tileSize*.5f );
+					}
+					break;
+				case TRIANGLESE:
+					g.setColor( Color.gray );
+					Polygon sep = new Polygon();
+					sep.addPoint( x*tileSize+tileSize, y*tileSize+tileSize );
+					sep.addPoint( x*tileSize, y*tileSize+tileSize );
+					sep.addPoint( x*tileSize+tileSize, y*tileSize );
+					g.fill( sep );
+					g.setColor( Color.black );
+					g.drawLine( x*tileSize, y*tileSize+tileSize, x*tileSize+tileSize, y*tileSize );
+					
+					if( (x-y) % 6 == 0 )
+					{
+						g.setColor( Color.darkGray );
+						g.drawLine( x*tileSize+tileSize, y*tileSize+tileSize, x*tileSize+tileSize*.5f, y*tileSize+tileSize*.5f );
+					}				
+					break;
+				case TRIANGLESW:
+					g.setColor( Color.gray );
+					Polygon swp = new Polygon();
+					swp.addPoint( x*tileSize, y*tileSize );
+					swp.addPoint( x*tileSize, y*tileSize+tileSize );
+					swp.addPoint( x*tileSize+tileSize, y*tileSize+tileSize );
+					g.fill( swp );
+					g.setColor( Color.black );
+					g.drawLine( x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize );
+					
+					if( (x+y) % 4 == 0 )
+					{
+						g.setColor( Color.darkGray );
+						g.drawLine( x*tileSize+tileSize*.5f, y*tileSize+tileSize*.5f, x*tileSize, y*tileSize+tileSize );
+					}
+					break;
 				}
 			}
 		}
@@ -96,17 +165,6 @@ public class Level implements Serializable, TileBasedMap
 		for( Building b : buildings )
 		{
 			b.render( g );
-		}
-	}
-	
-	public void clearVisited()
-	{
-		for( int y = 0; y < height; y++ )
-		{
-			for( int x = 0; x < width; x++ )
-			{
-				visited[x][y] = 0;
-			}
 		}
 	}
 	
@@ -122,7 +180,7 @@ public class Level implements Serializable, TileBasedMap
 
 	public boolean blocked( Mover m, int x, int y ) 
 	{
-		return getTile( x, y ) == 1;
+		return !getTile( x, y ).passable;
 	}
 
 	public float getCost( Mover m, int x, int y, int tx, int ty ) 
@@ -142,10 +200,10 @@ public class Level implements Serializable, TileBasedMap
 
 	public void pathFinderVisited( int x, int y )
 	{
-		visited[x][y] = 1;
+		
 	}
 
-	public int getTile( float lx, float ly )
+	public TileType getTile( float lx, float ly )
 	{
 		return tiles[getTileX(lx)][getTileY(ly)];
 	}
@@ -189,7 +247,7 @@ public class Level implements Serializable, TileBasedMap
 			return false;
 		}
 		
-		if( l.tiles[cx][cy] != 0 )
+		if( !l.tiles[cx][cy].passable )
 		{
 			// start point is inside a block
 			result.x = start.x;
@@ -245,7 +303,7 @@ public class Level implements Serializable, TileBasedMap
 			if( tMaxX < tMaxY )
 			{
 				cx = cx + stepX;
-				if( getTile( cx, cy ) != 0 )
+				if( !getTile( cx, cy ).passable )
 				{
 					hitTile = true;
 					break;
@@ -260,7 +318,7 @@ public class Level implements Serializable, TileBasedMap
 			else
 			{
 				cy = cy + stepY;
-				if( getTile( cx, cy ) != 0 )
+				if( !getTile( cx, cy ).passable )
 				{
 					hitTile = true;
 					break;
@@ -286,16 +344,16 @@ public class Level implements Serializable, TileBasedMap
 		return hitTile && tResult < 1;
 	}
 	
-	public int getTile( int x, int y )
+	public TileType getTile( int x, int y )
 	{
 		if( x < 0 || x >= width || y < 0 || y >= height )
 		{
-			return 1;
+			return TileType.WALL;
 		}
 		return tiles[x][y];
 	}
 	
-	public void setTile( int x, int y, int val )
+	public void setTile( int x, int y, TileType val )
 	{
 		if( x < 0 || x >= width || y < 0 || y >= height )
 		{
@@ -307,12 +365,35 @@ public class Level implements Serializable, TileBasedMap
 	@Override
 	public boolean blocked( PathFindingContext arg0, int x, int y )
 	{
-		return getTile( x, y ) == 1;
+		return !getTile( x, y ).passable;
 	}
 
 	@Override
 	public float getCost( PathFindingContext arg0, int x, int y )
 	{
 		return DMath.randomf( .1f, .9f );
+	}
+	
+	public enum TileType
+	{
+		FLOOR,
+		WALL( false ),
+		LIGHT,
+		TRIANGLENW,
+		TRIANGLESW,
+		TRIANGLENE,
+		TRIANGLESE;
+		
+		public boolean passable;
+		
+		TileType()
+		{
+			passable = true;
+		}
+		
+		TileType( boolean passable )
+		{
+			this.passable = passable;
+		}
 	}
 }

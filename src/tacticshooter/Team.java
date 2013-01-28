@@ -9,15 +9,8 @@ public class Team
 	
 	public static final Color[] teamColors = { Color.red, Color.green, Color.blue, Color.orange };
 	
-	private static int onID = -1;
+	public int id;
 	
-	private static int getID()
-	{
-		onID++;
-		return onID;
-	}
-	
-	public int id = getID();
 	public int cash = 1000;
 	
 	public Team()

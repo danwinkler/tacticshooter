@@ -35,5 +35,8 @@ public class KryoHelper
 		k.register( GameStats.class );
 		k.register( GameStats.TeamStats.class );
 		k.register( GameStats.TeamStats[].class );
+		k.register( Level.TileType.class );
+		k.register( Level.TileType[].class );
+		k.register( Level.TileType[][].class );
 	}
 }

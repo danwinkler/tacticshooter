@@ -10,6 +10,7 @@ import org.newdawn.slick.Input;
 import tacticshooter.Building;
 import tacticshooter.Building.BuildingType;
 import tacticshooter.Level;
+import tacticshooter.Level.TileType;
 import tacticshooter.LevelFileHelper;
 import tacticshooter.Slick2DEventMapper;
 import tacticshooter.Slick2DRenderer;
@@ -33,6 +34,7 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 	DUI dui;
 	DButton wall;
 	DButton floor;
+	DButton edge;
 	DButton teamACenter;
 	DButton teamBCenter;
 	DButton point;
@@ -68,9 +70,10 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			
 			wall = new DButton( "Wall", 0, gc.getHeight()-100, 150, 50 );
 			floor = new DButton( "Floor", 150, gc.getHeight()-100, 150, 50 );
-			teamACenter = new DButton( "A Center", 300, gc.getHeight()-100, 150, 50 );
-			teamBCenter = new DButton( "B Center", 450, gc.getHeight()-100, 150, 50 );
-			point = new DButton( "Point", 600, gc.getHeight()-100, 150, 50 );
+			edge = new DButton( "Edge" , 300, gc.getHeight()-100, 150, 50 );
+			teamACenter = new DButton( "A Center", 450, gc.getHeight()-100, 150, 50 );
+			teamBCenter = new DButton( "B Center", 600, gc.getHeight()-100, 150, 50 );
+			point = new DButton( "Point", 750, gc.getHeight()-100, 150, 50 );
 			
 			save = new DButton( "Save", 0, gc.getHeight()-50, 200, 50 );
 			saveAndExit = new DButton( "Save & Exit", 200, gc.getHeight()-50, 200, 50 );
@@ -84,6 +87,7 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			
 			dui.add( wall );
 			dui.add( floor );
+			dui.add( edge );
 			dui.add( teamACenter );
 			dui.add( teamBCenter );
 			dui.add( point );
@@ -104,22 +108,23 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 	
 	public void update( GameContainer gc, int delta )
 	{
+		float d = delta / 60.f;
 		Input input = gc.getInput();
 		if( input.isKeyDown( Input.KEY_DOWN ) )
 		{
-			scrolly += 1;
+			scrolly += 25 * d;
 		}
 		if( input.isKeyDown( Input.KEY_UP ) )
 		{
-			scrolly -= 1;
+			scrolly -= 25 * d;
 		}
 		if( input.isKeyDown( Input.KEY_LEFT ) )
 		{
-			scrollx -= 1;
+			scrollx -= 25 * d;
 		}
 		if( input.isKeyDown( Input.KEY_RIGHT ) )
 		{
-			scrollx += 1;
+			scrollx += 25 * d;
 		}
 		
 		if( input.getMouseY() < gc.getHeight()-100 )
@@ -146,16 +151,53 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			{
 				int x = l.getTileX( input.getMouseX() + scrollx );
 				int y = l.getTileY( input.getMouseY() + scrolly );
-				int tile = 0;
+				TileType tile = TileType.FLOOR;
 				int x2 = mirrorType == MirrorType.X || mirrorType == MirrorType.XY ? (l.width-1)-x : x;
 				int y2 = mirrorType == MirrorType.Y || mirrorType == MirrorType.XY ? (l.height-1)-y : y;
 				switch( brush )
 				{
 				case WALL:
-					tile = 1;
+					tile = TileType.WALL;
 					break;
 				case FLOOR:
-					tile = 0;
+					tile = TileType.FLOOR;
+					break;
+				case TRIANGLE:
+					if( l.getTile( x, y ) == TileType.WALL )
+					{
+						tile = TileType.WALL; 
+						break;
+					}
+					
+					TileType up = l.getTile( x, y-1 );
+					TileType down = l.getTile( x, y+1 );
+					TileType left = l.getTile( x-1, y );
+					TileType right = l.getTile( x+1, y );
+					
+					if( (up == TileType.WALL && down == TileType.WALL && left == TileType.WALL && right == TileType.WALL) )
+					{
+						tile = TileType.WALL;
+					}
+					else if( up == TileType.WALL && down == TileType.FLOOR && left == TileType.FLOOR && right == TileType.WALL )
+					{
+						tile = TileType.TRIANGLENE;
+					}
+					else if( up == TileType.WALL && down == TileType.FLOOR && left == TileType.WALL && right == TileType.FLOOR )
+					{
+						tile = TileType.TRIANGLENW;
+					}
+					else if( up == TileType.FLOOR && down == TileType.WALL && left == TileType.FLOOR && right == TileType.WALL )
+					{
+						tile = TileType.TRIANGLESE;
+					}
+					else if( up == TileType.FLOOR && down == TileType.WALL && left == TileType.WALL && right == TileType.FLOOR )
+					{
+						tile = TileType.TRIANGLESW;
+					}
+					else
+					{
+						tile = TileType.FLOOR;
+					}
 					break;
 				}
 				l.setTile( x, y, tile );
@@ -271,6 +313,7 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 	{
 		WALL,
 		FLOOR,
+		TRIANGLE,
 		CENTERTEAMA,
 		CENTERTEAMB,
 		POINT;
@@ -288,6 +331,10 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			else if( e == floor )
 			{
 				brush = Brush.FLOOR;
+			}
+			else if( e == edge )
+			{
+				brush = Brush.TRIANGLE;
 			}
 			else if( e == teamACenter )
 			{

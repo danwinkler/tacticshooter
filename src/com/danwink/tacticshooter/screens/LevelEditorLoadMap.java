@@ -3,6 +3,7 @@ package com.danwink.tacticshooter.screens;
 import java.io.File;
 import java.io.IOException;
 
+import org.dom4j.DocumentException;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
@@ -39,7 +40,7 @@ public class LevelEditorLoadMap extends DScreen<GameContainer, Graphics> impleme
 		{
 			for( int i = 0; i < files.length; i++ )
 			{
-				scrollPane.add( new DButton( files[i].getName(), 0, i*100, 400, 100 ) );
+				scrollPane.add( new DButton( files[i].getName().replace( ".xml", "" ), 0, i*100, 400, 100 ) );
 			}
 		}
 		scrollPane.setInnerPaneHeight( files.length*100 );
@@ -88,7 +89,7 @@ public class LevelEditorLoadMap extends DScreen<GameContainer, Graphics> impleme
 				try
 				{
 					dsh.message( "editor", LevelFileHelper.loadLevel( e.getName() ) );
-				} catch( IOException e1 )
+				} catch( DocumentException e1 )
 				{
 					// TODO Auto-generated catch block
 					e1.printStackTrace();

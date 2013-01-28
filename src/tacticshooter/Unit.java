@@ -262,7 +262,6 @@ public class Unit implements Serializable
 			{
 				path.add( new Point2i( tp.getX( i ), tp.getY( i ) ) );
 			}
-			l.clearVisited();
 			destx = tx;
 			desty = ty;
 			onStep = 0;
