@@ -122,74 +122,10 @@ public class Unit implements Serializable
 			heading += turnAmount;
 			if( turnAmount < .001f )
 			{
-				/*
-				int mtx = -1;
-				int mty = -1;
-				for( Unit u : ts.units )
-				{
-					if( !u.owner.team.equals( this.owner.team ) )
-					{
-						float angletoguy = (float)Math.atan2( u.y - y, u.x - x );
-						if( Math.abs( DMath.turnTowards( heading, angletoguy ) ) < Math.PI / 4 )
-						{
-							if( !l.hitwall( new Point2f( x, y ), new Vector2f( u.x - x, u.y - y ) ) )
-							{
-								mtx = l.getTileX( u.x );
-								mty = l.getTileY( u.y );
-								break;
-							}
-						}
-					}
-				}
-				if( mtx != -1 )
-				{
-					pathTo( mtx, mty, ts );
-				}
-				else
-				{
-					onStep = path.size();
-				}
-				state = UnitState.MOVING;
-				*/
 				state = UnitState.STOPPED;
 			}
 			break;
 		}
-		
-		//Bounce off walls
-		//@TODO doesn't work well, also is probably sort of computationally expensive. Might not be worth it
-		/*
-		int tx = l.getTileX( x );
-		int ty = l.getTileY( y );
-		if( l.getTile( x, y ) == 0 )
-		{
-			for( int y = Math.max( ty-1, 0 ); y < Math.min( ty+1, l.height-1 ); y++ )
-			{
-				for( int x = Math.max( tx-1, 0 ); x < Math.min( tx+1, l.width-1 ); x++ )
-				{
-					if( l.tiles[x][y] == 1 )
-					{
-						for( int i = 0; i < 4; i++ )
-						{
-							Vector2f vec = null;
-							switch( i )
-							{
-							case 0: vec = DMath.pointToLineSegment( new Point2f( x*l.tileSize, y*l.tileSize ), new Vector2f( l.tileSize, 0 ), new Point2f( this.x, this.y ) ); break;
-							case 1: vec = DMath.pointToLineSegment( new Point2f( x*l.tileSize, y*l.tileSize ), new Vector2f( 0, l.tileSize ), new Point2f( this.x, this.y ) ); break;
-							case 2: vec = DMath.pointToLineSegment( new Point2f( (x+1)*l.tileSize, y*l.tileSize ), new Vector2f( 0, l.tileSize ), new Point2f( this.x, this.y ) ); break;
-							case 3: vec = DMath.pointToLineSegment( new Point2f( x*l.tileSize, (y+1)*l.tileSize ), new Vector2f( l.tileSize, 0 ), new Point2f( this.x, this.y ) ); break;
-							}
-							if( vec.lengthSquared() < this.radius )
-							{
-								this.x += vec.x * 10;
-								this.y += vec.y * 10;
-							}
-						}
-					}
-				}
-			}
-		}
-		*/
 		
 		if( reloadtime <= 0 )
 		{
@@ -255,7 +191,7 @@ public class Unit implements Serializable
 		timeSinceUpdate++;
 	}
 	
-	public void render( Graphics g, Player p )
+	public void render( Graphics g, Player p, float mx, float my )
 	{
 		g.pushTransform();
 		g.translate( x, y );
@@ -292,6 +228,14 @@ public class Unit implements Serializable
 		g.setColor( new Color( DMath.bound( 1.f - health/type.health, 0, 1 ), DMath.bound(health/type.health, 0, 1 ), 0 ) );
 		g.fillRect( -8, -8, (int)(16.f * health/type.health), 2 );
 		
+		float dmx = x - mx;
+		float dmy = y - my;
+		if( dmx*dmx + dmy*dmy < 100 )
+		{
+			float strWidth = g.getFont().getWidth( owner.name );
+			g.setColor( Color.black );
+			g.drawString( owner.name, -strWidth/2, 10 );
+		}
 		
 		g.popTransform();
 		
@@ -420,7 +364,7 @@ public class Unit implements Serializable
 
 	public void renderMinimap( Graphics g, Player player )
 	{
-		g.setColor( this.owner.team.getColor() );
+		g.setColor( this.owner.id == player.id ? Color.blue : this.owner.team.getColor() );
 		g.fillOval( x-20, y-20, 40, 40 );
 	}
 }

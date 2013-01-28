@@ -1,11 +1,13 @@
 package tacticshooter;
 
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 
 import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.Sound;
 
+import com.phyloa.dlib.util.DFile;
 import com.phyloa.dlib.util.DOptions;
 
 public class StaticFiles
@@ -18,6 +20,18 @@ public class StaticFiles
 	static boolean ready = false;
 	
 	private static boolean started = false;
+	public static String names;
+	
+	static
+	{
+		try
+		{
+			names = DFile.loadText( "data/dist.male.first.txt" );
+		} catch( FileNotFoundException e )
+		{
+			System.err.println( "Make sure the names file is located at: data/dist.male.first.txt" );
+		}
+	}
 	
 	public static void loadAllMusic()
 	{

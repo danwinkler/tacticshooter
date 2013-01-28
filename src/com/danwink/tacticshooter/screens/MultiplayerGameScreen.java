@@ -234,7 +234,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				break;
 			case MESSAGE:
 				String mess = (String)m.message;
-				int lineLength = 32;
+				int lineLength = 60;
 				do
 				{
 					String p1 = mess.substring( 0, Math.min( lineLength, mess.length() ) );
@@ -349,7 +349,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		for( int i = 0; i < cs.units.size(); i++ )
 		{
 			Unit u = cs.units.get( i );
-			u.render( g, cs.player );
+			u.render( g, cs.player, input.getMouseX() + cs.scrollx, input.getMouseY() + cs.scrolly );
 		}
 		
 		g.setColor( Color.black );
@@ -384,7 +384,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			{
 				for( int i = messages.size()-1; i >= Math.max( messages.size()-12, 0 ); i-- )
 				{
-					g.drawString( messages.get( i ), gc.getWidth()-295, 300 - (messages.size()-1-i)*25 );
+					g.drawString( messages.get( i ), 10, 300 - (messages.size()-1-i)*25 );
 				}
 			}
 		}
@@ -463,7 +463,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			g.drawRect( gc.getWidth()/2 - 200, gc.getHeight()/2-300, 400, 500 );
 			for( int i = 0; i < cs.players.length; i++ )
 			{
-				g.drawString( cs.players[i].id + " " + (cs.players[i].isBot ? "BOT" : "HUMAN"), gc.getWidth()/2 - 190, gc.getHeight()/2-270 + i*30 );
+				g.drawString( cs.players[i].name + " - " + (cs.players[i].team.id == Team.a.id ? "RED" : "GREEN"), gc.getWidth()/2 - 190, gc.getHeight()/2-270 + i*30 );
 			}
 		}
 	}

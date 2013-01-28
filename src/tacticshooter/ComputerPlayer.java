@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 import javax.vecmath.Point2i;
 
 import com.esotericsoftware.kryonet.Connection;
+import com.phyloa.dlib.util.DFile;
 import com.phyloa.dlib.util.DMath;
 
 import tacticshooter.Unit.UnitState;
@@ -39,7 +40,17 @@ public class ComputerPlayer implements Runnable
 	
 	public void run() 
 	{
-		ci.sl.received( fc, new Message( MessageType.CLIENTJOIN, "BOT_A" ) );
+		String name = "DUDE";
+		try 
+		{
+			String[] names = StaticFiles.names.split( "\n" );
+			name = names[DMath.randomi( 0, names.length )].split( " " )[0];
+		} catch( Exception ex )
+		{
+			ex.printStackTrace();
+		}
+		
+		ci.sl.received( fc, new Message( MessageType.CLIENTJOIN, playType.name() + "_BOT_" + name ) );
 		while( playing )
 		{
 			while( fc.hasClientMessages() )
@@ -86,37 +97,70 @@ public class ComputerPlayer implements Runnable
 				{
 					if( u.owner.id == player.id && (u.state == UnitState.STOPPED || Math.random() < .1f) )
 					{
-						Building closeb = null;
-						float closed2 = Float.MAX_VALUE;
-						for( Building b : l.buildings )
+						if( playType == PlayType.SNEAKY )
 						{
-							boolean wantToTake = false;
-							switch( playType )
+							Building closeb = null;
+							for( Building b : l.buildings )
 							{
-							case AGGRESSIVE:
-								wantToTake = b.t == null || b.t.id != player.team.id && b.isCapturable( l );
-								break;
-							case MODERATE:
-								wantToTake = b.t == null || (b.t.id != player.team.id && b.isCapturable( l )) || (b.t.id == player.team.id && b.hold < Building.HOLDMAX);
-								break;
-							}
-							if( wantToTake )
-							{
-								float dx = u.x-b.x;
-								float dy = u.y-b.y;
-								float d2 = dx*dx + dy*dy;
-								if( d2 < closed2 )
+								boolean wantToTake = b.t == null || b.t.id != player.team.id && b.isCapturable( l );
+									
+								if( wantToTake )
 								{
-									closeb = b;
-									closed2 = d2;
+									float dx = u.x-b.x;
+									float dy = u.y-b.y;
+									float d2 = dx*dx + dy*dy;
+									if( d2 < 50 * 50 )
+									{
+										closeb = b;
+										break;
+									}
+								}
+							}
+							if( closeb == null )
+							{
+								Building b = l.buildings.get( DMath.randomi( 0, DMath.randomi( 0, l.buildings.size() ) ) );
+								if( b.t == null || b.t.id != player.team.id && b.isCapturable( l ) )
+								{
+									ArrayList<Integer> selected = new ArrayList<Integer>();
+									selected.add( u.id );
+									ci.sl.received( fc, new Message( MessageType.SETATTACKPOINT, new Object[]{ new Point2i( b.x/Level.tileSize, b.y/Level.tileSize ), selected } ) );
 								}
 							}
 						}
-						if( closeb != null )
+						else
 						{
-							ArrayList<Integer> selected = new ArrayList<Integer>();
-							selected.add( u.id );
-							ci.sl.received( fc, new Message( MessageType.SETATTACKPOINT, new Object[]{ new Point2i( closeb.x/Level.tileSize, closeb.y/Level.tileSize ), selected } ) );
+							Building closeb = null;
+							float closed2 = Float.MAX_VALUE;
+							for( Building b : l.buildings )
+							{
+								boolean wantToTake = false;
+								switch( playType )
+								{
+								case AGGRESSIVE:
+									wantToTake = b.t == null || b.t.id != player.team.id && b.isCapturable( l );
+									break;
+								case MODERATE:
+									wantToTake = b.t == null || (b.t.id != player.team.id && b.isCapturable( l )) || (b.t.id == player.team.id && b.hold < Building.HOLDMAX);
+									break;
+								}
+								if( wantToTake )
+								{
+									float dx = u.x-b.x;
+									float dy = u.y-b.y;
+									float d2 = dx*dx + dy*dy;
+									if( d2 < closed2 )
+									{
+										closeb = b;
+										closed2 = d2;
+									}
+								}
+							}
+							if( closeb != null )
+							{
+								ArrayList<Integer> selected = new ArrayList<Integer>();
+								selected.add( u.id );
+								ci.sl.received( fc, new Message( MessageType.SETATTACKPOINT, new Object[]{ new Point2i( closeb.x/Level.tileSize, closeb.y/Level.tileSize ), selected } ) );
+							}
 						}
 					}
 				}
@@ -174,6 +218,7 @@ public class ComputerPlayer implements Runnable
 	public enum PlayType
 	{
 		AGGRESSIVE,
-		MODERATE;
+		MODERATE,
+		SNEAKY;
 	}
 }
