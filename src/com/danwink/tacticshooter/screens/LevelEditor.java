@@ -5,7 +5,10 @@ import java.io.IOException;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
+import org.newdawn.slick.InputListener;
+import org.newdawn.slick.SlickException;
 
 import tacticshooter.Building;
 import tacticshooter.Building.BuildingType;
@@ -27,7 +30,7 @@ import com.phyloa.dlib.dui.DUIListener;
 import com.phyloa.dlib.renderer.DScreen;
 import com.phyloa.dlib.renderer.DScreenHandler;
 
-public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUIListener
+public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUIListener, InputListener
 {
 	Level l;
 	
@@ -35,6 +38,7 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 	DButton wall;
 	DButton floor;
 	DButton edge;
+	DButton light;
 	DButton teamACenter;
 	DButton teamBCenter;
 	DButton point;
@@ -56,6 +60,9 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 	
 	MirrorType mirrorType = MirrorType.NONE;
 	int nextMirror = 1;
+	
+	Image levelTexture;
+	Graphics levelG;
 
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
@@ -68,9 +75,10 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 		{
 			dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
 			
-			wall = new DButton( "Wall", 0, gc.getHeight()-100, 150, 50 );
-			floor = new DButton( "Floor", 150, gc.getHeight()-100, 150, 50 );
-			edge = new DButton( "Edge" , 300, gc.getHeight()-100, 150, 50 );
+			wall = new DButton( "Wall", 0, gc.getHeight()-100, 100, 50 );
+			floor = new DButton( "Floor", 100, gc.getHeight()-100, 100, 50 );
+			edge = new DButton( "Edge" , 200, gc.getHeight()-100, 100, 50 );
+			light = new DButton( "Light", 300, gc.getHeight()-100, 150, 50 );
 			teamACenter = new DButton( "A Center", 450, gc.getHeight()-100, 150, 50 );
 			teamBCenter = new DButton( "B Center", 600, gc.getHeight()-100, 150, 50 );
 			point = new DButton( "Point", 750, gc.getHeight()-100, 150, 50 );
@@ -88,6 +96,7 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			dui.add( wall );
 			dui.add( floor );
 			dui.add( edge );
+			dui.add( light );
 			dui.add( teamACenter );
 			dui.add( teamBCenter );
 			dui.add( point );
@@ -104,6 +113,18 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			dui.addDUIListener( this );
 		}
 		dui.setEnabled( true );
+		
+		try
+		{
+			levelTexture = new Image( l.width * Level.tileSize, l.height * Level.tileSize );
+			levelG = levelTexture.getGraphics();
+			l.render( levelG );
+			levelG.flush();
+		} catch( SlickException e )
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void update( GameContainer gc, int delta )
@@ -162,6 +183,9 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 				case FLOOR:
 					tile = TileType.FLOOR;
 					break;
+				case LIGHT:
+					tile = TileType.LIGHT;
+					break;
 				case TRIANGLE:
 					if( l.getTile( x, y ) == TileType.WALL )
 					{
@@ -205,6 +229,8 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 				{
 					l.setTile( x2, y2, tile );
 				}
+				l.render( levelG );
+				levelG.flush();
 			}
 				
 			if( input.isMousePressed( Input.MOUSE_LEFT_BUTTON ) )
@@ -254,6 +280,12 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			}
 		}
 		
+		if( input.isKeyDown( Input.KEY_R ) )
+		{
+			l.render( levelG );
+			levelG.flush();
+		}
+		
 		dui.update();
 	}
 
@@ -266,7 +298,7 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 		g.translate( -scrollx, -scrolly );
 		g.setColor( Color.gray );
 		g.drawRect( 0, 0, l.width*l.tileSize, l.height*l.tileSize );
-		l.render( g );
+		g.drawImage( levelTexture, 0, 0 );
 		l.renderBuildings( g );
 		
 		int x = l.getTileX( gc.getInput().getMouseX() + scrollx );
@@ -295,6 +327,7 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 	public void onExit()
 	{
 		dui.setEnabled( false );
+		gc.getInput().removeListener( this );
 	}
 
 	public void message( Object o )
@@ -314,6 +347,7 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 		WALL,
 		FLOOR,
 		TRIANGLE,
+		LIGHT,
 		CENTERTEAMA,
 		CENTERTEAMB,
 		POINT;
@@ -335,6 +369,10 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			else if( e == edge )
 			{
 				brush = Brush.TRIANGLE;
+			}
+			else if( e == light )
+			{
+				brush = Brush.LIGHT;
 			}
 			else if( e == teamACenter )
 			{
@@ -386,5 +424,158 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 		X,
 		Y,
 		XY;
+	}
+
+	@Override
+	public void mouseClicked( int arg0, int arg1, int arg2, int arg3 )
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseDragged( int arg0, int arg1, int arg2, int arg3 )
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseMoved( int arg0, int arg1, int arg2, int arg3 )
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mousePressed( int arg0, int arg1, int arg2 )
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseReleased( int arg0, int arg1, int arg2 )
+	{
+		
+	}
+
+	@Override
+	public void mouseWheelMoved( int arg0 )
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void inputEnded()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void inputStarted()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isAcceptingInput()
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setInput( Input arg0 )
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void keyPressed( int arg0, char arg1 )
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void keyReleased( int arg0, char arg1 )
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void controllerButtonPressed( int arg0, int arg1 )
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void controllerButtonReleased( int arg0, int arg1 )
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void controllerDownPressed( int arg0 )
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void controllerDownReleased( int arg0 )
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void controllerLeftPressed( int arg0 )
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void controllerLeftReleased( int arg0 )
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void controllerRightPressed( int arg0 )
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void controllerRightReleased( int arg0 )
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void controllerUpPressed( int arg0 )
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void controllerUpReleased( int arg0 )
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }

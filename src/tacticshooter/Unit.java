@@ -191,7 +191,7 @@ public class Unit implements Serializable
 		timeSinceUpdate++;
 	}
 	
-	public void render( Graphics g, Player p, float mx, float my )
+	public void render( Graphics g, Player p, float mx, float my, Level l )
 	{
 		g.pushTransform();
 		g.translate( x, y );
@@ -214,7 +214,9 @@ public class Unit implements Serializable
 		
 		g.rotate( 0, 0, heading / DMath.PI2F * 360 );
 		
-		g.setColor( this.owner.team.getColor() );
+		Color color = this.owner.team.getColor();
+		
+		g.setColor( color );
 		g.fillOval( -5, -5, 10, 10 );
 		g.setColor( Color.black );
 		g.drawOval( -5, -5, 10, 10 );

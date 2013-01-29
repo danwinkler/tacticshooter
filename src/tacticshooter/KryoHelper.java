@@ -38,5 +38,7 @@ public class KryoHelper
 		k.register( Level.TileType.class );
 		k.register( Level.TileType[].class );
 		k.register( Level.TileType[][].class );
+		k.register( float[].class );
+		k.register( float[][].class );
 	}
 }

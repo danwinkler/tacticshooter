@@ -3,13 +3,17 @@ package tacticshooter;
 import java.util.ArrayList;
 
 import javax.vecmath.Point2f;
+import javax.vecmath.Point2i;
 import javax.vecmath.Vector2f;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.geom.Polygon;
 import org.newdawn.slick.geom.Shape;
+import org.newdawn.slick.util.pathfinding.AStarPathFinder;
 import org.newdawn.slick.util.pathfinding.Mover;
+import org.newdawn.slick.util.pathfinding.Path;
+import org.newdawn.slick.util.pathfinding.PathFinder;
 import org.newdawn.slick.util.pathfinding.PathFindingContext;
 import org.newdawn.slick.util.pathfinding.TileBasedMap;
 
@@ -25,6 +29,10 @@ public class Level implements TileBasedMap
 	
 	public int width;
 	public int height;
+	
+	boolean randomFinding = true;
+	
+	public float[][] lightMap;
 	
 	public Level()
 	{
@@ -48,14 +56,16 @@ public class Level implements TileBasedMap
 	public void render( Graphics g )
 	{
 		g.setLineWidth( 1 );
+		//draw walls
 		for( int y = 0; y < height; y++ )
 		{
 			for( int x = 0; x < width; x++ )
 			{
 				switch( tiles[x][y] )
 				{
-				case FLOOR: 
-					//g.drawRect( x*tileSize, y*tileSize, tileSize, tileSize ); 
+				case LIGHT:
+					//g.setColor( Color.yellow );
+					//g.fillOval(  x*tileSize, y*tileSize, tileSize, tileSize );
 					break;
 				case WALL: 
 					g.setColor( Color.gray );
@@ -371,7 +381,7 @@ public class Level implements TileBasedMap
 	@Override
 	public float getCost( PathFindingContext arg0, int x, int y )
 	{
-		return DMath.randomf( .1f, .9f );
+		return randomFinding ? DMath.randomf( .1f, .9f ) : 1;
 	}
 	
 	public enum TileType

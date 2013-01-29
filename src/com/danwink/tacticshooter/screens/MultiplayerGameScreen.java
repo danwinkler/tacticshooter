@@ -17,6 +17,8 @@ import org.newdawn.slick.MusicListener;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.Sound;
 import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.opengl.shader.ShaderProgram;
+import org.newdawn.slick.particles.ParticleSystem;
 
 import tacticshooter.Building;
 import tacticshooter.Building.BuildingType;
@@ -93,6 +95,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	
 	ArrayList<String> messages = new ArrayList<String>();
 	
+	ShaderProgram shader;
+	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
 		this.dsh = dsh;
@@ -126,7 +130,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			dui.addDUIListener( this );
 		}
 		dui.setEnabled( true );
-		
 		
 		try 
 		{
@@ -163,6 +166,15 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		}
 		
 		running = true;
+		
+		try
+		{
+			shader = ShaderProgram.loadProgram( "data/shaders/pass.vert", "data/shaders/light1.frag" );
+		} catch( SlickException e )
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void update( GameContainer gc, int delta )
@@ -349,7 +361,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		for( int i = 0; i < cs.units.size(); i++ )
 		{
 			Unit u = cs.units.get( i );
-			u.render( g, cs.player, input.getMouseX() + cs.scrollx, input.getMouseY() + cs.scrolly );
+			u.render( g, cs.player, input.getMouseX() + cs.scrollx, input.getMouseY() + cs.scrolly, cs.l );
 		}
 		
 		g.setColor( Color.black );

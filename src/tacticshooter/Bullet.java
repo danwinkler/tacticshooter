@@ -1,20 +1,17 @@
 package tacticshooter;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.io.Serializable;
-
 import javax.vecmath.Point2f;
 import javax.vecmath.Point2i;
 import javax.vecmath.Vector2f;
 
+import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
 import com.danwink.tacticshooter.screens.MultiplayerGameScreen;
 import com.phyloa.dlib.util.DMath;
 
-public class Bullet implements Serializable
+public class Bullet
 {
 	public static float bulletSpeed = 30;
 	
@@ -128,7 +125,7 @@ public class Bullet implements Serializable
 	
 	public void render( Graphics g )
 	{
-		// g.setColor( Color.YELLOW );
+		//g.setColor( Color.white );
 		Vector2f vec = new Vector2f( x-lx, y-ly );
 		vec.normalize();
 		g.drawLine( x, y, x+vec.x*10, y+vec.y*10 );
