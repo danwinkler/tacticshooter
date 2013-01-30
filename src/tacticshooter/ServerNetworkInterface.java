@@ -11,7 +11,7 @@ import com.esotericsoftware.kryonet.Server;
 
 public class ServerNetworkInterface implements ServerInterface 
 {
-	public static final boolean DEBUG = true;
+	public static final boolean DEBUG = false;
 	static int[] messageCount;
 	
 	static {

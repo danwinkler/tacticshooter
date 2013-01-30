@@ -47,6 +47,8 @@ public class Unit implements Serializable
 	
 	public boolean update = false;
 	
+	public Building stoppedAt;
+	
 	//CLIENT ONLY
 	public boolean selected = false;
 	public int timeSinceUpdate = 0;
@@ -89,6 +91,7 @@ public class Unit implements Serializable
 		switch( state )
 		{
 		case MOVING:
+			stoppedAt = null;
 			if( owner == null && onStep >= path.size() )
 			{
 				pathTo( DMath.randomi( 0, l.width ), DMath.randomi( 0, l.height ), ts );
@@ -115,10 +118,21 @@ public class Unit implements Serializable
 			else
 			{
 				state = UnitState.STOPPED;
+				for( int i = 0; i < l.buildings.size(); i++ )
+				{
+					Building tb = l.buildings.get( i );
+					float dx = x - tb.x;
+					float dy = y - tb.y;
+					if( (dx*dx + dy*dy) < 50*50 )
+					{
+						stoppedAt = tb;
+						break;
+					}
+				}
 			}
 			break;
 		case TURNTO:
-			float turnAmount = DMath.turnTowards( heading, turnToAngle ) * .2f;
+			float turnAmount = DMath.turnTowards( heading, turnToAngle ) * .4f;
 			heading += turnAmount;
 			if( turnAmount < .001f )
 			{
@@ -299,26 +313,19 @@ public class Unit implements Serializable
 			bullet.owner.money += 2;
 		}
 		
-		Building b = null;
-		if( state != UnitState.MOVING )
-		{
-			for( int i = 0; i < l.buildings.size(); i++ )
-			{
-				Building tb = l.buildings.get( i );
-				float dx = x - tb.x;
-				float dy = y - tb.y;
-				if( (dx*dx + dy*dy) < 50*50 )
-				{
-					b = tb;
-					break;
-				}
-			}
-		}
-		
-		if( b != null )
+		if( stoppedAt != null )
 		{
 			state = UnitState.TURNTO;
 			turnToAngle = (float) Math.atan2( -bullet.dy, -bullet.dx );
+			for( int i = 0; i < ts.units.size(); i++ )
+			{
+				Unit u = ts.units.get( i );
+				if( u.owner.id == owner.id && u.stoppedAt == this.stoppedAt )
+				{
+					u.state = UnitState.TURNTO;
+					u.turnToAngle = turnToAngle;
+				}
+			}
 		}
 		else
 		{

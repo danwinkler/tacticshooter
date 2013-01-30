@@ -438,10 +438,10 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			u.renderMinimap( g, cs.player );
 		}
 		
-		g.setColor( Color.blue );
-		g.drawRect( cs.scrollx, cs.scrolly, gc.getWidth(), gc.getHeight() );
-		
 		g.popTransform();
+		
+		g.setColor( Color.blue );
+		g.drawRect( cs.scrollx*xScale, cs.scrolly * yScale, gc.getWidth() * xScale, gc.getHeight() * yScale );
 		
 		g.setColor( Color.black );
 		g.setLineWidth( 2 );
@@ -470,12 +470,23 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		if( input.isKeyDown( Input.KEY_TAB ) && cs.players != null )
 		{
 			g.setColor( new Color( 128, 128, 128, 200 ) );
-			g.fillRect( gc.getWidth()/2 - 200, gc.getHeight()/2-300, 400, 500 );
+			g.fillRect( gc.getWidth()/2 - 400, gc.getHeight()/2-300, 800, 600 );
 			g.setColor( Color.black );
-			g.drawRect( gc.getWidth()/2 - 200, gc.getHeight()/2-300, 400, 500 );
+			g.drawRect( gc.getWidth()/2 - 400, gc.getHeight()/2-300, 800, 600 );
+			int red = 0, green = 0;
 			for( int i = 0; i < cs.players.length; i++ )
 			{
-				g.drawString( cs.players[i].name + " - " + (cs.players[i].team.id == Team.a.id ? "RED" : "GREEN"), gc.getWidth()/2 - 190, gc.getHeight()/2-270 + i*30 );
+				Player p = cs.players[i];
+				boolean teamRed = p.team.id == Team.a.id;
+				g.drawString( p.name + " - " + (teamRed ? "RED" : "GREEN"), gc.getWidth()/2 - (teamRed ? 390 : -10), gc.getHeight()/2-270 + (teamRed ? red : green)*30 );
+				if( p.team.id == Team.a.id )
+				{
+					red++;
+				}
+				else 
+				{
+					green++;
+				}
 			}
 		}
 	}
@@ -663,7 +674,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			if( chatBox.isVisible() )
 			{
 				chatBox.setVisible( false );
-				ci.sendToServer( new Message( MessageType.MESSAGE, cs.player.name + ": " + chatBox.getText() ) );
+				ci.sendToServer( new Message( MessageType.MESSAGE, chatBox.getText().trim() ) );
 				chatBox.setText( "" );
 			}
 			else

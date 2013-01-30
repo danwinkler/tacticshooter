@@ -10,10 +10,15 @@ import java.util.Map.Entry;
 
 import javax.vecmath.Point2i;
 
+import org.newdawn.slick.util.pathfinding.AStarPathFinder;
+import org.newdawn.slick.util.pathfinding.Path;
+import org.newdawn.slick.util.pathfinding.PathFinder;
+
 import com.esotericsoftware.kryonet.Connection;
 import com.phyloa.dlib.util.DFile;
 import com.phyloa.dlib.util.DMath;
 
+import tacticshooter.Building.BuildingType;
 import tacticshooter.Unit.UnitState;
 import tacticshooter.Unit.UnitType;
 
@@ -31,6 +36,16 @@ public class ComputerPlayer implements Runnable
 	boolean playing = true;
 	
 	PlayType playType = PlayType.values()[DMath.randomi(0, PlayType.values().length)];
+	
+	Player[] players = new Player[0];
+	
+	//MASSER:
+	boolean attacking = false;
+	ArrayList<Unit> attackForce = new ArrayList<Unit>();
+	float attackPropensity = DMath.randomf( .8f, 2 );
+	Building enemyHome;
+	PathFinder finder;
+	Building closeb;
 	
 	public ComputerPlayer( ServerNetworkInterface si )
 	{
@@ -68,6 +83,12 @@ public class ComputerPlayer implements Runnable
 						tu = u;
 					}
 					tu.sync( u );
+					
+					if( !u.alive )
+					{
+						units.remove( unitMap.get( u.id ) );
+						unitMap.remove( u.id );
+					}
 					break;
 				case LEVELUPDATE:
 					l = (Level)m.message;
@@ -83,6 +104,7 @@ public class ComputerPlayer implements Runnable
 					}
 					break;
 				case PLAYERLIST:
+					this.players = (Player[])m.message;
 					break;
 				case GAMEOVER:
 					ci.sl.disconnected( fc );
@@ -93,11 +115,129 @@ public class ComputerPlayer implements Runnable
 				
 			if( player != null && l != null )
 			{
+				if( playType == PlayType.MASSER )
+				{
+					finder = new AStarPathFinder( l, 500, true );
+					//Find enemy home
+					Building enemyHome = null;
+					for( Building b : l.buildings )
+					{
+						if( b.bt == BuildingType.CENTER && b.t.id != this.player.team.id )
+						{
+							enemyHome = b;
+							break;
+						}
+					}
+					
+					if( enemyHome == null ) continue;
+					//Find closest friendly building to enemy home
+					closeb = null;
+					float closeDist = Float.MAX_VALUE;
+					for( Building b : l.buildings )
+					{
+						if( b.t != null && b.t.id == this.player.team.id )
+						{
+							Path p = finder.findPath( null, l.getTileX( b.x ), l.getTileY( b.y ), l.getTileX( enemyHome.x ), l.getTileY( enemyHome.y ) );
+							float d2 = p.getLength();
+							if( d2 < closeDist )
+							{
+								closeDist = d2;
+								closeb = b;
+							}
+						}
+					}
+					
+					if( !attacking )
+					{
+						//count own units, enemy units
+						int ownUnits = 0;
+						float enemyUnits = 0;
+						for( Unit u : units )
+						{
+							if( u.owner.team.id == player.team.id )
+							{
+								ownUnits++;
+							} 
+							else if( u.owner.team.id != player.team.id )
+							{
+								enemyUnits++;
+							}
+						}
+						
+						if( players.length == 0 ) continue;
+						
+						if( ownUnits >= (enemyUnits * attackPropensity) || Math.random() < .0025 )
+						{
+							attacking = true;
+							
+							//Find enemy home
+							for( Building b : l.buildings )
+							{
+								if( b.bt == BuildingType.CENTER && b.t.id != this.player.team.id )
+								{
+									enemyHome = b;
+									break;
+								}
+							}
+							if( enemyHome == null ) return;
+							
+							attackForce.clear();
+							
+							ArrayList<Integer> selected = new ArrayList<Integer>();
+							
+							for( Unit u : units )
+							{
+								if( u.owner.id == player.id )
+								{
+									attackForce.add( u );
+									selected.add( u.id );
+								}
+							}
+							
+							ci.sl.received( fc, new Message( MessageType.SETATTACKPOINT, new Object[]{ new Point2i( enemyHome.x/Level.tileSize, enemyHome.y/Level.tileSize ), selected } ) );
+						}
+					}
+					else
+					{
+						for( int i = 0; i < attackForce.size(); i++ )
+						{
+							Unit u = unitMap.get( attackForce.get( i ).id );
+							if( u == null || !u.alive )
+							{
+								attackForce.remove( i );
+								i--;
+							}
+							else
+							{
+								ArrayList<Integer> selected = new ArrayList<Integer>();
+								selected.add( u.id );
+								ci.sl.received( fc, new Message( MessageType.SETATTACKPOINT, new Object[]{ new Point2i( enemyHome.x/Level.tileSize, enemyHome.y/Level.tileSize ), selected } ) );
+							}
+						}
+						if( attackForce.size() == 0 )
+						{
+							attacking = false;
+							attackPropensity = DMath.randomf( .8f, 2 );
+						}
+					}
+				}
+				
 				for( Unit u : units )
 				{
-					if( u.owner.id == player.id && (u.state == UnitState.STOPPED || Math.random() < .1f) )
+					if( u.owner.id == player.id && (u.state == UnitState.STOPPED || (Math.random() < .1f && playType != PlayType.SNEAKY) ) )
 					{
-						if( playType == PlayType.SNEAKY )
+						if( playType == PlayType.MASSER )
+						{
+							if( !attacking )
+							{
+								if( closeb == null ) break;
+								
+								ArrayList<Integer> selected = new ArrayList<Integer>();
+								selected.add( u.id );
+								ci.sl.received( fc, new Message( MessageType.SETATTACKPOINT, new Object[]{ new Point2i( closeb.x/Level.tileSize, closeb.y/Level.tileSize ), selected } ) );
+							}
+						}
+						else if( playType == PlayType.SNEAKY )
 						{
 							Building closeb = null;
 							for( Building b : l.buildings )
@@ -219,6 +359,7 @@ public class ComputerPlayer implements Runnable
 	{
 		AGGRESSIVE,
 		MODERATE,
-		SNEAKY;
+		SNEAKY,
+		MASSER;
 	}
 }

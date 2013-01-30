@@ -1,5 +1,5 @@
 fullscreen false
-botCount 11
+botCount 15
 vsync true
 name TacticalMan
 windowHeight 900

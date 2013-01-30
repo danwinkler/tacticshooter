@@ -194,40 +194,7 @@ public class TacticServer
 					
 					if( won )
 					{
-						//reset
-						si.sendToAllClients( new Message( MessageType.GAMEOVER, gs ) );
-						
-						//kill all guys
-						for( int i = 0; i < units.size(); i++ )
-						{
-							units.get( i ).alive = false;
-						}
-						for( Entry<Integer, Player> e : players.entrySet() )
-						{
-							Player p = e.getValue();
-							p.money = 0;
-							si.sendToClient( p.id, new Message( MessageType.PLAYERUPDATE, p ) );
-						}
-						//make new level
-						gs.setup( a, b );
-						//l = new Level( 100, 100 );
-						//LevelBuilder.buildLevelB( l, a, b );
-						onMap = (onMap + 1) % maps.size();
-						try
-						{
-							l = LevelFileHelper.loadLevel( maps.get( onMap ) );
-						} catch( DocumentException e )
-						{
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						finder = new AStarPathFinder( l, 500, true );
-						for( int i = 0; i < botCount; i++ )
-						{
-							Thread ct = new Thread( new ComputerPlayer( (ServerNetworkInterface)si ) );
-							ct.start();
-						}
-						
+						nextMap();
 						return;
 					}
 				}
@@ -393,7 +360,19 @@ public class TacticServer
 			}
 			case MESSAGE:
 			{
-				si.sendToAllClients( new Message( MessageType.MESSAGE, m.message ) );
+				String text = (String)m.message;
+				if( !text.startsWith( "/" ) )
+				{
+					si.sendToAllClients( new Message( MessageType.MESSAGE, players.get( m.sender ).name + ": " + text ) );
+				}
+				else
+				{
+					if( text.trim().equals( "/endmap" ) )
+					{
+						nextMap();
+						return;
+					}
+				}
 				break;
 			}
 			case UNITUPDATE:
@@ -447,9 +426,46 @@ public class TacticServer
 		}
 	}
 	
+	public void nextMap()
+	{
+		//reset
+		si.sendToAllClients( new Message( MessageType.GAMEOVER, gs ) );
+		
+		//kill all guys
+		for( int i = 0; i < units.size(); i++ )
+		{
+			units.get( i ).alive = false;
+		}
+		for( Entry<Integer, Player> e : players.entrySet() )
+		{
+			Player p = e.getValue();
+			p.money = 0;
+			si.sendToClient( p.id, new Message( MessageType.PLAYERUPDATE, p ) );
+		}
+		//make new level
+		gs.setup( a, b );
+		//l = new Level( 100, 100 );
+		//LevelBuilder.buildLevelB( l, a, b );
+		onMap = (onMap + 1) % maps.size();
+		try
+		{
+			l = LevelFileHelper.loadLevel( maps.get( onMap ) );
+		} catch( DocumentException e )
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		finder = new AStarPathFinder( l, 500, true );
+		for( int i = 0; i < botCount; i++ )
+		{
+			Thread ct = new Thread( new ComputerPlayer( (ServerNetworkInterface)si ) );
+			ct.start();
+		}
+	}
+	
 	public void addBullet( Unit u, float angle )
 	{
-		Bullet b = new Bullet( u.x + DMath.cosf( angle ) * (Unit.radius+5), u.y + DMath.sinf( angle ) * (Unit.radius+5), angle );
+		Bullet b = new Bullet( u.x + DMath.cosf( angle ) * (Unit.radius), u.y + DMath.sinf( angle ) * (Unit.radius), angle );
 		b.owner = u.owner;
 		b.shooter = u;
 		gs.get( b.owner.team ).bulletsShot++;
