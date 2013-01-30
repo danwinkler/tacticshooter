@@ -118,7 +118,7 @@ public class OptionsScreen extends DScreen<GameContainer, Graphics> implements D
 				StaticFiles.options = new DOptions( "options.txt" );
 				
 				gc.setVSync( StaticFiles.options.getB( "vsync" ) );
-				dsh.activate( "settings", gc );
+				dsh.activate( "settings", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
 			} 
 		}
 	}

@@ -409,11 +409,11 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 				{
 					e1.printStackTrace();
 				}
-				dsh.activate( "home", gc );
+				dsh.activate( "home", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
 			}
 			else if( e == exitWithoutSaving )
 			{
-				dsh.activate( "home", gc );
+				dsh.activate( "home", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
 			}
 		}
 	}

@@ -116,15 +116,15 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 		} 
 		else if( e == multiPlayer )
 		{
-			dsh.activate( "multiplayersetup", gc );
+			dsh.activate( "multiplayersetup", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
 		} 
 		else if( e == levelEditor )
 		{
-			dsh.activate( "editorsetup", gc );
+			dsh.activate( "editorsetup", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
 		}
 		else if( e == settings )
 		{
-			dsh.activate( "settings", gc );
+			dsh.activate( "settings", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
 		} 
 		else if( e == exit )
 		{

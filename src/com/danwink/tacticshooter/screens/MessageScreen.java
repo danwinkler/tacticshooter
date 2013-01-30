@@ -5,6 +5,7 @@ import org.newdawn.slick.Graphics;
 
 import tacticshooter.Slick2DEventMapper;
 import tacticshooter.Slick2DRenderer;
+import tacticshooter.StaticFiles;
 
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DText;
@@ -63,7 +64,7 @@ public class MessageScreen extends DScreen<GameContainer, Graphics> implements D
 		if( e instanceof DButton && event.getType() == DButton.MOUSE_UP )
 		if( e == okay )
 		{
-			dsh.activate( "home", gc );
+			dsh.activate( "home", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
 		} 	
 	}
 

@@ -109,7 +109,7 @@ public class ComputerPlayer implements Runnable
 				case GAMEOVER:
 					ci.sl.disconnected( fc );
 					playing = false;
-					break;
+					return;
 				}
 			}
 				

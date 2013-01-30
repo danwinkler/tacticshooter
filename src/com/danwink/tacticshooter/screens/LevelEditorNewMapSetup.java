@@ -7,6 +7,7 @@ import tacticshooter.Level;
 import tacticshooter.ServerNetworkInterface;
 import tacticshooter.Slick2DEventMapper;
 import tacticshooter.Slick2DRenderer;
+import tacticshooter.StaticFiles;
 import tacticshooter.TacticServer;
 
 import com.phyloa.dlib.dui.DButton;
@@ -88,7 +89,7 @@ public class LevelEditorNewMapSetup extends DScreen<GameContainer, Graphics> imp
 		{
 			if( e == back )
 			{
-				dsh.activate( "editorsetup", gc );
+				dsh.activate( "editorsetup", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
 			}
 			else if( e == okay )
 			{
@@ -101,7 +102,7 @@ public class LevelEditorNewMapSetup extends DScreen<GameContainer, Graphics> imp
 						int w = Integer.parseInt( widthStr );
 						int h = Integer.parseInt( heightStr );
 						dsh.message( "editor", new Level( w, h ) );
-						dsh.activate( "editor", gc );
+						dsh.activate( "editor", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
 					} catch( NumberFormatException nfe )
 					{
 						

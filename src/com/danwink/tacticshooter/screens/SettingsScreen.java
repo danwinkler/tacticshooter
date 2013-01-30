@@ -6,6 +6,7 @@ import org.newdawn.slick.SlickException;
 
 import tacticshooter.Slick2DEventMapper;
 import tacticshooter.Slick2DRenderer;
+import tacticshooter.StaticFiles;
 
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DUI;
@@ -98,15 +99,15 @@ public class SettingsScreen extends DScreen<GameContainer, Graphics> implements 
 			}
 			else if( e == selectMaps )
 			{
-				dsh.activate( "selectMaps", gc );
+				dsh.activate( "selectMaps", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
 			}
 			else if( e == options )
 			{
-				dsh.activate( "options", gc );
+				dsh.activate( "options", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
 			}
 			else if( e == back )
 			{
-				dsh.activate( "home", gc );
+				dsh.activate( "home", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
 			} 
 		}
 	}

@@ -5,6 +5,7 @@ import org.newdawn.slick.Graphics;
 
 import tacticshooter.Slick2DEventMapper;
 import tacticshooter.Slick2DRenderer;
+import tacticshooter.StaticFiles;
 
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DUI;
@@ -74,15 +75,15 @@ public class LevelEditorSetup extends DScreen<GameContainer, Graphics> implement
 		{
 			if( e == newMap )
 			{
-				dsh.activate( "newmap", gc );
+				dsh.activate( "newmap", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
 			} 
 			else if( e == loadMap )
 			{
-				dsh.activate( "loadmap", gc );
+				dsh.activate( "loadmap", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
 			} 
 			else if( e == back )
 			{
-				dsh.activate( "home", gc );
+				dsh.activate( "home", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
 			}
 		}
 	}

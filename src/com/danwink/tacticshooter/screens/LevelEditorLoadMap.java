@@ -10,6 +10,7 @@ import org.newdawn.slick.Graphics;
 import tacticshooter.LevelFileHelper;
 import tacticshooter.Slick2DEventMapper;
 import tacticshooter.Slick2DRenderer;
+import tacticshooter.StaticFiles;
 
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DScrollPane;
@@ -82,7 +83,7 @@ public class LevelEditorLoadMap extends DScreen<GameContainer, Graphics> impleme
 		{
 			if( e == back )
 			{
-				dsh.activate( "editorsetup", gc );
+				dsh.activate( "editorsetup", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
 			} 
 			else
 			{
@@ -94,7 +95,7 @@ public class LevelEditorLoadMap extends DScreen<GameContainer, Graphics> impleme
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				dsh.activate( "editor", gc );
+				dsh.activate( "editor", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
 				dsh.message( "editor", e.getName() );
 			}
 		}

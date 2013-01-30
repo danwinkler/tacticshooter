@@ -7,6 +7,7 @@ import org.newdawn.slick.Graphics;
 
 import tacticshooter.Slick2DEventMapper;
 import tacticshooter.Slick2DRenderer;
+import tacticshooter.StaticFiles;
 
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DTextBox;
@@ -74,18 +75,18 @@ public class MultiplayerSetupScreen extends DScreen<GameContainer, Graphics> imp
 			if( e == enter )
 			{
 				dsh.message( "multiplayergame", address.getText().trim() );
-				dsh.activate( "multiplayergame", gc );
+				dsh.activate( "multiplayergame", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
 			} 
 			else if( e == back )
 			{
-				dsh.activate( "home", gc );
+				dsh.activate( "home", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
 			}
 		} else if( e instanceof DTextBox )
 		{
 			if( event.getType() == KeyEvent.VK_ENTER )
 			{
 				dsh.message( "multiplayergame", address.getText().trim() );
-				dsh.activate( "multiplayergame", gc );
+				dsh.activate( "multiplayergame", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
 			}
 		}
 	}

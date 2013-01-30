@@ -256,7 +256,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				break;
 			case GAMEOVER:
 				dsh.message( "postgame", m.message );
-				dsh.activate( "postgame", gc );
+				dsh.activate( "postgame", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
 				return;
 			}
 		}
@@ -319,6 +319,25 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		}
 		
 		dui.update();
+		
+		if( cs.l != null && miniMap == null )
+		{
+			try
+			{
+				float xScale = 200.f / (cs.l.width*cs.l.tileSize);
+				float yScale = 200.f / (cs.l.height*cs.l.tileSize);
+				miniMap = new Image( 200, 200 );
+				Graphics mg = miniMap.getGraphics();
+				mg.scale( xScale, yScale );
+				cs.l.render( mg );
+				mg.flush();
+				
+			} catch( SlickException e )
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public void render( GameContainer gc, Graphics g )
@@ -412,21 +431,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		g.setColor( Color.white );
 		g.fillRect( 0, 0, 200, 300 );
 		g.pushTransform();
-		if( miniMap == null )
-		{
-			g.scale( xScale, yScale );
-			cs.l.render( g );
-			try
-			{
-				miniMap = new Image( 200, 200 );
-			} catch( SlickException e )
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			g.copyArea( miniMap, gc.getWidth()-200, gc.getHeight()-200 );
-		}
-		else
+		
+		if( miniMap != null )
 		{
 			g.drawImage( miniMap, 0, 0 );
 			g.scale( xScale, yScale );
@@ -789,7 +795,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			{
 				running = false;
 				escapeMenu.setVisible( false );
-				dsh.activate( "home", gc );
+				dsh.activate( "home", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
 			} else if( e == returnToGame )
 			{
 				escapeMenu.setVisible( false );

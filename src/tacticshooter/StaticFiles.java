@@ -3,10 +3,14 @@ package tacticshooter;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 
+import org.newdawn.slick.GameContainer;
+import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.Sound;
 
+import com.danwink.tacticshooter.screens.DScreenSlideTransition;
+import com.phyloa.dlib.renderer.DScreenTransition;
 import com.phyloa.dlib.util.DFile;
 import com.phyloa.dlib.util.DOptions;
 
@@ -112,5 +116,25 @@ public class StaticFiles
 	public static Sound getSound( String name )
 	{
 		return sound.get( name );
+	}
+	
+	public static DScreenTransition<GameContainer, Graphics> getDownMenuOut()
+	{
+		return new DScreenSlideTransition( -1, 0, StaticFiles.options.getF( "menuTransitionSpeed" ), false );
+	}
+	
+	public static DScreenTransition<GameContainer, Graphics> getDownMenuIn()
+	{
+		return new DScreenSlideTransition( -1, 0, StaticFiles.options.getF( "menuTransitionSpeed" ), true );
+	}
+	
+	public static DScreenTransition<GameContainer, Graphics> getUpMenuOut()
+	{
+		return new DScreenSlideTransition( 1, 0, StaticFiles.options.getF( "menuTransitionSpeed" ), false );
+	}
+	
+	public static DScreenTransition<GameContainer, Graphics> getUpMenuIn()
+	{
+		return new DScreenSlideTransition( 1, 0, StaticFiles.options.getF( "menuTransitionSpeed" ), true );
 	}
 }

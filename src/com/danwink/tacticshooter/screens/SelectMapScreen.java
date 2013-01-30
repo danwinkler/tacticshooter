@@ -11,6 +11,7 @@ import org.newdawn.slick.Graphics;
 import tacticshooter.LevelFileHelper;
 import tacticshooter.Slick2DEventMapper;
 import tacticshooter.Slick2DRenderer;
+import tacticshooter.StaticFiles;
 
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DCheckBox;
@@ -131,7 +132,7 @@ public class SelectMapScreen extends DScreen<GameContainer, Graphics> implements
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				dsh.activate( "settings", gc );
+				dsh.activate( "settings", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
 			} 
 		}
 	}
