@@ -107,6 +107,41 @@ public class TacticServer
 			//Every 100 ticks
 			if( tick % 100 == 0 )
 			{
+				int apoints = 0;
+				int bpoints = 0;
+				int aunits = 0;
+				int bunits = 0;
+				for( Building bu : l.buildings )
+				{
+					if( bu.t != null && bu.t.id == a.id )
+					{
+						apoints++;
+					}
+					else if( bu.t != null && bu.t.id == b.id )
+					{
+						bpoints++;
+					}
+				}
+				for( int i = 0; i < units.size(); i++ )
+				{
+					Unit u = units.get( i );
+					if( u.owner.team.id == a.id )
+					{
+						aunits++;
+					}
+					else
+					{
+						bunits++;
+					}
+				}
+				
+				gs.get( a ).pointCount.add( apoints );
+				gs.get( a ).unitCount.add( aunits );
+				gs.get( b ).pointCount.add( bpoints );
+				gs.get( b ).unitCount.add( bunits );
+				
+				gs.totalPoints = l.buildings.size();
+				
 				((ServerNetworkInterface)si).printDebug();
 				Player[] playerArr = new Player[players.entrySet().size()];
 				int pi = 0;

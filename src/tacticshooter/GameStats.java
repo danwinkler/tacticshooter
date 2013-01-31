@@ -1,13 +1,16 @@
 package tacticshooter;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 
 public class GameStats
 {
 	public TeamStats[] teamStats;
+	public int totalPoints;
 	
 	public static class TeamStats
 	{	
+		public ArrayList<Integer> pointCount = new ArrayList<Integer>();
+		public ArrayList<Integer> unitCount = new ArrayList<Integer>();
 		public int bulletsShot;
 		public int unitsCreated;
 		public int unitsLost;

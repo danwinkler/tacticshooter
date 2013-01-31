@@ -1,5 +1,6 @@
 package com.danwink.tacticshooter.screens;
 
+import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
@@ -17,6 +18,7 @@ import com.phyloa.dlib.dui.DUIEvent;
 import com.phyloa.dlib.dui.DUIListener;
 import com.phyloa.dlib.renderer.DScreen;
 import com.phyloa.dlib.renderer.DScreenHandler;
+import com.phyloa.dlib.util.DMath;
 
 public class PostGameScreen extends DScreen<GameContainer, Graphics> implements DUIListener
 {
@@ -34,16 +36,16 @@ public class PostGameScreen extends DScreen<GameContainer, Graphics> implements 
 		
 		dui.add( new DText( "Post Game Stats", e.getWidth()/2 - 300, 30, true ) );
 		
-		int y = 100;
+		int x = e.getWidth()/2-400;
 		for( TeamStats ts : stats.teamStats )
 		{
-			dui.add( new DText( "Team: " + ts.t.id, e.getWidth()/2 - 350, y ) );
-			dui.add( new DText( "Bullets Shot: " + ts.bulletsShot, e.getWidth()/2 - 300, y+30 ) );
-			dui.add( new DText( "Money Earned: " + ts.moneyEarned, e.getWidth()/2 - 300, y+60 ) );
-			dui.add( new DText( "Points Taken: " + ts.pointsTaken, e.getWidth()/2 - 300, y+90 ) );
-			dui.add( new DText( "Units Created: " + ts.unitsCreated, e.getWidth()/2 - 300, y+120 ) );
-			dui.add( new DText( "Units Lost: " + ts.unitsLost, e.getWidth()/2 - 300, y+150 ) );
-			y += 200;
+			dui.add( new DText( "Team: " + ts.t.id, x, 100 ) );
+			dui.add( new DText( "Bullets Shot: " + ts.bulletsShot, x, 130 ) );
+			dui.add( new DText( "Money Earned: " + ts.moneyEarned, x, 160 ) );
+			dui.add( new DText( "Points Taken: " + ts.pointsTaken, x, 190 ) );
+			dui.add( new DText( "Units Created: " + ts.unitsCreated, x, 220 ) );
+			dui.add( new DText( "Units Lost: " + ts.unitsLost, x, 250 ) );
+			x += 400;
 		}
 		
 		okay = new DButton( "Okay", e.getWidth() / 2 - 200, e.getHeight() - 200, 200, 100 );
@@ -53,6 +55,9 @@ public class PostGameScreen extends DScreen<GameContainer, Graphics> implements 
 		
 		dui.add( okay );
 		dui.add( rejoin );
+		
+		dui.add( new DText( "Points:", e.getWidth()/2 - 500, e.getHeight()/2 - 100 ) );
+		dui.add( new DText( "Units:", e.getWidth()/2 - 500, e.getHeight()/2 + 100 ) );
 		
 		dui.addDUIListener( this );
 		
@@ -67,6 +72,56 @@ public class PostGameScreen extends DScreen<GameContainer, Graphics> implements 
 	public void render( GameContainer gc, Graphics g )
 	{
 		dui.render( r.renderTo( g ) );
+		
+		g.setLineWidth( 3 );
+		
+		g.pushTransform();
+		g.translate( gc.getWidth()/2 - 400, gc.getHeight()/2 - 150 );
+		g.setColor( Color.white );
+		g.drawLine( 0, 0, 0, 100 );
+		g.drawLine( 0, 100, 800, 100 );
+		float yScale = 100.f / stats.totalPoints;
+		for( TeamStats ts : stats.teamStats )
+		{
+			float xScale = 800.f / (ts.pointCount.size()-1);
+			Color c = ts.t.getColor();
+			g.setColor( new Color( c.r, c.g, c.b, 200 ) );
+			for( int i = 0; i < ts.pointCount.size()-1; i++ )
+			{
+				g.drawLine( i*xScale, 100 - ts.pointCount.get( i ) * yScale, (i+1)*xScale, 100 - ts.pointCount.get( i+1 ) * yScale );
+			}
+		}
+		g.popTransform();
+		
+		g.pushTransform();
+		g.translate( gc.getWidth()/2 - 400, gc.getHeight()/2 + 50 );
+		g.setColor( Color.white );
+		g.drawLine( 0, 0, 0, 100 );
+		g.drawLine( 0, 100, 800, 100 );
+		float maxUnits = 0;
+		for( TeamStats ts : stats.teamStats )
+		{
+			for( int i = 0; i < ts.unitCount.size(); i++ )
+			{
+				int c = ts.unitCount.get( i );
+				if( c > maxUnits )
+				{
+					maxUnits = c;
+				}
+			}
+		}
+		yScale = 100.f / maxUnits;
+		for( TeamStats ts : stats.teamStats )
+		{
+			float xScale = 800.f / (ts.unitCount.size()-1);
+			Color c = ts.t.getColor();
+			g.setColor( new Color( c.r, c.g, c.b, 200 ) );
+			for( int i = 0; i < ts.unitCount.size()-1; i++ )
+			{
+				g.drawLine( i*xScale, 100 - ts.unitCount.get( i ) * yScale, (i+1)*xScale, 100 - ts.unitCount.get( i+1 ) * yScale );
+			}
+		}
+		g.popTransform();
 	}
 
 	public void onExit()

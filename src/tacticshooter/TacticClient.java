@@ -63,7 +63,7 @@ public class TacticClient extends BasicGame
 		dsh.render( gc, g );
 	}
 	
-	public static void main( String[] args ) throws FileNotFoundException
+	public static void main( String[] args )
 	{
 		//Attempt to avoid sealed exception errors on zoe's mac
 		try
@@ -78,9 +78,16 @@ public class TacticClient extends BasicGame
 			app.start();
 		} catch( Exception ex )
 		{
-			PrintWriter pw = new PrintWriter( "tmp/error.log" );
-			ex.printStackTrace( pw );
 			ex.printStackTrace();
+			
+			PrintWriter pw = null;
+			try {
+				pw = new PrintWriter( "tmp/error.log" );
+			} catch (FileNotFoundException e) {
+				System.exit( 0 );
+				e.printStackTrace();
+			}
+			ex.printStackTrace( pw );
 			
 			pw.flush();
 			pw.close();

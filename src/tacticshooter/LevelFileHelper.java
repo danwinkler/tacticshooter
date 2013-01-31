@@ -46,7 +46,7 @@ public class LevelFileHelper
 		{
 			Building b = new Building( Integer.parseInt( n.valueOf( "@x" ) ), Integer.parseInt( n.valueOf( "@y" ) ), BuildingType.valueOf( n.valueOf( "@bt" ) ), n.valueOf( "@team" ).equals( "null" ) ? null : new Team( Integer.valueOf( n.valueOf( "@team" ) ) ) );
 			String id = n.valueOf( "@id" );
-			if( id != null )
+			if( id != null && !id.equals( "" ) )
 			{
 				b.id = Integer.parseInt( id );
 			}
