@@ -29,11 +29,11 @@ public class ServerNetworkInterface implements ServerInterface
 	
 	public ServerNetworkInterface()
 	{
-		server = new Server( 256000, 32000 );
+		server = new Server( 512000, 32000 );
 		KryoHelper.register( server.getKryo() );
 		server.start();
 		try {
-			server.bind(54555, 54777);
+			server.bind( 54555, 54777 );
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

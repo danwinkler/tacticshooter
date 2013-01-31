@@ -19,6 +19,7 @@ import com.phyloa.dlib.util.DFile;
 import com.phyloa.dlib.util.DMath;
 
 import tacticshooter.Building.BuildingType;
+import tacticshooter.Level.TileType;
 import tacticshooter.Unit.UnitState;
 import tacticshooter.Unit.UnitType;
 
@@ -100,17 +101,40 @@ public class ComputerPlayer implements Runnable
 					if( l != null )
 					{
 						Building building = (Building)m.message;
-						l.buildings.set( building.index, building );
+						for( int i = 0; i < l.buildings.size(); i++ )
+						{
+							Building b = l.buildings.get( i );
+							if( b.id == building.id )
+							{
+								l.buildings.set( i, building );
+							}
+						}
 					}
 					break;
 				case PLAYERLIST:
 					this.players = (Player[])m.message;
+					break;
+				case TILEUPDATE:
+					Object[] arr = (Object[])m.message;
+					int tx = (Integer)arr[0];
+					int ty = (Integer)arr[1];
+					TileType change = (TileType)arr[2];
+					l.tiles[tx][ty] = change;
 					break;
 				case GAMEOVER:
 					ci.sl.disconnected( fc );
 					playing = false;
 					return;
 				}
+			}
+			
+			try 
+			{
+				Thread.sleep( 1000 );
+			} 
+			catch( InterruptedException e )
+			{
+				e.printStackTrace();
 			}
 				
 			if( player != null && l != null )
@@ -138,6 +162,7 @@ public class ComputerPlayer implements Runnable
 						if( b.t != null && b.t.id == this.player.team.id )
 						{
 							Path p = finder.findPath( null, l.getTileX( b.x ), l.getTileY( b.y ), l.getTileX( enemyHome.x ), l.getTileY( enemyHome.y ) );
+							if( p == null ) continue;
 							float d2 = p.getLength();
 							if( d2 < closeDist )
 							{
@@ -179,7 +204,7 @@ public class ComputerPlayer implements Runnable
 									break;
 								}
 							}
-							if( enemyHome == null ) return;
+							if( enemyHome == null ) continue;
 							
 							attackForce.clear();
 							
@@ -242,7 +267,7 @@ public class ComputerPlayer implements Runnable
 							Building closeb = null;
 							for( Building b : l.buildings )
 							{
-								boolean wantToTake = b.t == null || b.t.id != player.team.id && b.isCapturable( l );
+								boolean wantToTake = (b.t == null || b.t.id != player.team.id) && b.isCapturable( l );
 									
 								if( wantToTake )
 								{
@@ -277,10 +302,10 @@ public class ComputerPlayer implements Runnable
 								switch( playType )
 								{
 								case AGGRESSIVE:
-									wantToTake = b.t == null || b.t.id != player.team.id && b.isCapturable( l );
+									wantToTake = (b.t == null || b.t.id != player.team.id) && b.isCapturable( l );
 									break;
 								case MODERATE:
-									wantToTake = b.t == null || (b.t.id != player.team.id && b.isCapturable( l )) || (b.t.id == player.team.id && b.hold < Building.HOLDMAX);
+									wantToTake = b.isCapturable( l ) && (b.t == null || (b.t.id != player.team.id) || (b.t.id == player.team.id && b.hold < Building.HOLDMAX));
 									break;
 								}
 								if( wantToTake )
@@ -309,15 +334,6 @@ public class ComputerPlayer implements Runnable
 				{
 					ci.sl.received( fc, new Message( MessageType.BUILDUNIT, UnitType.values()[DMath.randomi(0, UnitType.values().length)] ) );
 				}
-			}
-			
-			try 
-			{
-				Thread.sleep( 1000 );
-			} 
-			catch( InterruptedException e )
-			{
-				e.printStackTrace();
 			}
 		}
 	}

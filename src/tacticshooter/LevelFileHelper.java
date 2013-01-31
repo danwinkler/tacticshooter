@@ -16,6 +16,7 @@ import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 
 import tacticshooter.Building.BuildingType;
+import tacticshooter.Level.Link;
 import tacticshooter.Level.TileType;
 
 public class LevelFileHelper
@@ -44,7 +45,20 @@ public class LevelFileHelper
 		for( Node n : buildings )
 		{
 			Building b = new Building( Integer.parseInt( n.valueOf( "@x" ) ), Integer.parseInt( n.valueOf( "@y" ) ), BuildingType.valueOf( n.valueOf( "@bt" ) ), n.valueOf( "@team" ).equals( "null" ) ? null : new Team( Integer.valueOf( n.valueOf( "@team" ) ) ) );
+			String id = n.valueOf( "@id" );
+			if( id != null )
+			{
+				b.id = Integer.parseInt( id );
+			}
 			m.buildings.add( b );
+		}
+		
+		//Load Links
+		List<? extends Node> links = doc.selectNodes( "//level/links/link" );
+		for( Node n : links )
+		{
+			Link l = new Link( Integer.parseInt( n.valueOf( "@source" ) ), Integer.parseInt( n.valueOf( "@targetX" ) ), Integer.parseInt( n.valueOf( "@targetY" ) ) ) ;
+			m.links.add( l );
 		}
 		
 		return m;
@@ -76,11 +90,23 @@ public class LevelFileHelper
 		for( int i = 0; i < m.buildings.size(); i++ )
 		{
 			Building b = m.buildings.get( i );
-			Element buidling = buildings.addElement( "building" );
-			buidling.addAttribute( "x", Integer.toString( b.x ) );
-			buidling.addAttribute( "y", Integer.toString( b.y ) );
-			buidling.addAttribute( "bt", b.bt.name() );
-			buidling.addAttribute( "team", b.t == null ? "null" : Integer.toString( b.t.id ) );
+			Element building = buildings.addElement( "building" );
+			building.addAttribute( "x", Integer.toString( b.x ) );
+			building.addAttribute( "y", Integer.toString( b.y ) );
+			building.addAttribute( "bt", b.bt.name() );
+			building.addAttribute( "team", b.t == null ? "null" : Integer.toString( b.t.id ) );
+			building.addAttribute( "id", Integer.toString( b.id ) );
+		}
+		
+		//ADD links
+		Element links = level.addElement( "links" );
+		for( int i = 0; i < m.links.size(); i++ )
+		{
+			Link l = m.links.get( i );
+			Element link = links.addElement( "link" );
+			link.addAttribute( "source", Integer.toString( l.source ) );
+			link.addAttribute( "targetX", Integer.toString( l.targetX ) );
+			link.addAttribute( "targetY", Integer.toString( l.targetY ) );
 		}
 		
 		XMLWriter writer = new XMLWriter(

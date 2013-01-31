@@ -243,7 +243,6 @@ public class TacticServer
 			for( int i = 0; i < l.buildings.size(); i++ )
 			{
 				Building b = l.buildings.get( i );
-				b.index = i;
 				if( b.update( this ) )
 				{
 					si.sendToAllClients( new Message( MessageType.BUILDINGUPDATE, b ) );

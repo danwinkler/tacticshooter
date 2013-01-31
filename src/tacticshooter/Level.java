@@ -17,6 +17,8 @@ import org.newdawn.slick.util.pathfinding.PathFinder;
 import org.newdawn.slick.util.pathfinding.PathFindingContext;
 import org.newdawn.slick.util.pathfinding.TileBasedMap;
 
+import tacticshooter.Unit.UnitState;
+
 import com.phyloa.dlib.util.DMath;
 
 public class Level implements TileBasedMap
@@ -24,6 +26,7 @@ public class Level implements TileBasedMap
 	public static int tileSize = 20;
 	
 	public ArrayList<Building> buildings = new ArrayList<Building>();
+	public ArrayList<Link> links = new ArrayList<Link>();
 	
 	public TileType[][] tiles;
 	
@@ -53,10 +56,29 @@ public class Level implements TileBasedMap
 		}
 	}
 	
+	public void renderLinks( Graphics g )
+	{
+		g.setColor( Color.green );
+		for( int i = 0; i < links.size(); i++ )
+		{
+			Link l = links.get( i );
+			for( int j = 0; j < buildings.size(); j++ )
+			{
+				Building b = buildings.get( j );
+				if( b.id == l.source )
+				{
+					g.drawLine( b.x, b.y, l.targetX*tileSize + tileSize/2, l.targetY*tileSize + tileSize/2 );
+					break;
+				}
+			}
+		}
+	}
+	
 	public void render( Graphics g )
 	{
 		g.setLineWidth( 1 );
 		//draw walls
+		
 		for( int y = 0; y < height; y++ )
 		{
 			for( int x = 0; x < width; x++ )
@@ -67,23 +89,39 @@ public class Level implements TileBasedMap
 					//g.setColor( Color.yellow );
 					//g.fillOval(  x*tileSize, y*tileSize, tileSize, tileSize );
 					break;
+				case PASSOPEN:
+					g.setColor( Color.gray );
+					g.drawRect( x*tileSize + tileSize/4, y*tileSize + tileSize/4, tileSize/2, tileSize/2 );
+					break;
+				case PASSCLOSED:
+					g.setColor( Color.gray );
+					g.fillRect( x*tileSize + tileSize/4, y*tileSize + tileSize/4, tileSize/2, tileSize/2 );
+					break;
+				case GATEOPEN:
+					g.setColor( Color.gray );
+					g.drawRect( x*tileSize + tileSize/4, y*tileSize + tileSize/4, tileSize/2, tileSize/2 );
+					break;
+				case GATECLOSED:
+					g.setColor( Color.gray );
+					g.fillRect( x*tileSize + tileSize/4, y*tileSize + tileSize/4, tileSize/2, tileSize/2 );
+					break;
 				case WALL: 
 					g.setColor( Color.gray );
 					g.fillRect( x*tileSize, y*tileSize, tileSize, tileSize ); 
 					g.setColor( Color.black );
-					if( getTile( x-1, y ) == TileType.FLOOR )
+					if( getTile( x-1, y ) != TileType.WALL )
 					{
 						g.drawLine( x*tileSize, y*tileSize, x*tileSize, y*tileSize+tileSize );
 					}
-					if( getTile( x+1, y ) == TileType.FLOOR )
+					if( getTile( x+1, y ) != TileType.WALL )
 					{
 						g.drawLine( x*tileSize+tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize );
 					}
-					if( getTile( x, y-1 ) == TileType.FLOOR )
+					if( getTile( x, y-1 ) != TileType.WALL )
 					{
 						g.drawLine( x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize );
 					}
-					if( getTile( x, y+1 ) == TileType.FLOOR )
+					if( getTile( x, y+1 ) != TileType.WALL )
 					{
 						g.drawLine( x*tileSize, y*tileSize+tileSize, x*tileSize+tileSize, y*tileSize+tileSize );
 					}
@@ -392,7 +430,11 @@ public class Level implements TileBasedMap
 		TRIANGLENW,
 		TRIANGLESW,
 		TRIANGLENE,
-		TRIANGLESE;
+		TRIANGLESE,
+		PASSOPEN,
+		PASSCLOSED( false ),
+		GATEOPEN,
+		GATECLOSED( false );
 		
 		public boolean passable;
 		
@@ -404,6 +446,88 @@ public class Level implements TileBasedMap
 		TileType( boolean passable )
 		{
 			this.passable = passable;
+		}
+	}
+	
+	public static class Link
+	{
+		public int source;
+		public int targetX, targetY;
+		
+		public Link()
+		{
+			
+		}
+		
+		public Link( int source, int targetX, int targetY )
+		{
+			this.source = source;
+			this.targetX = targetX;
+			this.targetY = targetY;
+		}
+	}
+
+	public void signal( Building b, boolean signal, TacticServer ts )
+	{
+		for( int i = 0; i < links.size(); i++ )
+		{
+			Link l = links.get( i );
+			if( l.source == b.id )
+			{
+				TileType target = getTile( l.targetX, l.targetY );
+				TileType set = null;
+				switch( target )
+				{
+				case PASSOPEN:
+					if( signal )
+					{
+						set = TileType.PASSCLOSED;
+					}
+					break;
+				case PASSCLOSED:
+					if( !signal )
+					{
+						set = TileType.PASSOPEN;
+					}
+					break;
+				case GATEOPEN:
+					if( !signal )
+					{
+						set = TileType.GATECLOSED;
+					}
+					break;
+				case GATECLOSED:
+					if( signal )
+					{
+						set = TileType.GATEOPEN;
+					}
+					break;
+				}
+				if( set != null && tiles[l.targetX][l.targetY] != set )
+				{
+					tiles[l.targetX][l.targetY] = set;
+					ts.si.sendToAllClients( new Message( MessageType.TILEUPDATE, new Object[] { l.targetX, l.targetY, set } ) );
+					if( !set.passable )
+					{
+						for( int j = 0; j < ts.units.size(); j++ )
+						{
+							Unit u = ts.units.get( j );
+							for( int k = 0; k < u.path.size(); k++ )
+							{
+								Point2i p = u.path.get( k );
+								if( p.x == l.targetX && p.y == l.targetY )
+								{
+									u.path.clear();
+									u.state = UnitState.STOPPED;
+									u.pathTo( u.destx, u.desty, ts );
+									ts.si.sendToAllClients( new Message( MessageType.UNITUPDATE, u ) );
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 }

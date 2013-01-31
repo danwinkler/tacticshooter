@@ -15,5 +15,6 @@ public enum MessageType
 	BUILDUNIT,
 	PLAYERLIST, 
 	GAMEOVER,
-	MESSAGE;
+	MESSAGE,
+	TILEUPDATE;
 }

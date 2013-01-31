@@ -13,6 +13,7 @@ import org.newdawn.slick.SlickException;
 import tacticshooter.Building;
 import tacticshooter.Building.BuildingType;
 import tacticshooter.Level;
+import tacticshooter.Level.Link;
 import tacticshooter.Level.TileType;
 import tacticshooter.LevelFileHelper;
 import tacticshooter.Slick2DEventMapper;
@@ -43,6 +44,13 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 	DButton teamBCenter;
 	DButton point;
 	
+	DButton pob;
+	DButton pcb;
+	DButton gob;
+	DButton gcb;
+	DButton addLink;
+	DButton pressurePad;
+	
 	DButton save;
 	DButton saveAndExit;
 	DButton exitWithoutSaving;
@@ -63,6 +71,10 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 	
 	Image levelTexture;
 	Graphics levelG;
+	
+	String levelName = "";
+	
+	Building addLinkSelected;
 
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
@@ -78,10 +90,17 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			wall = new DButton( "Wall", 0, gc.getHeight()-100, 100, 50 );
 			floor = new DButton( "Floor", 100, gc.getHeight()-100, 100, 50 );
 			edge = new DButton( "Edge" , 200, gc.getHeight()-100, 100, 50 );
-			light = new DButton( "Light", 300, gc.getHeight()-100, 150, 50 );
-			teamACenter = new DButton( "A Center", 450, gc.getHeight()-100, 150, 50 );
-			teamBCenter = new DButton( "B Center", 600, gc.getHeight()-100, 150, 50 );
-			point = new DButton( "Point", 750, gc.getHeight()-100, 150, 50 );
+			light = new DButton( "Light", 300, gc.getHeight()-100, 100, 50 );
+			teamACenter = new DButton( "A Center", 400, gc.getHeight()-100, 100, 50 );
+			teamBCenter = new DButton( "B Center", 500, gc.getHeight()-100, 100, 50 );
+			point = new DButton( "Point", 600, gc.getHeight()-100, 100, 50 );
+			
+			pob = new DButton( "PO", 700, gc.getHeight()-100, 25, 50 );
+			pcb = new DButton( "PC", 725, gc.getHeight()-100, 25, 50 );
+			gob = new DButton( "GO", 750, gc.getHeight()-100, 25, 50 );
+			gcb = new DButton( "GC", 775, gc.getHeight()-100, 25, 50 );
+			addLink = new DButton( "Link", 800, gc.getHeight()-100, 100, 50 );
+			pressurePad = new DButton( "Pressure Pad", 900, gc.getHeight()-100, 100, 50 );
 			
 			save = new DButton( "Save", 0, gc.getHeight()-50, 200, 50 );
 			saveAndExit = new DButton( "Save & Exit", 200, gc.getHeight()-50, 200, 50 );
@@ -90,6 +109,7 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			fileNameText = new DText( "Map Name:", gc.getWidth()-350, gc.getHeight()-50 );
 			fileNameText.setColor( java.awt.Color.BLACK );
 			name = new DTextBox( gc.getWidth()-250, gc.getHeight()-50, 250, 50 );
+			name.setText( levelName );
 			
 			toggleMirrorBrush = new DButton( "Toggle Mirror Brush", gc.getWidth()-200, gc.getHeight()-100, 200, 50 );
 			
@@ -100,6 +120,13 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			dui.add( teamACenter );
 			dui.add( teamBCenter );
 			dui.add( point );
+			
+			dui.add( pob );
+			dui.add( pcb );
+			dui.add( gob );
+			dui.add( gcb );
+			dui.add( addLink );
+			dui.add( pressurePad );
 			
 			dui.add( save );
 			dui.add( saveAndExit );
@@ -125,6 +152,7 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		gc.getInput().addListener( this );
 	}
 	
 	public void update( GameContainer gc, int delta )
@@ -152,8 +180,14 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 		{
 			if( input.isMouseButtonDown( Input.MOUSE_RIGHT_BUTTON ) )
 			{
-				int x = (int)((input.getMouseX() + scrollx) / l.tileSize) * l.tileSize + l.tileSize/2;
-				int y = (int)((input.getMouseY() + scrolly) / l.tileSize) * l.tileSize + l.tileSize/2;
+				int tileX = (int)((input.getMouseX() + scrollx) / l.tileSize);
+				int tileY = (int)((input.getMouseY() + scrolly) / l.tileSize);
+				
+				int x = tileX * l.tileSize + l.tileSize/2;
+				int y = tileY * l.tileSize + l.tileSize/2;
+				
+				int x2 = mirrorType == MirrorType.X || mirrorType == MirrorType.XY ? (l.width-1)-tileX : tileX;
+				int y2 = mirrorType == MirrorType.Y || mirrorType == MirrorType.XY ? (l.height-1)-tileY : tileY;
 				
 				for( int i = 0; i < l.buildings.size(); i++ )
 				{
@@ -163,7 +197,36 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 					if( dx*dx + dy*dy < 10 )
 					{
 						l.buildings.remove( i );
+						for( int j = 0; j < l.links.size(); j++ )
+						{
+							Link link = l.links.get( j );
+							if( link.source == b.id )
+							{
+								l.links.remove( j );
+								j--;
+							}
+						}
 						i--;
+					}
+					
+					if( mirrorType != MirrorType.NONE )
+					{
+						dx = b.x-x2;
+						dy = b.y-y2;
+						if( dx*dx + dy*dy < 10 )
+						{
+							l.buildings.remove( i );
+							for( int j = 0; j < l.links.size(); j++ )
+							{
+								Link link = l.links.get( j );
+								if( link.source == b.id )
+								{
+									l.links.remove( j );
+									j--;
+								}
+							}
+							i--;
+						}
 					}
 				}
 			}
@@ -177,6 +240,9 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 				int y2 = mirrorType == MirrorType.Y || mirrorType == MirrorType.XY ? (l.height-1)-y : y;
 				switch( brush )
 				{
+				case ADDLINK:
+					tile = null;
+					break;
 				case WALL:
 					tile = TileType.WALL;
 					break;
@@ -185,6 +251,18 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 					break;
 				case LIGHT:
 					tile = TileType.LIGHT;
+					break;
+				case PO:
+					tile = TileType.PASSOPEN;
+					break;
+				case PC:
+					tile = TileType.PASSCLOSED;
+					break;
+				case GO:
+					tile = TileType.GATEOPEN;
+					break;
+				case GC:
+					tile = TileType.GATECLOSED;
 					break;
 				case TRIANGLE:
 					if( l.getTile( x, y ) == TileType.WALL )
@@ -224,19 +302,28 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 					}
 					break;
 				}
-				l.setTile( x, y, tile );
-				if( mirrorType != MirrorType.NONE )
+				if( tile != null )
 				{
-					l.setTile( x2, y2, tile );
+					l.setTile( x, y, tile );
+					if( mirrorType != MirrorType.NONE )
+					{
+						l.setTile( x2, y2, tile );
+					}
 				}
-				l.render( levelG );
-				levelG.flush();
 			}
 				
 			if( input.isMousePressed( Input.MOUSE_LEFT_BUTTON ) )
 			{
-				int x = (int)((input.getMouseX() + scrollx) / l.tileSize) * l.tileSize + l.tileSize/2;
-				int y = (int)((input.getMouseY() + scrolly) / l.tileSize) * l.tileSize + l.tileSize/2;
+				int tileX = (int)((input.getMouseX() + scrollx) / l.tileSize);
+				int tileY = (int)((input.getMouseY() + scrolly) / l.tileSize);
+				
+				int x = tileX * l.tileSize + l.tileSize/2;
+				int y = tileY * l.tileSize + l.tileSize/2;
+				
+				int x2 = mirrorType == MirrorType.X || mirrorType == MirrorType.XY ? (l.width-1)-tileX : tileX;
+				int y2 = mirrorType == MirrorType.Y || mirrorType == MirrorType.XY ? (l.height-1)-tileY : tileY;
+				x2 = x2 * l.tileSize + l.tileSize/2;
+				y2 = y2 * l.tileSize + l.tileSize/2;
 				
 				boolean addBuilding = true;
 				
@@ -274,6 +361,23 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 						Building pointBuilding = new Building( x, y, BuildingType.POINT, null );
 						pointBuilding.hold = 0;
 						l.buildings.add( pointBuilding );
+						if( mirrorType != MirrorType.NONE && !(x == x2 && y == y2) )
+						{
+							pointBuilding = new Building( x2, y2, BuildingType.POINT, null );
+							pointBuilding.hold = 0;
+							l.buildings.add( pointBuilding );
+						}
+						break;
+					case PRESSUREPAD:
+						Building ppBuilding = new Building( x, y, BuildingType.PRESSUREPAD, null );
+						ppBuilding.hold = 0;
+						l.buildings.add( ppBuilding );
+						if( mirrorType != MirrorType.NONE && !(x == x2 && y == y2) )
+						{
+							ppBuilding = new Building( x2, y2, BuildingType.PRESSUREPAD, null );
+							ppBuilding.hold = 0;
+							l.buildings.add( ppBuilding );
+						}
 						break;
 					}
 				}
@@ -298,14 +402,19 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 		g.translate( -scrollx, -scrolly );
 		g.setColor( Color.gray );
 		g.drawRect( 0, 0, l.width*l.tileSize, l.height*l.tileSize );
-		g.drawImage( levelTexture, 0, 0 );
+		l.render( g );
 		l.renderBuildings( g );
+		l.renderLinks( g );
 		
 		int x = l.getTileX( gc.getInput().getMouseX() + scrollx );
 		int y = l.getTileY( gc.getInput().getMouseY() + scrolly );
 		if( brush == Brush.POINT || brush == Brush.CENTERTEAMA || brush == Brush.CENTERTEAMB )
 		{
 			g.drawOval( x*l.tileSize-50 + l.tileSize/2, y*l.tileSize-50 + l.tileSize/2, 100, 100 );
+		}
+		else if( brush == Brush.PRESSUREPAD )
+		{
+			g.drawOval( x*l.tileSize-20 + l.tileSize/2, y*l.tileSize-20 + l.tileSize/2, 40, 40 );
 		}
 		else
 		{
@@ -322,6 +431,7 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 		g.setColor( Color.black );
 		g.drawString( x + ", " + y, 100, 25 );
 		g.drawString( "Mirror Brush: " + mirrorType.name(), 300, 25 );
+		g.drawString( "Brush: " + brush.name(), 500, 25 );
 	}
 
 	public void onExit()
@@ -338,7 +448,11 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 		}
 		else if( o instanceof String )
 		{
-			name.setText( (String)o );
+			levelName = (String)o;
+			if( name != null )
+			{
+				name.setText( levelName );
+			}
 		}
 	}
 	
@@ -350,7 +464,13 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 		LIGHT,
 		CENTERTEAMA,
 		CENTERTEAMB,
-		POINT;
+		POINT,
+		PO,
+		PC,
+		GO,
+		GC,
+		ADDLINK, 
+		PRESSUREPAD;
 	}
 	
 	public void event( DUIEvent event )
@@ -385,7 +505,32 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			else if( e == point )
 			{
 				brush = Brush.POINT;
-			} else if( e == toggleMirrorBrush )
+			}
+			else if( e == pob )
+			{
+				brush = Brush.PO;
+			}
+			else if( e == pcb )
+			{
+				brush = Brush.PC;
+			}
+			else if( e == gob )
+			{
+				brush = Brush.GO;
+			}
+			else if( e == gcb )
+			{
+				brush = Brush.GC;
+			}
+			else if( e == addLink )
+			{
+				brush = Brush.ADDLINK;
+			}
+			else if( e == pressurePad )
+			{
+				brush = Brush.PRESSUREPAD;
+			}
+			else if( e == toggleMirrorBrush )
 			{
 				mirrorType = MirrorType.values()[nextMirror];
 				nextMirror = (nextMirror+1) % MirrorType.values().length;
@@ -447,11 +592,37 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 		
 	}
 
-	@Override
-	public void mousePressed( int arg0, int arg1, int arg2 )
+	public void mousePressed( int button, int mx, int my )
 	{
-		// TODO Auto-generated method stub
+		int tileX = l.getTileX( (mx + scrollx) );
+		int tileY = l.getTileY( (my + scrolly) );
 		
+		int x = tileX * l.tileSize + l.tileSize/2;
+		int y = tileY * l.tileSize + l.tileSize/2;
+		
+		if( brush == Brush.ADDLINK )
+		{
+			System.out.println( "add" );
+			if( addLinkSelected == null )
+			{
+				for( int i = 0; i < l.buildings.size(); i++ )
+				{
+					Building b = l.buildings.get( i );
+					int dx = b.x-x;
+					int dy = b.y-y;
+					if( dx*dx + dy*dy < 10 )
+					{
+						addLinkSelected = b;
+						break;
+					}
+				}
+			}
+			else
+			{
+				l.links.add( new Link( addLinkSelected.id, tileX, tileY ) );
+				addLinkSelected = null;
+			}
+		}
 	}
 
 	@Override
@@ -485,7 +656,7 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 	public boolean isAcceptingInput()
 	{
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import javax.vecmath.Point2f;
 import javax.vecmath.Point2i;
 
+import tacticshooter.Level.Link;
 import tacticshooter.Unit.UnitType;
 
 import com.esotericsoftware.kryo.Kryo;
@@ -35,10 +36,15 @@ public class KryoHelper
 		k.register( GameStats.class );
 		k.register( GameStats.TeamStats.class );
 		k.register( GameStats.TeamStats[].class );
-		k.register( Level.TileType.class );
-		k.register( Level.TileType[].class );
-		k.register( Level.TileType[][].class );
 		k.register( float[].class );
 		k.register( float[][].class );
+		
+		//LEVEL
+		for( Class c : Level.class.getDeclaredClasses() )
+		{
+			k.register( c );
+		}
+		k.register( Level.TileType[].class );
+		k.register( Level.TileType[][].class );
 	}
 }

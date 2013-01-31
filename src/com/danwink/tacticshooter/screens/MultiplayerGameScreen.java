@@ -27,6 +27,7 @@ import tacticshooter.ClientInterface;
 import tacticshooter.ClientNetworkInterface;
 import tacticshooter.ClientState;
 import tacticshooter.Level;
+import tacticshooter.Level.TileType;
 import tacticshooter.Message;
 import tacticshooter.MessageType;
 import tacticshooter.MusicQueuer;
@@ -238,7 +239,14 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				if( cs.l != null )
 				{
 					Building building = (Building)m.message;
-					cs.l.buildings.set( building.index, building );
+					for( int i = 0; i < cs.l.buildings.size(); i++ )
+					{
+						Building bt = cs.l.buildings.get( i );
+						if( bt.id == building.id )
+						{
+							cs.l.buildings.set( i, building );
+						}
+					}
 				}
 				break;
 			case PLAYERLIST:
@@ -253,6 +261,13 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 					mess = mess.substring( Math.min( lineLength, mess.length() ), mess.length() );
 					messages.add( p1 + (mess.length() > 0 ? "-" : "") );
 				} while( mess.length() > 0 );
+				break;
+			case TILEUPDATE:
+				Object[] arr = (Object[])m.message;
+				int tx = (Integer)arr[0];
+				int ty = (Integer)arr[1];
+				TileType change = (TileType)arr[2];
+				cs.l.tiles[tx][ty] = change;
 				break;
 			case GAMEOVER:
 				dsh.message( "postgame", m.message );

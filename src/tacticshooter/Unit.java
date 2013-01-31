@@ -2,6 +2,7 @@ package tacticshooter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.vecmath.Point2f;
 import javax.vecmath.Point2i;
@@ -17,7 +18,7 @@ public class Unit implements Serializable
 	public static int radius = 10;
 	public static final int UPDATE_TIME = 3;
 	
-	public int id = (int) (Math.random() * Integer.MAX_VALUE);
+	public int id = new Random().nextInt();
 	
 	public float sx, sy;
 	
