@@ -65,9 +65,9 @@ public class TacticClient extends BasicGame
 	
 	public static void main( String[] args )
 	{
-		//Attempt to avoid sealed exception errors on zoe's mac
 		try
 		{
+			//Attempt to avoid sealed exception errors on zoe's mac
 			Class.forName( "javax.vecmath.Point2i" );
 			
 			AppGameContainer app = new AppGameContainer( new TacticClient() );

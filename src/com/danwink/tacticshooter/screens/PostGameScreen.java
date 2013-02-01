@@ -11,6 +11,7 @@ import tacticshooter.Slick2DRenderer;
 import tacticshooter.StaticFiles;
 
 import com.phyloa.dlib.dui.DButton;
+import com.phyloa.dlib.dui.DLinePlot;
 import com.phyloa.dlib.dui.DText;
 import com.phyloa.dlib.dui.DUI;
 import com.phyloa.dlib.dui.DUIElement;
@@ -19,6 +20,7 @@ import com.phyloa.dlib.dui.DUIListener;
 import com.phyloa.dlib.renderer.DScreen;
 import com.phyloa.dlib.renderer.DScreenHandler;
 import com.phyloa.dlib.util.DMath;
+import com.phyloa.dlib.util.DUtil;
 
 public class PostGameScreen extends DScreen<GameContainer, Graphics> implements DUIListener
 {
@@ -58,6 +60,21 @@ public class PostGameScreen extends DScreen<GameContainer, Graphics> implements 
 		
 		dui.add( new DText( "Points:", e.getWidth()/2 - 500, e.getHeight()/2 - 100 ) );
 		dui.add( new DText( "Units:", e.getWidth()/2 - 500, e.getHeight()/2 + 100 ) );
+		DLinePlot pointPlot = new DLinePlot( gc.getWidth()/2 - 400, gc.getHeight()/2 - 150, 800, 100 );
+		for( TeamStats ts : stats.teamStats )
+		{
+			Color c = ts.t.getColor();
+			pointPlot.addLine( DUtil.integerArrayListToIntArray( ts.pointCount ), new java.awt.Color( c.r, c.g, c.b, .8f ) );
+		}
+		dui.add( pointPlot );
+		
+		DLinePlot unitPlot = new DLinePlot( gc.getWidth()/2 - 400, gc.getHeight()/2 + 50, 800, 100 );
+		for( TeamStats ts : stats.teamStats )
+		{
+			Color c = ts.t.getColor();
+			unitPlot.addLine( DUtil.integerArrayListToIntArray( ts.unitCount ), new java.awt.Color( c.r, c.g, c.b, .8f ) );
+		}
+		dui.add( unitPlot );
 		
 		dui.addDUIListener( this );
 		
@@ -72,56 +89,6 @@ public class PostGameScreen extends DScreen<GameContainer, Graphics> implements 
 	public void render( GameContainer gc, Graphics g )
 	{
 		dui.render( r.renderTo( g ) );
-		
-		g.setLineWidth( 3 );
-		
-		g.pushTransform();
-		g.translate( gc.getWidth()/2 - 400, gc.getHeight()/2 - 150 );
-		g.setColor( Color.white );
-		g.drawLine( 0, 0, 0, 100 );
-		g.drawLine( 0, 100, 800, 100 );
-		float yScale = 100.f / stats.totalPoints;
-		for( TeamStats ts : stats.teamStats )
-		{
-			float xScale = 800.f / (ts.pointCount.size()-1);
-			Color c = ts.t.getColor();
-			g.setColor( new Color( c.r, c.g, c.b, 200 ) );
-			for( int i = 0; i < ts.pointCount.size()-1; i++ )
-			{
-				g.drawLine( i*xScale, 100 - ts.pointCount.get( i ) * yScale, (i+1)*xScale, 100 - ts.pointCount.get( i+1 ) * yScale );
-			}
-		}
-		g.popTransform();
-		
-		g.pushTransform();
-		g.translate( gc.getWidth()/2 - 400, gc.getHeight()/2 + 50 );
-		g.setColor( Color.white );
-		g.drawLine( 0, 0, 0, 100 );
-		g.drawLine( 0, 100, 800, 100 );
-		float maxUnits = 0;
-		for( TeamStats ts : stats.teamStats )
-		{
-			for( int i = 0; i < ts.unitCount.size(); i++ )
-			{
-				int c = ts.unitCount.get( i );
-				if( c > maxUnits )
-				{
-					maxUnits = c;
-				}
-			}
-		}
-		yScale = 100.f / maxUnits;
-		for( TeamStats ts : stats.teamStats )
-		{
-			float xScale = 800.f / (ts.unitCount.size()-1);
-			Color c = ts.t.getColor();
-			g.setColor( new Color( c.r, c.g, c.b, 200 ) );
-			for( int i = 0; i < ts.unitCount.size()-1; i++ )
-			{
-				g.drawLine( i*xScale, 100 - ts.unitCount.get( i ) * yScale, (i+1)*xScale, 100 - ts.unitCount.get( i+1 ) * yScale );
-			}
-		}
-		g.popTransform();
 	}
 
 	public void onExit()

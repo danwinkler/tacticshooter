@@ -269,5 +269,11 @@ public class Slick2DRenderer implements Renderer2D
 	{
 		gc.clearClip();
 	}
+
+	@Override
+	public void setLineWidth( float width )
+	{
+		gc.setLineWidth( width );
+	}
 	
 }
