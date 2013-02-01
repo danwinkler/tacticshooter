@@ -44,10 +44,8 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 	DButton teamBCenter;
 	DButton point;
 	
-	DButton pob;
-	DButton pcb;
-	DButton gob;
-	DButton gcb;
+	DButton pass;
+	DButton gate;
 	DButton addLink;
 	DButton pressurePad;
 	
@@ -95,10 +93,8 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			teamBCenter = new DButton( "B Center", 500, gc.getHeight()-100, 100, 50 );
 			point = new DButton( "Point", 600, gc.getHeight()-100, 100, 50 );
 			
-			pob = new DButton( "PO", 700, gc.getHeight()-100, 25, 50 );
-			pcb = new DButton( "PC", 725, gc.getHeight()-100, 25, 50 );
-			gob = new DButton( "GO", 750, gc.getHeight()-100, 25, 50 );
-			gcb = new DButton( "GC", 775, gc.getHeight()-100, 25, 50 );
+			pass = new DButton( "Pass", 700, gc.getHeight()-100, 50, 50 );
+			gate = new DButton( "Gate", 750, gc.getHeight()-100, 50, 50 );
 			addLink = new DButton( "Link", 800, gc.getHeight()-100, 100, 50 );
 			pressurePad = new DButton( "Pressure Pad", 900, gc.getHeight()-100, 100, 50 );
 			
@@ -121,10 +117,8 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			dui.add( teamBCenter );
 			dui.add( point );
 			
-			dui.add( pob );
-			dui.add( pcb );
-			dui.add( gob );
-			dui.add( gcb );
+			dui.add( pass );
+			dui.add( gate );
 			dui.add( addLink );
 			dui.add( pressurePad );
 			
@@ -252,16 +246,10 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 				case LIGHT:
 					tile = TileType.LIGHT;
 					break;
-				case PO:
+				case PASS:
 					tile = TileType.PASSOPEN;
 					break;
-				case PC:
-					tile = TileType.PASSCLOSED;
-					break;
-				case GO:
-					tile = TileType.GATEOPEN;
-					break;
-				case GC:
+				case GATE:
 					tile = TileType.GATECLOSED;
 					break;
 				case TRIANGLE:
@@ -465,10 +453,8 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 		CENTERTEAMA,
 		CENTERTEAMB,
 		POINT,
-		PO,
-		PC,
-		GO,
-		GC,
+		PASS,
+		GATE,
 		ADDLINK, 
 		PRESSUREPAD;
 	}
@@ -506,21 +492,13 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			{
 				brush = Brush.POINT;
 			}
-			else if( e == pob )
+			else if( e == pass )
 			{
-				brush = Brush.PO;
+				brush = Brush.PASS;
 			}
-			else if( e == pcb )
+			else if( e == gate )
 			{
-				brush = Brush.PC;
-			}
-			else if( e == gob )
-			{
-				brush = Brush.GO;
-			}
-			else if( e == gcb )
-			{
-				brush = Brush.GC;
+				brush = Brush.GATE;
 			}
 			else if( e == addLink )
 			{
@@ -602,7 +580,6 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 		
 		if( brush == Brush.ADDLINK )
 		{
-			System.out.println( "add" );
 			if( addLinkSelected == null )
 			{
 				for( int i = 0; i < l.buildings.size(); i++ )

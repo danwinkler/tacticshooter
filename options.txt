@@ -1,7 +1,7 @@
-fullscreen false
-botCount 15
 vsync true
-menuTransitionSpeed .4
+botCount 15
+fullscreen false
 name TacticalMan
+menuTransitionSpeed .4
 windowHeight 900
 windowWidth 1440
