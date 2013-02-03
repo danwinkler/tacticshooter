@@ -8,6 +8,8 @@ import javax.vecmath.Point2i;
 import javax.vecmath.Vector2f;
 
 import tacticshooter.Level.Link;
+import tacticshooter.TacticServer.Bin;
+import tacticshooter.Unit.UnitPacket;
 import tacticshooter.Unit.UnitType;
 
 import com.esotericsoftware.kryo.Kryo;
@@ -17,6 +19,7 @@ public class KryoHelper
 	public static void register( Kryo k )
 	{
 		k.register( Message.class );
+		k.register( UnitPacket.class );
 		k.register( Unit.class );
 		k.register( Level.class );
 		k.register( MessageType.class );
@@ -40,6 +43,9 @@ public class KryoHelper
 		k.register( float[].class );
 		k.register( float[][].class );
 		k.register( Vector2f.class );
+		k.register( Bin.class );
+		k.register( Bin[].class );
+		k.register( Bin[][].class );
 		
 		//LEVEL
 		for( Class c : Level.class.getDeclaredClasses() )

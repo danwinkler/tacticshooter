@@ -38,6 +38,7 @@ import tacticshooter.Slick2DRenderer;
 import tacticshooter.StaticFiles;
 import tacticshooter.Team;
 import tacticshooter.Unit;
+import tacticshooter.Unit.UnitPacket;
 import tacticshooter.Unit.UnitType;
 
 import com.esotericsoftware.minlog.Log;
@@ -92,6 +93,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	
 	boolean running = false;
 	
+	Image wallTexture;
 	Image bloodTexture;
 	Graphics btg;
 	
@@ -191,16 +193,20 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			switch( m.messageType )
 			{
 			case UNITUPDATE:
-				Unit u = (Unit)m.message;
-				Unit tu = cs.unitMap.get( u.id );
+				UnitPacket up = (UnitPacket)m.message;
+				Unit tu = cs.unitMap.get( up.id );
 				if( tu == null )
 				{
+					Unit u = new Unit();
+					u.x = up.x;
+					u.y = up.y;
+					u.sync( up );
 					cs.unitMap.put( u.id, u );
 					cs.units.add( u );
 					cs.ping1.play( 1.f, cs.getSoundMag( gc, u.x, u.y ) );
 					tu = u;
 				}
-				tu.sync( u );
+				tu.sync( up );
 				break;
 			case LEVELUPDATE:
 				if( cs.l == null && cs.player != null )
@@ -362,6 +368,10 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		{
 			try
 			{
+				wallTexture = new Image( cs.l.width * Level.tileSize, cs.l.height * Level.tileSize );
+				Graphics wt = wallTexture.getGraphics();
+				cs.l.render( wt );
+				wt.flush();
 				bloodTexture = new Image( cs.l.width * Level.tileSize, cs.l.height * Level.tileSize );
 				btg = bloodTexture.getGraphics();
 				btg.setColor( new Color( 255, 0, 0, 200 ) );
@@ -380,7 +390,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		
 		cs.l.renderBuildings( g );
 		g.drawImage( bloodTexture, 0, 0 );
-		cs.l.render( g );
+		g.drawImage( wallTexture, 0, 0 );
 		
 		
 		g.setColor( this.waitingForMoveConfirmation ? Color.gray : Color.green );
@@ -516,6 +526,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		cs.resetState();
 		miniMap = null;
 		bloodTexture = null;
+		wallTexture = null;
 		dui.setEnabled( false );
 		messages.clear();
 	}

@@ -10,12 +10,15 @@ import javax.vecmath.Vector2f;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.util.pathfinding.Path;
+
+import tacticshooter.TacticServer.Bin;
+
 import com.phyloa.dlib.util.DMath;
 
 public class Unit
 {
 	public static int radius = 10;
-	public static final int UPDATE_TIME = 5;
+	public static final int UPDATE_TIME = 15;
 	
 	public int id = new Random().nextInt();
 	
@@ -49,6 +52,11 @@ public class Unit
 	
 	public Building stoppedAt;
 	
+	Bin[][] bins = new Bin[2][2];
+	Bin[][] oldBin = new Bin[2][2];
+	
+	UnitPacket packet = new UnitPacket();
+	
 	//CLIENT ONLY
 	public boolean selected = false;
 	public int timeSinceUpdate = 0;
@@ -71,7 +79,7 @@ public class Unit
 		this.owner = owner;
 	}
 	
-	public boolean update( TacticServer ts )
+	public boolean update( TacticServer ts, float d )
 	{
 		Level l = ts.l;
 		
@@ -111,8 +119,11 @@ public class Unit
 					
 					float tangle = (float) Math.atan2( ny - y, nx - x );
 					heading += DMath.turnTowards( heading, tangle ) * .2f;
-					x += Math.cos( heading ) * type.speed;
-					y += Math.sin( heading ) * type.speed;
+					
+					float dx = (float)(Math.cos( heading ) * type.speed * d);
+					float dy = (float)(Math.sin( heading ) * type.speed * d);
+					if( l.getTile( x+dx, y ).passable ) x += dx;
+					if( l.getTile( x, y+dy ).passable ) y += dy;
 				}
 			}
 			else
@@ -165,6 +176,29 @@ public class Unit
 			}
 		}
 		
+		bins[0][0] = ts.getBin( x-ts.binOffset, y-ts.binOffset );
+		bins[1][0] = ts.getBin( x+ts.binOffset, y-ts.binOffset );
+		bins[0][1] = ts.getBin( x-ts.binOffset, y+ts.binOffset );
+		bins[1][1] = ts.getBin( x+ts.binOffset, y+ts.binOffset );
+		
+		if( oldBin[0][0] != bins[0][0] || oldBin[1][1] != bins[1][1] )
+		{
+			if( oldBin[0][0] != null ) oldBin[0][0].remove( this );
+			if( oldBin[1][0] != null ) oldBin[1][0].remove( this );
+			if( oldBin[0][1] != null ) oldBin[0][1].remove( this );
+			if( oldBin[1][1] != null ) oldBin[1][1].remove( this );
+			
+			if( bins[0][0] != null ) bins[0][0].add( this );
+			if( bins[1][0] != null ) bins[1][0].add( this );
+			if( bins[0][1] != null ) bins[0][1].add( this );
+			if( bins[1][1] != null ) bins[1][1].add( this );
+		}
+		
+		bins[0][0] = oldBin[0][0];
+		bins[1][0] = oldBin[1][0];
+		bins[0][1] = oldBin[0][1];
+		bins[1][1] = oldBin[1][1];
+		
 		//To keep Unit updates from getting out of hand
 		if( updateCountdown > 0 )
 		{
@@ -184,11 +218,35 @@ public class Unit
 	
 	public void clientUpdate( ClientState tc, float d )
 	{
-		//Predictive Movement
-		if( state == UnitState.MOVING )
+		int tilex = tc.l.getTileX( x );
+		int tiley = tc.l.getTileY( y );
+		
+		switch( state )
 		{
-			x += DMath.cosf( heading ) * type.speed * d;
-			y += DMath.sinf( heading ) * type.speed * d;
+		case MOVING:
+			if( onStep < path.size() )
+			{
+				Point2i s = path.get( onStep );
+				if( s.x == tilex && s.y == tiley )
+				{
+					onStep++;
+				}
+				else
+				{
+					float nx = s.x*tc.l.tileSize + tc.l.tileSize/2;
+					float ny = s.y*tc.l.tileSize + tc.l.tileSize/2;
+					
+					float tangle = (float) Math.atan2( ny - y, nx - x );
+					heading += DMath.turnTowards( heading, tangle ) * .2f;
+					sx += Math.cos( heading ) * type.speed * d/2;
+					sy += Math.sin( heading ) * type.speed * d/2;
+				}
+			}
+			break;
+		case TURNTO:
+			float turnAmount = DMath.turnTowards( heading, turnToAngle ) * .4f;
+			heading += turnAmount;
+			break;
 		}
 		
 		//Movement Smoothing
@@ -258,6 +316,7 @@ public class Unit
 		if( selected )
 		{
 			g.setColor( Color.lightGray );
+			
 			for( int i = 0; i < path.size()-1; i++ )
 			{
 				Point2i p1 = path.get( i );
@@ -285,10 +344,11 @@ public class Unit
 		}
 	}
 	
-	public void sync( Unit u )
+	public void sync( UnitPacket u )
 	{
 		assert( u.id == this.id );
 		
+		this.id = u.id;
 		this.sx = u.x;
 		this.sy = u.y;
 		this.destx = u.destx;
@@ -299,7 +359,49 @@ public class Unit
 		this.health = u.health;
 		this.type = u.type;
 		this.state = u.state;
+		this.owner = u.owner;
+		this.onStep = u.onStep;
 		timeSinceUpdate = 0;
+	}
+	
+	public static class UnitPacket
+	{
+		public int id;
+		public int destx;
+		public int desty;
+		public float x;
+		public float y;
+		public float heading;
+		public float health;
+		public boolean alive;
+		public UnitType type;
+		public UnitState state;
+		public Player owner;
+		public ArrayList<Point2i> path;
+		public int onStep;
+		
+		public UnitPacket()
+		{
+			
+		}
+	}
+	
+	public UnitPacket getPacket()
+	{
+		packet.id = this.id;
+		packet.x = this.x;
+		packet.y = this.y;
+		packet.destx = this.destx;
+		packet.desty = this.desty;
+		packet.path = this.path;
+		packet.alive = this.alive;
+		packet.heading = this.heading;
+		packet.health = this.health;
+		packet.type = this.type;
+		packet.state = this.state;
+		packet.owner = this.owner;
+		packet.onStep = this.onStep;
+		return packet;
 	}
 
 	public void hit( Bullet bullet, TacticServer ts )
@@ -348,9 +450,9 @@ public class Unit
 	
 	public enum UnitType
 	{
-		LIGHT( 3, 10, .05f, 10, 100, 1 ),
-		HEAVY( 1.5f, 3, .1f, 20, 200, 1  ),
-		SHOTGUN( 3.0f, 30, .3f, 15, 150, 5 );
+		LIGHT( 5, 10, .05f, 10, 100, 1 ),
+		HEAVY( 2.5f, 3, .1f, 20, 200, 1  ),
+		SHOTGUN( 5, 30, .3f, 15, 150, 5 );
 		
 		float speed;
 		int timeBetweenBullets;
