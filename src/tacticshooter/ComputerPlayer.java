@@ -66,7 +66,7 @@ public class ComputerPlayer implements Runnable
 			ex.printStackTrace();
 		}
 		
-		ci.sl.received( fc, new Message( MessageType.CLIENTJOIN, playType.name() + "_BOT_" + name ) );
+		ci.sl.received( fc, new Message( MessageType.CLIENTJOIN, "BOT_" + playType.name() + "_" + name ) );
 		while( playing )
 		{
 			while( fc.hasClientMessages() )
@@ -267,7 +267,7 @@ public class ComputerPlayer implements Runnable
 							Building closeb = null;
 							for( Building b : l.buildings )
 							{
-								boolean wantToTake = (b.t == null || b.t.id != player.team.id) && b.isCapturable( l );
+								boolean wantToTake = b.isCapturable( l ) && (b.t == null || b.t.id != player.team.id);
 									
 								if( wantToTake )
 								{

@@ -11,7 +11,6 @@ public class ClientState
 	public HashMap<Integer, Unit> unitMap = new HashMap<Integer, Unit>();
 	public ArrayList<Unit> units = new ArrayList<Unit>();
 	
-	public HashMap<Integer, Bullet> bulletMap = new HashMap<Integer, Bullet>();
 	public ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 	
 	public Level l;
@@ -32,7 +31,6 @@ public class ClientState
 	{
 		unitMap.clear();
 		units.clear();
-		bulletMap.clear();
 		bullets.clear();
 		l = null;
 		selected.clear();

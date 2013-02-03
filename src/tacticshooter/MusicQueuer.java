@@ -9,7 +9,7 @@ public class MusicQueuer implements MusicListener
 	int onCount;
 	public MusicQueuer( int onCount, String... names )
 	{
-		onCount = (onCount+1) % names.length;
+		this.onCount = (onCount+1) % names.length;
 		this.names = names;
 	}
 	

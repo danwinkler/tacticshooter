@@ -1,5 +1,6 @@
 package com.danwink.tacticshooter.screens;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.BufferOverflowException;
 import java.util.ArrayList;
@@ -153,12 +154,12 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		
 		try
 		{
-			cs.bullet1 = new Sound( "sound/bullet1.wav" );
-			cs.bullet2 = new Sound( "sound/bullet2.wav" );
-			cs.ping1 = new Sound( "sound/ping1.wav" );
-			cs.death1 = new Sound( "sound/death1.wav" );
-			cs.death2 = new Sound( "sound/death2.wav" );
-			cs.hit1 = new Sound( "sound/hit1.wav" );
+			cs.bullet1 = new Sound( "sound" + File.separator + "bullet1.wav" );
+			cs.bullet2 = new Sound( "sound" + File.separator + "bullet2.wav" );
+			cs.ping1 = new Sound( "sound" + File.separator + "ping1.wav" );
+			cs.death1 = new Sound( "sound" + File.separator + "death1.wav" );
+			cs.death2 = new Sound( "sound" + File.separator + "death2.wav" );
+			cs.hit1 = new Sound( "sound" + File.separator + "hit1.wav" );
 		} 
 		catch( SlickException e )
 		{
@@ -214,15 +215,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				break;
 			case BULLETUPDATE:
 				Bullet b = (Bullet)m.message;
-				Bullet tb = cs.bulletMap.get( b.id );
-				if( tb == null )
-				{
-					cs.bulletMap.put( b.id, b );
-					cs.bullets.add( b );
-					(Math.random() > .5 ? cs.bullet1 : cs.bullet2).play( 1.f, cs.getSoundMag( gc, b.x, b.y ) * .2f );
-					tb = b;
-				}
-				tb.sync( b );
+				cs.bullets.add( b );
+				(Math.random() > .5 ? cs.bullet1 : cs.bullet2).play( 1.f, cs.getSoundMag( gc, b.loc.x, b.loc.y ) * .2f );
 				break;
 			case MOVESUCCESS:
 				this.waitingForMoveConfirmation = false;
@@ -326,7 +320,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			b.clientUpdate( this, d, gc );
 			if( !b.alive )
 			{
-				cs.bulletMap.remove( b );
 				cs.bullets.remove( i );
 				i--;
 				continue;

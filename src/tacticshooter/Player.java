@@ -2,7 +2,7 @@ package tacticshooter;
 
 public class Player
 {
-	public static final int MAX_RESPAWN = 60;
+	public static final int MAX_RESPAWN = 6;
 	
 	public int id;
 	public Team team;

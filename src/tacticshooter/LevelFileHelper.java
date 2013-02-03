@@ -24,7 +24,7 @@ public class LevelFileHelper
 	public static Level loadLevel( String name ) throws DocumentException
 	{
 		SAXReader reader = new SAXReader();
-		Document doc = reader.read( new File( "levels\\" + name + ".xml" ) );
+		Document doc = reader.read( new File( "levels" + File.separator + name + ".xml" ) );
 		Node level = doc.selectSingleNode( "//level" );
 		Level m = new Level( Integer.parseInt( level.valueOf( "@width" ) ), Integer.parseInt( level.valueOf( "@height" ) ) );
 		
@@ -66,7 +66,7 @@ public class LevelFileHelper
 	
 	public static void saveLevel( String name, Level m ) throws IOException
 	{
-		File file = new File( "levels\\" + name + ".xml" );
+		File file = new File( "levels" + File.separator + name + ".xml" );
 		Document doc = DocumentHelper.createDocument();
 		Element level = doc.addElement( "level" );
 		level.addAttribute( "width", Integer.toString( m.width ) );

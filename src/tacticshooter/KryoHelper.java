@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import javax.vecmath.Point2f;
 import javax.vecmath.Point2i;
+import javax.vecmath.Vector2f;
 
 import tacticshooter.Level.Link;
 import tacticshooter.Unit.UnitType;
@@ -38,6 +39,7 @@ public class KryoHelper
 		k.register( GameStats.TeamStats[].class );
 		k.register( float[].class );
 		k.register( float[][].class );
+		k.register( Vector2f.class );
 		
 		//LEVEL
 		for( Class c : Level.class.getDeclaredClasses() )

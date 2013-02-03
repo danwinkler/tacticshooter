@@ -1,5 +1,6 @@
 package tacticshooter;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 
@@ -30,10 +31,10 @@ public class StaticFiles
 	{
 		try
 		{
-			names = DFile.loadText( "data/dist.male.first.txt" );
+			names = DFile.loadText( "data" + File.separator + "dist.male.first.txt" );
 		} catch( FileNotFoundException e )
 		{
-			System.err.println( "Make sure the names file is located at: data/dist.male.first.txt" );
+			System.err.println( "Make sure the names file is located at: data" + File.separator + "dist.male.first.txt" );
 		}
 	}
 	
@@ -45,10 +46,10 @@ public class StaticFiles
 				public void run()
 				{
 					started = true;
-					loadMusic( "menu", "sound/Deliberate Thought.ogg" );
-					loadMusic( "play1", "sound/Decisions.ogg" );
-					loadMusic( "play2", "sound/Finding the Balance.ogg" );
-					loadMusic( "play3", "sound/Rising.ogg" );
+					loadMusic( "menu", "sound" + File.separator + "Deliberate Thought.ogg" );
+					loadMusic( "play1", "sound" + File.separator + "Decisions.ogg" );
+					loadMusic( "play2", "sound" + File.separator + "Finding the Balance.ogg" );
+					loadMusic( "play3", "sound" + File.separator + "Rising.ogg" );
 					ready = true;
 				} 
 			}).start();

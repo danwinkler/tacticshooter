@@ -19,6 +19,12 @@ import tacticshooter.Unit.UnitType;
 import com.phyloa.dlib.util.DFile;
 import com.phyloa.dlib.util.DMath;
 
+/**
+ * Handles all of the game logic, and runs the server
+ * 
+ * @author Daniel Winkler
+ *
+ */
 public class TacticServer 
 {
 	ServerInterface si;
@@ -62,8 +68,7 @@ public class TacticServer
 	{
 		Collections.shuffle( maps );
 		gs.setup( a, b );
-		//l = new Level( 100, 100 );
-		//LevelBuilder.buildLevelB( l, a, b );
+		
 		try
 		{
 			String mapFile = DFile.loadText( "mapList.txt" );
@@ -107,6 +112,8 @@ public class TacticServer
 			//Every 100 ticks
 			if( tick % 100 == 0 )
 			{
+				
+				//Count how many units and points for each team for postgame stats
 				int apoints = 0;
 				int bpoints = 0;
 				int aunits = 0;
@@ -139,7 +146,6 @@ public class TacticServer
 				gs.get( a ).unitCount.add( aunits );
 				gs.get( b ).pointCount.add( bpoints );
 				gs.get( b ).unitCount.add( bunits );
-				
 				gs.totalPoints = l.buildings.size();
 				
 				((ServerNetworkInterface)si).printDebug();
@@ -235,46 +241,51 @@ public class TacticServer
 				}
 			}
 			
-			//Every tick
-			for( Entry<Integer, Player> e : players.entrySet() )
+			//Every 10 ticks test to see if player has no units. If the player has no units and it's been a little while, give them a unit.
+			if( tick % 10 == 0 )
 			{
-				Player p = e.getValue();
-				boolean contains = false;
-				for( Unit u : units )
+				for( Entry<Integer, Player> e : players.entrySet() )
 				{
-					if( u.owner.id == p.id )
+					Player p = e.getValue();
+					boolean contains = false;
+					for( Unit u : units )
 					{
-						contains = true;
-						break;
-					}
-				}
-				if( !contains )
-				{
-					if( p.respawn > 0 )
-					{
-						p.respawn--;
-					}
-					else
-					{
-						p.respawn = Player.MAX_RESPAWN;
-						Building base = null;
-						for( Building bu : l.buildings )
+						if( u.owner.id == p.id )
 						{
-							if( bu.bt == BuildingType.CENTER && bu.t.id == p.team.id )
-							{
-								base = bu;
-							}
+							contains = true;
+							break;
 						}
-						if( base != null )
+					}
+					if( !contains )
+					{
+						if( p.respawn > 0 )
 						{
-							Unit u = new Unit( base.x, base.y, p );
-							units.add( u );
-							si.sendToAllClients( new Message( MessageType.UNITUPDATE, u ) );
-							gs.get( u.owner.team ).unitsCreated++;
+							p.respawn--;
+						}
+						else
+						{
+							p.respawn = Player.MAX_RESPAWN;
+							Building base = null;
+							for( Building bu : l.buildings )
+							{
+								if( bu.bt == BuildingType.CENTER && bu.t.id == p.team.id )
+								{
+									base = bu;
+								}
+							}
+							if( base != null )
+							{
+								Unit u = new Unit( base.x, base.y, p );
+								units.add( u );
+								si.sendToAllClients( new Message( MessageType.UNITUPDATE, u ) );
+								gs.get( u.owner.team ).unitsCreated++;
+							}
 						}
 					}
 				}
 			}
+			
+			//Every tick
 			for( int i = 0; i < l.buildings.size(); i++ )
 			{
 				Building b = l.buildings.get( i );

@@ -109,19 +109,19 @@ public class Level implements TileBasedMap
 					g.setColor( Color.gray );
 					g.fillRect( x*tileSize, y*tileSize, tileSize, tileSize ); 
 					g.setColor( Color.black );
-					if( getTile( x-1, y ) != TileType.WALL )
+					if( !getTile( x-1, y ).isWall )
 					{
 						g.drawLine( x*tileSize, y*tileSize, x*tileSize, y*tileSize+tileSize );
 					}
-					if( getTile( x+1, y ) != TileType.WALL )
+					if( !getTile( x+1, y ).isWall )
 					{
 						g.drawLine( x*tileSize+tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize );
 					}
-					if( getTile( x, y-1 ) != TileType.WALL )
+					if( !getTile( x, y-1 ).isWall )
 					{
 						g.drawLine( x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize );
 					}
-					if( getTile( x, y+1 ) != TileType.WALL )
+					if( !getTile( x, y+1 ).isWall )
 					{
 						g.drawLine( x*tileSize, y*tileSize+tileSize, x*tileSize+tileSize, y*tileSize+tileSize );
 					}
@@ -424,28 +424,32 @@ public class Level implements TileBasedMap
 	
 	public enum TileType
 	{
-		FLOOR,
-		WALL( false ),
-		LIGHT,
-		TRIANGLENW,
-		TRIANGLESW,
-		TRIANGLENE,
-		TRIANGLESE,
-		PASSOPEN,
-		PASSCLOSED( false ),
-		GATEOPEN,
-		GATECLOSED( false );
+		FLOOR( true, true, false ),
+		WALL( false, false, true ),
+		LIGHT( true, true, false ),
+		TRIANGLENW( true, true, true ),
+		TRIANGLESW( true, true, true ),
+		TRIANGLENE( true, true, true ),
+		TRIANGLESE( true, true, true ),
+		PASSOPEN( true, true, false ),
+		PASSCLOSED( false, false, false ),
+		GATEOPEN( true, true, false ),
+		GATECLOSED( false, false, false );
 		
 		public boolean passable;
+		public boolean isWall;
+		public boolean shootable;
 		
 		TileType()
 		{
-			passable = true;
+			
 		}
 		
-		TileType( boolean passable )
+		TileType( boolean passable, boolean shootable, boolean isWall )
 		{
 			this.passable = passable;
+			this.isWall = isWall;
+			this.shootable = shootable;
 		}
 	}
 	

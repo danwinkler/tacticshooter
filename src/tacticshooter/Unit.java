@@ -1,6 +1,5 @@
 package tacticshooter;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -13,10 +12,10 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.util.pathfinding.Path;
 import com.phyloa.dlib.util.DMath;
 
-public class Unit implements Serializable
+public class Unit
 {
 	public static int radius = 10;
-	public static final int UPDATE_TIME = 3;
+	public static final int UPDATE_TIME = 5;
 	
 	public int id = new Random().nextInt();
 	
@@ -29,7 +28,7 @@ public class Unit implements Serializable
 	public boolean alive = true;
 	
 	public UnitType type = UnitType.LIGHT;
-	public UnitState state = UnitState.MOVING;
+	public UnitState state = UnitState.STOPPED;
 	public UnitState lastState = state;
 	public float turnToAngle;
 	
@@ -317,7 +316,7 @@ public class Unit implements Serializable
 		if( stoppedAt != null )
 		{
 			state = UnitState.TURNTO;
-			turnToAngle = (float) Math.atan2( -bullet.dy, -bullet.dx );
+			turnToAngle = (float) Math.atan2( -bullet.dir.y, -bullet.dir.x );
 			for( int i = 0; i < ts.units.size(); i++ )
 			{
 				Unit u = ts.units.get( i );

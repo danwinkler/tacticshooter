@@ -264,23 +264,23 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 					TileType left = l.getTile( x-1, y );
 					TileType right = l.getTile( x+1, y );
 					
-					if( (up == TileType.WALL && down == TileType.WALL && left == TileType.WALL && right == TileType.WALL) )
+					if( (up.isWall && down.isWall && left.isWall && right.isWall) )
 					{
 						tile = TileType.WALL;
 					}
-					else if( up == TileType.WALL && down == TileType.FLOOR && left == TileType.FLOOR && right == TileType.WALL )
+					else if( up.isWall && !down.isWall && !left.isWall && right.isWall )
 					{
 						tile = TileType.TRIANGLENE;
 					}
-					else if( up == TileType.WALL && down == TileType.FLOOR && left == TileType.WALL && right == TileType.FLOOR )
+					else if( up.isWall && !down.isWall && left.isWall && !right.isWall )
 					{
 						tile = TileType.TRIANGLENW;
 					}
-					else if( up == TileType.FLOOR && down == TileType.WALL && left == TileType.FLOOR && right == TileType.WALL )
+					else if( !up.isWall && down.isWall && !left.isWall && right.isWall )
 					{
 						tile = TileType.TRIANGLESE;
 					}
-					else if( up == TileType.FLOOR && down == TileType.WALL && left == TileType.WALL && right == TileType.FLOOR )
+					else if( !up.isWall && down.isWall && left.isWall && !right.isWall )
 					{
 						tile = TileType.TRIANGLESW;
 					}
