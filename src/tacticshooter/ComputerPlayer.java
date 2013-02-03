@@ -40,12 +40,13 @@ public class ComputerPlayer implements Runnable
 	
 	Player[] players = new Player[0];
 	
+	PathFinder finder;
+	
 	//MASSER:
 	boolean attacking = false;
 	ArrayList<Unit> attackForce = new ArrayList<Unit>();
 	float attackPropensity = DMath.randomf( .8f, 2 );
 	Building enemyHome;
-	PathFinder finder;
 	Building closeb;
 	
 	public ComputerPlayer( ServerNetworkInterface si )
@@ -139,9 +140,9 @@ public class ComputerPlayer implements Runnable
 				
 			if( player != null && l != null )
 			{
+				finder = new AStarPathFinder( l, 500, true );
 				if( playType == PlayType.MASSER )
 				{
-					finder = new AStarPathFinder( l, 500, true );
 					//Find enemy home
 					Building enemyHome = null;
 					for( Building b : l.buildings )
@@ -267,7 +268,7 @@ public class ComputerPlayer implements Runnable
 							Building closeb = null;
 							for( Building b : l.buildings )
 							{
-								boolean wantToTake = b.isCapturable( l ) && (b.t == null || b.t.id != player.team.id);
+								boolean wantToTake = b.isCapturable( l, u, finder ) && (b.t == null || b.t.id != player.team.id);
 									
 								if( wantToTake )
 								{
@@ -302,10 +303,10 @@ public class ComputerPlayer implements Runnable
 								switch( playType )
 								{
 								case AGGRESSIVE:
-									wantToTake = (b.t == null || b.t.id != player.team.id) && b.isCapturable( l );
+									wantToTake = (b.t == null || b.t.id != player.team.id) && b.isCapturable( l, u, finder );
 									break;
 								case MODERATE:
-									wantToTake = b.isCapturable( l ) && (b.t == null || (b.t.id != player.team.id) || (b.t.id == player.team.id && b.hold < Building.HOLDMAX));
+									wantToTake = b.isCapturable( l, u, finder ) && (b.t == null || (b.t.id != player.team.id) || (b.t.id == player.team.id && b.hold < Building.HOLDMAX));
 									break;
 								}
 								if( wantToTake )

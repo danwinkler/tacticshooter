@@ -4,6 +4,8 @@ import java.util.Random;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.util.pathfinding.PathFinder;
+
 import com.phyloa.dlib.util.DMath;
 
 public class Building
@@ -298,5 +300,13 @@ public class Building
 	public boolean isCapturable( Level l )
 	{
 		return bt.bu.isCapturable( l, this );
+	}
+
+	public boolean isCapturable( Level l, Unit u, PathFinder finder )
+	{
+		boolean bcheck = isCapturable( l );
+		if( !bcheck ) return false;
+		
+		return finder.findPath( null, l.getTileX( u.x ), l.getTileY( u.y ), l.getTileX( this.x ), l.getTileY( this.y ) ) != null;
 	}
 }

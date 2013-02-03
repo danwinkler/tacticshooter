@@ -107,22 +107,22 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		if( dui == null )
 		{
 			dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
-			switchTeams = new DButton( "Switch Teams", 0, gc.getHeight()-100, 200, 100 );
 			buildLightUnit = new DButton( "Build Light Unit\n10", 200, gc.getHeight()-100, 200, 100 );
 			buildHeavyUnit = new DButton( "Build Heavy Unit\n20", 400, gc.getHeight()-100, 200, 100 );
 			buildShotgunUnit = new DButton( "Build Shotgun Unit\n15", 600, gc.getHeight()-100, 200, 100 );
 			
-			escapeMenu = new DPanel( gc.getWidth() / 2 - 100, gc.getHeight()/2 - 100, 200, 200 );
+			escapeMenu = new DPanel( gc.getWidth() / 2 - 100, gc.getHeight()/2 - 100, 200, 300 );
 			quit = new DButton( "Quit Game", 0, 0, 200, 100 );
 			escapeMenu.add( quit );
 			returnToGame = new DButton( "Return to Game", 0, 100, 200, 100 );
 			escapeMenu.add( returnToGame );
+			switchTeams = new DButton( "Switch Teams", 0, 200, 200, 100 );
+			escapeMenu.add( switchTeams );
 			escapeMenu.setVisible( false );
 			
 			chatBox = new DTextBox( gc.getWidth()/2-200, gc.getHeight()/2-50, 400, 100 );
 			chatBox.setVisible( false );
 			
-			dui.add( switchTeams );
 			dui.add( buildLightUnit );
 			dui.add( buildHeavyUnit );
 			dui.add( buildShotgunUnit );
@@ -304,6 +304,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			{
 				cs.units.remove( i );
 				cs.unitMap.remove( u );
+				cs.selected.remove( (Object)u.id );
 				(Math.random() > .5 ? cs.death1 : cs.death2).play( 1.f, cs.getSoundMag( gc, u.x, u.y ) );
 				for( int j = 0; j < 10; j++ )
 				{
@@ -478,7 +479,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			g.fillRect( gc.getWidth()/2 - 100, 0, 200, gc.getHeight()/2-100 );
 			
 			//bottom
-			g.fillRect( gc.getWidth()/2 - 100, gc.getHeight()/2 + 100, 200, gc.getHeight()/2-100 );
+			g.fillRect( gc.getWidth()/2 - 100, gc.getHeight()/2 + 200, 200, gc.getHeight()/2-100 );
 		}
 		
 		if( input.isKeyDown( Input.KEY_TAB ) && cs.players != null )
