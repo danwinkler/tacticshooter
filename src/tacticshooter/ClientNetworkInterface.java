@@ -15,7 +15,7 @@ public class ClientNetworkInterface implements ClientInterface
 	
 	public ClientNetworkInterface( String address ) throws IOException
 	{
-		client = new Client( 512000, 64000 );
+		client = new Client( 128000, 32000 );
 		KryoHelper.register( client.getKryo() );
 		client.start();
 		client.connect( 2500, address, 54555, 54777 );

@@ -181,23 +181,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		}
 	}
 	
-	public void updateUnit( UnitPacket up )
-	{
-		Unit tu = cs.unitMap.get( up.id );
-		if( tu == null )
-		{
-			Unit u = new Unit();
-			u.x = up.x;
-			u.y = up.y;
-			u.sync( up );
-			cs.unitMap.put( u.id, u );
-			cs.units.add( u );
-			cs.ping1.play( 1.f, cs.getSoundMag( gc, u.x, u.y ) );
-			tu = u;
-		}
-		tu.sync( up );
-	}
-	
 	public void update( GameContainer gc, int delta )
 	{
 		if( !running ) return;
@@ -211,14 +194,19 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			{
 			case UNITUPDATE:
 				UnitPacket up = (UnitPacket)m.message;
-				updateUnit( up );
-				break;
-			case MULTIUNITUPDATE:
-				ArrayList<UnitPacket> packets = (ArrayList<UnitPacket>)m.message;
-				for( UnitPacket ups : packets )
+				Unit tu = cs.unitMap.get( up.id );
+				if( tu == null )
 				{
-					updateUnit( ups );
+					Unit u = new Unit();
+					u.x = up.x;
+					u.y = up.y;
+					u.sync( up );
+					cs.unitMap.put( u.id, u );
+					cs.units.add( u );
+					cs.ping1.play( 1.f, cs.getSoundMag( gc, u.x, u.y ) );
+					tu = u;
 				}
+				tu.sync( up );
 				break;
 			case LEVELUPDATE:
 				if( cs.l == null && cs.player != null )

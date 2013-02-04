@@ -54,7 +54,7 @@ public class Bullet
 			return;
 		}
 		
-		for( Unit u : ts.getBin( loc.x-ts.binOffset, loc.y-ts.binOffset ).units )
+		for( Unit u : ts.getBin( loc.x, loc.y ).units )
 		{
 			if( u.owner.team.id != owner.team.id )
 			{
@@ -64,52 +64,7 @@ public class Bullet
 				{
 					u.hit( this, ts );
 					alive = false;
-					return;
-				}
-			}
-		}
-		
-		for( Unit u : ts.getBin( loc.x+ts.binOffset, loc.y-ts.binOffset ).units )
-		{
-			if( u.owner.team.id != owner.team.id )
-			{
-				p.x = u.x;
-				p.y = u.y;
-				if( DMath.pointToLineSegment( lastLoc, dir, p ).lengthSquared() < Unit.radius * Unit.radius )
-				{
-					u.hit( this, ts );
-					alive = false;
-					return;
-				}
-			}
-		}
-		
-		for( Unit u : ts.getBin( loc.x-ts.binOffset, loc.y+ts.binOffset ).units )
-		{
-			if( u.owner.team.id != owner.team.id )
-			{
-				p.x = u.x;
-				p.y = u.y;
-				if( DMath.pointToLineSegment( lastLoc, dir, p ).lengthSquared() < Unit.radius * Unit.radius )
-				{
-					u.hit( this, ts );
-					alive = false;
-					return;
-				}
-			}
-		}
-		
-		for( Unit u : ts.getBin( loc.x+ts.binOffset, loc.y+ts.binOffset ).units )
-		{
-			if( u.owner.team.id != owner.team.id )
-			{
-				p.x = u.x;
-				p.y = u.y;
-				if( DMath.pointToLineSegment( lastLoc, dir, p ).lengthSquared() < Unit.radius * Unit.radius )
-				{
-					u.hit( this, ts );
-					alive = false;
-					return;
+					break;
 				}
 			}
 		}

@@ -29,7 +29,7 @@ public class ServerNetworkInterface implements ServerInterface
 	
 	public ServerNetworkInterface()
 	{
-		server = new Server( 512000, 64000 );
+		server = new Server( 512000, 32000 );
 		KryoHelper.register( server.getKryo() );
 		server.start();
 		try {

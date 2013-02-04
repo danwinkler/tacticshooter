@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.Map.Entry;
 import java.util.TreeSet;
 
@@ -16,7 +15,6 @@ import org.newdawn.slick.util.pathfinding.AStarPathFinder;
 import org.newdawn.slick.util.pathfinding.PathFinder;
 
 import tacticshooter.Building.BuildingType;
-import tacticshooter.Unit.UnitPacket;
 import tacticshooter.Unit.UnitType;
 
 import com.phyloa.dlib.util.DFile;
@@ -63,7 +61,7 @@ public class TacticServer
 	int onMap = 0;
 	
 	int binSize = 5;
-	float binOffset = (binSize*Level.tileSize)/4;
+	float binOffset = (binSize*Level.tileSize)/2;
 	Bin[][] bins;
 	
 	public TacticServer( ServerInterface si )
@@ -461,13 +459,12 @@ public class TacticServer
 			}
 		}
 		
-		ArrayList<UnitPacket> toUpdate = new ArrayList<UnitPacket>();
 		for( int i = 0; i < units.size(); i++ )
 		{
 			Unit u = units.get( i );
 			if( u.update( this, d ) || !u.alive )
 			{
-				toUpdate.add( u.getPacket() );
+				si.sendToAllClients( new Message( MessageType.UNITUPDATE, u.getPacket() ) );
 			}
 			if( !u.alive )
 			{
@@ -476,7 +473,6 @@ public class TacticServer
 				i--;
 			}
 		}
-		si.sendToAllClients( new Message( MessageType.MULTIUNITUPDATE, toUpdate ) );
 		
 		for( int i = 0; i < bullets.size(); i++ )
 		{
@@ -573,7 +569,7 @@ public class TacticServer
 	
 	public class Bin
 	{
-		LinkedHashSet<Unit> units = new LinkedHashSet<Unit>();
+		TreeSet<Unit> units = new TreeSet<Unit>();
 		
 		public void add( Unit u )
 		{
