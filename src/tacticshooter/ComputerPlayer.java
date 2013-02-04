@@ -20,7 +20,6 @@ import com.phyloa.dlib.util.DMath;
 
 import tacticshooter.Building.BuildingType;
 import tacticshooter.Level.TileType;
-import tacticshooter.Unit.UnitPacket;
 import tacticshooter.Unit.UnitState;
 import tacticshooter.Unit.UnitType;
 
@@ -77,24 +76,20 @@ public class ComputerPlayer implements Runnable
 				switch( m.messageType )
 				{
 				case UNITUPDATE:
-					UnitPacket up = (UnitPacket)m.message;
-					Unit tu = unitMap.get( up.id );
+					Unit u = (Unit)m.message;
+					Unit tu = unitMap.get( u.id );
 					if( tu == null )
 					{
-						Unit u = new Unit();
-						u.sync( up );
 						unitMap.put( u.id, u );
 						units.add( u );
 						tu = u;
 					}
-					tu.x = up.x;
-					tu.y = up.y;
-					tu.sync( up );
+					tu.sync( u );
 					
-					if( !up.alive )
+					if( !u.alive )
 					{
-						units.remove( unitMap.get( up.id ) );
-						unitMap.remove( up.id );
+						units.remove( unitMap.get( u.id ) );
+						unitMap.remove( u.id );
 					}
 					break;
 				case LEVELUPDATE:
@@ -145,7 +140,7 @@ public class ComputerPlayer implements Runnable
 				
 			if( player != null && l != null )
 			{
-				finder = new AStarPathFinder( l, 500, StaticFiles.options.getB( "diagonalPath" ) );
+				finder = new AStarPathFinder( l, 500, true );
 				if( playType == PlayType.MASSER )
 				{
 					//Find enemy home

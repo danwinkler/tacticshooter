@@ -7,7 +7,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map.Entry;
-import java.util.TreeSet;
 
 import javax.vecmath.Point2i;
 
@@ -61,10 +60,6 @@ public class TacticServer
 	ArrayList<String> maps = new ArrayList<String>();
 	int onMap = 0;
 	
-	int binSize = 5;
-	float binOffset = (binSize*Level.tileSize)/4;
-	Bin[][] bins;
-	
 	public TacticServer( ServerInterface si )
 	{
 		this.si = si;
@@ -94,16 +89,7 @@ public class TacticServer
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		finder = new AStarPathFinder( l, 500, StaticFiles.options.getB( "diagonalPath" ) );
-		
-		bins = new Bin[l.width/binSize + 1][l.height/binSize + 1];
-		for( int y = 0; y < l.height/binSize; y++ )
-		{
-			for( int x = 0; x < l.width/binSize; x++ )
-			{
-				bins[x][y] = new Bin();
-			}
-		}
+		finder = new AStarPathFinder( l, 500, true );
 		
 		sl = new ServerLoop();
 		t = new Thread( sl );
@@ -119,7 +105,6 @@ public class TacticServer
 	
 	public void update()
 	{	
-		float d = (System.currentTimeMillis() - sl.lastTime) / 60.f;
 		if( sl.lastTime - lastTick > 100 )
 		{
 			lastTick += 100;
@@ -293,7 +278,7 @@ public class TacticServer
 							{
 								Unit u = new Unit( base.x, base.y, p );
 								units.add( u );
-								si.sendToAllClients( new Message( MessageType.UNITUPDATE, u.getPacket() ) );
+								si.sendToAllClients( new Message( MessageType.UNITUPDATE, u ) );
 								gs.get( u.owner.team ).unitsCreated++;
 							}
 						}
@@ -336,7 +321,7 @@ public class TacticServer
 				si.sendToClient( m.sender, new Message( MessageType.LEVELUPDATE, l ) );
 				for( int i = 0; i < units.size(); i++ )
 				{
-					si.sendToClient( m.sender, new Message( MessageType.UNITUPDATE, units.get( i ).getPacket() ) );
+					si.sendToClient( m.sender, new Message( MessageType.UNITUPDATE, units.get( i ) ) );
 				}
 				si.sendToAllClients( new Message( MessageType.MESSAGE, player.name + " has joined the game." ) );
 				break;
@@ -396,7 +381,7 @@ public class TacticServer
 						Unit u = new Unit( base.x, base.y, player );
 						u.setType( type );
 						units.add( u );
-						si.sendToAllClients( new Message( MessageType.UNITUPDATE, u.getPacket() ) );
+						si.sendToAllClients( new Message( MessageType.UNITUPDATE, u ) );
 						gs.get( u.owner.team ).unitsCreated++;
 					}
 				}
@@ -445,7 +430,7 @@ public class TacticServer
 					Unit tu = units.get( i );
 					if( tu.id == u.id )
 					{
-						si.sendToClient( m.sender, new Message( MessageType.UNITUPDATE, tu.getPacket() ) );
+						si.sendToClient( m.sender, new Message( MessageType.UNITUPDATE, tu ) );
 						find = tu;
 						break;
 					}
@@ -454,7 +439,7 @@ public class TacticServer
 				{
 					u.alive = false;
 					u.health = 0;
-					si.sendToClient( m.sender, new Message( MessageType.UNITUPDATE, u.getPacket() ) );
+					si.sendToClient( m.sender, new Message( MessageType.UNITUPDATE, u ) );
 				}
 			}
 			}
@@ -463,9 +448,9 @@ public class TacticServer
 		for( int i = 0; i < units.size(); i++ )
 		{
 			Unit u = units.get( i );
-			if( u.update( this, d ) || !u.alive )
+			if( u.update( this ) || !u.alive )
 			{
-				si.sendToAllClients( new Message( MessageType.UNITUPDATE, u.getPacket() ) );
+				si.sendToAllClients( new Message( MessageType.UNITUPDATE, u ) );
 			}
 			if( !u.alive )
 			{
@@ -516,7 +501,7 @@ public class TacticServer
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		finder = new AStarPathFinder( l, 500, StaticFiles.options.getB( "diagonalPath" ) );
+		finder = new AStarPathFinder( l, 500, true );
 		for( int i = 0; i < botCount; i++ )
 		{
 			Thread ct = new Thread( new ComputerPlayer( (ServerNetworkInterface)si ) );
@@ -550,6 +535,7 @@ public class TacticServer
 			lastTime = System.currentTimeMillis();
 			while( running )
 			{
+				update();
 				long time = System.currentTimeMillis();
 				timeDiff = (lastTime + frameTime) - time;
 				if( timeDiff > 0 )
@@ -561,37 +547,10 @@ public class TacticServer
 						e.printStackTrace();
 					}
 				}
-				update();
 				lastTime = System.currentTimeMillis();
 			}
 			si.stop();
 		}	
-	}
-	
-	public class Bin
-	{
-		LinkedHashSet<Unit> units = new LinkedHashSet<Unit>();
-		
-		public void add( Unit u )
-		{
-			units.add( u );
-		}
-		
-		public void remove( Unit u )
-		{
-			units.remove( u );
-		}
-	}
-	
-	public Bin getBin( float x, float y )
-	{
-		int tx = l.getTileX( x );
-		int ty = l.getTileY( y );
-		if( tx < 0 || tx >= l.width || ty < 0 || ty >= l.height )
-		{
-			return null;
-		}
-		return bins[tx/binSize][ty/binSize];
 	}
 	
 	public static void main( String[] args )

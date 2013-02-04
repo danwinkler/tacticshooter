@@ -307,14 +307,6 @@ public class Building
 		boolean bcheck = isCapturable( l );
 		if( !bcheck ) return false;
 		
-		int utx = l.getTileX( u.x );
-		int uty = l.getTileY( u.y );
-		
-		int btx = l.getTileX( this.x );
-		int bty = l.getTileY( this.y );
-		
-		if( utx == btx && uty == bty ) return true;
-		
-		return finder.findPath( null, utx, uty, btx, bty ) != null;
+		return finder.findPath( null, l.getTileX( u.x ), l.getTileY( u.y ), l.getTileX( this.x ), l.getTileY( this.y ) ) != null;
 	}
 }

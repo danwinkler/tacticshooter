@@ -54,7 +54,7 @@ public class Bullet
 			return;
 		}
 		
-		for( Unit u : ts.getBin( loc.x, loc.y ).units )
+		for( Unit u : ts.units )
 		{
 			if( u.owner.team.id != owner.team.id )
 			{
