@@ -285,7 +285,7 @@ public class ComputerPlayer implements Runnable
 							if( closeb == null )
 							{
 								Building b = l.buildings.get( DMath.randomi( 0, DMath.randomi( 0, l.buildings.size() ) ) );
-								if( b.t == null || b.t.id != player.team.id && b.isCapturable( l ) )
+								if( b.isCapturable( l, u, finder ) && (b.t == null || b.t.id != player.team.id) )
 								{
 									ArrayList<Integer> selected = new ArrayList<Integer>();
 									selected.add( u.id );

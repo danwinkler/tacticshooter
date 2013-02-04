@@ -63,7 +63,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	float sx, sy, sx2, sy2;
 	boolean selecting = false;
 	
-	DButton switchTeams;
+	DButton buildScoutUnit;
 	DButton buildLightUnit;
 	DButton buildHeavyUnit;
 	DButton buildShotgunUnit;
@@ -71,6 +71,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	DPanel escapeMenu;
 	DButton quit;
 	DButton returnToGame;
+	DButton switchTeams;
 	
 	DTextBox chatBox;
 
@@ -92,12 +93,18 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	
 	boolean running = false;
 	
+	Image wallTexture;
 	Image bloodTexture;
 	Graphics btg;
+	
+	Image roofAutoTile;
+	Image floorAutoTile;
 	
 	ArrayList<String> messages = new ArrayList<String>();
 	
 	ShaderProgram shader;
+	
+	boolean mapChanged = true;
 	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
@@ -107,6 +114,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		if( dui == null )
 		{
 			dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
+			buildScoutUnit = new DButton( "Build Scout Unit\n3", 0, gc.getHeight()-100, 200, 100 );
 			buildLightUnit = new DButton( "Build Light Unit\n10", 200, gc.getHeight()-100, 200, 100 );
 			buildHeavyUnit = new DButton( "Build Heavy Unit\n20", 400, gc.getHeight()-100, 200, 100 );
 			buildShotgunUnit = new DButton( "Build Shotgun Unit\n15", 600, gc.getHeight()-100, 200, 100 );
@@ -123,6 +131,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			chatBox = new DTextBox( gc.getWidth()/2-200, gc.getHeight()/2-50, 400, 100 );
 			chatBox.setVisible( false );
 			
+			dui.add( buildScoutUnit );
 			dui.add( buildLightUnit );
 			dui.add( buildHeavyUnit );
 			dui.add( buildShotgunUnit );
@@ -165,6 +174,15 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		
+		try
+		{
+			roofAutoTile = new Image( "img" + File.separator + "roofautotile1.png" );
+			floorAutoTile = new Image( "img" + File.separator + "groundautotile1.png" );
+		} catch( SlickException ex )
+		{
+			System.err.println( "Could not load roofautotile1.png" );
 		}
 		
 		running = true;
@@ -262,6 +280,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				int ty = (Integer)arr[1];
 				TileType change = (TileType)arr[2];
 				cs.l.tiles[tx][ty] = change;
+				mapChanged = true;
 				break;
 			case GAMEOVER:
 				dsh.message( "postgame", m.message );
@@ -338,7 +357,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				miniMap = new Image( 200, 200 );
 				Graphics mg = miniMap.getGraphics();
 				mg.scale( xScale, yScale );
-				cs.l.render( mg );
+				cs.l.render( mg, roofAutoTile );
 				mg.flush();
 				
 			} catch( SlickException e )
@@ -364,11 +383,30 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			{
 				bloodTexture = new Image( cs.l.width * Level.tileSize, cs.l.height * Level.tileSize );
 				btg = bloodTexture.getGraphics();
+				cs.l.renderFloor( btg, floorAutoTile );
+				btg.flush();
 				btg.setColor( new Color( 255, 0, 0, 200 ) );
+				wallTexture = new Image( cs.l.width * Level.tileSize, cs.l.height * Level.tileSize );
 			} catch( SlickException e )
 			{
 				e.printStackTrace();
 			}
+		}
+		
+		if( mapChanged )
+		{
+			try
+			{	
+				Graphics wtg = wallTexture.getGraphics();
+				wtg.clear();
+				cs.l.render( wtg, roofAutoTile );
+				wtg.flush();
+			} catch( SlickException e )
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			mapChanged = false;
 		}
 		
 		g.setColor( Color.white );
@@ -378,9 +416,9 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		g.pushTransform();
 		g.translate( -cs.scrollx, -cs.scrolly );
 		
-		cs.l.renderBuildings( g );
 		g.drawImage( bloodTexture, 0, 0 );
-		cs.l.render( g );
+		cs.l.renderBuildings( g );
+		g.drawImage( wallTexture, 0, 0 );
 		
 		
 		g.setColor( this.waitingForMoveConfirmation ? Color.gray : Color.green );
@@ -516,6 +554,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		cs.resetState();
 		miniMap = null;
 		bloodTexture = null;
+		wallTexture = null;
+		mapChanged = true;
 		dui.setEnabled( false );
 		messages.clear();
 	}
@@ -791,7 +831,12 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			if( e == switchTeams )
 			{
 				ci.sendToServer( new Message( MessageType.SWITCHTEAMS, cs.player.team ) );
-			} else if( e == buildLightUnit )
+			}
+			else if( e == buildScoutUnit )
+			{
+				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.SCOUT ) );
+			} 
+			else if( e == buildLightUnit )
 			{
 				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.LIGHT ) );
 			} else if( e == buildHeavyUnit )

@@ -380,6 +380,7 @@ public class TacticServer
 					{
 						Unit u = new Unit( base.x, base.y, player );
 						u.setType( type );
+						u.stoppedAt = base;
 						units.add( u );
 						si.sendToAllClients( new Message( MessageType.UNITUPDATE, u ) );
 						gs.get( u.owner.team ).unitsCreated++;
@@ -535,7 +536,12 @@ public class TacticServer
 			lastTime = System.currentTimeMillis();
 			while( running )
 			{
+				try{
 				update();
+				} catch( Exception ex )
+				{
+					ex.printStackTrace();
+				}
 				long time = System.currentTimeMillis();
 				timeDiff = (lastTime + frameTime) - time;
 				if( timeDiff > 0 )

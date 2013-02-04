@@ -15,7 +15,7 @@ import com.phyloa.dlib.util.DMath;
 public class Unit
 {
 	public static int radius = 10;
-	public static final int UPDATE_TIME = 5;
+	public static final int UPDATE_TIME = 7;
 	
 	public int id = new Random().nextInt();
 	
@@ -104,16 +104,28 @@ public class Unit
 				{
 					onStep++;
 				}
-				else
+				else if( path.size() > onStep+1 )
 				{
-					float nx = s.x*l.tileSize + l.tileSize/2;
-					float ny = s.y*l.tileSize + l.tileSize/2;
-					
-					float tangle = (float) Math.atan2( ny - y, nx - x );
-					heading += DMath.turnTowards( heading, tangle ) * .2f;
-					x += Math.cos( heading ) * type.speed;
-					y += Math.sin( heading ) * type.speed;
+					Point2i s2 = path.get( onStep+1 );
+					if( s2.x == tilex && s2.y == tiley )
+					{
+						onStep += 2;
+					}
 				}
+				
+				float nx = s.x*l.tileSize + l.tileSize/2;
+				float ny = s.y*l.tileSize + l.tileSize/2;
+				
+				float dpx = nx-x;
+				float dpy = ny-y;
+				
+				float tangle = (float) Math.atan2( dpy, dpx );
+				heading += DMath.turnTowards( heading, tangle ) * .2f;
+				
+				float dx = (float)(Math.cos( heading ) * type.speed);
+				float dy = (float)(Math.sin( heading ) * type.speed);
+				if( l.getTile( x+dx, y ).passable ) x += dx;
+				if( l.getTile( x, y+dy ).passable ) y += dy;
 			}
 			else
 			{
@@ -187,8 +199,8 @@ public class Unit
 		//Predictive Movement
 		if( state == UnitState.MOVING )
 		{
-			x += DMath.cosf( heading ) * type.speed * d;
-			y += DMath.sinf( heading ) * type.speed * d;
+			sx += DMath.cosf( heading ) * type.speed * d;
+			sy += DMath.sinf( heading ) * type.speed * d;
 		}
 		
 		//Movement Smoothing
@@ -350,7 +362,8 @@ public class Unit
 	{
 		LIGHT( 3, 10, .05f, 10, 100, 1 ),
 		HEAVY( 1.5f, 3, .1f, 20, 200, 1  ),
-		SHOTGUN( 3.0f, 30, .3f, 15, 150, 5 );
+		SHOTGUN( 3.0f, 30, .3f, 15, 150, 5 ),
+		SCOUT( 6f, 30, .1f, 3, 30, 1 );
 		
 		float speed;
 		int timeBetweenBullets;

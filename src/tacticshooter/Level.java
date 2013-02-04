@@ -8,12 +8,9 @@ import javax.vecmath.Vector2f;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
 import org.newdawn.slick.geom.Polygon;
-import org.newdawn.slick.geom.Shape;
-import org.newdawn.slick.util.pathfinding.AStarPathFinder;
 import org.newdawn.slick.util.pathfinding.Mover;
-import org.newdawn.slick.util.pathfinding.Path;
-import org.newdawn.slick.util.pathfinding.PathFinder;
 import org.newdawn.slick.util.pathfinding.PathFindingContext;
 import org.newdawn.slick.util.pathfinding.TileBasedMap;
 
@@ -74,7 +71,21 @@ public class Level implements TileBasedMap
 		}
 	}
 	
-	public void render( Graphics g )
+	public void renderFloor( Graphics g, Image floorImage )
+	{
+		for( int y = 0; y < height; y++ )
+		{
+			for( int x = 0; x < width; x++ )
+			{
+				if( tiles[x][y] != TileType.WALL )
+				{
+					drawAutoTile( g, x, y, TileType.FLOOR, floorImage );
+				}
+			}
+		}
+	}
+	
+	public void render( Graphics g,Image roofImage )
 	{
 		g.setLineWidth( 1 );
 		//draw walls
@@ -105,7 +116,9 @@ public class Level implements TileBasedMap
 					g.setColor( Color.gray );
 					g.fillRect( x*tileSize + tileSize/4, y*tileSize + tileSize/4, tileSize/2, tileSize/2 );
 					break;
-				case WALL: 
+				case WALL:
+					drawAutoTile( g, x, y, tiles[x][y], roofImage );
+					/*
 					g.setColor( Color.gray );
 					g.fillRect( x*tileSize, y*tileSize, tileSize, tileSize ); 
 					g.setColor( Color.black );
@@ -137,6 +150,7 @@ public class Level implements TileBasedMap
 						g.setColor( Color.darkGray );
 						g.drawLine( x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize );
 					}
+					*/
 					break;
 				case TRIANGLENE:
 					g.setColor( Color.gray );
@@ -206,6 +220,24 @@ public class Level implements TileBasedMap
 			}
 		}
 		g.setLineWidth( 1 );
+	}
+	
+	public void drawAutoTile( Graphics g, int x, int y, TileType autoTile, Image tileImage )
+	{
+		g.pushTransform();
+		g.translate( x*tileSize, y*tileSize );
+		g.scale( tileSize/32f, tileSize/32f );
+		AutoTileDrawer.draw( g, tileImage, 32, 0, 	
+													getTile( x-1, y-1 ) == autoTile, 
+													getTile( x, y-1 ) == autoTile, 
+													getTile( x+1, y-1 ) == autoTile, 
+													getTile( x-1, y ) == autoTile, 
+													getTile( x+1, y ) == autoTile, 
+													getTile( x-1, y+1 ) == autoTile, 
+													getTile( x, y+1 ) == autoTile, 
+													getTile( x+1, y+1 ) == autoTile 
+							);
+		g.popTransform();
 	}
 	
 	public void renderBuildings( Graphics g )
