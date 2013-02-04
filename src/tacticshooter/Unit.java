@@ -18,7 +18,7 @@ import com.phyloa.dlib.util.DMath;
 public class Unit
 {
 	public static int radius = 10;
-	public static final int UPDATE_TIME = 15;
+	public static final int UPDATE_TIME = 7;
 	
 	public int id = new Random().nextInt();
 	
@@ -238,8 +238,8 @@ public class Unit
 					
 					float tangle = (float) Math.atan2( ny - y, nx - x );
 					heading += DMath.turnTowards( heading, tangle ) * .2f;
-					sx += Math.cos( heading ) * type.speed * d/2;
-					sy += Math.sin( heading ) * type.speed * d/2;
+					sx += Math.cos( heading ) * type.speed * d;
+					sy += Math.sin( heading ) * type.speed * d;
 				}
 			}
 			break;
@@ -252,8 +252,8 @@ public class Unit
 		//Movement Smoothing
 		float dsx = sx - x;
 		float dsy = sy - y;
-		x += dsx * .2f * d;
-		y += dsy * .2f * d;
+		x += dsx * .5f * d;
+		y += dsy * .5f * d;
 		
 		if( health <= 0 )
 		{

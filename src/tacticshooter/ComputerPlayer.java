@@ -56,6 +56,28 @@ public class ComputerPlayer implements Runnable
 		ci = si;
 	}
 	
+	public void updateUnit( UnitPacket up )
+	{
+		Unit tu = unitMap.get( up.id );
+		if( tu == null )
+		{
+			Unit u = new Unit();
+			u.sync( up );
+			unitMap.put( u.id, u );
+			units.add( u );
+			tu = u;
+		}
+		tu.x = up.x;
+		tu.y = up.y;
+		tu.sync( up );
+		
+		if( !up.alive )
+		{
+			units.remove( unitMap.get( up.id ) );
+			unitMap.remove( up.id );
+		}
+	}
+	
 	public void run() 
 	{
 		String name = "DUDE";
@@ -78,23 +100,13 @@ public class ComputerPlayer implements Runnable
 				{
 				case UNITUPDATE:
 					UnitPacket up = (UnitPacket)m.message;
-					Unit tu = unitMap.get( up.id );
-					if( tu == null )
+					updateUnit( up );
+					break;
+				case MULTIUNITUPDATE:
+					ArrayList<UnitPacket> packets = (ArrayList<UnitPacket>)m.message;
+					for( UnitPacket ups : packets )
 					{
-						Unit u = new Unit();
-						u.sync( up );
-						unitMap.put( u.id, u );
-						units.add( u );
-						tu = u;
-					}
-					tu.x = up.x;
-					tu.y = up.y;
-					tu.sync( up );
-					
-					if( !up.alive )
-					{
-						units.remove( unitMap.get( up.id ) );
-						unitMap.remove( up.id );
+						updateUnit( ups );
 					}
 					break;
 				case LEVELUPDATE:
