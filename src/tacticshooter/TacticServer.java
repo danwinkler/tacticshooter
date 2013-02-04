@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map.Entry;
 import java.util.TreeSet;
 
@@ -61,7 +62,7 @@ public class TacticServer
 	int onMap = 0;
 	
 	int binSize = 5;
-	float binOffset = (binSize*Level.tileSize)/2;
+	float binOffset = (binSize*Level.tileSize)/4;
 	Bin[][] bins;
 	
 	public TacticServer( ServerInterface si )
@@ -569,7 +570,7 @@ public class TacticServer
 	
 	public class Bin
 	{
-		TreeSet<Unit> units = new TreeSet<Unit>();
+		LinkedHashSet<Unit> units = new LinkedHashSet<Unit>();
 		
 		public void add( Unit u )
 		{
