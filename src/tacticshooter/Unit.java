@@ -19,7 +19,7 @@ public class Unit
 	
 	public int id = new Random().nextInt();
 	
-	public float sx, sy;
+	public float sx, sy, sheading;
 	
 	public float x;
 	public float y; 
@@ -199,8 +199,8 @@ public class Unit
 		//Predictive Movement
 		if( state == UnitState.MOVING )
 		{
-			sx += DMath.cosf( heading ) * type.speed * d;
-			sy += DMath.sinf( heading ) * type.speed * d;
+			sx += DMath.cosf( sheading ) * type.speed * d * 2;
+			sy += DMath.sinf( sheading ) * type.speed * d * 2;
 		}
 		
 		//Movement Smoothing
@@ -208,6 +208,8 @@ public class Unit
 		float dsy = sy - y;
 		x += dsx * .2f * d;
 		y += dsy * .2f * d;
+		
+		heading += DMath.turnTowards( heading, sheading ) * .1f;
 		
 		if( health <= 0 )
 		{
@@ -249,33 +251,71 @@ public class Unit
 			g.drawRect( -10, -10, 20, 20 );
 		}
 		
-		if( owner.id == p.id )
-		{
-			g.setColor( Color.white );
-			g.fillOval( -7, -7, 14, 14 );
-			g.setColor( Color.black );
-			g.drawOval( -7, -7, 14, 14 );
-		}
-		
 		g.pushTransform();
 		
 		g.rotate( 0, 0, heading / DMath.PI2F * 360 );
-		
 		Color color = this.owner.team.getColor();
 		
-		g.setColor( color );
-		g.fillOval( -5, -5, 10, 10 );
-		g.setColor( Color.black );
-		g.drawOval( -5, -5, 10, 10 );
-		g.drawLine( 0, 0, 5, 0 );
+		int healthBarDist = 0;
+		
+		switch( type )
+		{
+		case SCOUT:
+		case SHOTGUN:
+		case LIGHT:
+			if( owner.id == p.id )
+			{
+				g.setColor( Color.white );
+				g.fillOval( -7, -7, 14, 14 );
+				g.setColor( Color.black );
+				g.drawOval( -7, -7, 14, 14 );
+			}
+			
+			g.setColor( color );
+			g.fillOval( -5, -5, 10, 10 );
+			g.setColor( Color.black );
+			g.drawOval( -5, -5, 10, 10 );
+			g.drawLine( 0, 0, 5, 0 );
+			
+			healthBarDist = -9;
+			break;
+		case HEAVY:
+			if( owner.id == p.id )
+			{
+				g.setColor( Color.black );
+				g.fillOval( -9, -9, 18, 18 );
+				g.fillOval( -6, -13, 12, 12 );
+				g.fillOval( -6, 1, 12, 12 );
+				g.setColor( Color.white );
+				g.fillOval( -8, -8, 16, 16 );
+				g.fillOval( -5, -12, 10, 10 );
+				g.fillOval( -5, 2, 10, 10 );
+			}
+			g.setColor( Color.black );
+			g.fillOval( -7, -7, 14, 14 );
+			g.fillOval( -4, -10, 8, 8 );
+			g.fillOval( -4, 2, 8, 8 );
+			g.setColor( color );
+			g.fillOval( -6, -6, 12, 12 );
+			g.fillOval( -3, -9, 6, 6 );
+			g.fillOval( -3, 3, 6, 6 );
+			
+			g.setColor( Color.black );
+			g.drawLine( 0, 0, 6, 0 );
+			
+			healthBarDist = -14;
+			break;
+			
+		}
+		
 		
 		g.popTransform();
 		
 		g.setColor( Color.black );
-		g.fillRect( -9, -9, (int)(18.f * health/type.health), 4 );
+		g.fillRect( -9, healthBarDist, (int)(18.f * health/type.health), 4 );
 		
 		g.setColor( new Color( DMath.bound( 1.f - health/type.health, 0, 1 ), DMath.bound(health/type.health, 0, 1 ), 0 ) );
-		g.fillRect( -8, -8, (int)(16.f * health/type.health), 2 );
+		g.fillRect( -8, healthBarDist+1, (int)(16.f * health/type.health), 2 );
 		
 		float dmx = x - mx;
 		float dmy = y - my;
@@ -317,7 +357,7 @@ public class Unit
 		this.desty = u.desty;
 		this.path = u.path;
 		this.alive = u.alive;
-		this.heading = u.heading;
+		this.sheading = u.heading;
 		this.health = u.health;
 		this.type = u.type;
 		this.state = u.state;
@@ -373,7 +413,7 @@ public class Unit
 	{
 		LIGHT( 3, 10, .05f, 10, 100, 1 ),
 		HEAVY( 1.5f, 3, .1f, 20, 200, 1  ),
-		SHOTGUN( 3.0f, 30, .3f, 15, 150, 5 ),
+		SHOTGUN( 3.0f, 30, .3f, 15, 150, 6 ),
 		SCOUT( 6f, 30, .1f, 3, 30, 1 );
 		
 		float speed;

@@ -433,8 +433,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		
 		g.drawImage( bloodTexture, 0, 0 );
 		cs.l.renderBuildings( g );
-		g.drawImage( wallTexture, 0, 0 );
-		
 		
 		g.setColor( this.waitingForMoveConfirmation ? Color.gray : Color.green );
 		g.drawRect( mx * Level.tileSize, my * Level.tileSize, Level.tileSize, Level.tileSize );
@@ -444,6 +442,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			Unit u = cs.units.get( i );
 			u.render( g, cs.player, input.getMouseX() + cs.scrollx, input.getMouseY() + cs.scrolly, cs.l );
 		}
+		
+		g.drawImage( wallTexture, 0, 0 );
 		
 		g.setColor( Color.black );
 		

@@ -136,6 +136,8 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 		}
 		dui.setEnabled( true );
 		
+		l.loadTextures();
+		
 		try
 		{
 			levelTexture = new Image( l.width * Level.tileSize, l.height * Level.tileSize );
