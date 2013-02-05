@@ -10,6 +10,7 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.opengl.shader.ShaderProgram;
 
 import tacticshooter.AutoTileDrawer;
 import tacticshooter.Level;
@@ -45,7 +46,9 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 	Slick2DRenderer r = new Slick2DRenderer();
 	
 	String ip;
-
+	
+	Image title;
+	
 	public void onActivate( GameContainer e, DScreenHandler<GameContainer, Graphics> dsh )
 	{
 		if( dui == null )
@@ -72,6 +75,15 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 		StaticFiles.loopWhenReady( "menu" );
 		
 		dui.setEnabled( true );
+		
+		try
+		{
+			title = new Image( "img" + File.separator + "title.png" );
+		} catch( SlickException e1 )
+		{
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 	
 	public void update( GameContainer gc, int delta )
@@ -87,6 +99,8 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 			g.setColor( Color.white );
 			g.drawString( "Server Address: " + ip, 200, 15 );
 		}
+		
+		g.drawImage( title, gc.getWidth()/2 - title.getWidth()/2, 150, new Color( 0, 0, 0, 128 ) );
 	}
 
 	public void onExit()

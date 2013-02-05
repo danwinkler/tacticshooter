@@ -219,6 +219,27 @@ public class Unit
 	
 	public void render( Graphics g, Player p, float mx, float my, Level l )
 	{
+		if( selected && state == UnitState.MOVING )
+		{
+			g.setColor( Color.black );
+			g.setLineWidth( 3 );
+			for( int i = Math.max( onStep-2, 0 ); i < path.size()-1; i++ )
+			{
+				Point2i p1 = path.get( i );
+				Point2i p2 = path.get( i+1 );
+				g.drawLine( (p1.x+.5f) * Level.tileSize, (p1.y+.5f) * Level.tileSize, (p2.x+.5f) * Level.tileSize, (p2.y+.5f) * Level.tileSize );
+			}
+			
+			g.setColor( Color.lightGray );
+			g.setLineWidth( 1 );
+			for( int i = Math.max( onStep-2, 0 ); i < path.size()-1; i++ )
+			{
+				Point2i p1 = path.get( i );
+				Point2i p2 = path.get( i+1 );
+				g.drawLine( (p1.x+.5f) * Level.tileSize, (p1.y+.5f) * Level.tileSize, (p2.x+.5f) * Level.tileSize, (p2.y+.5f) * Level.tileSize );
+			}
+		}
+		
 		g.pushTransform();
 		g.translate( x, y );
 		
@@ -266,17 +287,6 @@ public class Unit
 		}
 		
 		g.popTransform();
-		
-		if( selected )
-		{
-			g.setColor( Color.lightGray );
-			for( int i = 0; i < path.size()-1; i++ )
-			{
-				Point2i p1 = path.get( i );
-				Point2i p2 = path.get( i+1 );
-				g.drawLine( (p1.x+.5f) * Level.tileSize, (p1.y+.5f) * Level.tileSize, (p2.x+.5f) * Level.tileSize, (p2.y+.5f) * Level.tileSize );
-			}
-		}
 	}
 	
 	public void pathTo( int tx, int ty, TacticServer ts )
@@ -311,6 +321,7 @@ public class Unit
 		this.health = u.health;
 		this.type = u.type;
 		this.state = u.state;
+		this.onStep = u.onStep;
 		timeSinceUpdate = 0;
 	}
 
