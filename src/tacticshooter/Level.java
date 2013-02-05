@@ -1,5 +1,6 @@
 package tacticshooter;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import javax.vecmath.Point2f;
@@ -9,6 +10,7 @@ import javax.vecmath.Vector2f;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
+import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Polygon;
 import org.newdawn.slick.util.pathfinding.Mover;
 import org.newdawn.slick.util.pathfinding.PathFindingContext;
@@ -17,6 +19,7 @@ import org.newdawn.slick.util.pathfinding.TileBasedMap;
 import tacticshooter.Unit.UnitState;
 
 import com.phyloa.dlib.util.DMath;
+import com.phyloa.dlib.util.DOptions;
 
 public class Level implements TileBasedMap
 {
@@ -31,6 +34,11 @@ public class Level implements TileBasedMap
 	public int height;
 	
 	boolean randomFinding = true;
+	
+	String theme;
+	
+	Image floor;
+	public Image wall;
 	
 	public float[][] lightMap;
 	
@@ -71,24 +79,45 @@ public class Level implements TileBasedMap
 		}
 	}
 	
-	public void renderFloor( Graphics g, Image floorImage )
+	public void renderFloor( Graphics g )
 	{
+		if( floor == null )
+		{
+			try
+			{
+				floor = new Image( "img" + File.separator + new DOptions( "themes" + File.separator + theme ).getS( "floor" ) );
+			} catch( SlickException e )
+			{
+				e.printStackTrace();
+			}
+		}
 		for( int y = 0; y < height; y++ )
 		{
 			for( int x = 0; x < width; x++ )
 			{
 				if( tiles[x][y] != TileType.WALL )
 				{
-					drawAutoTile( g, x, y, TileType.FLOOR, floorImage );
+					drawAutoTile( g, x, y, TileType.FLOOR, floor );
 				}
 			}
 		}
 	}
 	
-	public void render( Graphics g,Image roofImage )
+	public void render( Graphics g )
 	{
 		g.setLineWidth( 1 );
 		//draw walls
+		
+		if( floor == null )
+		{
+			try
+			{
+				wall = new Image( "img" + File.separator + new DOptions( "themes" + File.separator + theme ).getS( "wall" ) );
+			} catch( SlickException e )
+			{
+				e.printStackTrace();
+			}
+		}
 		
 		for( int y = 0; y < height; y++ )
 		{
@@ -117,7 +146,7 @@ public class Level implements TileBasedMap
 					g.fillRect( x*tileSize + tileSize/4, y*tileSize + tileSize/4, tileSize/2, tileSize/2 );
 					break;
 				case WALL:
-					drawAutoTile( g, x, y, tiles[x][y], roofImage );
+					drawAutoTile( g, x, y, tiles[x][y], wall );
 					/*
 					g.setColor( Color.gray );
 					g.fillRect( x*tileSize, y*tileSize, tileSize, tileSize ); 
@@ -226,18 +255,23 @@ public class Level implements TileBasedMap
 	{
 		g.pushTransform();
 		g.translate( x*tileSize, y*tileSize );
-		g.scale( tileSize/32f, tileSize/32f );
-		AutoTileDrawer.draw( g, tileImage, 32, 0, 	
-													getTile( x-1, y-1 ) == autoTile, 
-													getTile( x, y-1 ) == autoTile, 
-													getTile( x+1, y-1 ) == autoTile, 
-													getTile( x-1, y ) == autoTile, 
-													getTile( x+1, y ) == autoTile, 
-													getTile( x-1, y+1 ) == autoTile, 
-													getTile( x, y+1 ) == autoTile, 
-													getTile( x+1, y+1 ) == autoTile 
+		//g.scale( tileSize/32f, tileSize/32f );
+		AutoTileDrawer.draw( g, tileImage, tileSize, 0, 	
+													getTileR( x-1, y-1 ) == autoTile, 
+													getTileR( x, y-1 ) == autoTile, 
+													getTileR( x+1, y-1 ) == autoTile, 
+													getTileR( x-1, y ) == autoTile, 
+													getTileR( x+1, y ) == autoTile, 
+													getTileR( x-1, y+1 ) == autoTile, 
+													getTileR( x, y+1 ) == autoTile, 
+													getTileR( x+1, y+1 ) == autoTile 
 							);
 		g.popTransform();
+	}
+	
+	public TileType getTileR( int x, int y )
+	{
+		return getTile( x, y ) == TileType.WALL ? TileType.WALL : TileType.FLOOR;
 	}
 	
 	public void renderBuildings( Graphics g )

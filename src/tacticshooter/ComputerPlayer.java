@@ -140,7 +140,7 @@ public class ComputerPlayer implements Runnable
 				
 			if( player != null && l != null )
 			{
-				finder = new AStarPathFinder( l, 500, true );
+				finder = new AStarPathFinder( l, 500, StaticFiles.options.getB( "diagonalMove" ) );
 				if( playType == PlayType.MASSER )
 				{
 					//Find enemy home

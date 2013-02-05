@@ -37,12 +37,22 @@ public class OptionsScreen extends DScreen<GameContainer, Graphics> implements D
 	Slick2DRenderer r = new Slick2DRenderer();
 	
 	ArrayList<DTextBox> boxes = new ArrayList<DTextBox>();
+
+	private String optionsFile;
+
+	private String screenToReturn;
+	
+	public OptionsScreen( String optionsFile, String screenToReturn )
+	{
+		this.optionsFile = optionsFile;
+		this.screenToReturn = screenToReturn;
+	}
 	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
 		dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
 		
-		DOptions options = new DOptions( "options.txt" );
+		DOptions options = new DOptions( optionsFile );
 		
 		scrollPane = new DScrollPane( gc.getWidth()/2-200, 50, 410, 500 );
 		
@@ -116,6 +126,7 @@ public class OptionsScreen extends DScreen<GameContainer, Graphics> implements D
 					e1.printStackTrace();
 				}
 				StaticFiles.options = new DOptions( "options.txt" );
+				StaticFiles.advOptions = new DOptions( "data" + File.separator + "advoptions.txt" );
 				
 				gc.setVSync( StaticFiles.options.getB( "vsync" ) );
 				dsh.activate( "settings", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );

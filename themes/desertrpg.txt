@@ -1,0 +1,2 @@
+wall desertrpgwall.png
+floor desertrpgfloor.png

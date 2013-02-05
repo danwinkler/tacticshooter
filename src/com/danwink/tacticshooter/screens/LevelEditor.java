@@ -68,8 +68,6 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 	MirrorType mirrorType = MirrorType.NONE;
 	int nextMirror = 1;
 	
-	Image roofAutoTile;
-	Image floorAutoTile;
 	Image levelTexture;
 	Graphics levelG;
 	
@@ -140,18 +138,9 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 		
 		try
 		{
-			roofAutoTile = new Image( "img" + File.separator + "roofautotile1.png" );
-			floorAutoTile = new Image( "img" + File.separator + "floorautotile1.png" );
-		} catch( SlickException ex )
-		{
-			System.err.println( "Could not load roofautotile1.png" );
-		}
-		
-		try
-		{
 			levelTexture = new Image( l.width * Level.tileSize, l.height * Level.tileSize );
 			levelG = levelTexture.getGraphics();
-			l.render( levelG, roofAutoTile );
+			l.render( levelG );
 			levelG.flush();
 		} catch( SlickException e )
 		{
@@ -386,7 +375,7 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 		
 		if( input.isKeyDown( Input.KEY_R ) )
 		{
-			l.render( levelG, roofAutoTile );
+			l.render( levelG );
 			levelG.flush();
 		}
 		
@@ -402,7 +391,7 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 		g.translate( -scrollx, -scrolly );
 		g.setColor( Color.gray );
 		g.drawRect( 0, 0, l.width*l.tileSize, l.height*l.tileSize );
-		l.render( g, roofAutoTile );
+		l.render( g  );
 		l.renderBuildings( g );
 		l.renderLinks( g );
 		

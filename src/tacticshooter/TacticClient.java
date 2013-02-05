@@ -1,13 +1,23 @@
 package tacticshooter;
 
+import java.awt.Font;
+import java.awt.FontFormatException;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 
+import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.TrueTypeFont;
+import org.newdawn.slick.UnicodeFont;
+import org.newdawn.slick.font.effects.ColorEffect;
+import org.newdawn.slick.font.effects.OutlineEffect;
+import org.newdawn.slick.font.effects.ShadowEffect;
 
 import com.danwink.tacticshooter.screens.HomeScreen;
 import com.danwink.tacticshooter.screens.LevelEditor;
@@ -27,6 +37,8 @@ import com.phyloa.dlib.util.DFile;
 public class TacticClient extends BasicGame
 {
 	DScreenHandler<GameContainer, Graphics> dsh = new DScreenHandler<GameContainer, Graphics>();
+	
+	TrueTypeFont f;
 	
 	public TacticClient()
 	{
@@ -48,18 +60,44 @@ public class TacticClient extends BasicGame
 		
 		dsh.register( "settings", new SettingsScreen() );
 		dsh.register( "selectMaps", new SelectMapScreen() );
-		dsh.register( "options", new OptionsScreen() );
+		dsh.register( "options", new OptionsScreen( "options.txt", "settings" ) );
+		dsh.register( "advoptions", new OptionsScreen( "data" + File.separator + "advoptions.txt", "settings" ) );
 		
 		dsh.activate( "home", gc );
+		
+		try
+		{
+			f = new TrueTypeFont( Font.createFont( Font.TRUETYPE_FONT, new File( "data" + File.separator + "pixelfont1.TTF" ) ).deriveFont( 16.f ), false );
+		} catch( FontFormatException e )
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch( IOException e )
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void update( GameContainer gc, int delta ) throws SlickException
 	{
 		dsh.update( gc, delta );
+		
+		if( !(dsh.get() instanceof MultiplayerGameScreen) )
+		{
+			StaticFiles.bgd.update( delta );
+		}
 	}
 
 	public void render( GameContainer gc, Graphics g ) throws SlickException 
 	{
+		g.setFont( f );
+		
+		if( !(dsh.get() instanceof MultiplayerGameScreen) )
+		{
+			StaticFiles.bgd.render( gc, g );
+		}
+		
 		dsh.render( gc, g );
 	}
 	

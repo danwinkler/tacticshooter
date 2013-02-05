@@ -1,14 +1,18 @@
 package com.danwink.tacticshooter.screens;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
 import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
 
+import tacticshooter.AutoTileDrawer;
+import tacticshooter.Level;
 import tacticshooter.ServerNetworkInterface;
 import tacticshooter.Slick2DEventMapper;
 import tacticshooter.Slick2DRenderer;
@@ -23,6 +27,9 @@ import com.phyloa.dlib.dui.DUIEvent;
 import com.phyloa.dlib.dui.DUIListener;
 import com.phyloa.dlib.renderer.DScreen;
 import com.phyloa.dlib.renderer.DScreenHandler;
+import com.phyloa.dlib.util.DMath;
+import com.phyloa.dlib.util.DOptions;
+import com.phyloa.dlib.util.ImprovedNoise;
 
 public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIListener
 {
@@ -38,7 +45,7 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 	Slick2DRenderer r = new Slick2DRenderer();
 	
 	String ip;
-	
+
 	public void onActivate( GameContainer e, DScreenHandler<GameContainer, Graphics> dsh )
 	{
 		if( dui == null )

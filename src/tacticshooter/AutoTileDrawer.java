@@ -9,13 +9,15 @@ public class AutoTileDrawer
 	private static Graphics gg;
 	private static Image imim;
 	private static int ht;
+	private static int it;
 	private static int f;
 	public static void draw( Graphics g, Image im, int tileSize, int frame, boolean nw, boolean n, boolean ne, boolean w, boolean e, boolean sw, boolean s, boolean se )
 	{
 		ht = tileSize/2;
+		it = im.getWidth()/6;
 		gg = g;
 		imim = im;
-		f = frame*tileSize*3;
+		f = frame*it*2*3;
 		
 		if( !n && !e && !w && !s )
 		{
@@ -174,21 +176,21 @@ public class AutoTileDrawer
 	
 	private static void tl( int x, int y )
 	{
-		gg.drawImage( imim, 0, 0, ht, ht, f+ht*x, ht*y, f+ht*(x+1), ht*(y+1) );
+		gg.drawImage( imim, 0, 0, ht, ht, f+it*x, it*y, f+it*(x+1), it*(y+1) );
 	}
 	
 	private static void tr( int x, int y )
 	{
-		gg.drawImage( imim, ht, 0, ht+ht, ht, f+ht*x, ht*y, f+ht*(x+1), ht*(y+1) );
+		gg.drawImage( imim, ht, 0, ht+ht, ht, f+it*x, it*y, f+it*(x+1), it*(y+1) );
 	}
 	
 	private static void bl( int x, int y )
 	{
-		gg.drawImage( imim, 0, ht, ht, ht+ht, f+ht*x, ht*y, f+ht*(x+1), ht*(y+1) );
+		gg.drawImage( imim, 0, ht, ht, ht+ht, f+it*x, it*y, f+it*(x+1), it*(y+1) );
 	}
 	
 	private static void br( int x, int y )
 	{
-		gg.drawImage( imim, ht, ht, ht+ht, ht+ht, f+ht*x, ht*y, f+ht*(x+1), ht*(y+1) );
+		gg.drawImage( imim, ht, ht, ht+ht, ht+ht, f+it*x, it*y, f+it*(x+1), it*(y+1) );
 	}
 }

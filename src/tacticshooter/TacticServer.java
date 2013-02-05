@@ -89,7 +89,7 @@ public class TacticServer
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		finder = new AStarPathFinder( l, 500, true );
+		finder = new AStarPathFinder( l, 500, StaticFiles.advOptions.getB( "diagonalMove" )  );
 		
 		sl = new ServerLoop();
 		t = new Thread( sl );
@@ -502,7 +502,7 @@ public class TacticServer
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		finder = new AStarPathFinder( l, 500, true );
+		finder = new AStarPathFinder( l, 500, StaticFiles.advOptions.getB( "diagonalMove" )  );
 		for( int i = 0; i < botCount; i++ )
 		{
 			Thread ct = new Thread( new ComputerPlayer( (ServerNetworkInterface)si ) );

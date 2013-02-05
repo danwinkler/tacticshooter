@@ -1,0 +1,2 @@
+menuTransitionSpeed .4
+diagonalMove false

@@ -22,6 +22,9 @@ public class StaticFiles
 	static HashMap<String, Sound> sound = new HashMap<String, Sound>(); 
 	
 	public static DOptions options = new DOptions( "options.txt" );
+	public static DOptions advOptions = new DOptions( "data" + File.separator + "advoptions.txt" );
+	
+	public static BackgroundDrawer bgd = new BackgroundDrawer();
 	
 	static boolean ready = false;
 	
@@ -122,21 +125,21 @@ public class StaticFiles
 	
 	public static DScreenTransition<GameContainer, Graphics> getDownMenuOut()
 	{
-		return new DScreenSlideTransition( -1, 0, StaticFiles.options.getF( "menuTransitionSpeed" ), false );
+		return new DScreenSlideTransition( -1, 0, StaticFiles.advOptions.getF( "menuTransitionSpeed" ), false );
 	}
 	
 	public static DScreenTransition<GameContainer, Graphics> getDownMenuIn()
 	{
-		return new DScreenSlideTransition( -1, 0, StaticFiles.options.getF( "menuTransitionSpeed" ), true );
+		return new DScreenSlideTransition( -1, 0, StaticFiles.advOptions.getF( "menuTransitionSpeed" ), true );
 	}
 	
 	public static DScreenTransition<GameContainer, Graphics> getUpMenuOut()
 	{
-		return new DScreenSlideTransition( 1, 0, StaticFiles.options.getF( "menuTransitionSpeed" ), false );
+		return new DScreenSlideTransition( 1, 0, StaticFiles.advOptions.getF( "menuTransitionSpeed" ), false );
 	}
 	
 	public static DScreenTransition<GameContainer, Graphics> getUpMenuIn()
 	{
-		return new DScreenSlideTransition( 1, 0, StaticFiles.options.getF( "menuTransitionSpeed" ), true );
+		return new DScreenSlideTransition( 1, 0, StaticFiles.advOptions.getF( "menuTransitionSpeed" ), true );
 	}
 }

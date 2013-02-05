@@ -29,6 +29,7 @@ import tacticshooter.ClientNetworkInterface;
 import tacticshooter.ClientState;
 import tacticshooter.Level;
 import tacticshooter.Level.TileType;
+import tacticshooter.AutoTileDrawer;
 import tacticshooter.Message;
 import tacticshooter.MessageType;
 import tacticshooter.MusicQueuer;
@@ -97,8 +98,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	Image bloodTexture;
 	Graphics btg;
 	
-	Image roofAutoTile;
-	Image floorAutoTile;
+	Image backgroundTexture;
 	
 	ArrayList<String> messages = new ArrayList<String>();
 	
@@ -174,15 +174,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		
-		try
-		{
-			roofAutoTile = new Image( "img" + File.separator + "roofautotile1.png" );
-			floorAutoTile = new Image( "img" + File.separator + "groundautotile1.png" );
-		} catch( SlickException ex )
-		{
-			System.err.println( "Could not load roofautotile1.png" );
 		}
 		
 		running = true;
@@ -357,7 +348,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				miniMap = new Image( 200, 200 );
 				Graphics mg = miniMap.getGraphics();
 				mg.scale( xScale, yScale );
-				cs.l.render( mg, roofAutoTile );
+				cs.l.renderFloor( mg );
+				cs.l.render( mg );
 				mg.flush();
 				
 			} catch( SlickException e )
@@ -383,10 +375,29 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			{
 				bloodTexture = new Image( cs.l.width * Level.tileSize, cs.l.height * Level.tileSize );
 				btg = bloodTexture.getGraphics();
-				cs.l.renderFloor( btg, floorAutoTile );
+				cs.l.renderFloor( btg );
 				btg.flush();
 				btg.setColor( new Color( 255, 0, 0, 200 ) );
 				wallTexture = new Image( cs.l.width * Level.tileSize, cs.l.height * Level.tileSize );
+				
+				Graphics wtg = wallTexture.getGraphics();
+				wtg.clear();
+				cs.l.render( wtg );
+				wtg.flush();
+				
+				backgroundTexture = new Image( gc.getWidth() + Level.tileSize*2, gc.getHeight() + Level.tileSize*2 );
+				Graphics bgg = backgroundTexture.getGraphics();
+				for( int y = 0; y < gc.getHeight() + Level.tileSize*2; y += Level.tileSize )
+				{
+					for( int x = 0; x < gc.getWidth() + Level.tileSize*2; x += Level.tileSize )
+					{	
+						bgg.pushTransform();
+						bgg.translate( x, y );
+						AutoTileDrawer.draw( bgg, cs.l.wall, Level.tileSize, 0, true, true, true, true, true, true, true, true );
+						bgg.popTransform();
+					}
+				}
+				
 			} catch( SlickException e )
 			{
 				e.printStackTrace();
@@ -399,7 +410,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			{	
 				Graphics wtg = wallTexture.getGraphics();
 				wtg.clear();
-				cs.l.render( wtg, roofAutoTile );
+				cs.l.render( wtg );
 				wtg.flush();
 			} catch( SlickException e )
 			{
@@ -409,8 +420,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			mapChanged = false;
 		}
 		
-		g.setColor( Color.white );
-		g.fillRect( 0, 0, gc.getWidth(), gc.getHeight() );
+		g.drawImage( backgroundTexture, -Level.tileSize-(cs.scrollx - ((int)(cs.scrollx/Level.tileSize))*Level.tileSize), -Level.tileSize-(cs.scrolly - ((int)(cs.scrolly/Level.tileSize)*Level.tileSize)) );
+		
 		g.setColor( Color.black );
 		
 		g.pushTransform();
