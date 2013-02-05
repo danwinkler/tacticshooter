@@ -22,6 +22,7 @@ public class SettingsScreen extends DScreen<GameContainer, Graphics> implements 
 	DButton toggleFullscreen;
 	DButton selectMaps;
 	DButton options;
+	DButton advOptions;
 	DButton back;
 	
 	Slick2DRenderer r = new Slick2DRenderer();
@@ -32,14 +33,16 @@ public class SettingsScreen extends DScreen<GameContainer, Graphics> implements 
 		{
 			dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
 			
-			toggleFullscreen = new DButton( "Toggle Fullscreen", gc.getWidth()/2-100, gc.getHeight()/2-100, 200, 100 );
-			selectMaps = new DButton( "Select Maps", gc.getWidth()/2-100, gc.getHeight()/2, 200, 100 );
-			options = new DButton( "Options", gc.getWidth()/2-100, gc.getHeight()/2+100, 200, 100 );
+			toggleFullscreen = new DButton( "Toggle Fullscreen", gc.getWidth()/2-100, gc.getHeight()/2-200, 200, 100 );
+			selectMaps = new DButton( "Select Maps", gc.getWidth()/2-100, gc.getHeight()/2-100, 200, 100 );
+			options = new DButton( "Options", gc.getWidth()/2-100, gc.getHeight()/2, 200, 100 );
+			advOptions = new DButton( "Advanced Options", gc.getWidth()/2-100, gc.getHeight()/2+100, 200, 100 );
 			back = new DButton( "Back", gc.getWidth()/2-100, gc.getHeight()/2+200, 200, 100 );
 			
 			dui.add( toggleFullscreen );
 			dui.add( selectMaps );
 			dui.add( options );
+			dui.add( advOptions );
 			dui.add( back );
 			
 			dui.addDUIListener( this );
@@ -104,6 +107,10 @@ public class SettingsScreen extends DScreen<GameContainer, Graphics> implements 
 			else if( e == options )
 			{
 				dsh.activate( "options", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
+			}
+			else if( e == advOptions )
+			{
+				dsh.activate( "advoptions", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
 			}
 			else if( e == back )
 			{

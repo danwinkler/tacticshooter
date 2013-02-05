@@ -65,7 +65,7 @@ public class BackgroundDrawer
 				Image here = getTile( x, y );
 				if( here == wall )
 				{
-					g.drawImage( floor, 0, 0, Level.tileSize, Level.tileSize, 32, 0, 64, 32 );
+					g.drawImage( floor, 0, 0, Level.tileSize, Level.tileSize, floor.getWidth()/3, 0, floor.getWidth()/3 * 2, floor.getHeight()/4 );
 				}
 				AutoTileDrawer.draw( g, here, Level.tileSize, 0, 
 						getTile( x-1, y-1 ) == here, 

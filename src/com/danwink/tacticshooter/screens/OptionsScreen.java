@@ -119,7 +119,7 @@ public class OptionsScreen extends DScreen<GameContainer, Graphics> implements D
 				}
 				try
 				{
-					DFile.saveText( "options.txt", mapList.toString() );
+					DFile.saveText( optionsFile, mapList.toString() );
 				} catch( FileNotFoundException e1 )
 				{
 					// TODO Auto-generated catch block
@@ -129,7 +129,7 @@ public class OptionsScreen extends DScreen<GameContainer, Graphics> implements D
 				StaticFiles.advOptions = new DOptions( "data" + File.separator + "advoptions.txt" );
 				
 				gc.setVSync( StaticFiles.options.getB( "vsync" ) );
-				dsh.activate( "settings", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
+				dsh.activate( screenToReturn, gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
 			} 
 		}
 	}

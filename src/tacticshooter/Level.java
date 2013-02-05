@@ -81,16 +81,6 @@ public class Level implements TileBasedMap
 	
 	public void renderFloor( Graphics g )
 	{
-		if( floor == null )
-		{
-			try
-			{
-				floor = new Image( "img" + File.separator + new DOptions( "themes" + File.separator + theme ).getS( "floor" ) );
-			} catch( SlickException e )
-			{
-				e.printStackTrace();
-			}
-		}
 		for( int y = 0; y < height; y++ )
 		{
 			for( int x = 0; x < width; x++ )
@@ -107,17 +97,6 @@ public class Level implements TileBasedMap
 	{
 		g.setLineWidth( 1 );
 		//draw walls
-		
-		if( floor == null )
-		{
-			try
-			{
-				wall = new Image( "img" + File.separator + new DOptions( "themes" + File.separator + theme ).getS( "wall" ) );
-			} catch( SlickException e )
-			{
-				e.printStackTrace();
-			}
-		}
 		
 		for( int y = 0; y < height; y++ )
 		{
@@ -146,6 +125,7 @@ public class Level implements TileBasedMap
 					g.fillRect( x*tileSize + tileSize/4, y*tileSize + tileSize/4, tileSize/2, tileSize/2 );
 					break;
 				case WALL:
+					g.drawImage( floor, x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize, floor.getWidth()/3, 0, floor.getWidth()/3 * 2, floor.getHeight()/4 );
 					drawAutoTile( g, x, y, tiles[x][y], wall );
 					/*
 					g.setColor( Color.gray );
@@ -251,6 +231,18 @@ public class Level implements TileBasedMap
 		g.setLineWidth( 1 );
 	}
 	
+	public void loadTextures()
+	{
+		try
+		{
+			wall = new Image( "img" + File.separator + new DOptions( "themes" + File.separator + theme ).getS( "wall" ) );
+			floor = new Image( "img" + File.separator + new DOptions( "themes" + File.separator + theme ).getS( "floor" ) );
+		} catch( SlickException e )
+		{
+			e.printStackTrace();
+		}
+	}
+	
 	public void drawAutoTile( Graphics g, int x, int y, TileType autoTile, Image tileImage )
 	{
 		g.pushTransform();
@@ -319,7 +311,7 @@ public class Level implements TileBasedMap
 
 	public TileType getTile( float lx, float ly )
 	{
-		return tiles[getTileX(lx)][getTileY(ly)];
+		return getTile( getTileX(lx), getTileY(ly) );
 	}
 	
 	public boolean hitwall( Point2f start, Vector2f direction )

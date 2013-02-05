@@ -178,6 +178,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		
 		running = true;
 		
+		/*
 		try
 		{
 			shader = ShaderProgram.loadProgram( "data/shaders/pass.vert", "data/shaders/light1.frag" );
@@ -186,6 +187,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		*/
 	}
 	
 	public void update( GameContainer gc, int delta )
@@ -216,10 +218,12 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				{
 					cs.l = (Level)m.message;
 					scrollToTeamBase( cs.player.team );
+					cs.l.loadTextures();
 				}
 				else
 				{
 					cs.l = (Level)m.message;
+					cs.l.loadTextures();
 				}
 				break;
 			case BULLETUPDATE:
@@ -381,7 +385,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				wallTexture = new Image( cs.l.width * Level.tileSize, cs.l.height * Level.tileSize );
 				
 				Graphics wtg = wallTexture.getGraphics();
-				wtg.clear();
+				wtg.clearAlphaMap();
 				cs.l.render( wtg );
 				wtg.flush();
 				

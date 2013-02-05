@@ -14,11 +14,6 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.TrueTypeFont;
-import org.newdawn.slick.UnicodeFont;
-import org.newdawn.slick.font.effects.ColorEffect;
-import org.newdawn.slick.font.effects.OutlineEffect;
-import org.newdawn.slick.font.effects.ShadowEffect;
-
 import com.danwink.tacticshooter.screens.HomeScreen;
 import com.danwink.tacticshooter.screens.LevelEditor;
 import com.danwink.tacticshooter.screens.LevelEditorLoadMap;
@@ -32,13 +27,12 @@ import com.danwink.tacticshooter.screens.PostGameScreen;
 import com.danwink.tacticshooter.screens.SelectMapScreen;
 import com.danwink.tacticshooter.screens.SettingsScreen;
 import com.phyloa.dlib.renderer.DScreenHandler;
-import com.phyloa.dlib.util.DFile;
 
 public class TacticClient extends BasicGame
 {
 	DScreenHandler<GameContainer, Graphics> dsh = new DScreenHandler<GameContainer, Graphics>();
 	
-	TrueTypeFont f;
+	org.newdawn.slick.Font f;
 	
 	public TacticClient()
 	{
@@ -65,18 +59,9 @@ public class TacticClient extends BasicGame
 		
 		dsh.activate( "home", gc );
 		
-		try
-		{
-			f = new TrueTypeFont( Font.createFont( Font.TRUETYPE_FONT, new File( "data" + File.separator + "pixelfont1.TTF" ) ).deriveFont( 16.f ), false );
-		} catch( FontFormatException e )
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch( IOException e )
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
+		f = new AngelCodeFont( "data" + File.separator + "pixelfont1_16px.fnt", "data" + File.separator + "pixelfont1_16px_0.png" );
+		
 	}
 	
 	public void update( GameContainer gc, int delta ) throws SlickException
