@@ -124,8 +124,8 @@ public class Unit
 				
 				float dx = (float)(Math.cos( heading ) * type.speed);
 				float dy = (float)(Math.sin( heading ) * type.speed);
-				if( l.getTile( x+dx, y ).passable ) x += dx;
-				if( l.getTile( x, y+dy ).passable ) y += dy;
+				if( l.getTile( x+dx, y ).isPassable() ) x += dx;
+				if( l.getTile( x, y+dy ).isPassable() ) y += dy;
 			}
 			else
 			{
@@ -390,7 +390,7 @@ public class Unit
 				}
 			}
 		}
-		else
+		else if( state == UnitState.STOPPED )
 		{
 			pathTo( l.getTileX( bullet.shooter.x ), l.getTileY( bullet.shooter.y ), ts );
 		}

@@ -27,9 +27,9 @@ public class LevelFileHelper
 		Document doc = reader.read( new File( "levels" + File.separator + name + ".xml" ) );
 		Node level = doc.selectSingleNode( "//level" );
 		Level m = new Level( Integer.parseInt( level.valueOf( "@width" ) ), Integer.parseInt( level.valueOf( "@height" ) ) );
-		m.theme = level.valueOf( "@theme" );
-		if( m.theme.length() == 0 )
-			m.theme = "forestrpg.txt";
+		String theme = level.valueOf( "@theme" );
+		if( theme.length() > 0 )
+			m.theme = theme;
 		
 		Node map = level.selectSingleNode( "map" );
 		List<? extends Node> rows = map.selectNodes( "row" );

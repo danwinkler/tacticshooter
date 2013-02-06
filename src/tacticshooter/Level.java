@@ -16,6 +16,7 @@ import org.newdawn.slick.util.pathfinding.Mover;
 import org.newdawn.slick.util.pathfinding.PathFindingContext;
 import org.newdawn.slick.util.pathfinding.TileBasedMap;
 
+import tacticshooter.Level.TileType;
 import tacticshooter.Unit.UnitState;
 
 import com.phyloa.dlib.util.DMath;
@@ -35,10 +36,11 @@ public class Level implements TileBasedMap
 	
 	boolean randomFinding = true;
 	
-	String theme;
+	String theme = "desertrpg.txt";
 	
-	Image floor;
+	public Image floor;
 	public Image wall;
+	public Image grate;
 	
 	public float[][] lightMap;
 	
@@ -102,133 +104,146 @@ public class Level implements TileBasedMap
 		{
 			for( int x = 0; x < width; x++ )
 			{
-				switch( tiles[x][y] )
-				{
-				case LIGHT:
-					//g.setColor( Color.yellow );
-					//g.fillOval(  x*tileSize, y*tileSize, tileSize, tileSize );
-					break;
-				case PASSOPEN:
-					g.setColor( Color.gray );
-					g.drawRect( x*tileSize + tileSize/4, y*tileSize + tileSize/4, tileSize/2, tileSize/2 );
-					break;
-				case PASSCLOSED:
-					g.setColor( Color.gray );
-					g.fillRect( x*tileSize + tileSize/4, y*tileSize + tileSize/4, tileSize/2, tileSize/2 );
-					break;
-				case GATEOPEN:
-					g.setColor( Color.gray );
-					g.drawRect( x*tileSize + tileSize/4, y*tileSize + tileSize/4, tileSize/2, tileSize/2 );
-					break;
-				case GATECLOSED:
-					g.setColor( Color.gray );
-					g.fillRect( x*tileSize + tileSize/4, y*tileSize + tileSize/4, tileSize/2, tileSize/2 );
-					break;
-				case WALL:
-					g.drawImage( floor, x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize, floor.getWidth()/3, 0, floor.getWidth()/3 * 2, floor.getHeight()/4 );
-					drawAutoTile( g, x, y, tiles[x][y], wall );
-					/*
-					g.setColor( Color.gray );
-					g.fillRect( x*tileSize, y*tileSize, tileSize, tileSize ); 
-					g.setColor( Color.black );
-					if( !getTile( x-1, y ).isWall )
-					{
-						g.drawLine( x*tileSize, y*tileSize, x*tileSize, y*tileSize+tileSize );
-					}
-					if( !getTile( x+1, y ).isWall )
-					{
-						g.drawLine( x*tileSize+tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize );
-					}
-					if( !getTile( x, y-1 ).isWall )
-					{
-						g.drawLine( x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize );
-					}
-					if( !getTile( x, y+1 ).isWall )
-					{
-						g.drawLine( x*tileSize, y*tileSize+tileSize, x*tileSize+tileSize, y*tileSize+tileSize );
-					}
-					
-					if( (x+y) % 4 == 0 )
-					{
-						g.setColor( Color.darkGray );
-						g.drawLine( x*tileSize, y*tileSize+tileSize, x*tileSize+tileSize, y*tileSize );
-					}
-					
-					if( (x-y) % 6 == 0 )
-					{
-						g.setColor( Color.darkGray );
-						g.drawLine( x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize );
-					}
-					*/
-					break;
-				case TRIANGLENE:
-					g.setColor( Color.gray );
-					Polygon nep = new Polygon();
-					nep.addPoint( x*tileSize, y*tileSize );
-					nep.addPoint( x*tileSize+tileSize, y*tileSize );
-					nep.addPoint( x*tileSize+tileSize, y*tileSize+tileSize );
-					g.fill( nep );
-					g.setColor( Color.black );
-					g.drawLine( x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize );
-					
-					if( (x+y) % 4 == 0 )
-					{
-						g.setColor( Color.darkGray );
-						g.drawLine( x*tileSize+tileSize*.5f, y*tileSize+tileSize*.5f, x*tileSize+tileSize, y*tileSize );
-					}
-					break;
-				case TRIANGLENW:
-					g.setColor( Color.gray );
-					Polygon nwp = new Polygon();
-					nwp.addPoint( x*tileSize, y*tileSize );
-					nwp.addPoint( x*tileSize, y*tileSize+tileSize );
-					nwp.addPoint( x*tileSize+tileSize, y*tileSize );
-					g.fill( nwp );
-					g.setColor( Color.black );
-					g.drawLine( x*tileSize, y*tileSize+tileSize, x*tileSize+tileSize, y*tileSize );
-					
-					if( (x-y) % 6 == 0 )
-					{
-						g.setColor( Color.darkGray );
-						g.drawLine( x*tileSize, y*tileSize, x*tileSize+tileSize*.5f, y*tileSize+tileSize*.5f );
-					}
-					break;
-				case TRIANGLESE:
-					g.setColor( Color.gray );
-					Polygon sep = new Polygon();
-					sep.addPoint( x*tileSize+tileSize, y*tileSize+tileSize );
-					sep.addPoint( x*tileSize, y*tileSize+tileSize );
-					sep.addPoint( x*tileSize+tileSize, y*tileSize );
-					g.fill( sep );
-					g.setColor( Color.black );
-					g.drawLine( x*tileSize, y*tileSize+tileSize, x*tileSize+tileSize, y*tileSize );
-					
-					if( (x-y) % 6 == 0 )
-					{
-						g.setColor( Color.darkGray );
-						g.drawLine( x*tileSize+tileSize, y*tileSize+tileSize, x*tileSize+tileSize*.5f, y*tileSize+tileSize*.5f );
-					}				
-					break;
-				case TRIANGLESW:
-					g.setColor( Color.gray );
-					Polygon swp = new Polygon();
-					swp.addPoint( x*tileSize, y*tileSize );
-					swp.addPoint( x*tileSize, y*tileSize+tileSize );
-					swp.addPoint( x*tileSize+tileSize, y*tileSize+tileSize );
-					g.fill( swp );
-					g.setColor( Color.black );
-					g.drawLine( x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize );
-					
-					if( (x+y) % 4 == 0 )
-					{
-						g.setColor( Color.darkGray );
-						g.drawLine( x*tileSize+tileSize*.5f, y*tileSize+tileSize*.5f, x*tileSize, y*tileSize+tileSize );
-					}
-					break;
-				}
+				drawTile( x, y, g );
 			}
 		}
 		g.setLineWidth( 1 );
+	}
+	
+	public void drawTile( int x, int y, Graphics g )
+	{
+		switch( tiles[x][y] )
+		{
+		case LIGHT:
+			//g.setColor( Color.yellow );
+			//g.fillOval(  x*tileSize, y*tileSize, tileSize, tileSize );
+			break;
+		case PASSOPEN:
+			g.setColor( Color.gray );
+			g.drawRect( x*tileSize + tileSize/4, y*tileSize + tileSize/4, tileSize/2, tileSize/2 );
+			break;
+		case PASSCLOSED:
+			g.setColor( Color.gray );
+			g.fillRect( x*tileSize + tileSize/4, y*tileSize + tileSize/4, tileSize/2, tileSize/2 );
+			break;
+		case GATEOPEN:
+			g.setColor( Color.gray );
+			g.drawRect( x*tileSize + tileSize/4, y*tileSize + tileSize/4, tileSize/2, tileSize/2 );
+			break;
+		case GATECLOSED:
+			g.setColor( Color.gray );
+			g.fillRect( x*tileSize + tileSize/4, y*tileSize + tileSize/4, tileSize/2, tileSize/2 );
+			break;
+		case DOOR:
+			drawAutoTile( g, x, y, TileType.FLOOR, floor );
+			drawAutoTile( g, x, y, TileType.WALL, wall );
+			break;
+		case GRATE:
+			drawAutoTile( g, x, y, TileType.FLOOR, floor );
+			drawAutoTile( g, x, y, TileType.GRATE, grate );
+			break;
+		case WALL:
+			g.drawImage( floor, x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize, floor.getWidth()/3, 0, floor.getWidth()/3 * 2, floor.getHeight()/4 );
+			drawAutoTile( g, x, y, tiles[x][y], wall );
+			/*
+			g.setColor( Color.gray );
+			g.fillRect( x*tileSize, y*tileSize, tileSize, tileSize ); 
+			g.setColor( Color.black );
+			if( !getTile( x-1, y ).isWall )
+			{
+				g.drawLine( x*tileSize, y*tileSize, x*tileSize, y*tileSize+tileSize );
+			}
+			if( !getTile( x+1, y ).isWall )
+			{
+				g.drawLine( x*tileSize+tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize );
+			}
+			if( !getTile( x, y-1 ).isWall )
+			{
+				g.drawLine( x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize );
+			}
+			if( !getTile( x, y+1 ).isWall )
+			{
+				g.drawLine( x*tileSize, y*tileSize+tileSize, x*tileSize+tileSize, y*tileSize+tileSize );
+			}
+			
+			if( (x+y) % 4 == 0 )
+			{
+				g.setColor( Color.darkGray );
+				g.drawLine( x*tileSize, y*tileSize+tileSize, x*tileSize+tileSize, y*tileSize );
+			}
+			
+			if( (x-y) % 6 == 0 )
+			{
+				g.setColor( Color.darkGray );
+				g.drawLine( x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize );
+			}
+			*/
+			break;
+		case TRIANGLENE:
+			g.setColor( Color.gray );
+			Polygon nep = new Polygon();
+			nep.addPoint( x*tileSize, y*tileSize );
+			nep.addPoint( x*tileSize+tileSize, y*tileSize );
+			nep.addPoint( x*tileSize+tileSize, y*tileSize+tileSize );
+			g.fill( nep );
+			g.setColor( Color.black );
+			g.drawLine( x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize );
+			
+			if( (x+y) % 4 == 0 )
+			{
+				g.setColor( Color.darkGray );
+				g.drawLine( x*tileSize+tileSize*.5f, y*tileSize+tileSize*.5f, x*tileSize+tileSize, y*tileSize );
+			}
+			break;
+		case TRIANGLENW:
+			g.setColor( Color.gray );
+			Polygon nwp = new Polygon();
+			nwp.addPoint( x*tileSize, y*tileSize );
+			nwp.addPoint( x*tileSize, y*tileSize+tileSize );
+			nwp.addPoint( x*tileSize+tileSize, y*tileSize );
+			g.fill( nwp );
+			g.setColor( Color.black );
+			g.drawLine( x*tileSize, y*tileSize+tileSize, x*tileSize+tileSize, y*tileSize );
+			
+			if( (x-y) % 6 == 0 )
+			{
+				g.setColor( Color.darkGray );
+				g.drawLine( x*tileSize, y*tileSize, x*tileSize+tileSize*.5f, y*tileSize+tileSize*.5f );
+			}
+			break;
+		case TRIANGLESE:
+			g.setColor( Color.gray );
+			Polygon sep = new Polygon();
+			sep.addPoint( x*tileSize+tileSize, y*tileSize+tileSize );
+			sep.addPoint( x*tileSize, y*tileSize+tileSize );
+			sep.addPoint( x*tileSize+tileSize, y*tileSize );
+			g.fill( sep );
+			g.setColor( Color.black );
+			g.drawLine( x*tileSize, y*tileSize+tileSize, x*tileSize+tileSize, y*tileSize );
+			
+			if( (x-y) % 6 == 0 )
+			{
+				g.setColor( Color.darkGray );
+				g.drawLine( x*tileSize+tileSize, y*tileSize+tileSize, x*tileSize+tileSize*.5f, y*tileSize+tileSize*.5f );
+			}				
+			break;
+		case TRIANGLESW:
+			g.setColor( Color.gray );
+			Polygon swp = new Polygon();
+			swp.addPoint( x*tileSize, y*tileSize );
+			swp.addPoint( x*tileSize, y*tileSize+tileSize );
+			swp.addPoint( x*tileSize+tileSize, y*tileSize+tileSize );
+			g.fill( swp );
+			g.setColor( Color.black );
+			g.drawLine( x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize );
+			
+			if( (x+y) % 4 == 0 )
+			{
+				g.setColor( Color.darkGray );
+				g.drawLine( x*tileSize+tileSize*.5f, y*tileSize+tileSize*.5f, x*tileSize, y*tileSize+tileSize );
+			}
+			break;
+		}
 	}
 	
 	public void loadTextures()
@@ -237,6 +252,7 @@ public class Level implements TileBasedMap
 		{
 			wall = new Image( "img" + File.separator + new DOptions( "themes" + File.separator + theme ).getS( "wall" ) );
 			floor = new Image( "img" + File.separator + new DOptions( "themes" + File.separator + theme ).getS( "floor" ) );
+			grate = new Image( "img" + File.separator + new DOptions( "themes" + File.separator + theme ).getS( "grate" ) );
 		} catch( SlickException e )
 		{
 			e.printStackTrace();
@@ -249,21 +265,16 @@ public class Level implements TileBasedMap
 		g.translate( x*tileSize, y*tileSize );
 		//g.scale( tileSize/32f, tileSize/32f );
 		AutoTileDrawer.draw( g, tileImage, tileSize, 0, 	
-													getTileR( x-1, y-1 ) == autoTile, 
-													getTileR( x, y-1 ) == autoTile, 
-													getTileR( x+1, y-1 ) == autoTile, 
-													getTileR( x-1, y ) == autoTile, 
-													getTileR( x+1, y ) == autoTile, 
-													getTileR( x-1, y+1 ) == autoTile, 
-													getTileR( x, y+1 ) == autoTile, 
-													getTileR( x+1, y+1 ) == autoTile 
+													getTile( x-1, y-1 ).connectsTo( autoTile ), 
+													getTile( x, y-1 ).connectsTo( autoTile ), 
+													getTile( x+1, y-1 ).connectsTo( autoTile ), 
+													getTile( x-1, y ).connectsTo( autoTile ), 
+													getTile( x+1, y ).connectsTo( autoTile ), 
+													getTile( x-1, y+1 ).connectsTo( autoTile ), 
+													getTile( x, y+1 ).connectsTo( autoTile ), 
+													getTile( x+1, y+1 ).connectsTo( autoTile ) 
 							);
 		g.popTransform();
-	}
-	
-	public TileType getTileR( int x, int y )
-	{
-		return getTile( x, y ) == TileType.WALL ? TileType.WALL : TileType.FLOOR;
 	}
 	
 	public void renderBuildings( Graphics g )
@@ -286,7 +297,7 @@ public class Level implements TileBasedMap
 
 	public boolean blocked( Mover m, int x, int y ) 
 	{
-		return !getTile( x, y ).passable;
+		return !getTile( x, y ).isPassable();
 	}
 
 	public float getCost( Mover m, int x, int y, int tx, int ty ) 
@@ -353,7 +364,7 @@ public class Level implements TileBasedMap
 			return false;
 		}
 		
-		if( !l.tiles[cx][cy].passable )
+		if( !l.tiles[cx][cy].isShootable() )
 		{
 			// start point is inside a block
 			result.x = start.x;
@@ -409,7 +420,7 @@ public class Level implements TileBasedMap
 			if( tMaxX < tMaxY )
 			{
 				cx = cx + stepX;
-				if( !getTile( cx, cy ).passable )
+				if( !getTile( cx, cy ).isShootable() )
 				{
 					hitTile = true;
 					break;
@@ -424,7 +435,7 @@ public class Level implements TileBasedMap
 			else
 			{
 				cy = cy + stepY;
-				if( !getTile( cx, cy ).passable )
+				if( !getTile( cx, cy ).isShootable() )
 				{
 					hitTile = true;
 					break;
@@ -471,7 +482,7 @@ public class Level implements TileBasedMap
 	@Override
 	public boolean blocked( PathFindingContext arg0, int x, int y )
 	{
-		return !getTile( x, y ).passable;
+		return !getTile( x, y ).isPassable();
 	}
 
 	@Override
@@ -482,32 +493,122 @@ public class Level implements TileBasedMap
 	
 	public enum TileType
 	{
-		FLOOR( true, true, false ),
-		WALL( false, false, true ),
-		LIGHT( true, true, false ),
-		TRIANGLENW( true, true, true ),
-		TRIANGLESW( true, true, true ),
-		TRIANGLENE( true, true, true ),
-		TRIANGLESE( true, true, true ),
-		PASSOPEN( true, true, false ),
-		PASSCLOSED( false, false, false ),
-		GATEOPEN( true, true, false ),
-		GATECLOSED( false, false, false );
+		FLOOR( true, true ),
+		WALL( new WallInfo() ),
+		LIGHT( true, true ),
+		TRIANGLENW( true, true ),
+		TRIANGLESW( true, true ),
+		TRIANGLENE( true, true ),
+		TRIANGLESE( true, true ),
+		PASSOPEN( new PassInfo() ),
+		PASSCLOSED( new GateInfo() ),
+		GATEOPEN( new PassInfo() ),
+		GATECLOSED( new GateInfo() ),
+		DOOR( new DoorInfo() ),
+		GRATE( new GrateInfo() );
 		
-		public boolean passable;
-		public boolean isWall;
-		public boolean shootable;
+		TileInfo ti;
 		
 		TileType()
 		{
 			
 		}
 		
-		TileType( boolean passable, boolean shootable, boolean isWall )
+		TileType( boolean passable, boolean shootable )
+		{
+			ti = new TileInfo( passable, shootable );
+			ti.t = this;
+		}
+		
+		TileType( TileInfo ti )
+		{
+			this.ti = ti;
+			ti.t = this;
+		}
+		
+		public boolean isPassable()
+		{
+			return ti.passable;
+		}
+		
+		public boolean isShootable()
+		{
+			return ti.shootable;
+		}
+
+		public boolean connectsTo( TileType tt )
+		{
+			return ti.connectsTo( tt );
+		}
+	}
+	
+	public static class TileInfo
+	{
+		public TileType t;
+		public boolean passable;
+		public boolean shootable;
+		
+		public TileInfo( boolean passable, boolean shootable)
 		{
 			this.passable = passable;
-			this.isWall = isWall;
 			this.shootable = shootable;
+		}
+		
+		public boolean connectsTo( TileType t )
+		{
+			return this.t == t;
+		}
+	}
+
+	public static class DoorInfo extends TileInfo
+	{
+		public DoorInfo()
+		{
+			super( true, false );
+		}
+		
+		public boolean connectsTo( TileType t )
+		{
+			return t == TileType.DOOR || t == TileType.FLOOR || t == TileType.WALL;
+		}
+	}
+	
+	public static class GrateInfo extends TileInfo
+	{
+		public GrateInfo()
+		{
+			super( false, true );
+		}
+		
+		public boolean connectsTo( TileType t )
+		{
+			return t == TileType.GRATE || t == TileType.FLOOR;
+		}
+	}
+	
+	public static class PassInfo extends TileInfo
+	{
+		public PassInfo()
+		{
+			super( true, true );
+		}
+		
+		public boolean connectsTo( TileType t )
+		{
+			return t == TileType.FLOOR;
+		}
+	}
+	
+	public static class GateInfo extends TileInfo
+	{
+		public GateInfo()
+		{
+			super( false, false );
+		}
+		
+		public boolean connectsTo( TileType t )
+		{
+			return t == TileType.FLOOR;
 		}
 	}
 	
@@ -526,6 +627,19 @@ public class Level implements TileBasedMap
 			this.source = source;
 			this.targetX = targetX;
 			this.targetY = targetY;
+		}
+	}
+	
+	public static class WallInfo extends TileInfo
+	{
+		public WallInfo()
+		{
+			super( false, false );
+		}
+		
+		public boolean connectsTo( TileType t )
+		{
+			return t == TileType.GRATE || t == TileType.WALL;
 		}
 	}
 
@@ -569,7 +683,7 @@ public class Level implements TileBasedMap
 				{
 					tiles[l.targetX][l.targetY] = set;
 					ts.si.sendToAllClients( new Message( MessageType.TILEUPDATE, new Object[] { l.targetX, l.targetY, set } ) );
-					if( !set.passable )
+					if( !set.isPassable() )
 					{
 						for( int j = 0; j < ts.units.size(); j++ )
 						{

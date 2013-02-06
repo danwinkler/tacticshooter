@@ -278,6 +278,7 @@ public class TacticServer
 							{
 								Unit u = new Unit( base.x, base.y, p );
 								units.add( u );
+								u.stoppedAt = base;
 								si.sendToAllClients( new Message( MessageType.UNITUPDATE, u ) );
 								gs.get( u.owner.team ).unitsCreated++;
 							}

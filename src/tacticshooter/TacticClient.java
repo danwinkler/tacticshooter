@@ -68,7 +68,7 @@ public class TacticClient extends BasicGame
 	{
 		dsh.update( gc, delta );
 		
-		if( !(dsh.get() instanceof MultiplayerGameScreen) )
+		if( !(dsh.get() instanceof MultiplayerGameScreen) && !(dsh.get() instanceof LevelEditor) )
 		{
 			StaticFiles.bgd.update( delta );
 		}
@@ -78,7 +78,7 @@ public class TacticClient extends BasicGame
 	{
 		g.setFont( f );
 		
-		if( !(dsh.get() instanceof MultiplayerGameScreen) )
+		if( !(dsh.get() instanceof MultiplayerGameScreen) && !(dsh.get() instanceof LevelEditor) )
 		{
 			StaticFiles.bgd.render( gc, g );
 		}

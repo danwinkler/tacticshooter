@@ -49,6 +49,8 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 	DButton gate;
 	DButton addLink;
 	DButton pressurePad;
+	DButton door;
+	DButton grate;
 	
 	DButton save;
 	DButton saveAndExit;
@@ -103,6 +105,9 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			saveAndExit = new DButton( "Save & Exit", 200, gc.getHeight()-50, 200, 50 );
 			exitWithoutSaving = new DButton( "Exit", 400, gc.getHeight()-50, 200, 50 );
 			
+			door = new DButton( "Door", 600, gc.getHeight()-50, 50, 50 );
+			grate = new DButton( "Grate", 650, gc.getHeight()-50, 50, 50 );
+			
 			fileNameText = new DText( "Map Name:", gc.getWidth()-350, gc.getHeight()-50 );
 			fileNameText.setColor( java.awt.Color.BLACK );
 			name = new DTextBox( gc.getWidth()-250, gc.getHeight()-50, 250, 50 );
@@ -127,6 +132,9 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			dui.add( saveAndExit );
 			dui.add( exitWithoutSaving );
 			
+			dui.add( door );
+			dui.add( grate );
+			
 			dui.add( fileNameText );
 			dui.add( name );
 			
@@ -142,6 +150,7 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 		{
 			levelTexture = new Image( l.width * Level.tileSize, l.height * Level.tileSize );
 			levelG = levelTexture.getGraphics();
+			l.renderFloor( levelG );
 			l.render( levelG );
 			levelG.flush();
 		} catch( SlickException e )
@@ -255,6 +264,12 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 				case GATE:
 					tile = TileType.GATECLOSED;
 					break;
+				case DOOR:
+					tile = TileType.DOOR;
+					break;
+				case GRATE:
+					tile = TileType.GRATE;
+					break;
 				case TRIANGLE:
 					if( l.getTile( x, y ) == TileType.WALL )
 					{
@@ -267,23 +282,23 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 					TileType left = l.getTile( x-1, y );
 					TileType right = l.getTile( x+1, y );
 					
-					if( (up.isWall && down.isWall && left.isWall && right.isWall) )
+					if( (up.connectsTo( TileType.WALL ) && down.connectsTo( TileType.WALL ) && left.connectsTo( TileType.WALL ) && right.connectsTo( TileType.WALL )) )
 					{
 						tile = TileType.WALL;
 					}
-					else if( up.isWall && !down.isWall && !left.isWall && right.isWall )
+					else if( up.connectsTo( TileType.WALL ) && !down.connectsTo( TileType.WALL ) && !left.connectsTo( TileType.WALL ) && right.connectsTo( TileType.WALL ) )
 					{
 						tile = TileType.TRIANGLENE;
 					}
-					else if( up.isWall && !down.isWall && left.isWall && !right.isWall )
+					else if( up.connectsTo( TileType.WALL ) && !down.connectsTo( TileType.WALL ) && left.connectsTo( TileType.WALL ) && !right.connectsTo( TileType.WALL ) )
 					{
 						tile = TileType.TRIANGLENW;
 					}
-					else if( !up.isWall && down.isWall && !left.isWall && right.isWall )
+					else if( !up.connectsTo( TileType.WALL ) && down.connectsTo( TileType.WALL ) && !left.connectsTo( TileType.WALL ) && right.connectsTo( TileType.WALL ) )
 					{
 						tile = TileType.TRIANGLESE;
 					}
-					else if( !up.isWall && down.isWall && left.isWall && !right.isWall )
+					else if( !up.connectsTo( TileType.WALL ) && down.connectsTo( TileType.WALL ) && left.connectsTo( TileType.WALL ) && !right.connectsTo( TileType.WALL ) )
 					{
 						tile = TileType.TRIANGLESW;
 					}
@@ -296,10 +311,27 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 				if( tile != null )
 				{
 					l.setTile( x, y, tile );
+					for( int yy = Math.max( y-1, 0 ); yy <= Math.min( y+1, l.height-1 ); yy++ )
+					{
+						for( int xx = Math.max( x-1, 0 ); xx <= Math.min( x+1, l.width-1 ); xx++ )
+						{
+							l.drawAutoTile( levelG, xx, yy, TileType.FLOOR, l.floor );
+							l.drawTile( xx, yy, levelG );
+						}
+					}
 					if( mirrorType != MirrorType.NONE )
 					{
 						l.setTile( x2, y2, tile );
+						for( int yy = Math.max( y2-1, 0 ); yy <= Math.min( y2+1, l.height-1 ); yy++ )
+						{
+							for( int xx = Math.max( x2-1, 0 ); xx <= Math.min( x2+1, l.width-1 ); xx++ )
+							{
+								l.drawAutoTile( levelG, xx, yy, TileType.FLOOR, l.floor );
+								l.drawTile( xx, yy, levelG );
+							}
+						}
 					}
+					levelG.flush();
 				}
 			}
 				
@@ -377,6 +409,7 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 		
 		if( input.isKeyDown( Input.KEY_R ) )
 		{
+			l.renderFloor( levelG );
 			l.render( levelG );
 			levelG.flush();
 		}
@@ -393,7 +426,7 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 		g.translate( -scrollx, -scrolly );
 		g.setColor( Color.gray );
 		g.drawRect( 0, 0, l.width*l.tileSize, l.height*l.tileSize );
-		l.render( g  );
+		g.drawImage( levelTexture, 0, 0 );
 		l.renderBuildings( g );
 		l.renderLinks( g );
 		
@@ -459,7 +492,9 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 		PASS,
 		GATE,
 		ADDLINK, 
-		PRESSUREPAD;
+		PRESSUREPAD,
+		DOOR,
+		GRATE;
 	}
 	
 	public void event( DUIEvent event )
@@ -510,6 +545,14 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			else if( e == pressurePad )
 			{
 				brush = Brush.PRESSUREPAD;
+			}
+			else if( e == door )
+			{
+				brush = Brush.DOOR;
+			}
+			else if( e == grate )
+			{
+				brush = Brush.GRATE;
 			}
 			else if( e == toggleMirrorBrush )
 			{
