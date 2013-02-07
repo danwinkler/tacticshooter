@@ -320,6 +320,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				cs.unitMap.remove( u );
 				cs.selected.remove( (Object)u.id );
 				(Math.random() > .5 ? cs.death1 : cs.death2).play( 1.f, cs.getSoundMag( gc, u.x, u.y ) );
+				u.renderDead( btg );
 				for( int j = 0; j < 10; j++ )
 				{
 					drawBlood( u.x, u.y );
@@ -597,7 +598,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	
 	public void drawBlood( float x, float y )
 	{
-		//btg.setColor( Color.red );
+		btg.setColor( new Color( 255, 0, 0, 200 ) );
 		x += DMath.randomf( -8, 8 );
 		y += DMath.randomf( -8, 8 );
 		btg.fillOval( x-2, y-2, 4, 4 );

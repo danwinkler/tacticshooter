@@ -51,14 +51,15 @@ public class BackgroundDrawer
 		}
 		g.pushTransform();
 		g.setAntiAlias( true );
+		g.scale( 2, 2 );
 		g.translate( -scrollx, -scrolly );
 		
 		int scrollxTile = (int)(scrollx/Level.tileSize);
 		int scrollyTile = (int)(scrolly/Level.tileSize);
 		
-		for( int y = scrollyTile; y < scrollyTile + gc.getHeight()/Level.tileSize + 1; y++ )
+		for( int y = scrollyTile; y < scrollyTile + gc.getHeight()/Level.tileSize/2 + 2; y++ )
 		{
-			for( int x = scrollxTile; x < scrollxTile + gc.getWidth()/Level.tileSize + 1; x++ )
+			for( int x = scrollxTile; x < scrollxTile + gc.getWidth()/Level.tileSize/2 + 1; x++ )
 			{	
 				g.pushTransform();
 				g.translate( x*Level.tileSize, y*Level.tileSize );

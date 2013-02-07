@@ -462,6 +462,9 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 	{
 		dui.setEnabled( false );
 		gc.getInput().removeListener( this );
+		scrollx = 0;
+		scrolly = 0;
+		brush = Brush.FLOOR;
 	}
 
 	public void message( Object o )

@@ -254,16 +254,62 @@ public class Unit
 		g.pushTransform();
 		
 		g.rotate( 0, 0, heading / DMath.PI2F * 360 );
-		Color color = this.owner.team.getColor();
 		
 		int healthBarDist = 0;
+		switch( type )
+		{
+		case SCOUT:
+		case SHOTGUN:
+		case LIGHT:
+			healthBarDist = -9;
+			break;
+		case HEAVY:
+			healthBarDist = -14;
+			break;
+		}
+		
+		drawBody( g, owner.id == p.id );
+		
+		
+		g.popTransform();
+		
+		g.setColor( Color.black );
+		g.fillRect( -9, healthBarDist, (int)(18.f * health/type.health), 4 );
+		
+		g.setColor( new Color( DMath.bound( 1.f - health/type.health, 0, 1 ), DMath.bound(health/type.health, 0, 1 ), 0 ) );
+		g.fillRect( -8, healthBarDist+1, (int)(16.f * health/type.health), 2 );
+		
+		float dmx = x - mx;
+		float dmy = y - my;
+		if( dmx*dmx + dmy*dmy < 100 )
+		{
+			float strWidth = g.getFont().getWidth( owner.name );
+			g.setColor( Color.black );
+			g.drawString( owner.name, -strWidth/2, 10 );
+		}
+		
+		g.popTransform();
+	}
+	
+	public void renderDead( Graphics g )
+	{
+		g.pushTransform();
+		g.translate( x, y );
+		g.rotate( 0, 0, heading / DMath.PI2F * 360 );
+		drawBody( g, false );
+		g.popTransform();
+	}
+	
+	public void drawBody( Graphics g, boolean player )
+	{
+		Color color = this.owner.team.getColor();
 		
 		switch( type )
 		{
 		case SCOUT:
 		case SHOTGUN:
 		case LIGHT:
-			if( owner.id == p.id )
+			if( player )
 			{
 				g.setColor( Color.white );
 				g.fillOval( -7, -7, 14, 14 );
@@ -277,10 +323,9 @@ public class Unit
 			g.drawOval( -5, -5, 10, 10 );
 			g.drawLine( 0, 0, 5, 0 );
 			
-			healthBarDist = -9;
 			break;
 		case HEAVY:
-			if( owner.id == p.id )
+			if( player )
 			{
 				g.setColor( Color.black );
 				g.fillOval( -9, -9, 18, 18 );
@@ -302,31 +347,9 @@ public class Unit
 			
 			g.setColor( Color.black );
 			g.drawLine( 0, 0, 6, 0 );
-			
-			healthBarDist = -14;
 			break;
 			
 		}
-		
-		
-		g.popTransform();
-		
-		g.setColor( Color.black );
-		g.fillRect( -9, healthBarDist, (int)(18.f * health/type.health), 4 );
-		
-		g.setColor( new Color( DMath.bound( 1.f - health/type.health, 0, 1 ), DMath.bound(health/type.health, 0, 1 ), 0 ) );
-		g.fillRect( -8, healthBarDist+1, (int)(16.f * health/type.health), 2 );
-		
-		float dmx = x - mx;
-		float dmy = y - my;
-		if( dmx*dmx + dmy*dmy < 100 )
-		{
-			float strWidth = g.getFont().getWidth( owner.name );
-			g.setColor( Color.black );
-			g.drawString( owner.name, -strWidth/2, 10 );
-		}
-		
-		g.popTransform();
 	}
 	
 	public void pathTo( int tx, int ty, TacticServer ts )

@@ -47,13 +47,6 @@ public class Bullet
 		
 		Level l = ts.l;
 		
-		// Test if hits wall
-		if( l.hitwall( lastLoc, dir ) )
-		{
-			alive = false;
-			return;
-		}
-		
 		for( Unit u : ts.units )
 		{
 			if( u.owner.team.id != owner.team.id )
@@ -67,6 +60,13 @@ public class Bullet
 					break;
 				}
 			}
+		}
+		
+		// Test if hits wall
+		if( l.hitwall( lastLoc, dir ) )
+		{
+			alive = false;
+			return;
 		}
 		
 		if( loc.x > l.width * l.tileSize || loc.x < 0 || loc.y > l.height * l.tileSize || loc.y < 0 )
