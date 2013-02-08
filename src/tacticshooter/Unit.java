@@ -257,6 +257,7 @@ public class Unit
 		case SCOUT:
 		case SHOTGUN:
 		case LIGHT:
+		case SNIPER:
 			healthBarDist = -9;
 			break;
 		case HEAVY:
@@ -309,6 +310,7 @@ public class Unit
 		case SCOUT:
 		case SHOTGUN:
 		case LIGHT:
+		
 			if( player )
 			{
 				g.setColor( Color.white );
@@ -323,6 +325,21 @@ public class Unit
 			g.drawOval( -5, -5, 10, 10 );
 			g.drawLine( 0, 0, 5, 0 );
 			
+			break;
+		case SNIPER:
+			if( player )
+			{
+				g.setColor( Color.white );
+				g.fillOval( -7, -6, 14, 12 );
+				g.setColor( Color.black );
+				g.drawOval( -7, -6, 14, 12 );
+			}
+			
+			g.setColor( color );
+			g.fillOval( -5, -4, 10, 8 );
+			g.setColor( Color.black );
+			g.drawOval( -5, -4, 10, 8 );
+			g.drawLine( 0, 0, 5, 0 );
 			break;
 		case HEAVY:
 			if( player )
@@ -391,8 +408,8 @@ public class Unit
 	public void hit( Bullet bullet, TacticServer ts )
 	{
 		Level l = ts.l;
-		health -= 10;
-		if( health <= 0 && health > -10 )
+		health -= bullet.damage;
+		if( alive && health <= 0 )
 		{
 			alive = false;
 			killer = bullet.owner;
@@ -434,10 +451,11 @@ public class Unit
 	
 	public enum UnitType
 	{
-		LIGHT( 3, 10, .05f, 10, 100, 1 ),
-		HEAVY( 1.5f, 3, .1f, 20, 200, 1  ),
-		SHOTGUN( 3.0f, 30, .3f, 15, 150, 6 ),
-		SCOUT( 6f, 30, .1f, 3, 30, 1 );
+		LIGHT( 3, 10, .05f, 10, 100, 1, 10 ),
+		HEAVY( 1.5f, 3, .1f, 20, 200, 1, 10  ),
+		SHOTGUN( 3.0f, 30, .3f, 15, 150, 6, 10 ),
+		SCOUT( 6f, 30, .1f, 3, 30, 1, 10 ),
+		SNIPER( 2.5f, 100, 0, 20, 90, 1, 100 );
 		
 		float speed;
 		int timeBetweenBullets;
@@ -445,8 +463,9 @@ public class Unit
 		int price;
 		float health;
 		int bulletsAtOnce;
+		int damage;
 		
-		UnitType( float speed, int timeBetweenBullets, float bulletSpread, int price, float health, int bulletsAtOnce )
+		UnitType( float speed, int timeBetweenBullets, float bulletSpread, int price, float health, int bulletsAtOnce, int damage )
 		{
 			this.speed = speed;
 			this.timeBetweenBullets = timeBetweenBullets;
@@ -454,6 +473,7 @@ public class Unit
 			this.price = price;
 			this.health = health;
 			this.bulletsAtOnce = bulletsAtOnce;
+			this.damage = damage;
 		}
 	}
 

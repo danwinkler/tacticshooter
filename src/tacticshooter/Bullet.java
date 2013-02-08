@@ -21,6 +21,8 @@ public class Bullet
 	public Point2f lastLoc;
 	public Vector2f dir;
 	
+	int damage = 10;
+	
 	public boolean alive = true;
 	
 	public Player owner;
@@ -49,7 +51,7 @@ public class Bullet
 		
 		for( Unit u : ts.units )
 		{
-			if( u.owner.team.id != owner.team.id )
+			if( u.owner.team.id != owner.team.id && u.alive )
 			{
 				p.x = u.x;
 				p.y = u.y;
@@ -80,8 +82,8 @@ public class Bullet
 		ClientState ts = cs.cs;
 		Level l = ts.l;
 		lastLoc.set( loc );
-		loc.x += dir.x * d;
-		loc.y += dir.y * d;
+		loc.x += dir.x * d * 1.2f;
+		loc.y += dir.y * d * 1.2f;
 		
 		// Test if hits wall
 		if( l.hitwall( lastLoc, dir ) )
@@ -92,7 +94,7 @@ public class Bullet
 		
 		for( Unit u : ts.units )
 		{
-			if( u.owner.team.id != owner.team.id )
+			if( u.owner.team.id != owner.team.id && u.alive )
 			{
 				p.x = u.x;
 				p.y = u.y;

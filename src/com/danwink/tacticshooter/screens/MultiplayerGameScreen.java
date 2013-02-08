@@ -69,6 +69,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	DButton buildLightUnit;
 	DButton buildHeavyUnit;
 	DButton buildShotgunUnit;
+	DButton buildSniperUnit;
 	
 	DPanel escapeMenu;
 	DButton quit;
@@ -121,6 +122,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			buildLightUnit = new DButton( "Build Light Unit\n10", 200, gc.getHeight()-100, 200, 100 );
 			buildHeavyUnit = new DButton( "Build Heavy Unit\n20", 400, gc.getHeight()-100, 200, 100 );
 			buildShotgunUnit = new DButton( "Build Shotgun Unit\n15", 600, gc.getHeight()-100, 200, 100 );
+			buildSniperUnit = new DButton( "Build Sniper Unit\n20", 800, gc.getHeight()-100, 200, 100 );
+			
 			
 			escapeMenu = new DPanel( gc.getWidth() / 2 - 100, gc.getHeight()/2 - 100, 200, 300 );
 			quit = new DButton( "Quit Game", 0, 0, 200, 100 );
@@ -138,6 +141,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			dui.add( buildLightUnit );
 			dui.add( buildHeavyUnit );
 			dui.add( buildShotgunUnit );
+			dui.add( buildSniperUnit );
 			dui.add( escapeMenu );
 			dui.add( chatBox );
 			
@@ -888,13 +892,20 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			else if( e == buildLightUnit )
 			{
 				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.LIGHT ) );
-			} else if( e == buildHeavyUnit )
+			} 
+			else if( e == buildHeavyUnit )
 			{
 				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.HEAVY ) );
-			} else if( e == buildShotgunUnit )
+			} 
+			else if( e == buildShotgunUnit )
 			{
 				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.SHOTGUN ) );
-			} else if( e == quit )
+			} 
+			else if( e == buildSniperUnit )
+			{
+				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.SNIPER ) );
+			}
+			else if( e == quit )
 			{
 				running = false;
 				escapeMenu.setVisible( false );

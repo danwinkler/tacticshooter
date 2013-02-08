@@ -105,6 +105,7 @@ public class TacticServer
 	
 	public void update()
 	{	
+		float d = (System.currentTimeMillis() - sl.lastTime) / 60.f;
 		if( sl.lastTime - lastTick > 100 )
 		{
 			lastTick += 100;
@@ -534,6 +535,7 @@ public class TacticServer
 		Bullet b = new Bullet( u.x + DMath.cosf( angle ) * (Unit.radius), u.y + DMath.sinf( angle ) * (Unit.radius), angle );
 		b.owner = u.owner;
 		b.shooter = u;
+		b.damage = u.type.damage;
 		gs.get( b.owner.team ).bulletsShot++;
 		bullets.add( b );
 		si.sendToAllClients( new Message( MessageType.BULLETUPDATE, b ) );
