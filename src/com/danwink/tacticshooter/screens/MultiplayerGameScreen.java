@@ -6,6 +6,7 @@ import java.nio.BufferOverflowException;
 import java.util.ArrayList;
 
 import javax.vecmath.Point2i;
+import javax.vecmath.Vector3f;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
@@ -106,6 +107,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	
 	boolean mapChanged = true;
 	
+	ArrayList<Vector3f> pings = new ArrayList<Vector3f>();
+	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
 		this.dsh = dsh;
@@ -172,22 +175,10 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		} 
 		catch( SlickException e )
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		running = true;
-		
-		/*
-		try
-		{
-			shader = ShaderProgram.loadProgram( "data/shaders/pass.vert", "data/shaders/light1.frag" );
-		} catch( SlickException e )
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		*/
 	}
 	
 	public void update( GameContainer gc, int delta )
@@ -277,6 +268,11 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				cs.l.tiles[tx][ty] = change;
 				mapChanged = true;
 				break;
+			case PINGMAP:
+				Point2i pingLoc = (Point2i)m.message;
+				pings.add( new Vector3f( pingLoc.x, pingLoc.y, 100 ) );
+				cs.ping1.play( 2.f, 1.f );
+				break;
 			case GAMEOVER:
 				dsh.message( "postgame", m.message );
 				dsh.activate( "postgame", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
@@ -342,14 +338,25 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			}
 		}
 		
+		for( int i = 0; i < pings.size(); i++ )
+		{
+			Vector3f v = pings.get( i );
+			v.z -= d;
+			if( v.z < 0 )
+			{
+				pings.remove( i );
+				i--;
+			}
+		}
+		
 		dui.update();
 		
 		if( cs.l != null && miniMap == null )
 		{
 			try
 			{
-				float xScale = 200.f / (cs.l.width*cs.l.tileSize);
-				float yScale = 200.f / (cs.l.height*cs.l.tileSize);
+				float xScale = 200.f / (cs.l.width*Level.tileSize);
+				float yScale = 200.f / (cs.l.height*Level.tileSize);
 				miniMap = new Image( 200, 200 );
 				Graphics mg = miniMap.getGraphics();
 				mg.scale( xScale, yScale );
@@ -419,7 +426,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				wtg.flush();
 			} catch( SlickException e )
 			{
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			mapChanged = false;
@@ -441,7 +447,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		for( int i = 0; i < cs.units.size(); i++ )
 		{
 			Unit u = cs.units.get( i );
-			u.render( g, cs.player, input.getMouseX() + cs.scrollx, input.getMouseY() + cs.scrolly, cs.l );
+			u.renderBody( g, cs.player );
 		}
 		
 		g.drawImage( wallTexture, 0, 0 );
@@ -452,6 +458,12 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		{
 			Bullet b = cs.bullets.get( i );
 			b.render( g );
+		}
+		
+		for( int i = 0; i < cs.units.size(); i++ )
+		{
+			Unit u = cs.units.get( i );
+			u.render( g, cs.player, input.getMouseX() + cs.scrollx, input.getMouseY() + cs.scrolly, cs.l );
 		}
 		
 		if( selecting )
@@ -487,8 +499,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		
 		//Draw minimap
 		g.setClip( gc.getWidth()-200, gc.getHeight()-200, 200, 200 );
-		float xScale = 200.f / (cs.l.width*cs.l.tileSize);
-		float yScale = 200.f / (cs.l.height*cs.l.tileSize);
+		float xScale = 200.f / (cs.l.width*Level.tileSize);
+		float yScale = 200.f / (cs.l.height*Level.tileSize);
 		g.pushTransform();
 		g.translate( gc.getWidth()-200, gc.getHeight()-200 );
 		g.setColor( Color.white );
@@ -508,6 +520,16 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		}
 		
 		g.popTransform();
+		
+		for( int i = 0; i < pings.size(); i++ )
+		{
+			Vector3f v = pings.get( i );
+			float size = (v.z / 100.f) * 10;
+			g.setColor( Color.pink );
+			g.fillOval( v.x - size/2, v.y - size/2, size, size );
+			g.setColor( Color.black );
+			g.drawOval( v.x - size/2, v.y - size/2, size, size );
+		}
 		
 		g.setColor( Color.blue );
 		g.drawRect( cs.scrollx*xScale, cs.scrolly * yScale, gc.getWidth() * xScale, gc.getHeight() * yScale );
@@ -614,12 +636,19 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	{
 		if( x > gc.getWidth()-200 && y > gc.getHeight()-200 && !selecting )
 		{	
-			//miniMap
-			float minimapX = x - (gc.getWidth()-200);
-			float minimapY = y - (gc.getHeight()-200);
-			Rectangle screenBounds = getScreenBounds();
-			cs.scrollx = DMath.bound( (minimapX / 200.f) * cs.l.width*Level.tileSize - gc.getWidth()/2, screenBounds.getMinX(), screenBounds.getMaxX() );
-			cs.scrolly = DMath.bound( (minimapY / 200.f) * cs.l.height*Level.tileSize - gc.getHeight()/2, screenBounds.getMinY(), screenBounds.getMaxY() );
+			if( input.isKeyDown( Input.KEY_LCONTROL ) )
+			{
+				ci.sendToServer( new Message( MessageType.MESSAGE, "/ping " + (input.getMouseX()-(gc.getWidth()-200)) + " " + (input.getMouseY()-(gc.getHeight()-200)) ) );
+			}
+			else
+			{
+				//miniMap
+				float minimapX = x - (gc.getWidth()-200);
+				float minimapY = y - (gc.getHeight()-200);
+				Rectangle screenBounds = getScreenBounds();
+				cs.scrollx = DMath.bound( (minimapX / 200.f) * cs.l.width*Level.tileSize - gc.getWidth()/2, screenBounds.getMinX(), screenBounds.getMaxX() );
+				cs.scrolly = DMath.bound( (minimapY / 200.f) * cs.l.height*Level.tileSize - gc.getHeight()/2, screenBounds.getMinY(), screenBounds.getMaxY() );
+			}
 		}	
 		else
 		{
@@ -669,12 +698,15 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	{
 		if( newx > gc.getWidth()-200 && newy > gc.getHeight()-200 && !selecting )
 		{	
-			//miniMap
-			float minimapX = newx - (gc.getWidth()-200);
-			float minimapY = newy - (gc.getHeight()-200);
-			Rectangle screenBounds = getScreenBounds();
-			cs.scrollx = DMath.bound( (minimapX / 200.f) * cs.l.width*Level.tileSize - gc.getWidth()/2, screenBounds.getMinX(), screenBounds.getMaxX() );
-			cs.scrolly = DMath.bound( (minimapY / 200.f) * cs.l.height*Level.tileSize - gc.getHeight()/2, screenBounds.getMinY(), screenBounds.getMaxY() );
+			if( !input.isKeyDown( Input.KEY_LCONTROL ) )
+			{
+				//miniMap
+				float minimapX = newx - (gc.getWidth()-200);
+				float minimapY = newy - (gc.getHeight()-200);
+				Rectangle screenBounds = getScreenBounds();
+				cs.scrollx = DMath.bound( (minimapX / 200.f) * cs.l.width*Level.tileSize - gc.getWidth()/2, screenBounds.getMinX(), screenBounds.getMaxX() );
+				cs.scrolly = DMath.bound( (minimapY / 200.f) * cs.l.height*Level.tileSize - gc.getHeight()/2, screenBounds.getMinY(), screenBounds.getMaxY() );
+			}
 		}	
 		else
 		{
@@ -750,6 +782,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			}
 			else
 			{
+				chatBox.setText( "" );
 				chatBox.setVisible( true );
 				dui.setFocus( chatBox );
 			}

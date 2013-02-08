@@ -419,6 +419,24 @@ public class TacticServer
 					{
 						nextMap();
 						return;
+					} else if( text.trim().startsWith( "/ping" ) )
+					{
+						try
+						{
+							String[] commands = text.split( " " );
+							Player tp = players.get( m.sender );
+							for( Entry<Integer, Player> e : players.entrySet() )
+							{
+								Player p = e.getValue();
+								if( p.team.id == tp.team.id )
+								{
+									si.sendToClient( p.id, new Message( MessageType.PINGMAP, new Point2i( Integer.parseInt( commands[1] ), Integer.parseInt( commands[2] ) ) ) );
+								}
+							}
+						} catch( Exception ex )
+						{
+							si.sendToClient( m.sender, new Message( MessageType.MESSAGE, "SERVER: Malformed command." ) );
+						}
 					}
 				}
 				break;

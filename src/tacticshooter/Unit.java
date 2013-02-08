@@ -251,10 +251,6 @@ public class Unit
 			g.drawRect( -10, -10, 20, 20 );
 		}
 		
-		g.pushTransform();
-		
-		g.rotate( 0, 0, heading / DMath.PI2F * 360 );
-		
 		int healthBarDist = 0;
 		switch( type )
 		{
@@ -267,11 +263,6 @@ public class Unit
 			healthBarDist = -14;
 			break;
 		}
-		
-		drawBody( g, owner.id == p.id );
-		
-		
-		g.popTransform();
 		
 		g.setColor( Color.black );
 		g.fillRect( -9, healthBarDist, (int)(18.f * health/type.health), 4 );
@@ -288,6 +279,15 @@ public class Unit
 			g.drawString( owner.name, -strWidth/2, 10 );
 		}
 		
+		g.popTransform();
+	}
+
+	public void renderBody( Graphics g, Player p )
+	{
+		g.pushTransform();
+		g.translate( x, y );
+		g.rotate( 0, 0, heading / DMath.PI2F * 360 );
+		drawBody( g, owner.id == p.id );
 		g.popTransform();
 	}
 	
