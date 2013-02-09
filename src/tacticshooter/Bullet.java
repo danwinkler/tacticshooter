@@ -82,8 +82,8 @@ public class Bullet
 		ClientState ts = cs.cs;
 		Level l = ts.l;
 		lastLoc.set( loc );
-		loc.x += dir.x * d * 1.2f;
-		loc.y += dir.y * d * 1.2f;
+		loc.x += dir.x * d * 1.4f;
+		loc.y += dir.y * d * 1.4f;
 		
 		// Test if hits wall
 		if( l.hitwall( lastLoc, dir ) )
