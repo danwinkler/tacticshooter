@@ -790,7 +790,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		}
 		else if( keyCode == Input.KEY_ENTER )
 		{
-			if( chatBox.isVisible() )
+			if( chatBox.isVisible() && chatBox.getText().trim().length() > 0 )
 			{
 				chatBox.setVisible( false );
 				ci.sendToServer( new Message( MessageType.MESSAGE, chatBox.getText().trim() ) );
