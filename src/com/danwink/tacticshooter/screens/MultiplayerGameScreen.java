@@ -646,12 +646,24 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			}
 			else
 			{
-				//miniMap
-				float minimapX = x - (gc.getWidth()-200);
-				float minimapY = y - (gc.getHeight()-200);
-				Rectangle screenBounds = getScreenBounds();
-				cs.scrollx = DMath.bound( (minimapX / 200.f) * cs.l.width*Level.tileSize - gc.getWidth()/2, screenBounds.getMinX(), screenBounds.getMaxX() );
-				cs.scrolly = DMath.bound( (minimapY / 200.f) * cs.l.height*Level.tileSize - gc.getHeight()/2, screenBounds.getMinY(), screenBounds.getMaxY() );
+				if( button == Input.MOUSE_LEFT_BUTTON )
+				{
+					//miniMap
+					float minimapX = x - (gc.getWidth()-200);
+					float minimapY = y - (gc.getHeight()-200);
+					Rectangle screenBounds = getScreenBounds();
+					cs.scrollx = DMath.bound( (minimapX / 200.f) * cs.l.width*Level.tileSize - gc.getWidth()/2, screenBounds.getMinX(), screenBounds.getMaxX() );
+					cs.scrolly = DMath.bound( (minimapY / 200.f) * cs.l.height*Level.tileSize - gc.getHeight()/2, screenBounds.getMinY(), screenBounds.getMaxY() );
+				}
+				else if( button == Input.MOUSE_RIGHT_BUTTON )
+				{
+					int tx = cs.l.getTileX( ((x - (gc.getWidth()-200.f)) / 200.f) * cs.l.width*Level.tileSize );
+					int ty = cs.l.getTileY( ((y - (gc.getHeight()-200.f)) / 200.f) * cs.l.height*Level.tileSize );
+					ci.sendToServer( new Message( input.isKeyDown( Input.KEY_LCONTROL ) ? MessageType.SETATTACKPOINTCONTINUE : MessageType.SETATTACKPOINT, new Object[]{ new Point2i( tx, ty ), cs.selected } ) );
+					this.waitingForMoveConfirmation = true;
+					mx = tx;
+					my = ty;
+				}
 			}
 		}	
 		else
@@ -702,7 +714,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	{
 		if( newx > gc.getWidth()-200 && newy > gc.getHeight()-200 && !selecting )
 		{	
-			if( !input.isKeyDown( Input.KEY_LCONTROL ) )
+			if( input.isMouseButtonDown( Input.MOUSE_LEFT_BUTTON ) && !input.isKeyDown( Input.KEY_LCONTROL ) )
 			{
 				//miniMap
 				float minimapX = newx - (gc.getWidth()-200);
