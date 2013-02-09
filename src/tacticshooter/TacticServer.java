@@ -343,6 +343,21 @@ public class TacticServer
 				si.sendToClient( m.sender, new Message( MessageType.MOVESUCCESS, null ) );
 				break;
 			}
+			case SETATTACKPOINTCONTINUE:
+			{
+				Object[] oa = (Object[])m.message;
+				Point2i p = (Point2i)oa[0];
+				ArrayList<Integer> selected = (ArrayList<Integer>)oa[1];
+				for( Unit unit : units )
+				{
+					if( unit.owner.id == m.sender && selected.contains( unit.id ) )
+					{
+						unit.pathToContinue( p.x, p.y, this );
+					}
+				}
+				si.sendToClient( m.sender, new Message( MessageType.MOVESUCCESS, null ) );
+				break;
+			}
 			case SWITCHTEAMS:
 			{
 				Team t = (Team)m.message;

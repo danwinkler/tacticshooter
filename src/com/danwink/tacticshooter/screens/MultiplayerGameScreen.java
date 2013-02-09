@@ -668,7 +668,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			{
 				int tx = (int)((x+cs.scrollx) / Level.tileSize);
 				int ty = (int)((y+cs.scrolly) / Level.tileSize);
-				ci.sendToServer( new Message( MessageType.SETATTACKPOINT, new Object[]{ new Point2i( tx, ty ), cs.selected } ) );
+				ci.sendToServer( new Message( input.isKeyDown( Input.KEY_LCONTROL ) ? MessageType.SETATTACKPOINTCONTINUE : MessageType.SETATTACKPOINT, new Object[]{ new Point2i( tx, ty ), cs.selected } ) );
 				this.waitingForMoveConfirmation = true;
 				mx = tx;
 				my = ty;

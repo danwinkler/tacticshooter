@@ -387,6 +387,27 @@ public class Unit
 		}
 	}
 	
+	public void pathToContinue( int tx, int ty, TacticServer ts )
+	{
+		if( state != UnitState.MOVING )
+		{
+			pathTo( tx, ty, ts );
+			return;
+		}
+		Level l = ts.l;
+		Point2i lastPoint = path.get( path.size()-1 );
+		Path tp = ts.finder.findPath( null, lastPoint.x, lastPoint.y, tx, ty );
+		if( tp != null )
+		{
+			for( int i = 0; i < tp.getLength(); i++ )
+			{
+				path.add( new Point2i( tp.getX( i ), tp.getY( i ) ) );
+			}
+			destx = tx;
+			desty = ty;
+		}
+	}
+	
 	public void sync( Unit u )
 	{
 		assert( u.id == this.id );
