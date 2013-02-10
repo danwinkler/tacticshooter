@@ -39,19 +39,24 @@ public class AutoTileDrawer
 						tl( 4, 0 );
 						continue;
 					}
-					else if( !w && n )
+					else if( !w && n && s )
 					{
 						tl( 0, 4 );
 						continue;
 					}
-					else if( w && !n )
+					else if( w && !n && e )
 					{
 						tl( 2, 2 );
 						continue;
 					}
-					else if( !w && !n )
+					else if( !w && !n && s )
 					{
 						tl( 0, 2 );
+						continue;
+					}
+					else if( !s && !w && n )
+					{
+						tl( 0, 6 );
 						continue;
 					}
 					break;
@@ -61,19 +66,24 @@ public class AutoTileDrawer
 						tr( 5, 0 );
 						continue;
 					}
-					else if( !e && n )
+					else if( !e && n && s )
 					{
 						tr( 5, 4 );
 						continue;
 					}
-					else if( e && !n )
+					else if( e && !n && w )
 					{
 						tr( 3, 2 );
 						continue;
 					}
-					else if( !e && !n )
+					else if( !e && !n && s )
 					{
 						tr( 5, 2 );
+						continue;
+					}
+					else if( !e && !s && n )
+					{
+						tr( 5, 6 );
 						continue;
 					}
 					break;
@@ -83,19 +93,29 @@ public class AutoTileDrawer
 						bl( 4, 1 );
 						continue;
 					}
-					else if( !w && s )
+					else if( !w && s && n )
 					{
 						bl( 0, 5 );
 						continue;
 					}
-					else if( w && !s )
+					else if( w && !s && e )
 					{
 						bl( 2, 7 );
+						continue;
+					}
+					else if( !w && !n && s )
+					{
+						bl( 0, 3 );
 						continue;
 					}
 					else if( !w && !s )
 					{
 						bl( 0, 7 );
+						continue;
+					}
+					else if( !e && !s && w )
+					{
+						bl( 4, 7 );
 						continue;
 					}
 					break;
@@ -105,14 +125,19 @@ public class AutoTileDrawer
 						br( 5, 1 );
 						continue;
 					}
-					else if( !e && s )
+					else if( !e && s && n )
 					{
 						br( 5, 5 );
 						continue;
 					}
-					else if( e && !s )
+					else if( e && !s && w )
 					{
 						br( 3, 7 );
+						continue;
+					}
+					else if( !e && !n && s )
+					{
+						br( 5, 3 );
 						continue;
 					}
 					else if( !e && !s )
@@ -120,10 +145,19 @@ public class AutoTileDrawer
 						br( 5, 7 );
 						continue;
 					}
+					else if( !w && !s && e )
+					{
+						br( 1, 7 );
+						continue;
+					}
 					break;
 				}
 				
-				if( !w && !n && e ) //nw
+				if( w && n && s && e ) //center
+				{
+					t( 2, 4, i );
+				} 
+				else if( !w && !n && e ) //nw
 				{
 					t( 0, 2, i );
 				}
@@ -138,10 +172,6 @@ public class AutoTileDrawer
 				else if( !w && n && s && e ) //w
 				{	
 					t( 0, 4, i );
-				}
-				else if( w && n && s && e ) //center
-				{
-					t( 2, 4, i );
 				}
 				else if( w && s && n && !e ) //e
 				{
@@ -159,6 +189,7 @@ public class AutoTileDrawer
 				{
 					t( 4, 6, i );
 				}
+				
 			}
 		}
 	}

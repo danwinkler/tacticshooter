@@ -2,6 +2,7 @@ package tacticshooter;
 
 import java.io.File;
 
+import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
@@ -51,24 +52,25 @@ public class BackgroundDrawer
 		}
 		g.pushTransform();
 		g.setAntiAlias( true );
-		g.scale( 2, 2 );
 		g.translate( -scrollx, -scrolly );
 		
-		int scrollxTile = (int)(scrollx/Level.tileSize);
-		int scrollyTile = (int)(scrolly/Level.tileSize);
+		int tileSize = 40;
 		
-		for( int y = scrollyTile; y < scrollyTile + gc.getHeight()/Level.tileSize/2 + 2; y++ )
+		int scrollxTile = (int)(scrollx/tileSize);
+		int scrollyTile = (int)(scrolly/tileSize);
+		
+		for( int y = scrollyTile; y < scrollyTile + gc.getHeight()/tileSize + 3; y++ )
 		{
-			for( int x = scrollxTile; x < scrollxTile + gc.getWidth()/Level.tileSize/2 + 1; x++ )
+			for( int x = scrollxTile; x < scrollxTile + gc.getWidth()/tileSize + 3; x++ )
 			{	
 				g.pushTransform();
-				g.translate( x*Level.tileSize, y*Level.tileSize );
+				g.translate( x*tileSize, y*tileSize );
 				Image here = getTile( x, y );
 				if( here == wall )
 				{
-					g.drawImage( floor, 0, 0, Level.tileSize, Level.tileSize, floor.getWidth()/3, 0, floor.getWidth()/3 * 2, floor.getHeight()/4 );
+					g.drawImage( floor, 0, 0, tileSize, tileSize, floor.getWidth()/3, 0, floor.getWidth()/3 * 2, floor.getHeight()/4 );
 				}
-				AutoTileDrawer.draw( g, here, Level.tileSize, 0, 
+				AutoTileDrawer.draw( g, here, tileSize, 0, 
 						getTile( x-1, y-1 ) == here, 
 						getTile( x, y-1 ) == here, 
 						getTile( x+1, y-1 ) == here, 
