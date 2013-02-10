@@ -698,12 +698,34 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			float y1 = Math.min( sy, y+cs.scrolly );
 			float x2 = Math.max( sx, x+cs.scrollx );
 			float y2 = Math.max( sy, y+cs.scrolly );
-			for( Unit u : cs.units )
+			
+			if( x2 - x1 > 2 || y2 - y1 > 2 )
 			{
-				u.selected = u.owner.id == this.cs.player.id && u.x > x1 && u.x < x2 && u.y > y1 && u.y < y2;
-				if( u.selected )
+				for( Unit u : cs.units )
 				{
-					cs.selected.add( u.id );
+					u.selected = u.owner.id == this.cs.player.id && u.x > x1 && u.x < x2 && u.y > y1 && u.y < y2;
+					if( u.selected )
+					{
+						cs.selected.add( u.id );
+					}
+				}
+			}
+			else
+			{
+				for( Unit u : cs.units )
+				{
+					float dx = x2 - u.x;
+					float dy = y2 - u.y;
+					if( u.owner.id == this.cs.player.id && dx*dx + dy*dy < u.radius * u.radius )
+					{
+						u.selected = true;
+						cs.selected.add( u.id );
+						break;
+					}
+					else
+					{
+						u.selected = false;
+					}
 				}
 			}
 			selecting = false;
