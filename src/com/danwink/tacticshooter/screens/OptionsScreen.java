@@ -15,6 +15,7 @@ import tacticshooter.StaticFiles;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DCheckBox;
 import com.phyloa.dlib.dui.DScrollPane;
+import com.phyloa.dlib.dui.DSlider;
 import com.phyloa.dlib.dui.DText;
 import com.phyloa.dlib.dui.DTextBox;
 import com.phyloa.dlib.dui.DUI;
@@ -36,7 +37,7 @@ public class OptionsScreen extends DScreen<GameContainer, Graphics> implements D
 	
 	Slick2DRenderer r = new Slick2DRenderer();
 	
-	ArrayList<DTextBox> boxes = new ArrayList<DTextBox>();
+	ArrayList<DUIElement> boxes = new ArrayList<DUIElement>();
 
 	private String optionsFile;
 
@@ -59,12 +60,23 @@ public class OptionsScreen extends DScreen<GameContainer, Graphics> implements D
 		int i = 0;
 		for( Entry<String, String> e : options.options.entrySet() )
 		{
-			scrollPane.add( new DText( e.getKey(), 10, i*50 ) );
-			DTextBox box = new DTextBox( 150, i*50, 250, 50 );
-			box.setText( e.getValue() );
-			box.setName( e.getKey() );
-			boxes.add( box );
-			scrollPane.add( box );
+			if( e.getKey().startsWith( "slider." ) )
+			{
+				scrollPane.add( new DText( e.getKey(), 10, i*50 ) );
+				DSlider box = new DSlider( 150, i*50, 250, 50, 0, 1, Float.parseFloat( e.getValue() ) );
+				box.setName( e.getKey() );
+				boxes.add( box );
+				scrollPane.add( box );
+			}
+			else
+			{
+				scrollPane.add( new DText( e.getKey(), 10, i*50 ) );
+				DTextBox box = new DTextBox( 150, i*50, 250, 50 );
+				box.setText( e.getValue() );
+				box.setName( e.getKey() );
+				boxes.add( box );
+				scrollPane.add( box );
+			}
 			i++;
 		}
 		scrollPane.setInnerPaneHeight( options.options.entrySet().size()*50 );
@@ -111,11 +123,23 @@ public class OptionsScreen extends DScreen<GameContainer, Graphics> implements D
 				StringBuilder mapList = new StringBuilder();
 				for( int i = 0; i < boxes.size(); i++ )
 				{
-					DTextBox b = boxes.get( i );
-					mapList.append( b.getName() );
-					mapList.append( " " );
-					mapList.append( b.getText().trim() );
-					mapList.append( "\n" );
+					DUIElement element = boxes.get( i );
+					if( element instanceof DTextBox )
+					{
+						DTextBox b = (DTextBox)element;
+						mapList.append( b.getName() );
+						mapList.append( " " );
+						mapList.append( b.getText().trim() );
+						mapList.append( "\n" );
+					}
+					else if( element instanceof DSlider )
+					{
+						DSlider d = (DSlider)element;
+						mapList.append( d.getName() );
+						mapList.append( " " );
+						mapList.append( d.getPosition() );
+						mapList.append( "\n" );
+					}
 				}
 				try
 				{
@@ -127,6 +151,8 @@ public class OptionsScreen extends DScreen<GameContainer, Graphics> implements D
 				}
 				StaticFiles.options = new DOptions( "options.txt" );
 				StaticFiles.advOptions = new DOptions( "data" + File.separator + "advoptions.txt" );
+				
+				gc.setMusicVolume( StaticFiles.options.getF( "slider.music" ) );
 				
 				gc.setVSync( StaticFiles.options.getB( "vsync" ) );
 				dsh.activate( screenToReturn, gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );

@@ -1,6 +1,7 @@
-vsync true
-botCount 9
 fullscreen false
+botCount 9
+vsync true
+slider.music 0.95
 name TacticalMan
 windowHeight 900
 windowWidth 1440
