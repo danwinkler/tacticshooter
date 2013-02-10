@@ -62,6 +62,8 @@ public class TacticClient extends BasicGame
 		
 		f = new AngelCodeFont( "data" + File.separator + "pixelfont1_16px.fnt", "data" + File.separator + "pixelfont1_16px_0.png" );
 		
+		gc.setMusicVolume( StaticFiles.options.getF( "slider.music" ) );
+		gc.setSoundVolume( StaticFiles.options.getF( "slider.sound" ) );
 	}
 	
 	public void update( GameContainer gc, int delta ) throws SlickException

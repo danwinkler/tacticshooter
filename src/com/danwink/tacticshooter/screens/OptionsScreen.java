@@ -153,6 +153,7 @@ public class OptionsScreen extends DScreen<GameContainer, Graphics> implements D
 				StaticFiles.advOptions = new DOptions( "data" + File.separator + "advoptions.txt" );
 				
 				gc.setMusicVolume( StaticFiles.options.getF( "slider.music" ) );
+				gc.setSoundVolume( StaticFiles.options.getF( "slider.sound" ) );
 				
 				gc.setVSync( StaticFiles.options.getB( "vsync" ) );
 				dsh.activate( screenToReturn, gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
