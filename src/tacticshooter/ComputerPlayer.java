@@ -45,8 +45,8 @@ public class ComputerPlayer implements Runnable
 	//MASSER:
 	boolean attacking = false;
 	ArrayList<Unit> attackForce = new ArrayList<Unit>();
-	float attackPropensity = DMath.randomf( .8f, 2 );
-	Building enemyHome;
+	float attackPropensity = DMath.randomf( 1.5f, 4 );
+	Building target;
 	Building closeb;
 	
 	public ComputerPlayer( ServerNetworkInterface si )
@@ -132,6 +132,10 @@ public class ComputerPlayer implements Runnable
 			try 
 			{
 				Thread.sleep( 1000 );
+				if( playType == PlayType.MASSER )
+				{
+					Thread.sleep( 1000 );
+				}
 			} 
 			catch( InterruptedException e )
 			{
@@ -143,26 +147,37 @@ public class ComputerPlayer implements Runnable
 				finder = new AStarPathFinder( l, 500, StaticFiles.options.getB( "diagonalMove" ) );
 				if( playType == PlayType.MASSER )
 				{
-					//Find enemy home
-					Building enemyHome = null;
+					//Find enemy point with most units
+					int maxUnits = 0;
 					for( Building b : l.buildings )
 					{
-						if( b.bt == BuildingType.CENTER && b.t.id != this.player.team.id )
+						if( b.t != null && b.t.id != this.player.team.id )
 						{
-							enemyHome = b;
-							break;
+							int count = 0;
+							for( Unit u : units )
+							{
+								if( u.stoppedAt != null && u.stoppedAt.id == b.id )
+								{
+									count++;
+								}
+							}
+							if( count > maxUnits )
+							{
+								maxUnits = count;
+								target = b;
+							}
 						}
 					}
 					
-					if( enemyHome == null ) continue;
-					//Find closest friendly building to enemy home
+					if( target == null ) continue;
+					//Find closest friendly building to target
 					closeb = null;
 					float closeDist = Float.MAX_VALUE;
 					for( Building b : l.buildings )
 					{
 						if( b.t != null && b.t.id == this.player.team.id )
 						{
-							Path p = finder.findPath( null, l.getTileX( b.x ), l.getTileY( b.y ), l.getTileX( enemyHome.x ), l.getTileY( enemyHome.y ) );
+							Path p = finder.findPath( null, l.getTileX( b.x ), l.getTileY( b.y ), l.getTileX( target.x ), l.getTileY( target.y ) );
 							if( p == null ) continue;
 							float d2 = p.getLength();
 							if( d2 < closeDist )
@@ -180,11 +195,11 @@ public class ComputerPlayer implements Runnable
 						float enemyUnits = 0;
 						for( Unit u : units )
 						{
-							if( u.owner.team.id == player.team.id )
+							if( u.owner.id == player.id && u.stoppedAt != null && u.stoppedAt.id == closeb.id )
 							{
 								ownUnits++;
 							} 
-							else if( u.owner.team.id != player.team.id )
+							else if( u.stoppedAt != null && u.stoppedAt.id == target.id )
 							{
 								enemyUnits++;
 							}
@@ -195,17 +210,6 @@ public class ComputerPlayer implements Runnable
 						if( ownUnits >= (enemyUnits * attackPropensity) || Math.random() < .0025 )
 						{
 							attacking = true;
-							
-							//Find enemy home
-							for( Building b : l.buildings )
-							{
-								if( b.bt == BuildingType.CENTER && b.t.id != this.player.team.id )
-								{
-									enemyHome = b;
-									break;
-								}
-							}
-							if( enemyHome == null ) continue;
 							
 							attackForce.clear();
 							
@@ -220,7 +224,7 @@ public class ComputerPlayer implements Runnable
 								}
 							}
 							
-							ci.sl.received( fc, new Message( MessageType.SETATTACKPOINT, new Object[]{ new Point2i( enemyHome.x/Level.tileSize, enemyHome.y/Level.tileSize ), selected } ) );
+							ci.sl.received( fc, new Message( MessageType.SETATTACKPOINT, new Object[]{ new Point2i( target.x/Level.tileSize, target.y/Level.tileSize ), selected } ) );
 						}
 					}
 					else
@@ -235,15 +239,16 @@ public class ComputerPlayer implements Runnable
 							}
 							else
 							{
-								ArrayList<Integer> selected = new ArrayList<Integer>();
-								selected.add( u.id );
-								ci.sl.received( fc, new Message( MessageType.SETATTACKPOINT, new Object[]{ new Point2i( enemyHome.x/Level.tileSize, enemyHome.y/Level.tileSize ), selected } ) );
+								//Not necessary now that guys don't lose their path
+								//ArrayList<Integer> selected = new ArrayList<Integer>();
+								//selected.add( u.id );
+								//ci.sl.received( fc, new Message( MessageType.SETATTACKPOINT, new Object[]{ new Point2i( target.x/Level.tileSize, target.y/Level.tileSize ), selected } ) );
 							}
 						}
-						if( attackForce.size() == 0 )
+						if( attackForce.size() == 0 || (target.t != null && target.t.id == player.team.id) )
 						{
 							attacking = false;
-							attackPropensity = DMath.randomf( .8f, 2 );
+							attackPropensity = DMath.randomf( 1.5f, 4f );
 						}
 					}
 				}
@@ -257,6 +262,7 @@ public class ComputerPlayer implements Runnable
 							if( !attacking )
 							{
 								if( closeb == null ) break;
+								if( u.stoppedAt != null && u.stoppedAt == closeb ) break;
 								
 								ArrayList<Integer> selected = new ArrayList<Integer>();
 								selected.add( u.id );

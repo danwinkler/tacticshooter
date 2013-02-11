@@ -103,7 +103,7 @@ public class Bullet
 				{
 					alive = false;
 					
-					ts.hit1.play( DMath.randomf( .9f, 1.1f ), ts.getSoundMag( gc, loc.x, loc.y ) * .2f );
+					ts.hit1.play( DMath.randomf( .9f, 1.1f ), ts.getSoundMag( gc, loc.x, loc.y ) * .4f );
 					cs.drawBlood( loc.x, loc.y );
 					break;
 				}
