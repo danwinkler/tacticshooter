@@ -89,6 +89,9 @@ public class PostGameScreen extends DScreen<GameContainer, Graphics> implements 
 	public void render( GameContainer gc, Graphics g )
 	{
 		g.setAntiAlias( true );
+		g.setColor( new Color( 0, 0, 0, 100 ) );
+		g.fillRect( 0, 0, gc.getWidth(), gc.getHeight() );
+		
 		dui.render( r.renderTo( g ) );
 	}
 
