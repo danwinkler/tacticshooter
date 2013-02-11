@@ -154,8 +154,8 @@ public class OptionsScreen extends DScreen<GameContainer, Graphics> implements D
 				
 				gc.setMusicVolume( StaticFiles.options.getF( "slider.music" ) );
 				gc.setSoundVolume( StaticFiles.options.getF( "slider.sound" ) );
-				
 				gc.setVSync( StaticFiles.options.getB( "vsync" ) );
+				
 				dsh.activate( screenToReturn, gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
 			} 
 		}

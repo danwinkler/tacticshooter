@@ -1,5 +1,6 @@
 package tacticshooter;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -9,6 +10,9 @@ import javax.vecmath.Vector2f;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
+import org.newdawn.slick.SlickException;
+import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.util.pathfinding.Path;
 import com.phyloa.dlib.util.DMath;
 
@@ -16,6 +20,22 @@ public class Unit
 {
 	public static int radius = 10;
 	public static final int UPDATE_TIME = 7;
+	public static final float frameTime = 5;
+	public static SpriteSheet light;
+	public static SpriteSheet heavy;
+	
+	public static void loadTextures()
+	{
+		try
+		{
+			light = new SpriteSheet( new Image( "img" + File.separator + "man2.png" ), 16, 16 );
+			heavy = new SpriteSheet( new Image( "img" + File.separator + "man3.png" ), 32, 32 );
+		} catch( SlickException e )
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
 	public int id = new Random().nextInt();
 	
@@ -52,6 +72,9 @@ public class Unit
 	//CLIENT ONLY
 	public boolean selected = false;
 	public int timeSinceUpdate = 0;
+	
+	int frame = 0;
+	float timeSinceLastFrame = 0;
 	
 	public Unit()
 	{
@@ -201,6 +224,19 @@ public class Unit
 		{
 			sx += DMath.cosf( sheading ) * type.speed * d * 2;
 			sy += DMath.sinf( sheading ) * type.speed * d * 2;
+			if( timeSinceLastFrame < frameTime/type.speed )
+			{
+				timeSinceLastFrame += d;
+			}
+			else 
+			{
+				timeSinceLastFrame -= frameTime/type.speed;
+				frame = (frame+1) % 4;
+			}
+		}
+		if( state == UnitState.STOPPED )
+		{
+			frame = 0;
 		}
 		
 		//Movement Smoothing
@@ -258,7 +294,7 @@ public class Unit
 		case SHOTGUN:
 		case LIGHT:
 		case SNIPER:
-			healthBarDist = -9;
+			healthBarDist = -11;
 			break;
 		case HEAVY:
 			healthBarDist = -14;
@@ -307,10 +343,15 @@ public class Unit
 		
 		switch( type )
 		{
+		case LIGHT:
+			g.pushTransform();
+			g.rotate( 0, 0, 90 );
+			//g.scale( 1.0f, 1.0f );
+			g.drawImage( light.getSprite( frame, 0 ), -8, -8, color );
+			g.popTransform();
+			break;
 		case SCOUT:
 		case SHOTGUN:
-		case LIGHT:
-		
 			if( player )
 			{
 				g.setColor( Color.white );
@@ -342,28 +383,11 @@ public class Unit
 			g.drawLine( 0, 0, 5, 0 );
 			break;
 		case HEAVY:
-			if( player )
-			{
-				g.setColor( Color.black );
-				g.fillOval( -9, -9, 18, 18 );
-				g.fillOval( -6, -13, 12, 12 );
-				g.fillOval( -6, 1, 12, 12 );
-				g.setColor( Color.white );
-				g.fillOval( -8, -8, 16, 16 );
-				g.fillOval( -5, -12, 10, 10 );
-				g.fillOval( -5, 2, 10, 10 );
-			}
-			g.setColor( Color.black );
-			g.fillOval( -7, -7, 14, 14 );
-			g.fillOval( -4, -10, 8, 8 );
-			g.fillOval( -4, 2, 8, 8 );
-			g.setColor( color );
-			g.fillOval( -6, -6, 12, 12 );
-			g.fillOval( -3, -9, 6, 6 );
-			g.fillOval( -3, 3, 6, 6 );
-			
-			g.setColor( Color.black );
-			g.drawLine( 0, 0, 6, 0 );
+			g.pushTransform();
+			g.rotate( 0, 0, 90 );
+			//g.scale( 1.0f, 1.0f );
+			g.drawImage( heavy.getSprite( frame, 0 ), -16, -16, color );
+			g.popTransform();
 			break;
 			
 		}
