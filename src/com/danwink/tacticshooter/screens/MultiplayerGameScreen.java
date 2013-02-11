@@ -382,8 +382,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	{
 		if( !running ) return;
 		
-		g.setAntiAlias( true );
-		
 		if( cs.l == null )
 		{
 			return;

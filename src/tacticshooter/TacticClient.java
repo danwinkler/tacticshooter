@@ -79,6 +79,7 @@ public class TacticClient extends BasicGame
 	public void render( GameContainer gc, Graphics g ) throws SlickException 
 	{
 		g.setFont( f );
+		g.setAntiAlias( StaticFiles.advOptions.getB( "antialias" ) );
 		
 		if( !(dsh.get() instanceof MultiplayerGameScreen) && !(dsh.get() instanceof LevelEditor) )
 		{

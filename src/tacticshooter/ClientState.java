@@ -6,6 +6,8 @@ import java.util.HashMap;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Sound;
 
+import com.phyloa.dlib.util.DMath;
+
 public class ClientState
 {
 	public HashMap<Integer, Unit> unitMap = new HashMap<Integer, Unit>();
@@ -46,8 +48,9 @@ public class ClientState
 	
 	public float getSoundMag( GameContainer gc, float x, float y )
 	{
-		float dx = (scrollx+gc.getWidth()/2) - x;
-		float dy = (scrolly+gc.getHeight()/2) - y;
-		return (float)((soundFadeDist - Math.sqrt( dx*dx+dy*dy )) / soundFadeDist);
+		float dx = (scrollx+(gc.getWidth()/2)) - x;
+		float dy = (scrolly+(gc.getHeight()/2)) - y;
+		float dist = (float)Math.sqrt( (dx*dx)+(dy*dy) );
+		return (float)((soundFadeDist - dist) / soundFadeDist);
 	}
 }
