@@ -1,3 +1,5 @@
 wall forestrpgwall.png
 floor forestrpgfloor.png
 grate grate.png
+light man2.png
+heavy man3.png

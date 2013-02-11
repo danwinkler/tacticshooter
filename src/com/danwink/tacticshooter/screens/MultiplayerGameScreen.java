@@ -214,13 +214,13 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 					cs.l = (Level)m.message;
 					scrollToTeamBase( cs.player.team );
 					cs.l.loadTextures();
-					Unit.loadTextures();
+					Unit.loadTextures( cs.l );
 				}
 				else
 				{
 					cs.l = (Level)m.message;
 					cs.l.loadTextures();
-					Unit.loadTextures();
+					Unit.loadTextures( cs.l );
 				}
 				break;
 			case BULLETUPDATE:

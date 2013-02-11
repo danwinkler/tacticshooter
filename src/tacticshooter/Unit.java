@@ -15,6 +15,7 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.util.pathfinding.Path;
 import com.phyloa.dlib.util.DMath;
+import com.phyloa.dlib.util.DOptions;
 
 public class Unit
 {
@@ -24,12 +25,12 @@ public class Unit
 	public static SpriteSheet light;
 	public static SpriteSheet heavy;
 	
-	public static void loadTextures()
+	public static void loadTextures( Level l )
 	{
 		try
 		{
-			light = new SpriteSheet( new Image( "img" + File.separator + "man2.png" ), 16, 16 );
-			heavy = new SpriteSheet( new Image( "img" + File.separator + "man3.png" ), 32, 32 );
+			light = new SpriteSheet( new Image( "img" + File.separator + new DOptions( "themes" + File.separator + l.theme ).getS( "light" ) ), 16, 16 );
+			heavy = new SpriteSheet( new Image( "img" + File.separator + new DOptions( "themes" + File.separator + l.theme ).getS( "heavy" ) ), 32, 32 );
 		} catch( SlickException e )
 		{
 			// TODO Auto-generated catch block

@@ -1,3 +1,5 @@
 wall desertrpgwall.png
 floor desertrpgfloor.png
 grate grate.png
+light man2.png
+heavy man3.png
