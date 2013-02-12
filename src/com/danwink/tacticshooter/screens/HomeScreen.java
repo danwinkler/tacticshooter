@@ -20,6 +20,7 @@ import tacticshooter.Slick2DRenderer;
 import tacticshooter.StaticFiles;
 import tacticshooter.TacticServer;
 import tacticshooter.Unit.UnitType;
+import tacticshooter.UserInfo;
 
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DUI;
@@ -51,7 +52,7 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 	
 	Image title;
 	
-	String name;
+	UserInfo user;
 	
 	public void onActivate( GameContainer e, DScreenHandler<GameContainer, Graphics> dsh )
 	{
@@ -160,14 +161,25 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 		}
 		else if( e == login )
 		{
-			dsh.activate( "login", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
+			if( user == null )
+			{
+				dsh.activate( "login", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
+			}
+			else
+			{
+				user = null;
+				login.setText( "Login" );
+			}
 		} 
 	}
 
 	@Override
 	public void message( Object o )
 	{
-		// TODO Auto-generated method stub
-		
+		if( o instanceof UserInfo )
+		{
+			this.user = (UserInfo)o;
+			login.setText( "Logout" );
+		}
 	} 
 }

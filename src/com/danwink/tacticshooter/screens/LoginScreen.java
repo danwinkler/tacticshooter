@@ -26,6 +26,7 @@ import tacticshooter.Level;
 import tacticshooter.Slick2DEventMapper;
 import tacticshooter.Slick2DRenderer;
 import tacticshooter.StaticFiles;
+import tacticshooter.UserInfo;
 
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DText;
@@ -42,6 +43,7 @@ public class LoginScreen extends DScreen<GameContainer, Graphics> implements DUI
 	DUI dui;
 	DText usernameText;
 	DText passwordText;
+	DText errorText;
 	DTextBox username;
 	DTextBox password;
 	DButton back;
@@ -58,6 +60,8 @@ public class LoginScreen extends DScreen<GameContainer, Graphics> implements DUI
 			usernameText.setCentered( true );
 			passwordText = new DText( "Password:", gc.getWidth()/2 - 150, gc.getHeight()/2 );
 			passwordText.setCentered( true );
+			errorText = new DText( "", gc.getWidth()/2, gc.getHeight()/2 - 200 );
+			errorText.setCentered( true );
 			username = new DTextBox( gc.getWidth()/2 - 100, gc.getHeight()/2-150, 200, 100 );
 			password = new DTextBox( gc.getWidth()/2 - 100, gc.getHeight()/2-50, 200, 100 );
 			password.setPasswordInput( true );
@@ -66,6 +70,7 @@ public class LoginScreen extends DScreen<GameContainer, Graphics> implements DUI
 			
 			dui.add( usernameText );
 			dui.add( passwordText );
+			dui.add( errorText );
 			dui.add( username );
 			dui.add( password );
 			dui.add( back );
@@ -89,6 +94,9 @@ public class LoginScreen extends DScreen<GameContainer, Graphics> implements DUI
 
 	public void onExit()
 	{
+		errorText.setText( "" );
+		username.setText( "" );
+		password.setText( "" );
 		dui.setEnabled( false );
 	}
 	
@@ -111,22 +119,28 @@ public class LoginScreen extends DScreen<GameContainer, Graphics> implements DUI
 				try
 				{
 					HttpClient client = new DefaultHttpClient();
-					HttpPost httppost = new HttpPost("http://www.tacticshooter.com/user/checkLogin");
+					HttpPost httppost = new HttpPost( "http://www.tacticshooter.com/user/checkLogin" );
 
 					ArrayList<NameValuePair> list = new ArrayList<NameValuePair>();
 
 					list.add( new BasicNameValuePair( "username", username.getText().trim() ) );
 					list.add( new BasicNameValuePair( "password", password.getText() ) );
 
-					httppost.setEntity( new UrlEncodedFormEntity(list) );
+					httppost.setEntity( new UrlEncodedFormEntity( list ) );
 
-					HttpResponse r = client.execute(httppost);
+					HttpResponse r = client.execute( httppost );
 					
 					String s = EntityUtils.toString( r.getEntity() );
 					
-					dsh.message( "message", s );
-					dsh.activate( "message", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
-			 
+					if( s.equals( "0" ) )
+					{
+						errorText.setText( "Username/Password combination not found." );
+					}
+					else if( s.equals( "1" ) ) 
+					{
+						dsh.message( "home", new UserInfo( username.getText().trim(), password.getText() ) );
+						dsh.activate( "home", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
+					}
 				} catch( MalformedURLException e1 )
 				{
 					// TODO Auto-generated catch block
