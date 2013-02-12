@@ -52,8 +52,6 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 	
 	Image title;
 	
-	UserInfo user;
-	
 	public void onActivate( GameContainer e, DScreenHandler<GameContainer, Graphics> dsh )
 	{
 		if( dui == null )
@@ -83,6 +81,15 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 		StaticFiles.loopWhenReady( "menu" );
 		
 		dui.setEnabled( true );
+		
+		if( StaticFiles.user == null )
+		{
+			login.setText( "Login" );
+		}
+		else
+		{
+			login.setText( "Logout" );
+		}
 		
 		try
 		{
@@ -161,13 +168,13 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 		}
 		else if( e == login )
 		{
-			if( user == null )
+			if( StaticFiles.user == null )
 			{
 				dsh.activate( "login", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
 			}
 			else
 			{
-				user = null;
+				StaticFiles.user = null;
 				login.setText( "Login" );
 			}
 		} 
@@ -176,10 +183,6 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 	@Override
 	public void message( Object o )
 	{
-		if( o instanceof UserInfo )
-		{
-			this.user = (UserInfo)o;
-			login.setText( "Logout" );
-		}
+		
 	} 
 }

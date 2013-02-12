@@ -566,7 +566,7 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			{
 				try
 				{
-					LevelFileHelper.saveLevel( name.getText(), l );
+					LevelFileHelper.saveLevel( name.getText().replace( ".", "" ), l );
 				} catch( IOException e1 )
 				{
 					e1.printStackTrace();
@@ -576,7 +576,7 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			{
 				try
 				{
-					LevelFileHelper.saveLevel( name.getText(), l );
+					LevelFileHelper.saveLevel( name.getText().replace( ".", "" ), l );
 				} catch( IOException e1 )
 				{
 					e1.printStackTrace();

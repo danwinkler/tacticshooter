@@ -2,8 +2,8 @@ package tacticshooter;
 
 public class UserInfo
 {
-	String username;
-	String password;
+	public String username;
+	public String password;
 	
 	public UserInfo( String username, String password )
 	{

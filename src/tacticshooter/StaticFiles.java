@@ -26,6 +26,8 @@ public class StaticFiles
 	
 	public static BackgroundDrawer bgd = new BackgroundDrawer();
 	
+	public static UserInfo user;
+
 	static boolean ready = false;
 	
 	private static boolean started = false;

@@ -138,7 +138,7 @@ public class LoginScreen extends DScreen<GameContainer, Graphics> implements DUI
 					}
 					else if( s.equals( "1" ) ) 
 					{
-						dsh.message( "home", new UserInfo( username.getText().trim(), password.getText() ) );
+						StaticFiles.user = new UserInfo( username.getText().trim(), password.getText() );
 						dsh.activate( "home", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
 					}
 				} catch( MalformedURLException e1 )
