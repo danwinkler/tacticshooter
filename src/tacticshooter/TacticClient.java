@@ -19,6 +19,7 @@ import com.danwink.tacticshooter.screens.LevelEditor;
 import com.danwink.tacticshooter.screens.LevelEditorLoadMap;
 import com.danwink.tacticshooter.screens.LevelEditorNewMapSetup;
 import com.danwink.tacticshooter.screens.LevelEditorSetup;
+import com.danwink.tacticshooter.screens.LoginScreen;
 import com.danwink.tacticshooter.screens.MessageScreen;
 import com.danwink.tacticshooter.screens.MultiplayerGameScreen;
 import com.danwink.tacticshooter.screens.MultiplayerSetupScreen;
@@ -42,6 +43,8 @@ public class TacticClient extends BasicGame
 	public void init( GameContainer gc ) throws SlickException
 	{
 		dsh.register( "home", new HomeScreen() );
+		dsh.register( "login", new LoginScreen() );
+		
 		dsh.register( "multiplayersetup", new MultiplayerSetupScreen() );
 		dsh.register( "multiplayergame", new MultiplayerGameScreen() );
 		dsh.register( "message", new MessageScreen() );

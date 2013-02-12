@@ -43,11 +43,15 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 	DButton settings;
 	DButton exit;
 	
+	DButton login;
+	
 	Slick2DRenderer r = new Slick2DRenderer();
 	
 	String ip;
 	
 	Image title;
+	
+	String name;
 	
 	public void onActivate( GameContainer e, DScreenHandler<GameContainer, Graphics> dsh )
 	{
@@ -61,12 +65,15 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 			settings = new DButton( "Settings", e.getWidth() / 2 - 200, e.getHeight()/2 + 100, 400, 100 );
 			exit = new DButton( "Exit", e.getWidth() / 2 - 200, e.getHeight()/2 + 200, 400, 100 );
 			
+			login = new DButton( "Login", 50, 50, 200, 100 );
 			
 			dui.add( singlePlayer );
 			dui.add( multiPlayer );
 			dui.add( levelEditor );
 			dui.add( settings );
 			dui.add( exit );
+			
+			dui.add( login );
 			
 			dui.addDUIListener( this );
 		}
@@ -151,6 +158,10 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 		{
 			gc.exit();
 		}
+		else if( e == login )
+		{
+			dsh.activate( "login", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
+		} 
 	}
 
 	@Override
