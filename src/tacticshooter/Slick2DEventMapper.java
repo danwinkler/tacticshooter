@@ -442,6 +442,7 @@ public class Slick2DEventMapper implements DEventMapper, InputListener
 		dke.keyCode = KEYTABLE[key];
 		dke.keyChar = c;
 		dke.isActionKey = false;
+		dke.lctrl = input.isKeyDown( Input.KEY_LCONTROL );
 		for( int i = 0; i < tempKLs.size(); i++ )
 		{
 			DKeyListener l = tempKLs.get( i );
@@ -457,6 +458,7 @@ public class Slick2DEventMapper implements DEventMapper, InputListener
 		dke.keyCode = KEYTABLE[key];
 		dke.keyChar = c;
 		dke.isActionKey = false;
+		dke.lctrl = input.isKeyDown( Input.KEY_LCONTROL );
 		for( int i = 0; i < tempKLs.size(); i++ )
 		{
 			DKeyListener l = tempKLs.get( i );
