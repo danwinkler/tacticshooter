@@ -110,10 +110,17 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	
 	ArrayList<Vector3f> pings = new ArrayList<Vector3f>();
 	
+	ArrayList<Integer>[] battleGroups = new ArrayList[10];
+	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
 		this.dsh = dsh;
 		this.gc = gc;
+		
+		for( int i = 0; i < 10; i++ )
+		{
+			battleGroups[i] = new ArrayList<Integer>();
+		}
 		
 		if( dui == null )
 		{
@@ -823,6 +830,38 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				chatBox.setText( "" );
 				chatBox.setVisible( true );
 				dui.setFocus( chatBox );
+			}
+		}
+		else if( keyCode >= Input.KEY_1 && keyCode <= Input.KEY_0 )
+		{
+			ArrayList<Integer> bg = battleGroups[keyCode-Input.KEY_1];
+			if( input.isKeyPressed( Input.KEY_LCONTROL ) )
+			{
+				bg.clear();
+				for( int i = 0; i < cs.selected.size(); i++ )
+				{
+					bg.add( cs.selected.get( i ) );
+				}
+			}
+			else
+			{
+				//Deselect all units
+				for( int i = 0; i < cs.selected.size(); i++ )
+				{
+					cs.unitMap.get( cs.selected.get( i ) ).selected = false;
+				}
+				cs.selected.clear();
+				
+				//Select units in battlegroup
+				for( int i = 0; i < bg.size(); i++ )
+				{
+					Unit u = cs.unitMap.get( bg.get( i ) );
+					if( u != null && u.alive )
+					{
+						u.selected = true;
+						cs.selected.add( bg.get( i ) );
+					}
+				}
 			}
 		}
 	}
