@@ -424,7 +424,7 @@ public class Unit
 		Path tp = ts.finder.findPath( null, lastPoint.x, lastPoint.y, tx, ty );
 		if( tp != null )
 		{
-			for( int i = 0; i < tp.getLength(); i++ )
+			for( int i = 1; i < tp.getLength(); i++ )
 			{
 				path.add( new Point2i( tp.getX( i ), tp.getY( i ) ) );
 			}
