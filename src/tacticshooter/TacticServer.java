@@ -60,6 +60,8 @@ public class TacticServer
 	ArrayList<String> maps = new ArrayList<String>();
 	int onMap = 0;
 	
+	ServerState state = ServerState.LOBBY;
+	
 	public TacticServer( ServerInterface si )
 	{
 		this.si = si;
@@ -101,6 +103,16 @@ public class TacticServer
 			Thread ct = new Thread( new ComputerPlayer( (ServerNetworkInterface)si ) );
 			ct.start();
 		}
+	}
+	
+	public void setupLobby()
+	{
+		
+	}
+	
+	public void setupServer()
+	{
+		
 	}
 	
 	public void update()
@@ -593,6 +605,12 @@ public class TacticServer
 			}
 			si.stop();
 		}	
+	}
+	
+	public enum ServerState
+	{
+		LOBBY,
+		PLAYING;
 	}
 	
 	public static void main( String[] args )
