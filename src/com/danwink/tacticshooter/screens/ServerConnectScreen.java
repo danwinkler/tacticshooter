@@ -57,7 +57,7 @@ public class ServerConnectScreen extends DScreen<GameContainer, Graphics>
 
 	public void onExit()
 	{
-		
+		ci.stop();
 	}
 
 	public void message( Object o )
