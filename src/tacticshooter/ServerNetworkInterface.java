@@ -106,6 +106,26 @@ public class ServerNetworkInterface implements ServerInterface
 			}
 		}
 		
+		public void connected( Connection c )
+		{
+			synchronized( messages )
+			{
+				synchronized( connectionsArr )
+				{
+					Message m = new Message();
+					m.message = c.getID();
+					m.sender = c.getID();
+					m.messageType = MessageType.CONNECTED;
+					messages.push( m );
+					if( connections.get( c.getID() ) == null )
+					{
+						connections.put( c.getID(), c );
+						connectionsArr.add( c );
+					}
+				}
+			}
+		}
+		
 		public void disconnected( Connection c )
 		{
 			synchronized( messages )

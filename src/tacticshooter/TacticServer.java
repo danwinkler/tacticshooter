@@ -315,6 +315,9 @@ public class TacticServer
 			Message m = si.getNextServerMessage();
 			switch( m.messageType )
 			{
+			case CONNECTED:
+				si.sendToClient( m.sender, new Message( MessageType.SERVERSTATE, this.state ) );
+				break;
 			case CLIENTJOIN:
 			{
 				Player player = new Player( m.sender );

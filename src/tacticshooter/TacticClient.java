@@ -19,6 +19,7 @@ import com.danwink.tacticshooter.screens.LevelEditor;
 import com.danwink.tacticshooter.screens.LevelEditorLoadMap;
 import com.danwink.tacticshooter.screens.LevelEditorNewMapSetup;
 import com.danwink.tacticshooter.screens.LevelEditorSetup;
+import com.danwink.tacticshooter.screens.LobbyScreen;
 import com.danwink.tacticshooter.screens.LoginScreen;
 import com.danwink.tacticshooter.screens.MessageScreen;
 import com.danwink.tacticshooter.screens.MultiplayerGameScreen;
@@ -26,6 +27,7 @@ import com.danwink.tacticshooter.screens.MultiplayerSetupScreen;
 import com.danwink.tacticshooter.screens.OptionsScreen;
 import com.danwink.tacticshooter.screens.PostGameScreen;
 import com.danwink.tacticshooter.screens.SelectMapScreen;
+import com.danwink.tacticshooter.screens.ServerConnectScreen;
 import com.danwink.tacticshooter.screens.SettingsScreen;
 import com.phyloa.dlib.renderer.DScreenHandler;
 
@@ -47,6 +49,9 @@ public class TacticClient extends BasicGame
 		
 		dsh.register( "multiplayersetup", new MultiplayerSetupScreen() );
 		dsh.register( "multiplayergame", new MultiplayerGameScreen() );
+		dsh.register( "connect", new ServerConnectScreen() );
+		dsh.register( "lobby", new LobbyScreen() );
+		
 		dsh.register( "message", new MessageScreen() );
 		dsh.register( "postgame", new PostGameScreen() );
 		

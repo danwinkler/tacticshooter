@@ -48,5 +48,6 @@ public class KryoHelper
 		}
 		k.register( Level.TileType[].class );
 		k.register( Level.TileType[][].class );
+		k.register( TacticServer.ServerState.class );
 	}
 }

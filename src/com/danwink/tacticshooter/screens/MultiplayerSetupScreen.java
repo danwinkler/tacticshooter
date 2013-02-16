@@ -74,8 +74,8 @@ public class MultiplayerSetupScreen extends DScreen<GameContainer, Graphics> imp
 		{
 			if( e == enter )
 			{
-				dsh.message( "multiplayergame", address.getText().trim() );
-				dsh.activate( "multiplayergame", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
+				dsh.message( "connect", address.getText().trim() );
+				dsh.activate( "connect", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
 			} 
 			else if( e == back )
 			{
@@ -85,8 +85,8 @@ public class MultiplayerSetupScreen extends DScreen<GameContainer, Graphics> imp
 		{
 			if( event.getType() == KeyEvent.VK_ENTER )
 			{
-				dsh.message( "multiplayergame", address.getText().trim() );
-				dsh.activate( "multiplayergame", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
+				dsh.message( "connect", address.getText().trim() );
+				dsh.activate( "connect", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
 			}
 		}
 	}
