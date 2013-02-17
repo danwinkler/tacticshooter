@@ -8,6 +8,7 @@ import org.newdawn.slick.Graphics;
 import tacticshooter.ClientInterface;
 import tacticshooter.ClientNetworkInterface;
 import tacticshooter.ComputerPlayer;
+import tacticshooter.Message;
 import tacticshooter.Slick2DEventMapper;
 import tacticshooter.Slick2DRenderer;
 import tacticshooter.StaticFiles;
@@ -46,36 +47,18 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 		
 		dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
 		dui.addDUIListener( this );
-		for( int i = 0; i < 8; i++ )
+		for( int i = 0; i < 16; i++ )
 		{
-			names[i] = new DButton( "Open", 20, 100 + i * 30, 170, 25 );
+			int baseHeight = i < 8 ? 100 : 300;
+			names[i] = new DButton( "Open", 20, baseHeight + i * 30, 170, 25 );
 			dui.add( names[i] );
 			
-			humanOrBot[i] = new DDropDown( 200, 100 + i * 30, 100, 25 );
+			humanOrBot[i] = new DDropDown( 200, baseHeight + i * 30, 100, 25 );
 			humanOrBot[i].name = "hb " + i;
 			humanOrBot[i].addItems( "HUMAN", "BOT" );
 			dui.add( humanOrBot[i] );
 			
-			botType[i] = new DDropDown( 310, 100 + i * 30, 200, 25 );
-			botType[i].name = "bt " + i;
-			botType[i].setVisible( false );
-			for( ComputerPlayer.PlayType pt : ComputerPlayer.PlayType.values() )
-			{
-				botType[i].addItems( pt.name() );
-			}
-			dui.add( botType[i] );
-		}
-		for( int i = 8; i < 16; i++ )
-		{
-			names[i] = new DButton( "Player", 20, 300 + i * 30, 170, 25 );
-			dui.add( names[i] );
-			
-			humanOrBot[i] = new DDropDown( 200, 300 + i * 30, 100, 25 );
-			humanOrBot[i].name = "hb " + i;
-			humanOrBot[i].addItems( "HUMAN", "BOT" );
-			dui.add( humanOrBot[i] );
-			
-			botType[i] = new DDropDown( 310, 300 + i * 30, 200, 25 );
+			botType[i] = new DDropDown( 310, baseHeight + i * 30, 200, 25 );
 			botType[i].name = "bt " + i;
 			botType[i].setVisible( false );
 			for( ComputerPlayer.PlayType pt : ComputerPlayer.PlayType.values() )
@@ -89,6 +72,16 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 	public void update( GameContainer gc, int delta )
 	{
 		dui.update();
+		
+		while( ci.hasClientMessages() )
+		{
+			Message m = ci.getNextClientMessage();
+			switch( m.messageType )
+			{
+			case PLAYERUPDATE:
+				break;
+			}
+		}
 	}
 
 	public void render( GameContainer gc, Graphics g )

@@ -1,5 +1,6 @@
 package tacticshooter;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,6 +18,7 @@ import org.newdawn.slick.util.pathfinding.PathFinder;
 import tacticshooter.Building.BuildingType;
 import tacticshooter.Unit.UnitType;
 
+import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.util.DFile;
 import com.phyloa.dlib.util.DMath;
 
@@ -29,8 +31,6 @@ import com.phyloa.dlib.util.DMath;
 public class TacticServer 
 {
 	ServerInterface si;
-	
-	int botCount = StaticFiles.options.getI( "botCount" );
 	
 	ArrayList<Team> teams = new ArrayList<Team>();
 	
@@ -53,14 +53,14 @@ public class TacticServer
 	Team a = Team.a;
 	Team b = Team.b;
 	
-	boolean onTeam = false;
-	
 	GameStats gs = new GameStats();
 	
 	ArrayList<String> maps = new ArrayList<String>();
-	int onMap = 0;
 	
 	ServerState state = ServerState.LOBBY;
+	
+	//LOBBY
+	Player[] slots = new Player[16];
 	
 	public TacticServer( ServerInterface si )
 	{
@@ -69,54 +69,88 @@ public class TacticServer
 	
 	public void begin()
 	{
-		Collections.shuffle( maps );
-		gs.setup( a, b );
-		
-		try
+		File[] files = new File( "levels" ).listFiles();
+		if( files != null )
 		{
-			String mapFile = DFile.loadText( "mapList.txt" );
-			String[] mapArr = mapFile.split( "\n" );
-			for( String s : mapArr )
+			for( int i = 0; i < files.length; i++ )
 			{
-				maps.add( s );
+				maps.add( files[i].getName().replace( ".xml", "" ) );
 			}
-			Collections.shuffle( maps );
-			l = LevelFileHelper.loadLevel( maps.get( onMap ) );
-		} catch( IOException e )
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch( DocumentException e )
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
-		finder = new AStarPathFinder( l, 500, StaticFiles.advOptions.getB( "diagonalMove" )  );
 		
 		sl = new ServerLoop();
 		t = new Thread( sl );
 		t.start();
 		lastTick = System.currentTimeMillis();
-		
-		for( int i = 0; i < botCount; i++ )
-		{
-			Thread ct = new Thread( new ComputerPlayer( (ServerNetworkInterface)si ) );
-			ct.start();
-		}
 	}
 	
 	public void setupLobby()
 	{
-		
+		state = ServerState.LOBBY;
 	}
 	
 	public void setupServer()
 	{
-		
+		state = ServerState.PLAYING;
+		gs.setup( a, b );
+		finder = new AStarPathFinder( l, 500, StaticFiles.advOptions.getB( "diagonalMove" )  );
 	}
 	
 	public void update()
 	{	
+		if( state == ServerState.LOBBY )
+		{
+			while( si.hasServerMessages() )
+			{
+				Message m = si.getNextServerMessage();
+				switch( m.messageType )
+				{
+				case CONNECTED:
+					si.sendToClient( m.sender, new Message( MessageType.SERVERSTATE, this.state ) );
+					break;
+				case CLIENTJOIN:
+					Player player = new Player( m.sender );
+					if( m.message != null )
+					{
+						String name = (String)m.message;
+						player.name = name;
+						if( name.startsWith( "BOT" ) )
+						{
+							player.isBot = true;
+						}
+					}
+					
+					boolean foundSlot = false;
+					for( int i = 0; i < 16; i++ )
+					{
+						if( slots[i] == null )
+						{
+							slots[i] = player;
+							player.slot = i;
+							foundSlot = true;
+							break;
+						}
+					}
+					
+					if( !foundSlot )
+					{
+						si.sendToClient( m.sender, new Message( MessageType.KICK, "Sorry, the server is full." ) );
+						si.sendToAllClients( new Message( MessageType.MESSAGE, player.name + " tried to join the game but the game is full." ) );
+					}
+					else
+					{
+						si.sendToClient( m.sender, new Message( MessageType.PLAYERUPDATE, player ) );
+						for( int i = 0; i < units.size(); i++ )
+						{
+							si.sendToClient( m.sender, new Message( MessageType.UNITUPDATE, units.get( i ) ) );
+						}
+						si.sendToAllClients( new Message( MessageType.MESSAGE, player.name + " has joined the game." ) );
+					}
+				}
+			}
+			return;
+		}
+		
 		float d = (System.currentTimeMillis() - sl.lastTime) / 60.f;
 		if( sl.lastTime - lastTick > 100 )
 		{
@@ -249,7 +283,8 @@ public class TacticServer
 					
 					if( won )
 					{
-						nextMap();
+						endGame();
+						setupLobby();
 						return;
 					}
 				}
@@ -320,27 +355,7 @@ public class TacticServer
 				break;
 			case CLIENTJOIN:
 			{
-				Player player = new Player( m.sender );
-				if( m.message != null )
-				{
-					String name = (String)m.message;
-					player.name = name;
-					if( name.startsWith( "BOT" ) )
-					{
-						player.isBot = true;
-					}
-				}
-				player.team = onTeam ? a : b;
-				onTeam = !onTeam;
-				players.put( m.sender, player );
-				
-				si.sendToClient( m.sender, new Message( MessageType.PLAYERUPDATE, player ) );
-				si.sendToClient( m.sender, new Message( MessageType.LEVELUPDATE, l ) );
-				for( int i = 0; i < units.size(); i++ )
-				{
-					si.sendToClient( m.sender, new Message( MessageType.UNITUPDATE, units.get( i ) ) );
-				}
-				si.sendToAllClients( new Message( MessageType.MESSAGE, player.name + " has joined the game." ) );
+				si.sendToClient( m.sender, new Message( MessageType.KICK, "Game is in progress." ) );
 				break;
 			}
 			case SETATTACKPOINT:
@@ -446,11 +461,7 @@ public class TacticServer
 				}
 				else
 				{
-					if( text.trim().equals( "/endmap" ) )
-					{
-						nextMap();
-						return;
-					} else if( text.trim().startsWith( "/ping" ) )
+					if( text.trim().startsWith( "/ping" ) )
 					{
 						try
 						{
@@ -523,41 +534,16 @@ public class TacticServer
 		}
 	}
 	
-	public void nextMap()
+	public void endGame()
 	{
-		//reset
+		//send stats to everyone
 		si.sendToAllClients( new Message( MessageType.GAMEOVER, gs ) );
 		
-		//kill all guys
-		for( int i = 0; i < units.size(); i++ )
-		{
-			units.get( i ).alive = false;
-		}
-		for( Entry<Integer, Player> e : players.entrySet() )
-		{
-			Player p = e.getValue();
-			p.money = 0;
-			si.sendToClient( p.id, new Message( MessageType.PLAYERUPDATE, p ) );
-		}
-		//make new level
-		gs.setup( a, b );
-		//l = new Level( 100, 100 );
-		//LevelBuilder.buildLevelB( l, a, b );
-		onMap = (onMap + 1) % maps.size();
-		try
-		{
-			l = LevelFileHelper.loadLevel( maps.get( onMap ) );
-		} catch( DocumentException e )
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		finder = new AStarPathFinder( l, 500, StaticFiles.advOptions.getB( "diagonalMove" )  );
-		for( int i = 0; i < botCount; i++ )
-		{
-			Thread ct = new Thread( new ComputerPlayer( (ServerNetworkInterface)si ) );
-			ct.start();
-		}
+		//Clear everything
+		units.clear();
+		bullets.clear();
+		l = null;
+		players.clear();
 	}
 	
 	public void addBullet( Unit u, float angle )

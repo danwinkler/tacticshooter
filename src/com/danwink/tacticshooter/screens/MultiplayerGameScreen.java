@@ -137,8 +137,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			escapeMenu.add( quit );
 			returnToGame = new DButton( "Return to Game", 0, 100, 200, 100 );
 			escapeMenu.add( returnToGame );
-			switchTeams = new DButton( "Switch Teams", 0, 200, 200, 100 );
-			escapeMenu.add( switchTeams );
 			escapeMenu.setVisible( false );
 			
 			chatBox = new DTextBox( gc.getWidth()/2-200, gc.getHeight()/2-50, 400, 100 );

@@ -9,7 +9,9 @@ public class Player
 	public int money;
 	public int respawn = 0;
 	public boolean isBot = false;
+	public ComputerPlayer.PlayType playType = ComputerPlayer.PlayType.AGGRESSIVE;
 	public String name;
+	public int slot;
 	
 	public Player()
 	{
