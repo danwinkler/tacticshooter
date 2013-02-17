@@ -163,7 +163,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			dsh.activate( "message", gc );
 			return;
 		}
-		ci.sendToServer( new Message( MessageType.CLIENTJOIN, StaticFiles.options.getS( "name" ) ) );
+		
 		input = gc.getInput();
 		input.addListener( this );
 		

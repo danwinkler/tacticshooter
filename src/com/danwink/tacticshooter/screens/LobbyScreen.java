@@ -8,7 +8,10 @@ import org.newdawn.slick.Graphics;
 import tacticshooter.ClientInterface;
 import tacticshooter.ClientNetworkInterface;
 import tacticshooter.ComputerPlayer;
+import tacticshooter.ComputerPlayer.PlayType;
 import tacticshooter.Message;
+import tacticshooter.MessageType;
+import tacticshooter.Player;
 import tacticshooter.Slick2DEventMapper;
 import tacticshooter.Slick2DRenderer;
 import tacticshooter.StaticFiles;
@@ -34,6 +37,8 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 	DDropDown[] humanOrBot = new DDropDown[16];
 	DDropDown[] botType = new DDropDown[16];
 	
+	Player[] slots = new Player[16];
+	
 	Slick2DRenderer r = new Slick2DRenderer();
 	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
@@ -45,11 +50,13 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 			dsh.activate( "message", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
 		}
 		
+		ci.sendToServer( new Message( MessageType.CLIENTJOIN, StaticFiles.options.getS( "name" ) ) );
+		
 		dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
 		dui.addDUIListener( this );
 		for( int i = 0; i < 16; i++ )
 		{
-			int baseHeight = i < 8 ? 100 : 300;
+			int baseHeight = i < 8 ? 100 : 200;
 			names[i] = new DButton( "Open", 20, baseHeight + i * 30, 170, 25 );
 			dui.add( names[i] );
 			
@@ -79,7 +86,27 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 			switch( m.messageType )
 			{
 			case PLAYERUPDATE:
+				Object[] oa = (Object[])m.message;
+				Player p = (Player)oa[1];
+				int slot = (Integer)oa[0];
+				if( p == null )
+				{
+					names[slot].setText( "Open" );
+					humanOrBot[slot].setSelected( 0 );
+					botType[slot].setVisible( false );
+				}
+				else
+				{
+					names[p.slot].setText( p.name );
+					humanOrBot[p.slot].setSelected( p.isBot ? 1 : 0 );
+					botType[p.slot].setVisible( p.isBot );
+					botType[p.slot].setSelected( p.playType.ordinal() );
+				}
 				break;
+			case KICK:
+				ci.stop();
+				dsh.message( "message", m.message );
+				dsh.activate( "message", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
 			}
 		}
 	}
@@ -110,20 +137,16 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 			String[] name = el.name.split( " " );
 			if( name.length == 2 )
 			{
+				int line = Integer.parseInt( name[1] );
 				if( name[0].equals( "hb" ) )
 				{
-					int line = Integer.parseInt( name[1] );
 					boolean isBot = el.getSelected().equals( "BOT" );
-					botType[line].setVisible( isBot );
-					if( isBot )
-					{
-						String[] rnames = StaticFiles.names.split( "\n" );
-						names[line].setText( rnames[DMath.randomi( 0, names.length )].split( " " )[0] );
-					}
-					else 
-					{
-						names[line].setText( "Open" );
-					}
+					ci.sendToServer( new Message( MessageType.SETBOT, new Object[] { line, isBot } ) );
+				}
+				else if( name[0].equals( "bt" ) )
+				{
+					PlayType pt = PlayType.values()[el.getSelectedOrdinal()];
+					ci.sendToServer( new Message( MessageType.SETPLAYTYPE, new Object[] { line, pt } ) );
 				}
 			}
 		}

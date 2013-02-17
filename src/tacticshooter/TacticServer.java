@@ -16,6 +16,7 @@ import org.newdawn.slick.util.pathfinding.AStarPathFinder;
 import org.newdawn.slick.util.pathfinding.PathFinder;
 
 import tacticshooter.Building.BuildingType;
+import tacticshooter.ComputerPlayer.PlayType;
 import tacticshooter.Unit.UnitType;
 
 import com.phyloa.dlib.dui.DButton;
@@ -139,13 +140,64 @@ public class TacticServer
 					}
 					else
 					{
-						si.sendToClient( m.sender, new Message( MessageType.PLAYERUPDATE, player ) );
-						for( int i = 0; i < units.size(); i++ )
+						for( int i = 0; i < 16; i++ )
 						{
-							si.sendToClient( m.sender, new Message( MessageType.UNITUPDATE, units.get( i ) ) );
+							if( slots[i] != null )
+							{
+								si.sendToClient( m.sender, new Message( MessageType.PLAYERUPDATE, new Object[] { i, slots[i] } ) );
+							}
 						}
-						si.sendToAllClients( new Message( MessageType.MESSAGE, player.name + " has joined the game." ) );
+						si.sendToAllClients( new Message( MessageType.PLAYERUPDATE, new Object[] { player.slot, player } ) );
+						si.sendToAllClients( new Message( MessageType.MESSAGE, player.name + " joined." ) );
 					}
+					break;
+				case SETBOT:
+				{
+					Object[] oa = (Object[])m.message;
+					int line = (Integer)oa[0];
+					boolean isBot = (Boolean)oa[1];
+					Player p = slots[line];
+					
+					if( p != null )
+					{
+						if( isBot )
+						{
+							si.sendToClient( p.id, new Message( MessageType.KICK, "Your slot turned into a bot." ) );
+						}
+						else if( !isBot && p.isBot )
+						{
+							slots[line] = null;
+						}
+					}
+					
+					if( isBot )
+					{
+						p = new Player();
+						p.slot = line;
+						String[] rnames = StaticFiles.names.split( "\n" );
+						p.name = rnames[DMath.randomi( 0, rnames.length )].split( " " )[0];
+						p.isBot = isBot;
+						slots[line] = p;
+					}
+					
+					si.sendToAllClients( new Message( MessageType.PLAYERUPDATE, new Object[] { line, slots[line] } ) );
+					break;
+				}
+				case SETPLAYTYPE:	
+				{
+					Object[] oa = (Object[])m.message;
+					int line = (Integer)oa[0];
+					PlayType pt = (PlayType)oa[1];
+					Player p = slots[line];
+					
+					if( p != null )
+					{
+						p.playType = pt;
+					}
+					
+					si.sendToAllClients( new Message( MessageType.PLAYERUPDATE, new Object[] { line, slots[line] } ) );
+					break;
+				}
 				}
 			}
 			return;
