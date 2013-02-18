@@ -26,10 +26,10 @@ import com.danwink.tacticshooter.screens.MultiplayerGameScreen;
 import com.danwink.tacticshooter.screens.MultiplayerSetupScreen;
 import com.danwink.tacticshooter.screens.OptionsScreen;
 import com.danwink.tacticshooter.screens.PostGameScreen;
-import com.danwink.tacticshooter.screens.SelectMapScreen;
 import com.danwink.tacticshooter.screens.ServerConnectScreen;
 import com.danwink.tacticshooter.screens.SettingsScreen;
 import com.phyloa.dlib.renderer.DScreenHandler;
+import com.phyloa.dlib.util.DFile;
 
 public class TacticClient extends BasicGame
 {
@@ -44,6 +44,22 @@ public class TacticClient extends BasicGame
 
 	public void init( GameContainer gc ) throws SlickException
 	{
+		//Attempt to login from file
+		new Thread( new Runnable() {
+			public void run()
+			{
+				try
+				{
+					String[] loginFile = (String[])DFile.loadObject( "data" + File.separator + "l.strarr" );
+					StaticFiles.login( loginFile[0], loginFile[1] );
+				}
+				catch( Exception ex )
+				{
+					
+				}
+			}
+		}).start();
+		
 		dsh.register( "home", new HomeScreen() );
 		dsh.register( "login", new LoginScreen() );
 		
@@ -61,7 +77,6 @@ public class TacticClient extends BasicGame
 		dsh.register( "editor", new LevelEditor() );
 		
 		dsh.register( "settings", new SettingsScreen() );
-		dsh.register( "selectMaps", new SelectMapScreen() );
 		dsh.register( "options", new OptionsScreen( "options.txt", "settings" ) );
 		dsh.register( "advoptions", new OptionsScreen( "data" + File.separator + "advoptions.txt", "settings" ) );
 		

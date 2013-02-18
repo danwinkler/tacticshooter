@@ -1,6 +1,7 @@
 package com.danwink.tacticshooter.screens;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -29,6 +30,7 @@ import tacticshooter.StaticFiles;
 import tacticshooter.UserInfo;
 
 import com.phyloa.dlib.dui.DButton;
+import com.phyloa.dlib.dui.DCheckBox;
 import com.phyloa.dlib.dui.DText;
 import com.phyloa.dlib.dui.DTextBox;
 import com.phyloa.dlib.dui.DUI;
@@ -37,6 +39,7 @@ import com.phyloa.dlib.dui.DUIEvent;
 import com.phyloa.dlib.dui.DUIListener;
 import com.phyloa.dlib.renderer.DScreen;
 import com.phyloa.dlib.renderer.DScreenHandler;
+import com.phyloa.dlib.util.DFile;
 
 public class LoginScreen extends DScreen<GameContainer, Graphics> implements DUIListener
 {
@@ -46,6 +49,7 @@ public class LoginScreen extends DScreen<GameContainer, Graphics> implements DUI
 	DText errorText;
 	DTextBox username;
 	DTextBox password;
+	DCheckBox remember;
 	DButton back;
 	DButton okay;
 	
@@ -67,6 +71,7 @@ public class LoginScreen extends DScreen<GameContainer, Graphics> implements DUI
 			password.setPasswordInput( true );
 			back = new DButton( "Back", gc.getWidth()/2 - 100, gc.getHeight()/2 + 50, 100, 100 );
 			okay = new DButton( "Okay", gc.getWidth()/2, gc.getHeight()/2 + 50, 100, 100 );
+			remember = new DCheckBox( gc.getWidth()/2 + 80, gc.getHeight()/2 + 160, 20, 20 );
 			
 			dui.add( usernameText );
 			dui.add( passwordText );
@@ -75,6 +80,14 @@ public class LoginScreen extends DScreen<GameContainer, Graphics> implements DUI
 			dui.add( password );
 			dui.add( back );
 			dui.add( okay );
+			dui.add( remember );
+			
+			DText line1 = new DText( "Save login information", gc.getWidth()/2-110, gc.getHeight()/2 + 165 );
+			DText line2 = new DText( "(Password is saved as plaintext)", gc.getWidth()/2, gc.getHeight()/2 + 185 );
+			line2.setCentered( true );
+			
+			dui.add( line1 );
+			dui.add( line2 );
 			
 			dui.addDUIListener( this );
 		}
@@ -116,40 +129,27 @@ public class LoginScreen extends DScreen<GameContainer, Graphics> implements DUI
 			}
 			else if( e == okay )
 			{
-				try
+				boolean success = StaticFiles.login( username.getText(), password.getText() );
+				
+				if( !success )
 				{
-					HttpClient client = new DefaultHttpClient();
-					HttpPost httppost = new HttpPost( "http://www.tacticshooter.com/user/checkLogin" );
-
-					ArrayList<NameValuePair> list = new ArrayList<NameValuePair>();
-
-					list.add( new BasicNameValuePair( "username", username.getText().trim() ) );
-					list.add( new BasicNameValuePair( "password", password.getText() ) );
-
-					httppost.setEntity( new UrlEncodedFormEntity( list ) );
-
-					HttpResponse r = client.execute( httppost );
-					
-					String s = EntityUtils.toString( r.getEntity() );
-					
-					if( s.equals( "0" ) )
-					{
-						errorText.setText( "Username/Password combination not found." );
-					}
-					else if( s.equals( "1" ) ) 
-					{
-						StaticFiles.user = new UserInfo( username.getText().trim(), password.getText() );
-						dsh.activate( "home", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
-					}
-				} catch( MalformedURLException e1 )
-				{
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch( IOException e1 )
-				{
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					errorText.setText( "Username/Password combination not found." );
 				}
+				else 
+				{
+					if( remember.checked )
+					{
+						try
+						{
+							DFile.saveObject( "data" + File.separator + "l.strarr", new String[] { username.getText().trim(), password.getText() } );
+						} catch ( IOException e1 )
+						{
+							e1.printStackTrace();
+						}
+					}
+					
+					dsh.activate( "home", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
+				}			
 			}
 		}
 	}

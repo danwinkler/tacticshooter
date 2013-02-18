@@ -20,7 +20,6 @@ public class SettingsScreen extends DScreen<GameContainer, Graphics> implements 
 {
 	DUI dui;
 	DButton toggleFullscreen;
-	DButton selectMaps;
 	DButton options;
 	DButton advOptions;
 	DButton back;
@@ -34,13 +33,11 @@ public class SettingsScreen extends DScreen<GameContainer, Graphics> implements 
 			dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
 			
 			toggleFullscreen = new DButton( "Toggle Fullscreen", gc.getWidth()/2-100, gc.getHeight()/2-200, 200, 100 );
-			selectMaps = new DButton( "Select Maps", gc.getWidth()/2-100, gc.getHeight()/2-100, 200, 100 );
-			options = new DButton( "Options", gc.getWidth()/2-100, gc.getHeight()/2, 200, 100 );
-			advOptions = new DButton( "Advanced Options", gc.getWidth()/2-100, gc.getHeight()/2+100, 200, 100 );
-			back = new DButton( "Back", gc.getWidth()/2-100, gc.getHeight()/2+200, 200, 100 );
+			options = new DButton( "Options", gc.getWidth()/2-100, gc.getHeight()/2-100, 200, 100 );
+			advOptions = new DButton( "Advanced Options", gc.getWidth()/2, gc.getHeight()/2+100, 200, 100 );
+			back = new DButton( "Back", gc.getWidth()/2-100, gc.getHeight()/2+100, 200, 100 );
 			
 			dui.add( toggleFullscreen );
-			dui.add( selectMaps );
 			dui.add( options );
 			dui.add( advOptions );
 			dui.add( back );
@@ -77,32 +74,14 @@ public class SettingsScreen extends DScreen<GameContainer, Graphics> implements 
 		{
 			if( e == toggleFullscreen )
 			{
-				if( gc.isFullscreen() )
+				try
 				{
-					try
-					{
-						gc.setFullscreen( false );
-					} catch( SlickException e1 )
-					{
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-				} 
-				else
+					gc.setFullscreen( !gc.isFullscreen() );
+				} catch( SlickException e1 )
 				{
-					try
-					{
-						gc.setFullscreen( true );
-					} catch( SlickException e1 )
-					{
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
 				}
-			}
-			else if( e == selectMaps )
-			{
-				dsh.activate( "selectMaps", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
 			}
 			else if( e == options )
 			{

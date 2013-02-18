@@ -50,7 +50,7 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{	
-		ci.sendToServer( new Message( MessageType.CLIENTJOIN, StaticFiles.options.getS( "name" ) ) );
+		ci.sendToServer( new Message( MessageType.CLIENTJOIN, StaticFiles.getUsername() ) );
 		
 		dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
 		dui.addDUIListener( this );

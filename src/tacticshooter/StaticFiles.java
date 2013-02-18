@@ -2,8 +2,17 @@ package tacticshooter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
@@ -125,6 +134,35 @@ public class StaticFiles
 		return sound.get( name );
 	}
 	
+	public static boolean login( String username, String password )
+	{
+		String s = "";
+		try
+		{
+			HttpClient client = new DefaultHttpClient();
+			HttpPost httppost = new HttpPost( "http://www.tacticshooter.com/user/checkLogin" );
+	
+			ArrayList<NameValuePair> list = new ArrayList<NameValuePair>();
+	
+			list.add( new BasicNameValuePair( "username", username.trim() ) );
+			list.add( new BasicNameValuePair( "password", password ) );
+	
+			httppost.setEntity( new UrlEncodedFormEntity( list ) );
+	
+			HttpResponse r = client.execute( httppost );
+			
+			s = EntityUtils.toString( r.getEntity() );
+			
+			user = new UserInfo( username.trim(), password );
+		} 
+		catch( Exception ex )
+		{
+			return false;
+		}
+		
+		return s.trim().equals( "1" );
+	}
+	
 	public static DScreenTransition<GameContainer, Graphics> getDownMenuOut()
 	{
 		return new DScreenSlideTransition( -1, 0, StaticFiles.advOptions.getF( "menuTransitionSpeed" ), false );
@@ -143,5 +181,10 @@ public class StaticFiles
 	public static DScreenTransition<GameContainer, Graphics> getUpMenuIn()
 	{
 		return new DScreenSlideTransition( 1, 0, StaticFiles.advOptions.getF( "menuTransitionSpeed" ), true );
+	}
+
+	public static Object getUsername() 
+	{
+		return user != null ? user.username : "Player";
 	}
 }
