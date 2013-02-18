@@ -50,8 +50,7 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{	
-		ci.sendToServer( new Message( MessageType.CLIENTJOIN, StaticFiles.getUsername() ) );
-		
+		messages.clear();
 		dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
 		dui.addDUIListener( this );
 		for( int i = 0; i < 16; i++ )
@@ -91,6 +90,8 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 		DPanel chatBackground = new DPanel( gc.getWidth() - 600, 100, 500, gc.getHeight() - 310 );
 		chatBackground.setDrawBackground( true );
 		dui.add( chatBackground );
+		
+		ci.sendToServer( new Message( MessageType.CLIENTJOIN, StaticFiles.getUsername() ) );
 	}
 	
 	public void update( GameContainer gc, int delta )
@@ -165,6 +166,7 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 	public void onExit() 
 	{
 		dui.setEnabled( false );
+		dui = null;
 	}
 
 	public void message( Object o )
@@ -228,6 +230,7 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 				else if( b == leaveGame )
 				{
 					ci.stop();
+					dsh.activate( "home", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
 				}
 				else
 				{

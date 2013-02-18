@@ -114,6 +114,11 @@ public class TacticServer
 			{
 				slots[i] = null;
 			}
+			else if( slots != null && slots[i].isBot )
+			{
+				slots[i].money = 0;
+				slots[i].respawn = 0;
+			}
 		}
 		state = ServerState.LOBBY;
 	}
@@ -177,7 +182,10 @@ public class TacticServer
 						if( slots[i] != null && slots[i].id == m.sender )
 						{
 							si.sendToAllClients( new Message( MessageType.MESSAGE, slots[i].name + " left the game." ) );
-							slots[i] = null;
+							if( !slots[i].isBot )
+							{
+								slots[i] = null;
+							}
 							si.sendToClient( m.sender, new Message( MessageType.PLAYERUPDATE, new Object[] { i, slots[i] } ) );
 							break;
 						}
@@ -544,10 +552,23 @@ public class TacticServer
 				Player player = players.get( m.sender );
 				if( player != null )
 				{
+					Player chosenPlayer = null;
+					for( int i = 0; i < slots.length; i++ )
+					{
+						if( slots[i].team == player.team && slots[i].id != player.id )
+						{
+							chosenPlayer = slots[i];
+							break;
+						}
+					}
 					for( int i = 0; i < units.size(); i++ )
 					{
 						Unit u = units.get( i );
-						if( u.owner == null || u.owner.id == player.id )
+						if( chosenPlayer != null )
+						{
+							u.owner = chosenPlayer;
+						}
+						else
 						{
 							u.alive = false;
 						}

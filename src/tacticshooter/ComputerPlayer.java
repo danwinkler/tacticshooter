@@ -53,11 +53,11 @@ public class ComputerPlayer implements Runnable
 	{
 		fc = new FakeConnection();
 		ci = si;
+		ci.sl.connected( fc );
 	}
 	
 	public void run() 
 	{
-		ci.sl.connected( fc );
 		while( playing )
 		{
 			while( fc.hasClientMessages() )
