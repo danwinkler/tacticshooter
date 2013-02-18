@@ -36,7 +36,7 @@ public class ComputerPlayer implements Runnable
 	
 	boolean playing = true;
 	
-	PlayType playType = PlayType.values()[DMath.randomi(0, PlayType.values().length)];
+	PlayType playType;
 	
 	Player[] players = new Player[0];
 	
@@ -57,17 +57,7 @@ public class ComputerPlayer implements Runnable
 	
 	public void run() 
 	{
-		String name = "DUDE";
-		try 
-		{
-			String[] names = StaticFiles.names.split( "\n" );
-			name = names[DMath.randomi( 0, names.length )].split( " " )[0];
-		} catch( Exception ex )
-		{
-			ex.printStackTrace();
-		}
-		
-		ci.sl.received( fc, new Message( MessageType.CLIENTJOIN, "BOT_" + playType.name() + "_" + name ) );
+		ci.sl.connected( fc );
 		while( playing )
 		{
 			while( fc.hasClientMessages() )
@@ -141,7 +131,7 @@ public class ComputerPlayer implements Runnable
 			{
 				e.printStackTrace();
 			}
-				
+			
 			if( player != null && l != null )
 			{
 				finder = new AStarPathFinder( l, 500, StaticFiles.options.getB( "diagonalMove" ) );

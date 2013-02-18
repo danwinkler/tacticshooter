@@ -138,6 +138,10 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 			case MESSAGE:
 				messages.add( (String)m.message );
 				break;
+			case STARTGAME:
+				dsh.message( "multiplayergame", ci );
+				dsh.activate( "multiplayergame", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
+				break;
 			case LEVELUPDATE:
 			{
 				Object[] oa = (Object[])m.message;

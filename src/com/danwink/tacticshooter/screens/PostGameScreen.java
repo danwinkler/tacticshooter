@@ -110,7 +110,8 @@ public class PostGameScreen extends DScreen<GameContainer, Graphics> implements 
 				dsh.activate( "home", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
 			} else if( e == rejoin )
 			{
-				dsh.activate( "multiplayergame", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
+				dsh.message( "connect", ((MultiplayerSetupScreen)dsh.get( "multiplayersetup" )).address.getText().trim() );
+				dsh.activate( "connect", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
 			}
 		}
 	}

@@ -86,8 +86,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	
 	Slick2DRenderer renderer = new Slick2DRenderer();
 	
-	String address;
-	
 	GameContainer gc;
 	
 	Image miniMap;
@@ -153,16 +151,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			dui.addDUIListener( this );
 		}
 		dui.setEnabled( true );
-		
-		try 
-		{
-			ci = new ClientNetworkInterface( address );	
-		} catch( IOException e )
-		{
-			dsh.message( "message", "Could not connect to: " + address );
-			dsh.activate( "message", gc );
-			return;
-		}
 		
 		input = gc.getInput();
 		input.addListener( this );
@@ -944,7 +932,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	@Override
 	public void message( Object o )
 	{
-		address = (String)o;
+		this.ci = (ClientInterface)o;
 	}
 	
 	public void event( DUIEvent event )

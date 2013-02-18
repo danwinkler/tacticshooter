@@ -33,8 +33,6 @@ public class TacticServer
 {
 	ServerInterface si;
 	
-	ArrayList<Team> teams = new ArrayList<Team>();
-	
 	ArrayList<Unit> units = new ArrayList<Unit>();
 	ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 	
@@ -88,14 +86,58 @@ public class TacticServer
 	
 	public void setupLobby()
 	{
+		for( int i = 0; i < 16; i++ )
+		{
+			if( slots[i] != null && !slots[i].isBot )
+			{
+				slots[i] = null;
+			}
+		}
 		state = ServerState.LOBBY;
 	}
 	
 	public void setupServer()
 	{
-		state = ServerState.PLAYING;
+		try {
+			l = LevelFileHelper.loadLevel( maps.get( selectedMap ) );
+		} catch( DocumentException e ) {
+			e.printStackTrace();
+		}
 		gs.setup( a, b );
+		for( int i = 0; i < 16; i++ )
+		{
+			if( slots[i] != null )
+			{
+				slots[i].team = i < 8 ? a : b;
+				if( slots[i].isBot )
+				{
+					ComputerPlayer cp = new ComputerPlayer( (ServerNetworkInterface)si );
+					cp.player = slots[i];
+					cp.playType = slots[i].playType;
+					Thread ct = new Thread( cp );
+					ct.start();
+					slots[i].id = cp.fc.id;
+					players.put( cp.fc.id, slots[i] );
+				}
+				else
+				{
+					players.put( slots[i].id, slots[i] );
+				}
+			}
+		}
+		
+		for( int i = 0; i < 16; i++ )
+		{
+			if( slots[i] != null )
+			{
+				si.sendToAllClients( new Message( MessageType.PLAYERUPDATE, slots[i] ) );	
+			}
+		}
+		
+		si.sendToAllClients( new Message( MessageType.LEVELUPDATE, l ) );
+		
 		finder = new AStarPathFinder( l, 500, StaticFiles.advOptions.getB( "diagonalMove" )  );
+		state = ServerState.PLAYING;
 	}
 	
 	public void update()
@@ -326,54 +368,6 @@ public class TacticServer
 					p.money += bc;
 					gs.get( p.team ).moneyEarned += bc;
 					si.sendToClient( p.id, new Message( MessageType.PLAYERUPDATE, p ) );
-				}
-				
-				HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
-				for( int i = 0; i < playerArr.length; i++ )
-				{
-					Player p = playerArr[i];
-					if( !map.containsKey( p.team.id ) )
-					{
-						map.put( p.team.id, 0 );
-					}
-					int a = map.get( p.team.id );
-					a++;
-					map.put( p.team.id, a );
-				}
-				ArrayList<Entry<Integer, Integer>> list = new ArrayList<Entry<Integer, Integer>>();
-				for( Entry<Integer, Integer> e : map.entrySet() )
-				{
-					list.add( e );
-				}
-				Collections.sort( list, new Comparator<Entry<Integer, Integer>>() {
-					public int compare( Entry<Integer, Integer> arg0, Entry<Integer, Integer> arg1 )
-					{
-						return arg1.getValue() - arg0.getValue();
-					} 
-				} );
-				System.out.println( list );
-				if( list.get( 0 ).getValue() - list.get( 1 ).getValue() > 1 )
-				{
-					for( int i = 0; i < playerArr.length; i++ )
-					{
-						Player player = playerArr[i];
-						if( player.isBot && player.team.id == list.get( 0 ).getKey() )
-						{
-							player.respawn = 0;
-							player.team = player.team.id == a.id ? b : a;
-							
-							for( Unit u : units )
-							{
-								if( u.owner == null || u.owner.id == player.id )
-								{
-									u.alive = false;
-								}
-							}
-							
-							si.sendToClient( player.id, new Message( MessageType.PLAYERUPDATE, player ) );
-							break;
-						}
-					}
 				}
 				
 				si.sendToAllClients( new Message( MessageType.PLAYERLIST, playerArr ) );
