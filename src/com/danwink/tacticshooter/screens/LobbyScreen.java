@@ -1,6 +1,8 @@
 package com.danwink.tacticshooter.screens;
 
+import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -18,7 +20,8 @@ import tacticshooter.StaticFiles;
 
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DDropDown;
-import com.phyloa.dlib.dui.DText;
+import com.phyloa.dlib.dui.DPanel;
+import com.phyloa.dlib.dui.DTextBox;
 import com.phyloa.dlib.dui.DUI;
 import com.phyloa.dlib.dui.DUIEvent;
 import com.phyloa.dlib.dui.DUIListener;
@@ -32,14 +35,19 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 	ClientInterface ci;
 	
 	DUI dui;
+	Slick2DRenderer r = new Slick2DRenderer();
 	
 	DButton[] names = new DButton[16];
 	DDropDown[] humanOrBot = new DDropDown[16];
 	DDropDown[] botType = new DDropDown[16];
+	DDropDown maps;
+	DTextBox chatBox;
+	DButton startGame;
+	DButton leaveGame;
 	
 	Player[] slots = new Player[16];
 	
-	Slick2DRenderer r = new Slick2DRenderer();
+	ArrayList<String> messages = new ArrayList<String>();
 	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
@@ -56,8 +64,9 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 		dui.addDUIListener( this );
 		for( int i = 0; i < 16; i++ )
 		{
-			int baseHeight = i < 8 ? 100 : 200;
+			int baseHeight = i < 8 ? 160 : 200;
 			names[i] = new DButton( "Open", 20, baseHeight + i * 30, 170, 25 );
+			names[i].setName( "na " + i );
 			dui.add( names[i] );
 			
 			humanOrBot[i] = new DDropDown( 200, baseHeight + i * 30, 100, 25 );
@@ -74,6 +83,22 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 			}
 			dui.add( botType[i] );
 		}
+		
+		maps = new DDropDown( 20, 100, 500, 25 );
+		dui.add( maps );
+		
+		leaveGame = new DButton( "Leave", 105, 700, 90, 50 );
+		dui.add( leaveGame );
+		
+		startGame = new DButton( "Start", 205, 700, 90, 50 );
+		dui.add( startGame );
+		
+		chatBox = new DTextBox( gc.getWidth()-600, gc.getHeight() - 200, 500, 50 );
+		dui.add( chatBox );
+		
+		DPanel chatBackground = new DPanel( gc.getWidth() - 600, 100, 500, gc.getHeight() - 310 );
+		chatBackground.setDrawBackground( true );
+		dui.add( chatBackground );
 	}
 	
 	public void update( GameContainer gc, int delta )
@@ -86,6 +111,7 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 			switch( m.messageType )
 			{
 			case PLAYERUPDATE:
+			{
 				Object[] oa = (Object[])m.message;
 				Player p = (Player)oa[1];
 				int slot = (Integer)oa[0];
@@ -103,17 +129,41 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 					botType[p.slot].setSelected( p.playType.ordinal() );
 				}
 				break;
+			}
 			case KICK:
 				ci.stop();
 				dsh.message( "message", m.message );
 				dsh.activate( "message", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
+				break;
+			case MESSAGE:
+				messages.add( (String)m.message );
+				break;
+			case LEVELUPDATE:
+			{
+				Object[] oa = (Object[])m.message;
+				ArrayList<String> mapList = (ArrayList<String>)oa[1];
+				int selectedMap = (Integer)oa[0];
+				maps.clearItems();
+				for( String s : mapList )
+				{
+					maps.addItems( s );
+				}
+				maps.setSelected( selectedMap );
+				break;
+			}
 			}
 		}
 	}
 
 	public void render( GameContainer gc, Graphics g )
-	{
+	{	
 		dui.render( r.renderTo( g ) );
+		int count = 0;
+		for( int i = messages.size()-1; i >= Math.max( messages.size() - 10, 0 ); i-- )
+		{
+			g.drawString( messages.get( i ), gc.getWidth() - 600 + 10, gc.getHeight() - 230 + count * -20 );
+			count++;
+		}	
 	}
 
 	public void onExit() 
@@ -134,19 +184,66 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 		if( event.getElement() instanceof DDropDown )
 		{
 			DDropDown el = (DDropDown)event.getElement();
-			String[] name = el.name.split( " " );
-			if( name.length == 2 )
+			if( el == maps )
 			{
-				int line = Integer.parseInt( name[1] );
-				if( name[0].equals( "hb" ) )
+				ci.sendToServer( new Message( MessageType.LEVELUPDATE, el.getSelectedOrdinal() ) );
+			}
+			else
+			{
+				String[] name = el.name.split( " " );
+				if( name.length == 2 )
 				{
-					boolean isBot = el.getSelected().equals( "BOT" );
-					ci.sendToServer( new Message( MessageType.SETBOT, new Object[] { line, isBot } ) );
+					int line = Integer.parseInt( name[1] );
+					if( name[0].equals( "hb" ) )
+					{
+						boolean isBot = el.getSelected().equals( "BOT" );
+						ci.sendToServer( new Message( MessageType.SETBOT, new Object[] { line, isBot } ) );
+					}
+					else if( name[0].equals( "bt" ) )
+					{
+						PlayType pt = PlayType.values()[el.getSelectedOrdinal()];
+						ci.sendToServer( new Message( MessageType.SETPLAYTYPE, new Object[] { line, pt } ) );
+					}
 				}
-				else if( name[0].equals( "bt" ) )
+			}
+		}
+		else if( event.getElement() instanceof DTextBox )
+		{
+			DTextBox b = (DTextBox)event.getElement();
+			if( event.getType() == KeyEvent.VK_ENTER )
+			{
+				String text = b.getText().trim();
+				if( text.length() > 0 )
 				{
-					PlayType pt = PlayType.values()[el.getSelectedOrdinal()];
-					ci.sendToServer( new Message( MessageType.SETPLAYTYPE, new Object[] { line, pt } ) );
+					ci.sendToServer( new Message( MessageType.MESSAGE, b.getText().trim() ) );
+				}
+				b.setText( "" );
+			}
+		}
+		else if( event.getElement() instanceof DButton )
+		{
+			DButton b = (DButton)event.getElement();
+			if( event.getType() == DButton.MOUSE_UP )
+			{
+				if( b == startGame )
+				{
+					ci.sendToServer( new Message( MessageType.STARTGAME, null ) );
+				}
+				else if( b == leaveGame )
+				{
+					ci.stop();
+				}
+				else
+				{
+					String[] name = b.name.split( " " );
+					if( name.length == 2 )
+					{
+						int line = Integer.parseInt( name[1] );
+						if( name[0].equals( "na" ) )
+						{
+							ci.sendToServer( new Message( MessageType.SWITCHTEAMS, line ) );
+						}
+					}
 				}
 			}
 		}

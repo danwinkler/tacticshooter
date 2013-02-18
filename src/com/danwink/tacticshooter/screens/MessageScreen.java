@@ -1,5 +1,6 @@
 package com.danwink.tacticshooter.screens;
 
+import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
@@ -49,6 +50,9 @@ public class MessageScreen extends DScreen<GameContainer, Graphics> implements D
 
 	public void render( GameContainer gc, Graphics g )
 	{
+		g.setColor( new Color( 0, 0, 0, 100 ) );
+		g.fillRect( 0, 0, gc.getWidth(), gc.getHeight() );
+		
 		dui.render( r.renderTo( g ) );
 	}
 

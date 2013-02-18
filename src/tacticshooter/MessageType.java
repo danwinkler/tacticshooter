@@ -23,5 +23,6 @@ public enum MessageType
 	SERVERSTATE,
 	KICK, 
 	SETBOT,
-	SETPLAYTYPE;
+	SETPLAYTYPE,
+	STARTGAME;
 }

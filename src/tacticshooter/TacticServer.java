@@ -62,6 +62,7 @@ public class TacticServer
 	
 	//LOBBY
 	Player[] slots = new Player[16];
+	int selectedMap = 0;
 	
 	public TacticServer( ServerInterface si )
 	{
@@ -106,6 +107,18 @@ public class TacticServer
 				Message m = si.getNextServerMessage();
 				switch( m.messageType )
 				{
+				case DISCONNECTED:
+					for( int i = 0; i < 16; i++ )
+					{
+						if( slots[i] != null && slots[i].id == m.sender )
+						{
+							si.sendToAllClients( new Message( MessageType.MESSAGE, slots[i].name + " left the game." ) );
+							slots[i] = null;
+							si.sendToClient( m.sender, new Message( MessageType.PLAYERUPDATE, new Object[] { i, slots[i] } ) );
+							break;
+						}
+					}
+					break;
 				case CONNECTED:
 					si.sendToClient( m.sender, new Message( MessageType.SERVERSTATE, this.state ) );
 					break;
@@ -147,6 +160,7 @@ public class TacticServer
 								si.sendToClient( m.sender, new Message( MessageType.PLAYERUPDATE, new Object[] { i, slots[i] } ) );
 							}
 						}
+						si.sendToClient( m.sender, new Message( MessageType.LEVELUPDATE, new Object[] { selectedMap, maps } ) );
 						si.sendToAllClients( new Message( MessageType.PLAYERUPDATE, new Object[] { player.slot, player } ) );
 						si.sendToAllClients( new Message( MessageType.MESSAGE, player.name + " joined." ) );
 					}
@@ -196,6 +210,51 @@ public class TacticServer
 					}
 					
 					si.sendToAllClients( new Message( MessageType.PLAYERUPDATE, new Object[] { line, slots[line] } ) );
+					break;
+				}
+				case MESSAGE:
+				{
+					String text = (String)m.message;
+					for( int i = 0; i < slots.length; i++ )
+					{
+						if( slots[i].id == m.sender )
+						{
+							si.sendToAllClients( new Message( MessageType.MESSAGE, slots[i].name + ": " + text ) );
+							break;
+						}
+					}
+					break;
+				}
+				case STARTGAME:
+				{
+					si.sendToAllClients( new Message( MessageType.STARTGAME, null ) );
+					setupServer();
+					break;
+				}
+				case LEVELUPDATE:
+				{
+					selectedMap = (Integer)m.message;
+					si.sendToAllClients( new Message( MessageType.LEVELUPDATE, new Object[] { selectedMap, maps } ) );
+					break;
+				}
+				case SWITCHTEAMS:
+				{
+					int target = (Integer)m.message;
+					if( slots[target] == null )
+					{
+						for( int i = 0; i < slots.length; i++ )
+						{
+							if( slots[i] != null && slots[i].id == m.sender )
+							{
+								slots[target] = slots[i];
+								slots[target].slot = target;
+								slots[i] = null;
+								si.sendToAllClients( new Message( MessageType.PLAYERUPDATE, new Object[] { i, null } ) );
+								si.sendToAllClients( new Message( MessageType.PLAYERUPDATE, new Object[] { target, slots[target] } ) );
+								break;
+							}
+						}
+					}
 					break;
 				}
 				}
@@ -438,25 +497,6 @@ public class TacticServer
 					}
 				}
 				si.sendToClient( m.sender, new Message( MessageType.MOVESUCCESS, null ) );
-				break;
-			}
-			case SWITCHTEAMS:
-			{
-				Team t = (Team)m.message;
-				Player player = players.get( m.sender );
-				player.respawn = 0;
-				player.team = t.id == a.id ? b : a;
-				player.money = 0;
-				
-				for( Unit u : units )
-				{
-					if( u.owner == null || u.owner.id == player.id )
-					{
-						u.alive = false;
-					}
-				}
-				
-				si.sendToClient( m.sender, new Message( MessageType.PLAYERUPDATE, player ) );
 				break;
 			}
 			case BUILDUNIT:
