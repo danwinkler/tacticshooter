@@ -25,6 +25,8 @@ public class ServerConnectScreen extends DScreen<GameContainer, Graphics>
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		ci.sendToServer( new Message( MessageType.CONNECTED, null ) );
 	}
 	
 	public void update( GameContainer gc, int delta )
@@ -38,13 +40,13 @@ public class ServerConnectScreen extends DScreen<GameContainer, Graphics>
 				switch( s )
 				{
 				case LOBBY:
-					dsh.message( "lobby", address );
+					dsh.message( "lobby", ci );
 					dsh.activate( "lobby", gc );
-					break;
+					return;
 				case PLAYING:
-					dsh.message( "multiplayergame", address );
+					dsh.message( "multiplayergame", ci );
 					dsh.activate( "multiplayergame", gc );
-					break;
+					return;
 				}
 			}
 		}
@@ -57,7 +59,7 @@ public class ServerConnectScreen extends DScreen<GameContainer, Graphics>
 
 	public void onExit()
 	{
-		ci.stop();
+		
 	}
 
 	public void message( Object o )

@@ -31,7 +31,6 @@ import com.phyloa.dlib.util.DMath;
 
 public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUIListener
 {
-	String address;
 	ClientInterface ci;
 	
 	DUI dui;
@@ -50,14 +49,7 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 	ArrayList<String> messages = new ArrayList<String>();
 	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
-	{
-		try {
-			ci = new ClientNetworkInterface( address );
-		} catch (IOException e) {
-			dsh.message( "message", "Could not connect to server at: " + address );
-			dsh.activate( "message", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
-		}
-		
+	{	
 		ci.sendToServer( new Message( MessageType.CLIENTJOIN, StaticFiles.options.getS( "name" ) ) );
 		
 		dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
@@ -177,9 +169,9 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 
 	public void message( Object o )
 	{
-		if( o instanceof String )
+		if( o instanceof ClientInterface )
 		{
-			address = (String)o;
+			ci = (ClientInterface)o;
 		}
 	}
 

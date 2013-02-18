@@ -82,6 +82,28 @@ public class TacticServer
 		t = new Thread( sl );
 		t.start();
 		lastTick = System.currentTimeMillis();
+		
+		for( int i = 4; i < 8; i++ )
+		{
+			Player p = new Player();
+			p.slot = i;
+			String[] rnames = StaticFiles.names.split( "\n" );
+			p.name = rnames[DMath.randomi( 0, rnames.length )].split( " " )[0];
+			p.playType = PlayType.values()[i%PlayType.values().length];
+			p.isBot = true;
+			slots[i] = p;
+		}
+		
+		for( int i = 12; i < 16; i++ )
+		{
+			Player p = new Player();
+			p.slot = i;
+			String[] rnames = StaticFiles.names.split( "\n" );
+			p.name = rnames[DMath.randomi( 0, rnames.length )].split( " " )[0];
+			p.playType = PlayType.values()[i%PlayType.values().length];
+			p.isBot = true;
+			slots[i] = p;
+		}
 	}
 	
 	public void setupLobby()
@@ -170,10 +192,6 @@ public class TacticServer
 					{
 						String name = (String)m.message;
 						player.name = name;
-						if( name.startsWith( "BOT" ) )
-						{
-							player.isBot = true;
-						}
 					}
 					
 					boolean foundSlot = false;
