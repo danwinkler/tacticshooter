@@ -23,14 +23,19 @@ public class Unit
 	public static final int UPDATE_TIME = 7;
 	public static final float frameTime = 5;
 	public static SpriteSheet light;
+	public static SpriteSheet lightColor;
 	public static SpriteSheet heavy;
+	public static SpriteSheet heavyColor;
+	public static Color playerColor = new Color( 128, 128, 255 );
 	
 	public static void loadTextures( Level l )
 	{
 		try
 		{
 			light = new SpriteSheet( new Image( "img" + File.separator + new DOptions( "themes" + File.separator + l.theme ).getS( "light" ) ), 16, 16 );
+			lightColor = new SpriteSheet( new Image( "img" + File.separator + new DOptions( "themes" + File.separator + l.theme ).getS( "lightcolor" ) ), 16, 16 );
 			heavy = new SpriteSheet( new Image( "img" + File.separator + new DOptions( "themes" + File.separator + l.theme ).getS( "heavy" ) ), 32, 32 );
+			heavyColor = new SpriteSheet( new Image( "img" + File.separator + new DOptions( "themes" + File.separator + l.theme ).getS( "heavycolor" ) ), 32, 32 );
 		} catch( SlickException e )
 		{
 			// TODO Auto-generated catch block
@@ -340,7 +345,7 @@ public class Unit
 	
 	public void drawBody( Graphics g, boolean player )
 	{
-		Color color = this.owner.team.getColor();
+		Color color = player ? playerColor : this.owner.team.getColor();
 		
 		switch( type )
 		{
@@ -348,7 +353,8 @@ public class Unit
 			g.pushTransform();
 			g.rotate( 0, 0, 90 );
 			//g.scale( 1.0f, 1.0f );
-			g.drawImage( light.getSprite( frame, 0 ), -8, -8, color );
+			g.drawImage( light.getSprite( frame, 0 ), -8, -8 );
+			g.drawImage( lightColor.getSprite( frame, 0 ), -8, -8, color );
 			g.popTransform();
 			break;
 		case SCOUT:
@@ -387,7 +393,8 @@ public class Unit
 			g.pushTransform();
 			g.rotate( 0, 0, 90 );
 			//g.scale( 1.0f, 1.0f );
-			g.drawImage( heavy.getSprite( frame, 0 ), -16, -16, color );
+			g.drawImage( heavy.getSprite( frame, 0 ), -16, -16 );
+			g.drawImage( heavyColor.getSprite( frame, 0 ), -16, -16, color );
 			g.popTransform();
 			break;
 			
