@@ -50,8 +50,8 @@ public class MessageScreen extends DScreen<GameContainer, Graphics> implements D
 
 	public void render( GameContainer gc, Graphics g )
 	{
-		g.setColor( new Color( 0, 0, 0, 100 ) );
-		g.fillRect( 0, 0, gc.getWidth(), gc.getHeight() );
+		//g.setColor( new Color( 0, 0, 0, 100 ) );
+		//g.fillRect( 0, 0, gc.getWidth(), gc.getHeight() );
 		
 		dui.render( r.renderTo( g ) );
 	}

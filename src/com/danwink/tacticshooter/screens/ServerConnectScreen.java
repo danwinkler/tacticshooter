@@ -44,8 +44,8 @@ public class ServerConnectScreen extends DScreen<GameContainer, Graphics>
 					dsh.activate( "lobby", gc );
 					return;
 				case PLAYING:
-					dsh.message( "multiplayergame", ci );
-					dsh.activate( "multiplayergame", gc );
+					dsh.message( "message", "Cannot join game in progress." );
+					dsh.activate( "message", gc );
 					return;
 				}
 			}
