@@ -114,7 +114,7 @@ public class TacticServer
 			{
 				slots[i] = null;
 			}
-			else if( slots != null && slots[i].isBot )
+			else if( slots[i] != null && slots[i].isBot )
 			{
 				slots[i].money = 0;
 				slots[i].respawn = 0;
@@ -165,6 +165,8 @@ public class TacticServer
 		
 		finder = new AStarPathFinder( l, 500, StaticFiles.advOptions.getB( "diagonalMove" )  );
 		state = ServerState.PLAYING;
+		
+		lastTick = System.currentTimeMillis();
 	}
 	
 	public void update()
