@@ -448,6 +448,7 @@ public class Unit
 		this.type = u.type;
 		this.state = u.state;
 		this.onStep = u.onStep;
+		this.owner = u.owner;
 		timeSinceUpdate = 0;
 	}
 

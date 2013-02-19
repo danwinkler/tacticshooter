@@ -34,7 +34,7 @@ public class SettingsScreen extends DScreen<GameContainer, Graphics> implements 
 			
 			toggleFullscreen = new DButton( "Toggle Fullscreen", gc.getWidth()/2-100, gc.getHeight()/2-200, 200, 100 );
 			options = new DButton( "Options", gc.getWidth()/2-100, gc.getHeight()/2-100, 200, 100 );
-			advOptions = new DButton( "Advanced Options", gc.getWidth()/2, gc.getHeight()/2+100, 200, 100 );
+			advOptions = new DButton( "Advanced Options", gc.getWidth()/2-100, gc.getHeight()/2, 200, 100 );
 			back = new DButton( "Back", gc.getWidth()/2-100, gc.getHeight()/2+100, 200, 100 );
 			
 			dui.add( toggleFullscreen );

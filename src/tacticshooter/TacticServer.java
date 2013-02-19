@@ -120,6 +120,9 @@ public class TacticServer
 				slots[i].respawn = 0;
 			}
 		}
+		
+		selectedMap = (selectedMap+1) % maps.size();
+		
 		state = ServerState.LOBBY;
 	}
 	
@@ -141,10 +144,10 @@ public class TacticServer
 					ComputerPlayer cp = new ComputerPlayer( (ServerNetworkInterface)si );
 					cp.player = slots[i];
 					cp.playType = slots[i].playType;
-					Thread ct = new Thread( cp );
-					ct.start();
 					slots[i].id = cp.fc.id;
 					players.put( cp.fc.id, slots[i] );
+					Thread ct = new Thread( cp );
+					ct.start();
 				}
 				else
 				{
@@ -157,16 +160,16 @@ public class TacticServer
 		{
 			if( slots[i] != null )
 			{
-				si.sendToAllClients( new Message( MessageType.PLAYERUPDATE, slots[i] ) );	
+				si.sendToClient( slots[i].id, new Message( MessageType.PLAYERUPDATE, slots[i] ) );	
 			}
 		}
 		
 		si.sendToAllClients( new Message( MessageType.LEVELUPDATE, l ) );
 		
 		finder = new AStarPathFinder( l, 500, StaticFiles.advOptions.getB( "diagonalMove" )  );
-		state = ServerState.PLAYING;
 		
 		lastTick = System.currentTimeMillis();
+		state = ServerState.PLAYING;
 	}
 	
 	public void update()
@@ -557,7 +560,7 @@ public class TacticServer
 					Player chosenPlayer = null;
 					for( int i = 0; i < slots.length; i++ )
 					{
-						if( slots[i].team == player.team && slots[i].id != player.id )
+						if( slots[i] != null && slots[i].team == player.team && slots[i].id != player.id )
 						{
 							chosenPlayer = slots[i];
 							break;

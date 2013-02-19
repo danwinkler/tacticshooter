@@ -552,7 +552,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			g.fillRect( gc.getWidth()/2 - 100, 0, 200, gc.getHeight()/2-100 );
 			
 			//bottom
-			g.fillRect( gc.getWidth()/2 - 100, gc.getHeight()/2 + 200, 200, gc.getHeight()/2-100 );
+			g.fillRect( gc.getWidth()/2 - 100, gc.getHeight()/2 + 100, 200, gc.getHeight()/2-100 );
 		}
 		
 		if( input.isKeyDown( Input.KEY_TAB ) && cs.players != null )

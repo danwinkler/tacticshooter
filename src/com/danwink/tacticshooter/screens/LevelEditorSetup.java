@@ -55,12 +55,12 @@ public class LevelEditorSetup extends DScreen<GameContainer, Graphics> implement
 		{
 			dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
 			
-			newMap = new DButton( "New Map", gc.getWidth()/2 - 100, gc.getHeight()/2 - 150, 200, 100 );
-			loadMap = new DButton( "Load Map", gc.getWidth()/2 - 100, gc.getHeight()/2 - 50, 200, 100 );
-			back = new DButton( "Back", gc.getWidth()/2 - 100, gc.getHeight()/2 + 50, 200, 100 );
+			newMap = new DButton( "New Map", gc.getWidth()/2 - 100, gc.getHeight()/2 - 250, 200, 100 );
+			loadMap = new DButton( "Load Map", gc.getWidth()/2 - 100, gc.getHeight()/2 - 150, 200, 100 );
+			back = new DButton( "Back", gc.getWidth()/2 - 100, gc.getHeight()/2 - 50, 200, 100 );
 			
-			uploadAllMaps = new DButton( "Upload All Maps", gc.getWidth()/2 - 100, gc.getHeight()/2 + 150, 200, 100 );
-			downloadAllMaps = new DButton( "Download All Maps", gc.getWidth()/2 - 100, gc.getHeight()/2 + 250, 200, 100 );
+			uploadAllMaps = new DButton( "Upload All Maps", gc.getWidth()/2 - 100, gc.getHeight()/2 + 50, 200, 100 );
+			downloadAllMaps = new DButton( "Download All Maps", gc.getWidth()/2 - 100, gc.getHeight()/2 + 150, 200, 100 );
 			
 			dui.add( newMap );
 			dui.add( loadMap );

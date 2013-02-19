@@ -119,21 +119,8 @@ public class ComputerPlayer implements Runnable
 				}
 			}
 			
-			try 
-			{
-				Thread.sleep( 1000 );
-				if( playType == PlayType.MASSER )
-				{
-					Thread.sleep( 1000 );
-				}
-			} 
-			catch( InterruptedException e )
-			{
-				e.printStackTrace();
-			}
-			
 			if( player != null && l != null )
-			{
+			{	
 				finder = new AStarPathFinder( l, 500, StaticFiles.options.getB( "diagonalMove" ) );
 				if( playType == PlayType.MASSER )
 				{
@@ -330,6 +317,19 @@ public class ComputerPlayer implements Runnable
 				if( player.money > 20 )
 				{
 					ci.sl.received( fc, new Message( MessageType.BUILDUNIT, UnitType.values()[DMath.randomi(0, UnitType.values().length)] ) );
+				}
+				
+				try 
+				{	
+					Thread.sleep( 1000 );
+					if( playType == PlayType.MASSER )
+					{
+						Thread.sleep( 1000 );
+					}
+				} 
+				catch( InterruptedException e )
+				{
+					e.printStackTrace();
 				}
 			}
 		}

@@ -60,18 +60,17 @@ public class OptionsScreen extends DScreen<GameContainer, Graphics> implements D
 		int i = 0;
 		for( Entry<String, String> e : options.options.entrySet() )
 		{
+			scrollPane.add( new DText( e.getKey(), 10, i*50 + 10 ) );
 			if( e.getKey().startsWith( "slider." ) )
 			{
-				scrollPane.add( new DText( e.getKey(), 10, i*50 ) );
-				DSlider box = new DSlider( 150, i*50, 250, 50, 0, 1, Float.parseFloat( e.getValue() ) );
+				DSlider box = new DSlider( 200, i*50, 200, 50, 0, 1, Float.parseFloat( e.getValue() ) );
 				box.setName( e.getKey() );
 				boxes.add( box );
 				scrollPane.add( box );
 			}
 			else
 			{
-				scrollPane.add( new DText( e.getKey(), 10, i*50 ) );
-				DTextBox box = new DTextBox( 150, i*50, 250, 50 );
+				DTextBox box = new DTextBox( 200, i*50, 200, 50 );
 				box.setText( e.getValue() );
 				box.setName( e.getKey() );
 				boxes.add( box );

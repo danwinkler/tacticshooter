@@ -41,10 +41,10 @@ public class LevelEditorLoadMap extends DScreen<GameContainer, Graphics> impleme
 		{
 			for( int i = 0; i < files.length; i++ )
 			{
-				scrollPane.add( new DButton( files[i].getName().replace( ".xml", "" ), 0, i*100, 400, 100 ) );
+				scrollPane.add( new DButton( files[i].getName().replace( ".xml", "" ), 0, i*50, 400, 50 ) );
 			}
 		}
-		scrollPane.setInnerPaneHeight( files.length*100 );
+		scrollPane.setInnerPaneHeight( files.length*50 );
 		back = new DButton( "Back", gc.getWidth()/2 - 100, gc.getHeight() - 150, 200, 100 );
 		
 		dui.add( scrollPane );
