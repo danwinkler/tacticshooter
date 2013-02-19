@@ -183,6 +183,9 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 	@Override
 	public void message( Object o )
 	{
-		
+		if( StaticFiles.user != null )
+		{
+			login.setText( "Logout" );
+		}
 	} 
 }

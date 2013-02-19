@@ -44,22 +44,6 @@ public class TacticClient extends BasicGame
 
 	public void init( GameContainer gc ) throws SlickException
 	{
-		//Attempt to login from file
-		new Thread( new Runnable() {
-			public void run()
-			{
-				try
-				{
-					String[] loginFile = (String[])DFile.loadObject( "data" + File.separator + "l.strarr" );
-					StaticFiles.login( loginFile[0], loginFile[1] );
-				}
-				catch( Exception ex )
-				{
-					
-				}
-			}
-		}).start();
-		
 		dsh.register( "home", new HomeScreen() );
 		dsh.register( "login", new LoginScreen() );
 		
@@ -82,6 +66,21 @@ public class TacticClient extends BasicGame
 		
 		dsh.activate( "home", gc );
 		
+		new Thread( new Runnable() {
+			public void run()
+			{
+				try
+				{
+					String[] loginFile = (String[])DFile.loadObject( "data" + File.separator + "l.strarr" );
+					StaticFiles.login( loginFile[0], loginFile[1] );
+					dsh.message( "home", null );
+				}
+				catch( Exception ex )
+				{
+					
+				}
+			}
+		}).start();
 		
 		f = new AngelCodeFont( "data" + File.separator + "pixelfont1_16px.fnt", "data" + File.separator + "pixelfont1_16px_0.png" );
 		
