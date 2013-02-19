@@ -141,7 +141,7 @@ public class LoginScreen extends DScreen<GameContainer, Graphics> implements DUI
 					{
 						try
 						{
-							DFile.saveObject( "data" + File.separator + "l.strarr", new String[] { username.getText().trim(), password.getText() } );
+							DFile.saveObject( "data" + File.separator + "l.tmp", new String[] { username.getText().trim(), password.getText() } );
 						} catch ( IOException e1 )
 						{
 							e1.printStackTrace();

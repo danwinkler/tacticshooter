@@ -71,7 +71,7 @@ public class TacticClient extends BasicGame
 			{
 				try
 				{
-					String[] loginFile = (String[])DFile.loadObject( "data" + File.separator + "l.strarr" );
+					String[] loginFile = (String[])DFile.loadObject( "data" + File.separator + "l.tmp" );
 					StaticFiles.login( loginFile[0], loginFile[1] );
 					dsh.message( "home", null );
 				}
