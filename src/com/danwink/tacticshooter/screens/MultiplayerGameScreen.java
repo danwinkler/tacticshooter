@@ -18,7 +18,7 @@ import org.newdawn.slick.Sound;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.opengl.shader.ShaderProgram;
 
-import tacticshooter.BasicParticle;
+import tacticshooter.ExplodeParticle;
 import tacticshooter.Building;
 import tacticshooter.Building.BuildingType;
 import tacticshooter.Bullet;
@@ -97,6 +97,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	
 	Image backgroundTexture;
 	Image craterTexture;
+	Image smoke1;
 	
 	ArrayList<String> messages = new ArrayList<String>();
 	
@@ -174,6 +175,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			cs.explode1 = new Sound( "sound" + File.separator + "explode1.wav" );
 			
 			craterTexture = new Image( "img" + File.separator + "crater1.png" );
+			smoke1 = new Image( "img" + File.separator + "smoke1.png" );
 		} 
 		catch( SlickException e )
 		{
@@ -339,9 +341,10 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 							float r = DMath.lerp( mag, .5f, 1f );
 							float g = DMath.lerp( mag, .5f, .25f );
 							float b = DMath.lerp( mag, .5f, 0f );
-							BasicParticle p = new BasicParticle( u.x, u.y, DMath.cosf( heading ) * 50 * mag * magmax, DMath.sinf( heading ) * 50 * mag * magmax, 30 );
-							p.c = new Color( r, g, b, .5f );
-							p.friction = .15f;
+							ExplodeParticle p = new ExplodeParticle( u.x, u.y, DMath.cosf( heading ) * 25 * mag * magmax, DMath.sinf( heading ) * 25 * mag * magmax, 30 );
+							p.c = new Color( r, g, b );
+							p.friction = .075f;
+							p.im = smoke1;
 							p.size = (1.f-mag) * magmax * 20;
 							ps.add( p );
 						}
@@ -651,12 +654,13 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		cs.scrolly = DMath.bound( destY-gc.getHeight()/2, screenBounds.getMinY(), screenBounds.getMaxY() );
 	}
 	
+	public static Color bloodColor = new Color( 255, 0, 0 );
 	public void drawBlood( float x, float y )
 	{
-		btg.setColor( new Color( 255, 0, 0, 200 ) );
 		x += DMath.randomf( -8, 8 );
 		y += DMath.randomf( -8, 8 );
-		btg.fillOval( x-2, y-2, 4, 4 );
+		//btg.fillOval( x-2, y-2, 4, 4 );
+		btg.drawImage( smoke1, x-4, y-4, x+4, y+4, 0, 0, 64, 64, bloodColor );
 		btg.flush();
 	}
 	

@@ -144,6 +144,7 @@ public class TacticServer
 					ComputerPlayer cp = new ComputerPlayer( (ServerNetworkInterface)si );
 					cp.player = slots[i];
 					cp.playType = slots[i].playType;
+					cp.l = l;
 					slots[i].id = cp.fc.id;
 					players.put( cp.fc.id, slots[i] );
 					Thread ct = new Thread( cp );
@@ -156,6 +157,8 @@ public class TacticServer
 			}
 		}
 		
+		si.sendToAllClients( new Message( MessageType.LEVELUPDATE, l ) );
+		
 		for( int i = 0; i < 16; i++ )
 		{
 			if( slots[i] != null )
@@ -163,8 +166,6 @@ public class TacticServer
 				si.sendToClient( slots[i].id, new Message( MessageType.PLAYERUPDATE, slots[i] ) );	
 			}
 		}
-		
-		si.sendToAllClients( new Message( MessageType.LEVELUPDATE, l ) );
 		
 		finder = new AStarPathFinder( l, 500, StaticFiles.advOptions.getB( "diagonalMove" )  );
 		

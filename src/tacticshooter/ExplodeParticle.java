@@ -2,16 +2,19 @@ package tacticshooter;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
 
 import com.phyloa.dlib.particle.Particle;
+import com.phyloa.dlib.util.DMath;
 
-public class BasicParticle extends Particle<Graphics>
+public class ExplodeParticle extends Particle<Graphics>
 {
 	public Color c;
 	float maxdur;
 	public float size;
+	public Image im;
 	
-	public BasicParticle( float x, float y, float dx, float dy, float duration )
+	public ExplodeParticle( float x, float y, float dx, float dy, float duration )
 	{
 		super( x, y, dx, dy, duration );
 		maxdur = duration;
@@ -20,12 +23,12 @@ public class BasicParticle extends Particle<Graphics>
 	public void update( float d )
 	{
 		super.update( d );
-		c.a = .5f * (timeleft/maxdur);
+		c.a = .5f * DMath.minf( ((timeleft*2)/maxdur), 1 );
 	}
 	
 	public void render( Graphics r )
 	{
 		r.setColor( c );
-		r.fillOval( x-size, y-size, size*2, size*2 );
+		r.drawImage( im, x-size, y-size, x+size, y+size, 0, 0, 64, 64, c );
 	}
 }
