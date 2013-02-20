@@ -18,6 +18,7 @@ import org.newdawn.slick.Sound;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.opengl.shader.ShaderProgram;
 
+import tacticshooter.BasicParticle;
 import tacticshooter.Building;
 import tacticshooter.Building.BuildingType;
 import tacticshooter.Bullet;
@@ -82,7 +83,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	
 	Slick2DRenderer renderer = new Slick2DRenderer();
 	
-	GameContainer gc;
+	public GameContainer gc;
 	
 	Image miniMap;
 	
@@ -328,6 +329,23 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 					cs.explode1.play();
 					btg.drawImage( craterTexture, u.x - 16, u.y - 16, u.x + 16, u.y + 16, 0, 0, 32, 32 );
 					btg.flush();
+					
+					for( int j = 0; j < 7; j++ )
+					{
+						float magmax = DMath.randomf( .4f, 1 );
+						float heading = DMath.randomf( 0, DMath.PI2F );
+						for( float mag = .1f; mag < 1; mag += .1f )
+						{
+							float r = DMath.lerp( mag, .5f, 1f );
+							float g = DMath.lerp( mag, .5f, .25f );
+							float b = DMath.lerp( mag, .5f, 0f );
+							BasicParticle p = new BasicParticle( u.x, u.y, DMath.cosf( heading ) * 50 * mag * magmax, DMath.sinf( heading ) * 50 * mag * magmax, 30 );
+							p.c = new Color( r, g, b, .5f );
+							p.friction = .15f;
+							p.size = (1.f-mag) * magmax * 20;
+							ps.add( p );
+						}
+					}
 				}
 				else
 				{
@@ -478,7 +496,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			u.render( g, cs.player, input.getMouseX() + cs.scrollx, input.getMouseY() + cs.scrolly, cs.l );
 		}
 		
-		g.setColor( Color.black );
+		g.setColor( Color.darkGray );
 		ps.render( g );
 		
 		if( selecting )

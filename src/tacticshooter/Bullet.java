@@ -117,6 +117,10 @@ public class Bullet
 		if( loc.x > l.width * l.tileSize || loc.x < 0 || loc.y > l.height * l.tileSize || loc.y < 0 )
 		{
 			alive = false;
+			for( int i = 0; i < 10; i++ )
+			{
+				cs.ps.add( WallParticle.makeParticle( loc.x+dir.x*.5f, loc.y+dir.y*.5f ) );
+			}
 		}
 	}
 	

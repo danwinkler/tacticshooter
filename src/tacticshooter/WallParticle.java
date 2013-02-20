@@ -1,5 +1,6 @@
 package tacticshooter;
 
+import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 
 import com.phyloa.dlib.particle.Particle;
