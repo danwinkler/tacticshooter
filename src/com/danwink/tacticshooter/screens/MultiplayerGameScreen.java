@@ -39,7 +39,9 @@ import tacticshooter.Unit;
 import tacticshooter.Unit.UnitType;
 
 import com.phyloa.dlib.dui.DButton;
+import com.phyloa.dlib.dui.DCheckBox;
 import com.phyloa.dlib.dui.DPanel;
+import com.phyloa.dlib.dui.DText;
 import com.phyloa.dlib.dui.DTextBox;
 import com.phyloa.dlib.dui.DUI;
 import com.phyloa.dlib.dui.DUIElement;
@@ -73,7 +75,9 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	DButton returnToGame;
 	DButton switchTeams;
 	
+	DPanel chatPanel;
 	DTextBox chatBox;
+	DCheckBox teamChat;
 
     DUI dui;
 	
@@ -139,8 +143,15 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			escapeMenu.add( returnToGame );
 			escapeMenu.setVisible( false );
 			
-			chatBox = new DTextBox( gc.getWidth()/2-200, gc.getHeight()/2-50, 400, 100 );
-			chatBox.setVisible( false );
+			chatPanel = new DPanel( gc.getWidth()/2-200, gc.getHeight()/2-50, 400, 100 );
+			chatBox = new DTextBox( 0, 50, 400, 50 );
+			teamChat = new DCheckBox( 10, 10, 30, 30 );
+			
+			chatPanel.add( new DText( "Team Chat", 50, 25 ) );
+			chatPanel.add( teamChat );
+			chatPanel.add( chatBox );
+			
+			chatPanel.setVisible( false );
 			
 			dui.add( buildScoutUnit );
 			dui.add( buildLightUnit );
@@ -149,7 +160,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			dui.add( buildSniperUnit );
 			dui.add( buildSaboteurUnit );
 			dui.add( escapeMenu );
-			dui.add( chatBox );
+			dui.add( chatPanel );
 			
 			dui.addDUIListener( this );
 		}
@@ -845,16 +856,16 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		}
 		else if( keyCode == Input.KEY_ENTER )
 		{
-			if( chatBox.isVisible() && chatBox.getText().trim().length() > 0 )
+			if( chatPanel.isVisible() && chatBox.getText().trim().length() > 0 )
 			{
-				chatBox.setVisible( false );
-				ci.sendToServer( new Message( MessageType.MESSAGE, chatBox.getText().trim() ) );
+				chatPanel.setVisible( false );
+				ci.sendToServer( new Message( MessageType.MESSAGE, (teamChat.checked ? "/team " : "") + chatBox.getText().trim() ) );
 				chatBox.setText( "" );
 			}
 			else
 			{
 				chatBox.setText( "" );
-				chatBox.setVisible( true );
+				chatPanel.setVisible( true );
 				dui.setFocus( chatBox );
 			}
 		}

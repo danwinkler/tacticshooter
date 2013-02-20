@@ -611,6 +611,25 @@ public class TacticServer
 							si.sendToClient( m.sender, new Message( MessageType.MESSAGE, "SERVER: Malformed command." ) );
 						}
 					}
+					else if( text.trim().startsWith( "/team" ) )
+					{
+						try
+						{
+							String[] commands = text.split( " ", 2 );
+							Player tp = players.get( m.sender );
+							for( Entry<Integer, Player> e : players.entrySet() )
+							{
+								Player p = e.getValue();
+								if( p.team.id == tp.team.id )
+								{
+									si.sendToClient( p.id, new Message( MessageType.MESSAGE, "(TEAM)" + players.get( m.sender ).name + ": " + commands[1] ) );
+								}
+							}
+						} catch( Exception ex )
+						{
+							si.sendToClient( m.sender, new Message( MessageType.MESSAGE, "SERVER: Malformed command." ) );
+						}
+					}
 				}
 				break;
 			}
