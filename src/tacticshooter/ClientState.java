@@ -21,7 +21,7 @@ public class ClientState
 	
 	public Player player;
 	
-	public Sound bullet1, bullet2, ping1, death1, death2, hit1;
+	public Sound bullet1, bullet2, ping1, death1, death2, hit1, explode1;
 	
 	public float scrollx = 0;
 	public float scrolly = 0;

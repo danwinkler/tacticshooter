@@ -152,7 +152,7 @@ public class ComputerPlayer implements Runnable
 					float closeDist = Float.MAX_VALUE;
 					for( Building b : l.buildings )
 					{
-						if( b.t != null && b.t.id == this.player.team.id )
+						if( b.t != null && b.t.id == this.player.team.id && b.hold == Building.HOLDMAX )
 						{
 							Path p = finder.findPath( null, l.getTileX( b.x ), l.getTileY( b.y ), l.getTileX( target.x ), l.getTileY( target.y ) );
 							if( p == null ) continue;

@@ -1,8 +1,6 @@
 package com.danwink.tacticshooter.screens;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.BufferOverflowException;
 import java.util.ArrayList;
 
 import javax.vecmath.Point2i;
@@ -15,18 +13,15 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.InputListener;
 import org.newdawn.slick.Music;
-import org.newdawn.slick.MusicListener;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.Sound;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.opengl.shader.ShaderProgram;
-import org.newdawn.slick.particles.ParticleSystem;
 
 import tacticshooter.Building;
 import tacticshooter.Building.BuildingType;
 import tacticshooter.Bullet;
 import tacticshooter.ClientInterface;
-import tacticshooter.ClientNetworkInterface;
 import tacticshooter.ClientState;
 import tacticshooter.Level;
 import tacticshooter.Level.TileType;
@@ -42,7 +37,6 @@ import tacticshooter.Team;
 import tacticshooter.Unit;
 import tacticshooter.Unit.UnitType;
 
-import com.esotericsoftware.minlog.Log;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DPanel;
 import com.phyloa.dlib.dui.DTextBox;
@@ -50,6 +44,7 @@ import com.phyloa.dlib.dui.DUI;
 import com.phyloa.dlib.dui.DUIElement;
 import com.phyloa.dlib.dui.DUIEvent;
 import com.phyloa.dlib.dui.DUIListener;
+import com.phyloa.dlib.particle.ParticleSystem;
 import com.phyloa.dlib.renderer.DScreen;
 import com.phyloa.dlib.renderer.DScreenHandler;
 import com.phyloa.dlib.util.DMath;
@@ -70,6 +65,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	DButton buildHeavyUnit;
 	DButton buildShotgunUnit;
 	DButton buildSniperUnit;
+	DButton buildSaboteurUnit;
 	
 	DPanel escapeMenu;
 	DButton quit;
@@ -99,10 +95,13 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	Graphics btg;
 	
 	Image backgroundTexture;
+	Image craterTexture;
 	
 	ArrayList<String> messages = new ArrayList<String>();
 	
 	ShaderProgram shader;
+	
+	public ParticleSystem<Graphics> ps = new ParticleSystem<Graphics>();
 	
 	boolean mapChanged = true;
 	
@@ -123,11 +122,12 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		if( dui == null )
 		{
 			dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
-			buildScoutUnit = new DButton( "Build Scout Unit\n3", 0, gc.getHeight()-100, 200, 100 );
-			buildLightUnit = new DButton( "Build Light Unit\n10", 200, gc.getHeight()-100, 200, 100 );
-			buildHeavyUnit = new DButton( "Build Heavy Unit\n20", 400, gc.getHeight()-100, 200, 100 );
-			buildShotgunUnit = new DButton( "Build Shotgun Unit\n15", 600, gc.getHeight()-100, 200, 100 );
-			buildSniperUnit = new DButton( "Build Sniper Unit\n20", 800, gc.getHeight()-100, 200, 100 );
+			buildScoutUnit = new DButton( "Build Scout\n3", 0, gc.getHeight()-75, 150, 75 );
+			buildLightUnit = new DButton( "Build Light\n10", 150, gc.getHeight()-75, 150, 75 );
+			buildHeavyUnit = new DButton( "Build Heavy\n20", 300, gc.getHeight()-75, 150, 75 );
+			buildShotgunUnit = new DButton( "Build Shotgun\n15", 450, gc.getHeight()-75, 150, 75 );
+			buildSniperUnit = new DButton( "Build Sniper\n20", 600, gc.getHeight()-75, 150, 75 );
+			buildSaboteurUnit = new DButton( "Build Saboteur\n" + UnitType.SABOTEUR.price, 750, gc.getHeight()-75, 150, 75 );
 			
 			
 			escapeMenu = new DPanel( gc.getWidth() / 2 - 100, gc.getHeight()/2 - 100, 200, 300 );
@@ -145,6 +145,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			dui.add( buildHeavyUnit );
 			dui.add( buildShotgunUnit );
 			dui.add( buildSniperUnit );
+			dui.add( buildSaboteurUnit );
 			dui.add( escapeMenu );
 			dui.add( chatBox );
 			
@@ -169,6 +170,9 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			cs.death1 = new Sound( "sound" + File.separator + "death1.wav" );
 			cs.death2 = new Sound( "sound" + File.separator + "death2.wav" );
 			cs.hit1 = new Sound( "sound" + File.separator + "hit1.wav" );
+			cs.explode1 = new Sound( "sound" + File.separator + "explode1.wav" );
+			
+			craterTexture = new Image( "img" + File.separator + "crater1.png" );
 		} 
 		catch( SlickException e )
 		{
@@ -314,11 +318,20 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				cs.units.remove( i );
 				cs.unitMap.remove( u );
 				cs.selected.remove( (Object)u.id );
-				(Math.random() > .5 ? cs.death1 : cs.death2).play( 1.f, cs.getSoundMag( gc, u.x, u.y ) );
 				u.renderDead( btg );
 				for( int j = 0; j < 10; j++ )
 				{
 					drawBlood( u.x, u.y );
+				}
+				if( u.type == UnitType.SABOTEUR )
+				{
+					cs.explode1.play();
+					btg.drawImage( craterTexture, u.x - 16, u.y - 16, u.x + 16, u.y + 16, 0, 0, 32, 32 );
+					btg.flush();
+				}
+				else
+				{
+					(Math.random() > .5 ? cs.death1 : cs.death2).play( 1.f, cs.getSoundMag( gc, u.x, u.y ) );
 				}
 				i--;
 				continue;
@@ -369,6 +382,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				e.printStackTrace();
 			}
 		}
+		
+		ps.update( d );
 	}
 
 	public void render( GameContainer gc, Graphics g )
@@ -462,6 +477,9 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			Unit u = cs.units.get( i );
 			u.render( g, cs.player, input.getMouseX() + cs.scrollx, input.getMouseY() + cs.scrolly, cs.l );
 		}
+		
+		g.setColor( Color.black );
+		ps.render( g );
 		
 		if( selecting )
 		{
@@ -963,6 +981,10 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			else if( e == buildSniperUnit )
 			{
 				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.SNIPER ) );
+			}
+			else if( e == buildSaboteurUnit )
+			{
+				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.SABOTEUR ) );
 			}
 			else if( e == quit )
 			{

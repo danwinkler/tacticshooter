@@ -1,5 +1,6 @@
 package com.danwink.tacticshooter.screens;
 
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -150,6 +151,13 @@ public class LoginScreen extends DScreen<GameContainer, Graphics> implements DUI
 					
 					dsh.activate( "home", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
 				}			
+			}
+		}
+		else if( e instanceof DTextBox )
+		{
+			if( e == username && event.getType() == KeyEvent.VK_TAB )
+			{
+				dui.setFocus( password );
 			}
 		}
 	}

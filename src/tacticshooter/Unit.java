@@ -300,6 +300,7 @@ public class Unit
 		case SHOTGUN:
 		case LIGHT:
 		case SNIPER:
+		case SABOTEUR:
 			healthBarDist = -11;
 			break;
 		case HEAVY:
@@ -359,6 +360,7 @@ public class Unit
 			break;
 		case SCOUT:
 		case SHOTGUN:
+		case SABOTEUR:
 			if( player )
 			{
 				g.setColor( Color.white );
@@ -458,6 +460,25 @@ public class Unit
 		this.owner = u.owner;
 		timeSinceUpdate = 0;
 	}
+	
+	public void explode( TacticServer ts )
+	{
+		for( Unit u : ts.units )
+		{
+			if( u.owner.team.id != owner.team.id )
+			{
+				float dx = u.x - x;
+				float dy = u.y - y;
+				float dist = dx*dx+dy*dy;
+				float dmg = Math.max( 0, 1500-(dist) );
+				Bullet b = new Bullet( x, y, heading );
+				b.owner = this.owner;
+				b.damage = (int)dmg;
+				b.shooter = this;
+				u.hit( b, ts );
+			}
+		}
+	}
 
 	public void hit( Bullet bullet, TacticServer ts )
 	{
@@ -468,6 +489,31 @@ public class Unit
 			alive = false;
 			killer = bullet.owner;
 			bullet.owner.money += 2;
+			if( type == UnitType.SABOTEUR )
+			{
+				explode( ts );
+			}
+		}
+		
+		if( alive )
+		{
+			if( type == UnitType.SABOTEUR )
+			{
+				for( Unit u : ts.units )
+				{
+					if( u.owner.team.id != owner.team.id )
+					{
+						float dx = u.x - x;
+						float dy = u.y - y;
+						float dist = dx*dx+dy*dy;
+						if( dist < 25*25 )
+						{
+							alive = false;
+							explode( ts );
+						}
+					}
+				}
+			}
 		}
 		
 		if( stoppedAt != null )
@@ -509,15 +555,16 @@ public class Unit
 		HEAVY( 1.5f, 3, .1f, 20, 200, 1, 10  ),
 		SHOTGUN( 3.0f, 30, .3f, 15, 150, 6, 10 ),
 		SCOUT( 6f, 30, .1f, 3, 30, 1, 10 ),
-		SNIPER( 2.5f, 100, 0, 20, 90, 1, 100 );
+		SNIPER( 2.5f, 100, 0, 20, 90, 1, 100 ),
+		SABOTEUR( 4f, 10000, 0, 20, 150, 0, 0 );
 		
-		float speed;
-		int timeBetweenBullets;
-		float bulletSpread;
-		int price;
-		float health;
-		int bulletsAtOnce;
-		int damage;
+		public float speed;
+		public int timeBetweenBullets;
+		public float bulletSpread;
+		public int price;
+		public float health;
+		public int bulletsAtOnce;
+		public int damage;
 		
 		UnitType( float speed, int timeBetweenBullets, float bulletSpread, int price, float health, int bulletsAtOnce, int damage )
 		{
