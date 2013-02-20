@@ -302,7 +302,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			return;
 		}
 		
-		if( !chatBox.isVisible() && !escapeMenu.isVisible() )
+		if( !chatPanel.isVisible() && !escapeMenu.isVisible() )
 		{
 			float scrollSpeed = 20;
 			Rectangle screenBounds = getScreenBounds();
