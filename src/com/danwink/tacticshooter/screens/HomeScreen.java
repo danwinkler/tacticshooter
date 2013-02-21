@@ -7,75 +7,86 @@ import java.net.UnknownHostException;
 import tacticshooter.AutoTileDrawer;
 import tacticshooter.Level;
 import tacticshooter.ServerNetworkInterface;
-import tacticshooter.GdxEventMapper;
-import tacticshooter.GdxRenderer;
 import tacticshooter.StaticFiles;
+import tacticshooter.TacticClient;
 import tacticshooter.TacticServer;
 import tacticshooter.Unit.UnitType;
 import tacticshooter.UserInfo;
 
 import com.badlogic.gdx.Application;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
-import com.phyloa.dlib.dui.DButton;
-import com.phyloa.dlib.dui.DUI;
-import com.phyloa.dlib.dui.DUIElement;
-import com.phyloa.dlib.dui.DUIEvent;
-import com.phyloa.dlib.dui.DUIListener;
-import com.phyloa.dlib.renderer.DScreen;
-import com.phyloa.dlib.renderer.DScreenHandler;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Event;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.phyloa.dlib.util.DMath;
 import com.phyloa.dlib.util.DOptions;
 import com.phyloa.dlib.util.ImprovedNoise;
 
-public class HomeScreen extends DScreen<Graphics, Graphics> implements DUIListener
+public class HomeScreen implements Screen, EventListener
 {
 	TacticServer server;
 	
-	DUI dui;
-	DButton singlePlayer;
-	DButton multiPlayer;
-	DButton levelEditor;
-	DButton settings;
-	DButton exit;
+	Stage stage;
 	
-	DButton login;
+	TextButton singlePlayer;
+	TextButton multiPlayer;
+	TextButton levelEditor;
+	TextButton settings;
+	TextButton exit;
 	
-	GdxRenderer r = new GdxRenderer();
+	TextButton login;
 	
 	String ip;
 	
 	Texture title;
+
+	TacticClient tc;
 	
-	public void onActivate( Graphics e, DScreenHandler<Graphics, Graphics> dsh )
+	public HomeScreen( TacticClient tc )
 	{
-		if( dui == null )
-		{
-			dui = new DUI( new GdxEventMapper() );
-			
-			singlePlayer = new DButton( "Start Local Server", e.getWidth() / 2 - 200, e.getHeight()/2 - 200, 400, 100 );
-			multiPlayer = new DButton( "Multiplayer", e.getWidth() / 2 - 200, e.getHeight()/2 - 100, 400, 100 );
-			levelEditor = new DButton( "Level Editor", e.getWidth() / 2 - 200, e.getHeight()/2, 400, 100 );
-			settings = new DButton( "Settings", e.getWidth() / 2 - 200, e.getHeight()/2 + 100, 400, 100 );
-			exit = new DButton( "Exit", e.getWidth() / 2 - 200, e.getHeight()/2 + 200, 400, 100 );
-			
-			login = new DButton( "Login", 50, 50, 200, 100 );
-			
-			dui.add( singlePlayer );
-			dui.add( multiPlayer );
-			dui.add( levelEditor );
-			dui.add( settings );
-			dui.add( exit );
-			
-			dui.add( login );
-			
-			dui.addDUIListener( this );
-		}
+		this.tc = tc;
+	}
+	
+	public void show()
+	{
+		stage = new Stage();
+		
+		TextButton.TextButtonStyle tbs = new TextButton.TextButtonStyle();
+		
+		singlePlayer = new TextButton( "Start Local Server", tbs );
+		multiPlayer = new TextButton( "Multiplayer", tbs );
+		levelEditor = new TextButton( "Level Editor", tbs );
+		settings = new TextButton( "Settings", tbs );
+		exit = new TextButton( "Exit", tbs );
+		login = new TextButton( "Login", tbs );
+
+		singlePlayer.addListener( this );
+		
+		Table table = new Table();
+		table.setFillParent( true );
+		
+		table.add( singlePlayer );
+		table.row();
+		table.add( multiPlayer );
+		table.row();
+		table.add( levelEditor );
+		table.row();
+		table.add( settings );
+		table.row();
+		table.add( exit );
+		table.row();
+		table.add( login );
+		
+		stage.addActor( table );
 		
 		StaticFiles.loadAllMusic();
 		StaticFiles.loopWhenReady( "menu" );
-		
-		dui.setEnabled( true );
 		
 		if( StaticFiles.user == null )
 		{
@@ -88,33 +99,27 @@ public class HomeScreen extends DScreen<Graphics, Graphics> implements DUIListen
 		
 		title = new Texture( "img" + File.separator + "title.png" );		
 	}
-	
-	public void update( Graphics gc, int delta )
-	{
-		dui.update();
-	}
 
-	public void render( Graphics gc, Graphics g )
+	public void render( float d )
 	{
-		dui.render( r );
+		stage.act( Gdx.graphics.getDeltaTime() );
+		stage.draw();
 		if( ip != null )
 		{
-			g.setColor( Color.white );
-			g.drawString( "Server Address: " + ip, 200, 15 );
+			//g.drawString( "Server Address: " + ip, 200, 15 );
 		}
 		
-		g.drawImage( title, gc.getWidth()/2 - title.getWidth()/2, 150, new Color( 0, 0, 0, 128 ) );
+		//g.drawImage( title, gc.getWidth()/2 - title.getWidth()/2, 150, new Color( 0, 0, 0, 128 ) );
 	}
 
 	public void onExit()
 	{
-		dui.setEnabled( false );
+		stage.dispose();
 	}
 	
-	public void event( DUIEvent event )
+	public boolean handle( Event event )
 	{
-		DUIElement e = event.getElement();
-		if( e instanceof DButton && event.getType() == DButton.MOUSE_UP )
+		Actor e = event.getListenerActor();
 		if( e == singlePlayer )
 		{
 			if( server == null )
@@ -140,40 +145,58 @@ public class HomeScreen extends DScreen<Graphics, Graphics> implements DUIListen
 		} 
 		else if( e == multiPlayer )
 		{
-			dsh.activate( "multiplayersetup", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
+			//tc.setScreen( tc.multiplayersetup );
 		} 
 		else if( e == levelEditor )
 		{
-			dsh.activate( "editorsetup", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
+			//tc.setScreen( tc.editorsetup );
 		}
 		else if( e == settings )
 		{
-			dsh.activate( "settings", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
+			//tc.setScreen( tc.settings );
 		} 
 		else if( e == exit )
 		{
-			gc.exit();
+			Gdx.app.exit();
 		}
 		else if( e == login )
 		{
 			if( StaticFiles.user == null )
 			{
-				dsh.activate( "login", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
+				//tc.setScreen( login );
 			}
 			else
 			{
 				StaticFiles.user = null;
 				login.setText( "Login" );
 			}
-		} 
+		}
+		return true;
 	}
 
-	@Override
-	public void message( Object o )
+	public void dispose()
 	{
-		if( StaticFiles.user != null )
-		{
-			login.setText( "Logout" );
-		}
-	} 
+		stage.dispose();
+	}
+
+	public void hide()
+	{
+		
+	}
+
+	public void pause()
+	{
+		
+	}
+
+	public void resize( int width, int height )
+	{
+		stage.setViewport(width, height, true);
+	}
+
+	public void resume()
+	{
+		// TODO Auto-generated method stub
+		
+	}
 }

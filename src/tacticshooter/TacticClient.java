@@ -7,8 +7,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.danwink.tacticshooter.screens.HomeScreen;
 import com.danwink.tacticshooter.screens.LevelEditor;
@@ -29,10 +31,25 @@ import com.phyloa.dlib.util.DFile;
 
 public class TacticClient extends Game
 {
-	DScreenHandler<> dsh = new DScreenHandler();
+	public HomeScreen home;
+	public LoginScreen login;
 	
-	org.newdawn.slick.Font f;
+	public MultiplayerSetupScreen multiplayersetup;
+	public MultiplayerGameScreen multiplayergame;
+	public ServerConnectScreen connect;
+	public LobbyScreen lobby;
 	
+	public MessageScreen message;
+	public PostGameScreen postgame;
+	
+	public LevelEditorSetup editorsetup;
+	public LevelEditorNewMapSetup newmap;
+	public LevelEditorLoadMap loadmap;
+	public LevelEditor editor;
+	
+	public SettingsScreen settings;
+	public OptionsScreen options;
+	public OptionsScreen advoptions;
 	public TacticClient()
 	{
 		
@@ -40,27 +57,27 @@ public class TacticClient extends Game
 
 	public void create()
 	{
-		dsh.register( "home", new HomeScreen() );
-		dsh.register( "login", new LoginScreen() );
+		home = new HomeScreen( this );
+		/*login = new LoginScreen();
 		
-		dsh.register( "multiplayersetup", new MultiplayerSetupScreen() );
-		dsh.register( "multiplayergame", new MultiplayerGameScreen() );
-		dsh.register( "connect", new ServerConnectScreen() );
-		dsh.register( "lobby", new LobbyScreen() );
+		multiplayersetup = new MultiplayerSetupScreen();
+		multiplayergame = new MultiplayerGameScreen();
+		connect = new ServerConnectScreen();
+		lobby = new LobbyScreen();
 		
-		dsh.register( "message", new MessageScreen() );
-		dsh.register( "postgame", new PostGameScreen() );
+		message = new MessageScreen();
+		postgame = new PostGameScreen();
 		
-		dsh.register( "editorsetup", new LevelEditorSetup() );
-		dsh.register( "newmap", new LevelEditorNewMapSetup() );
-		dsh.register( "loadmap", new LevelEditorLoadMap() );
-		dsh.register( "editor", new LevelEditor() );
+		editorsetup = new LevelEditorSetup();
+		newmap = new LevelEditorNewMapSetup();
+		loadmap = new LevelEditorLoadMap();
+		editor = new LevelEditor();
 		
-		dsh.register( "settings", new SettingsScreen() );
-		dsh.register( "options", new OptionsScreen( "options.txt", "settings" ) );
-		dsh.register( "advoptions", new OptionsScreen( "data" + File.separator + "advoptions.txt", "settings" ) );
-		
-		dsh.activate( "home", gc );
+		settings = new SettingsScreen();
+		options = new OptionsScreen( "options.txt", "settings" );
+		advoptions = new OptionsScreen( "data" + File.separator + "advoptions.txt", "settings" );
+		*/
+		setScreen( home );
 		
 		new Thread( new Runnable() {
 			public void run()
@@ -69,7 +86,6 @@ public class TacticClient extends Game
 				{
 					String[] loginFile = (String[])DFile.loadObject( "data" + File.separator + "l.tmp" );
 					StaticFiles.login( loginFile[0], loginFile[1] );
-					dsh.message( "home", null );
 				}
 				catch( Exception ex )
 				{
@@ -78,33 +94,8 @@ public class TacticClient extends Game
 			}
 		}).start();
 		
-		f = new AngelCodeFont( "data" + File.separator + "pixelfont1_16px.fnt", "data" + File.separator + "pixelfont1_16px_0.png" );
-		
-		gc.setMusicVolume( StaticFiles.options.getF( "slider.music" ) );
-		gc.setSoundVolume( StaticFiles.options.getF( "slider.sound" ) );
-	}
-	
-	public void update( GameContainer gc, int delta ) throws SlickException
-	{
-		dsh.update( gc, delta );
-		
-		if( !(dsh.get() instanceof MultiplayerGameScreen) && !(dsh.get() instanceof LevelEditor) )
-		{
-			StaticFiles.bgd.update( delta );
-		}
-	}
-
-	public void render( GameContainer gc, Graphics g ) throws SlickException 
-	{
-		g.setFont( f );
-		g.setAntiAlias( StaticFiles.advOptions.getB( "antialias" ) );
-		
-		if( !(dsh.get() instanceof MultiplayerGameScreen) && !(dsh.get() instanceof LevelEditor) )
-		{
-			StaticFiles.bgd.render( gc, g );
-		}
-		
-		dsh.render( gc, g );
+		//gc.setMusicVolume( StaticFiles.options.getF( "slider.music" ) );
+		//gc.setSoundVolume( StaticFiles.options.getF( "slider.sound" ) );
 	}
 	
 	public static void main( String[] args )

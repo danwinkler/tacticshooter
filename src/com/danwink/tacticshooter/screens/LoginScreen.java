@@ -25,8 +25,6 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
 import tacticshooter.Level;
-import tacticshooter.GdxEventMapper;
-import tacticshooter.GdxRenderer;
 import tacticshooter.StaticFiles;
 import tacticshooter.UserInfo;
 

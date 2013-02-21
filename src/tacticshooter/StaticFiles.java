@@ -13,17 +13,13 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
-import org.newdawn.slick.Music;
-import org.newdawn.slick.SlickException;
-import org.newdawn.slick.Sound;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.danwink.tacticshooter.screens.DScreenSlideTransition;
-import com.phyloa.dlib.renderer.DScreenTransition;
+
 import com.phyloa.dlib.util.DFile;
 import com.phyloa.dlib.util.DOptions;
 
@@ -34,8 +30,6 @@ public class StaticFiles
 	
 	public static DOptions options = new DOptions( "options.txt" );
 	public static DOptions advOptions = new DOptions( "data" + File.separator + "advoptions.txt" );
-	
-	public static BackgroundDrawer bgd = new BackgroundDrawer();
 	
 	public static UserInfo user;
 
@@ -56,7 +50,7 @@ public class StaticFiles
 			System.err.println( "Make sure the names file is located at: data" + File.separator + "dist.male.first.txt" );
 		}
 		
-		f = new BitmapFont( new FileHandle( "data" + File.separator + "pixelfont1_16px.fnt" ), new FileHandle( "data" + File.separator + "pixelfont1_16px_0.png" ), false );
+		//f = new BitmapFont( new FileHandle( "data" + File.separator + "pixelfont1_16px.fnt" ), new FileHandle( "data" + File.separator + "pixelfont1_16px_0.png" ), false );
 	}
 	
 	public static void loadAllMusic()
@@ -79,31 +73,21 @@ public class StaticFiles
 	
 	static void loadMusic( String name, String file )
 	{
-		try
-		{
-			music.put( name, new Music( file ) );
-		} catch( SlickException e )
-		{
-			
-		}
+		music.put( name, Gdx.audio.newMusic( new FileHandle( file ) ) );
 	}
 	
 	static void loadSound( String name, String file )
 	{
-		try
-		{
-			sound.put( name, new Sound( file ) );
-		} catch( SlickException e )
-		{
-			
-		}
+		sound.put( name, Gdx.audio.newSound( new FileHandle( file ) ) );
 	}
 	
 	public static void loopMusic( String name )
 	{
 		if( ready )
 		{
-			getMusic( name ).loop();
+			Music m = getMusic( name );
+			m.setLooping( true );
+			m.play();
 		}
 		else
 		{
@@ -121,8 +105,11 @@ public class StaticFiles
 				{
 					if( (m = getMusic( name )) != null )
 					{
-						if( !m.playing() )
-							m.loop();
+						if( !m.isPlaying() )
+						{
+							m.setLooping( true );
+							m.play();
+						}
 						break;
 					}
 				}
@@ -169,26 +156,6 @@ public class StaticFiles
 		return s.trim().equals( "1" );
 	}
 	
-	public static DScreenTransition<GameContainer, Graphics> getDownMenuOut()
-	{
-		return new DScreenSlideTransition( -1, 0, StaticFiles.advOptions.getF( "menuTransitionSpeed" ), false );
-	}
-	
-	public static DScreenTransition<GameContainer, Graphics> getDownMenuIn()
-	{
-		return new DScreenSlideTransition( -1, 0, StaticFiles.advOptions.getF( "menuTransitionSpeed" ), true );
-	}
-	
-	public static DScreenTransition<GameContainer, Graphics> getUpMenuOut()
-	{
-		return new DScreenSlideTransition( 1, 0, StaticFiles.advOptions.getF( "menuTransitionSpeed" ), false );
-	}
-	
-	public static DScreenTransition<GameContainer, Graphics> getUpMenuIn()
-	{
-		return new DScreenSlideTransition( 1, 0, StaticFiles.advOptions.getF( "menuTransitionSpeed" ), true );
-	}
-
 	public static Object getUsername() 
 	{
 		return user != null ? user.username : "Player";
