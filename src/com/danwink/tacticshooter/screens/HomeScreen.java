@@ -17,11 +17,14 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.phyloa.dlib.util.DMath;
@@ -56,8 +59,11 @@ public class HomeScreen implements Screen, EventListener
 	public void show()
 	{
 		stage = new Stage();
+		Gdx.input.setInputProcessor( stage );
 		
-		TextButton.TextButtonStyle tbs = new TextButton.TextButtonStyle();
+		//TextureAtlas atlas = new TextureAtlas( new FileHandle( "data" + File.separator + "uiskin.atlas" ) );
+		Skin skin = StaticFiles.skin;
+		TextButton.TextButtonStyle tbs = skin.get( TextButton.TextButtonStyle.class );
 		
 		singlePlayer = new TextButton( "Start Local Server", tbs );
 		multiPlayer = new TextButton( "Multiplayer", tbs );
@@ -67,6 +73,7 @@ public class HomeScreen implements Screen, EventListener
 		login = new TextButton( "Login", tbs );
 
 		singlePlayer.addListener( this );
+		exit.addListener( this );
 		
 		Table table = new Table();
 		table.setFillParent( true );
@@ -120,55 +127,62 @@ public class HomeScreen implements Screen, EventListener
 	public boolean handle( Event event )
 	{
 		Actor e = event.getListenerActor();
-		if( e == singlePlayer )
+		if( e instanceof TextButton )
 		{
-			if( server == null )
+			TextButton button = (TextButton)e;
+			if( button.isPressed() )
 			{
-				singlePlayer.setText( "Stop Local Server" );
-				server = new TacticServer( new ServerNetworkInterface() );
-				server.begin();
-				try
+				if( e == singlePlayer )
 				{
-					InetAddress thisIp = InetAddress.getLocalHost();
-					ip = thisIp.getHostAddress();
-				} catch( UnknownHostException e1 )
+					if( server == null )
+					{
+						singlePlayer.setText( "Stop Local Server" );
+						server = new TacticServer( new ServerNetworkInterface() );
+						server.begin();
+						try
+						{
+							InetAddress thisIp = InetAddress.getLocalHost();
+							ip = thisIp.getHostAddress();
+						} catch( UnknownHostException e1 )
+						{
+						}
+					}
+					else
+					{
+						singlePlayer.setText( "Start Local Server" );
+						server.sl.running = false;
+						server = null;
+						ip = null;
+					}
+				} 
+				else if( e == multiPlayer )
 				{
+					//tc.setScreen( tc.multiplayersetup );
+				} 
+				else if( e == levelEditor )
+				{
+					//tc.setScreen( tc.editorsetup );
 				}
-			}
-			else
-			{
-				singlePlayer.setText( "Start Local Server" );
-				server.sl.running = false;
-				server = null;
-				ip = null;
-			}
-		} 
-		else if( e == multiPlayer )
-		{
-			//tc.setScreen( tc.multiplayersetup );
-		} 
-		else if( e == levelEditor )
-		{
-			//tc.setScreen( tc.editorsetup );
-		}
-		else if( e == settings )
-		{
-			//tc.setScreen( tc.settings );
-		} 
-		else if( e == exit )
-		{
-			Gdx.app.exit();
-		}
-		else if( e == login )
-		{
-			if( StaticFiles.user == null )
-			{
-				//tc.setScreen( login );
-			}
-			else
-			{
-				StaticFiles.user = null;
-				login.setText( "Login" );
+				else if( e == settings )
+				{
+					//tc.setScreen( tc.settings );
+				} 
+				else if( e == exit )
+				{
+					Gdx.app.exit();
+				}
+				else if( e == login )
+				{
+					if( StaticFiles.user == null )
+					{
+						//tc.setScreen( login );
+					}
+					else
+					{
+						StaticFiles.user = null;
+						login.setText( "Login" );
+					}
+				}
 			}
 		}
 		return true;

@@ -19,6 +19,7 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 import com.phyloa.dlib.util.DFile;
 import com.phyloa.dlib.util.DOptions;
@@ -38,7 +39,7 @@ public class StaticFiles
 	private static boolean started = false;
 	public static String names;
 	
-	static BitmapFont f;
+	public static Skin skin;
 	
 	static
 	{
@@ -50,7 +51,7 @@ public class StaticFiles
 			System.err.println( "Make sure the names file is located at: data" + File.separator + "dist.male.first.txt" );
 		}
 		
-		//f = new BitmapFont( new FileHandle( "data" + File.separator + "pixelfont1_16px.fnt" ), new FileHandle( "data" + File.separator + "pixelfont1_16px_0.png" ), false );
+		skin = new Skin( new FileHandle( "data" + File.separator + "uiskin.json" ) );
 	}
 	
 	public static void loadAllMusic()

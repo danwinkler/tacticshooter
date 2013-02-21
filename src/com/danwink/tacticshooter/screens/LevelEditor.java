@@ -3,13 +3,17 @@ package com.danwink.tacticshooter.screens;
 import java.io.File;
 import java.io.IOException;
 
-import org.newdawn.slick.Color;
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
-import org.newdawn.slick.Input;
-import org.newdawn.slick.InputListener;
-import org.newdawn.slick.SlickException;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
 
 import tacticshooter.Building;
 import tacticshooter.Building.BuildingType;
@@ -17,153 +21,94 @@ import tacticshooter.Level;
 import tacticshooter.Level.Link;
 import tacticshooter.Level.TileType;
 import tacticshooter.LevelFileHelper;
-import tacticshooter.GdxEventMapper;
-import tacticshooter.GdxRenderer;
 import tacticshooter.StaticFiles;
 import tacticshooter.Team;
 
-import com.phyloa.dlib.dui.DButton;
-import com.phyloa.dlib.dui.DText;
-import com.phyloa.dlib.dui.DTextBox;
-import com.phyloa.dlib.dui.DUI;
-import com.phyloa.dlib.dui.DUIElement;
-import com.phyloa.dlib.dui.DUIEvent;
-import com.phyloa.dlib.dui.DUIListener;
-import com.phyloa.dlib.renderer.DScreen;
-import com.phyloa.dlib.renderer.DScreenHandler;
-
-public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUIListener, InputListener
+public class LevelEditor implements Screen, EventListener
 {
 	Level l;
 	
-	DUI dui;
-	DButton wall;
-	DButton floor;
-	DButton edge;
-	DButton light;
-	DButton teamACenter;
-	DButton teamBCenter;
-	DButton point;
+	Stage stage;
 	
-	DButton pass;
-	DButton gate;
-	DButton addLink;
-	DButton pressurePad;
-	DButton door;
-	DButton grate;
+	TextButton wall;
+	TextButton floor;
+	TextButton edge;
+	TextButton light;
+	TextButton teamACenter;
+	TextButton teamBCenter;
+	TextButton point;
 	
-	DButton save;
-	DButton saveAndExit;
-	DButton exitWithoutSaving;
+	TextButton pass;
+	TextButton gate;
+	TextButton addLink;
+	TextButton pressurePad;
+	TextButton door;
+	TextButton grate;
 	
-	DButton toggleMirrorBrush;
+	TextButton save;
+	TextButton saveAndExit;
+	TextButton exitWithoutSaving;
 	
-	DText fileNameText;
-	DTextBox name;
+	TextButton toggleMirrorBrush;
+	
+	Label fileNameText;
+	TextField name;
 	
 	float scrollx, scrolly;
 	
 	Brush brush = Brush.WALL;
 	
-	GdxRenderer renderer = new GdxRenderer();
-	
 	MirrorType mirrorType = MirrorType.NONE;
 	int nextMirror = 1;
-	
-	Image levelTexture;
-	Graphics levelG;
 	
 	String levelName = "";
 	
 	Building addLinkSelected;
 
-	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
+	public void show()
 	{
 		//Wait until menu music is loaded, then make sure its already started before you stop it
 		while( StaticFiles.getMusic( "menu" ) == null ){}
 		StaticFiles.getMusic( "menu" ).play();
 		StaticFiles.getMusic( "menu" ).stop();
-
-		if( dui == null )
-		{
-			dui = new DUI( new GdxEventMapper( gc.getInput() ) );
-			
-			wall = new DButton( "Wall", 0, gc.getHeight()-100, 100, 50 );
-			floor = new DButton( "Floor", 100, gc.getHeight()-100, 100, 50 );
-			edge = new DButton( "Edge" , 200, gc.getHeight()-100, 100, 50 );
-			light = new DButton( "Light", 300, gc.getHeight()-100, 100, 50 );
-			teamACenter = new DButton( "A Center", 400, gc.getHeight()-100, 100, 50 );
-			teamBCenter = new DButton( "B Center", 500, gc.getHeight()-100, 100, 50 );
-			point = new DButton( "Point", 600, gc.getHeight()-100, 100, 50 );
-			
-			pass = new DButton( "Pass", 700, gc.getHeight()-100, 50, 50 );
-			gate = new DButton( "Gate", 750, gc.getHeight()-100, 50, 50 );
-			addLink = new DButton( "Link", 800, gc.getHeight()-100, 100, 50 );
-			pressurePad = new DButton( "Pressure Pad", 900, gc.getHeight()-100, 100, 50 );
-			
-			save = new DButton( "Save", 0, gc.getHeight()-50, 200, 50 );
-			saveAndExit = new DButton( "Save & Exit", 200, gc.getHeight()-50, 200, 50 );
-			exitWithoutSaving = new DButton( "Exit", 400, gc.getHeight()-50, 200, 50 );
-			
-			door = new DButton( "Door", 600, gc.getHeight()-50, 50, 50 );
-			grate = new DButton( "Grate", 650, gc.getHeight()-50, 50, 50 );
-			
-			fileNameText = new DText( "Map Name:", gc.getWidth()-350, gc.getHeight()-50 );
-			fileNameText.setColor( java.awt.Color.BLACK );
-			name = new DTextBox( gc.getWidth()-250, gc.getHeight()-50, 250, 50 );
-			name.setText( levelName );
-			
-			toggleMirrorBrush = new DButton( "Toggle Mirror Brush", gc.getWidth()-200, gc.getHeight()-100, 200, 50 );
-			
-			dui.add( wall );
-			dui.add( floor );
-			dui.add( edge );
-			dui.add( light );
-			dui.add( teamACenter );
-			dui.add( teamBCenter );
-			dui.add( point );
-			
-			dui.add( pass );
-			dui.add( gate );
-			dui.add( addLink );
-			dui.add( pressurePad );
-			
-			dui.add( save );
-			dui.add( saveAndExit );
-			dui.add( exitWithoutSaving );
-			
-			dui.add( door );
-			dui.add( grate );
-			
-			dui.add( fileNameText );
-			dui.add( name );
-			
-			dui.add( toggleMirrorBrush );
-			
-			dui.addDUIListener( this );
-		}
-		dui.setEnabled( true );
 		
-		l.loadTextures();
+		stage = new Stage();
+		Gdx.input.setInputProcessor( stage );
 		
-		try
-		{
-			levelTexture = new Image( l.width * Level.tileSize, l.height * Level.tileSize );
-			levelG = levelTexture.getGraphics();
-			l.renderFloor( levelG );
-			l.render( levelG );
-			levelG.flush();
-		} catch( SlickException e )
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		gc.getInput().addListener( this );
+		Skin skin = StaticFiles.skin;
+		TextButtonStyle tbs = skin.get( TextButtonStyle.class );
+		LabelStyle ls = skin.get( LabelStyle.class );
+		TextFieldStyle tfs = skin.get( TextFieldStyle.class );
+		
+		wall = new TextButton( "Wall", tbs );
+		floor = new TextButton( "Floor", tbs );
+		edge = new TextButton( "Edge" , tbs );
+		light = new TextButton( "Light", tbs );
+		teamACenter = new TextButton( "A Center", tbs );
+		teamBCenter = new TextButton( "B Center", tbs );
+		point = new TextButton( "Point", tbs );
+		
+		pass = new TextButton( "Pass", tbs );
+		gate = new TextButton( "Gate", tbs );
+		addLink = new TextButton( "Link", tbs );
+		pressurePad = new TextButton( "Pressure Pad", tbs );
+		
+		save = new TextButton( "Save", tbs );
+		saveAndExit = new TextButton( "Save & Exit", tbs );
+		exitWithoutSaving = new TextButton( "Exit", tbs );
+		
+		door = new TextButton( "Door", tbs );
+		grate = new TextButton( "Grate", tbs );
+		
+		fileNameText = new Label( "Map Name:", ls );
+		name = new TextField( "", tfs );
+		name.setText( levelName );
+		
+		toggleMirrorBrush = new TextButton( "Toggle Mirror Brush", tbs );
 	}
 	
-	public void update( GameContainer gc, int delta )
+	public void render( float d )
 	{
-		float d = delta / 60.f;
 		Input input = gc.getInput();
 		if( input.isKeyDown( Input.KEY_DOWN ) )
 		{
@@ -503,7 +448,7 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 	public void event( DUIEvent event )
 	{
 		DUIElement e = event.getElement();
-		if( e instanceof DButton && event.getType() == DButton.MOUSE_UP )
+		if( e instanceof TextButton && event.getType() == TextButton.MOUSE_UP )
 		{
 			if( e == wall )
 			{
