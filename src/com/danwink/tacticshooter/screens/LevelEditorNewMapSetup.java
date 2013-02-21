@@ -5,8 +5,8 @@ import org.newdawn.slick.Graphics;
 
 import tacticshooter.Level;
 import tacticshooter.ServerNetworkInterface;
-import tacticshooter.Slick2DEventMapper;
-import tacticshooter.Slick2DRenderer;
+import tacticshooter.GdxEventMapper;
+import tacticshooter.GdxRenderer;
 import tacticshooter.StaticFiles;
 import tacticshooter.TacticServer;
 
@@ -30,13 +30,13 @@ public class LevelEditorNewMapSetup extends DScreen<GameContainer, Graphics> imp
 	DButton back;
 	DButton okay;
 	
-	Slick2DRenderer r;
+	GdxRenderer r;
 	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
 		if( dui == null )
 		{
-			dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
+			dui = new DUI( new GdxEventMapper( gc.getInput() ) );
 			widthText = new DText( "Width:", gc.getWidth()/2 - 150, gc.getHeight()/2-100 );
 			widthText.setCentered( true );
 			heightText = new DText( "Height:", gc.getWidth()/2 - 150, gc.getHeight()/2 );
@@ -57,7 +57,7 @@ public class LevelEditorNewMapSetup extends DScreen<GameContainer, Graphics> imp
 		}
 		
 		dui.setEnabled( true );
-		r = new Slick2DRenderer();
+		r = new GdxRenderer();
 	}
 	
 	public void update( GameContainer gc, int delta )

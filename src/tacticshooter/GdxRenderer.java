@@ -8,24 +8,23 @@ import java.util.HashMap;
 
 import javax.vecmath.Vector2f;
 
-import org.newdawn.slick.Color;
-import org.newdawn.slick.Graphics;
-import org.newdawn.slick.SlickException;
-import org.newdawn.slick.opengl.Texture;
-import org.newdawn.slick.util.BufferedImageUtil;
-
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.phyloa.dlib.renderer.Renderer2D;
 import com.phyloa.dlib.util.DGraphics;
 
-public class Slick2DRenderer implements Renderer2D
+public class GdxRenderer implements Renderer2D
 {
-	Graphics gc;
 	private HashMap<Image, org.newdawn.slick.Image> imageHash = new HashMap<Image, org.newdawn.slick.Image>();
 	
-	public Slick2DRenderer renderTo( Graphics g )
+	ShapeRenderer g;
+	
+	public GdxRenderer()
 	{
-		gc = g;
-		return this;
+		g = new ShapeRenderer();
 	}
 	
 	public void begin()
@@ -51,105 +50,114 @@ public class Slick2DRenderer implements Renderer2D
 	@Override
 	public void color( int c )
 	{
-		gc.setColor( new Color( c ) );
+		Color t = new Color();
+		Color.rgb888ToColor( t, c );
+		g.setColor( t );
 	}
 
 	@Override
 	public void color( float r, float g, float b )
 	{
-		gc.setColor( new Color( r/255, g/255, b/255 ) );
+		this.g.setColor( new Color( r/255, g/255, b/255, 1.f ) );
 	}
 
 	@Override
 	public void color( float r, float g, float b, float a )
 	{
-		gc.setColor( new Color( r/255, g/255, b/255, a/255 ) );
+		this.g.setColor( new Color( r/255, g/255, b/255, a/255 ) );
 	}
 
 	@Override
 	public void color( java.awt.Color color )
 	{
-		gc.setColor( new Color( color.getRGB() ) );
+		Color t = new Color();
+		Color.rgb888ToColor( t, color.getRGB() );
+		g.setColor( t );
 	}
 
 	@Override
 	public void line( float x1, float y1, float x2, float y2 )
 	{
-		gc.drawLine( x1, y1, x2, y2 );
+		g.begin( ShapeType.Line );
+		g.line( x1, y1, x2, y2 );
+		g.end();
 	}
 
 	@Override
 	public void fillRect( float x, float y, float width, float height )
 	{
-		gc.fillRect( x, y, width, height );
+		g.begin( ShapeType.Filled );
+		g.rect( x, y, width, height );
+		g.end();
 	}
 
 	@Override
 	public void drawRect( float x, float y, float width, float height )
 	{
-		gc.drawRect( x, y, width, height );
+		g.begin( ShapeType.Line );
+		g.rect( x, y, width, height );
+		g.end();
 	}
 
 	@Override
-	public void fillRoundedRect( float x, float y, float width, float height,
-			float arcWidth, float arcHeight )
+	public void fillRoundedRect( float x, float y, float width, float height, float arcWidth, float arcHeight )
 	{
-		gc.fillRoundRect( x, y, width, height, (int)arcWidth );
+		
 	}
 
 	@Override
-	public void drawRoundedRect( float x, float y, float width, float height,
-			float arcWidth, float arcHeight )
+	public void drawRoundedRect( float x, float y, float width, float height, float arcWidth, float arcHeight )
 	{
-		gc.drawRoundRect( x, y, width, height, (int)arcWidth );
+		
 	}
 
 	@Override
 	public void fillOval( float x, float y, float width, float height )
 	{
-		gc.fillOval( x, y, width, height );
+		
 	}
 
 	@Override
 	public void drawOval( float x, float y, float width, float height )
 	{
-		gc.drawOval( x, y, width, height );
+		
 	}
 
 	@Override
 	public void text( String text, float x, float y )
 	{
-		gc.drawString( text, x, y );
+		SpriteBatch sb = new SpriteBatch();
+		StaticFiles.f.draw( sb, text, x, y );
 	}
 
 	@Override
 	public void translate( float x, float y )
 	{
-		gc.translate( x, y );
+		g.translate( x, y, 0 );
 	}
 
 	@Override
 	public void scale( float x, float y )
 	{
-		gc.scale( x, y );
+		g.scale( x, y, 0 );
 	}
 
 	@Override
 	public void rotate( float angle )
 	{
-		gc.rotate( 0, 0, angle );
+		g.rotate( 0, 0, 1, angle );
 	}
 
 	@Override
 	public void pushMatrix()
 	{
-		gc.pushTransform();
+		Gdx.gl11.glPushMatrix();
 	}
 
 	@Override
 	public void popMatrix()
 	{
-		gc.popTransform();
+		Gdx.gl11.glPopMatrix();
 	}
 
 	@Override

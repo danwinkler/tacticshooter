@@ -7,13 +7,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import org.newdawn.slick.AngelCodeFont;
-import org.newdawn.slick.AppGameContainer;
-import org.newdawn.slick.BasicGame;
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
-import org.newdawn.slick.SlickException;
-import org.newdawn.slick.TrueTypeFont;
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.danwink.tacticshooter.screens.HomeScreen;
 import com.danwink.tacticshooter.screens.LevelEditor;
 import com.danwink.tacticshooter.screens.LevelEditorLoadMap;
@@ -31,18 +27,18 @@ import com.danwink.tacticshooter.screens.SettingsScreen;
 import com.phyloa.dlib.renderer.DScreenHandler;
 import com.phyloa.dlib.util.DFile;
 
-public class TacticClient extends BasicGame
+public class TacticClient extends Game
 {
-	DScreenHandler<GameContainer, Graphics> dsh = new DScreenHandler<GameContainer, Graphics>();
+	DScreenHandler<> dsh = new DScreenHandler();
 	
 	org.newdawn.slick.Font f;
 	
 	public TacticClient()
 	{
-		super( "Tactic Shooter Client" );
+		
 	}
 
-	public void init( GameContainer gc ) throws SlickException
+	public void create()
 	{
 		dsh.register( "home", new HomeScreen() );
 		dsh.register( "login", new LoginScreen() );
@@ -115,15 +111,14 @@ public class TacticClient extends BasicGame
 	{
 		try
 		{
-			//Attempt to avoid sealed exception errors on zoe's mac
-			Class.forName( "javax.vecmath.Point2i" );
-			
-			AppGameContainer app = new AppGameContainer( new TacticClient() );
-			app.setDisplayMode( StaticFiles.options.getI( "windowWidth" ), StaticFiles.options.getI( "windowHeight" ), StaticFiles.options.getB( "fullscreen" ) );
-			app.setVSync( StaticFiles.options.getB( "vsync" ) );
-			app.setUpdateOnlyWhenVisible( false );
-			app.setAlwaysRender( true );
-			app.start();
+	        TacticClient tc = new TacticClient();
+	 
+	        // whether to use OpenGL ES 2.0
+	        boolean useOpenGLES2 = true;
+	 
+	        // create the game
+	        LwjglApplication app = new LwjglApplication( tc, "Tactic Shooter", StaticFiles.options.getI( "windowWidth" ), StaticFiles.options.getI( "windowHeight" ), useOpenGLES2 );
+	        
 		} catch( Exception ex )
 		{
 			ex.printStackTrace();

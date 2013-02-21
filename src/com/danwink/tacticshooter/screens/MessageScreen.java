@@ -4,8 +4,8 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
-import tacticshooter.Slick2DEventMapper;
-import tacticshooter.Slick2DRenderer;
+import tacticshooter.GdxEventMapper;
+import tacticshooter.GdxRenderer;
 import tacticshooter.StaticFiles;
 
 import com.phyloa.dlib.dui.DButton;
@@ -23,13 +23,13 @@ public class MessageScreen extends DScreen<GameContainer, Graphics> implements D
 	DButton okay;
 	DText text;
 	
-	Slick2DRenderer r = new Slick2DRenderer();
+	GdxRenderer r = new GdxRenderer();
 		
 	String message;
 	
 	public void onActivate( GameContainer e, DScreenHandler<GameContainer, Graphics> dsh )
 	{
-		dui = new DUI( new Slick2DEventMapper( e.getInput() ) );
+		dui = new DUI( new GdxEventMapper( e.getInput() ) );
 		
 		okay = new DButton( "Okay", e.getWidth() / 2 - 100, e.getHeight()/2, 200, 100 );
 		text = new DText( message, e.getWidth()/2 - 100, e.getHeight()/2-100 );

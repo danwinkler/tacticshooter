@@ -4,8 +4,8 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
 
-import tacticshooter.Slick2DEventMapper;
-import tacticshooter.Slick2DRenderer;
+import tacticshooter.GdxEventMapper;
+import tacticshooter.GdxRenderer;
 import tacticshooter.StaticFiles;
 
 import com.phyloa.dlib.dui.DButton;
@@ -24,13 +24,13 @@ public class SettingsScreen extends DScreen<GameContainer, Graphics> implements 
 	DButton advOptions;
 	DButton back;
 	
-	Slick2DRenderer r = new Slick2DRenderer();
+	GdxRenderer r = new GdxRenderer();
 	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
 		if( dui == null )
 		{
-			dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
+			dui = new DUI( new GdxEventMapper( gc.getInput() ) );
 			
 			toggleFullscreen = new DButton( "Toggle Fullscreen", gc.getWidth()/2-100, gc.getHeight()/2-200, 200, 100 );
 			options = new DButton( "Options", gc.getWidth()/2-100, gc.getHeight()/2-100, 200, 100 );

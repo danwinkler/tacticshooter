@@ -8,8 +8,8 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
 import tacticshooter.LevelFileHelper;
-import tacticshooter.Slick2DEventMapper;
-import tacticshooter.Slick2DRenderer;
+import tacticshooter.GdxEventMapper;
+import tacticshooter.GdxRenderer;
 import tacticshooter.StaticFiles;
 
 import com.phyloa.dlib.dui.DButton;
@@ -29,11 +29,11 @@ public class LevelEditorLoadMap extends DScreen<GameContainer, Graphics> impleme
 	
 	DButton back;
 	
-	Slick2DRenderer r = new Slick2DRenderer();
+	GdxRenderer r = new GdxRenderer();
 	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
-		dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
+		dui = new DUI( new GdxEventMapper( gc.getInput() ) );
 		
 		scrollPane = new DScrollPane( gc.getWidth()/2-200, 50, 410, 500 );
 		File[] files = new File( "levels" ).listFiles();

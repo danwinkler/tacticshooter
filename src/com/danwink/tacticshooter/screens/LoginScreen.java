@@ -25,8 +25,8 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
 import tacticshooter.Level;
-import tacticshooter.Slick2DEventMapper;
-import tacticshooter.Slick2DRenderer;
+import tacticshooter.GdxEventMapper;
+import tacticshooter.GdxRenderer;
 import tacticshooter.StaticFiles;
 import tacticshooter.UserInfo;
 
@@ -54,13 +54,13 @@ public class LoginScreen extends DScreen<GameContainer, Graphics> implements DUI
 	DButton back;
 	DButton okay;
 	
-	Slick2DRenderer r;
+	GdxRenderer r;
 	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
 		if( dui == null )
 		{
-			dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
+			dui = new DUI( new GdxEventMapper( gc.getInput() ) );
 			usernameText = new DText( "Username:", gc.getWidth()/2 - 150, gc.getHeight()/2-100 );
 			usernameText.setCentered( true );
 			passwordText = new DText( "Password:", gc.getWidth()/2 - 150, gc.getHeight()/2 );
@@ -93,7 +93,7 @@ public class LoginScreen extends DScreen<GameContainer, Graphics> implements DUI
 			dui.addDUIListener( this );
 		}
 		dui.setEnabled( true );
-		r = new Slick2DRenderer();
+		r = new GdxRenderer();
 	}
 	
 	public void update( GameContainer gc, int delta )

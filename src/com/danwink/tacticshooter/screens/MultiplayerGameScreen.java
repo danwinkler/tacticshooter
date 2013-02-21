@@ -31,8 +31,8 @@ import tacticshooter.Message;
 import tacticshooter.MessageType;
 import tacticshooter.MusicQueuer;
 import tacticshooter.Player;
-import tacticshooter.Slick2DEventMapper;
-import tacticshooter.Slick2DRenderer;
+import tacticshooter.GdxEventMapper;
+import tacticshooter.GdxRenderer;
 import tacticshooter.StaticFiles;
 import tacticshooter.Team;
 import tacticshooter.Unit;
@@ -85,7 +85,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	
 	DScreenHandler<GameContainer, Graphics> dsh;
 	
-	Slick2DRenderer renderer = new Slick2DRenderer();
+	GdxRenderer renderer = new GdxRenderer();
 	
 	public GameContainer gc;
 	
@@ -127,7 +127,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		
 		if( dui == null )
 		{
-			dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
+			dui = new DUI( new GdxEventMapper( gc.getInput() ) );
 			buildScoutUnit = new DButton( "Build Scout\n3", 0, gc.getHeight()-75, 150, 75 );
 			buildLightUnit = new DButton( "Build Light\n10", 150, gc.getHeight()-75, 150, 75 );
 			buildHeavyUnit = new DButton( "Build Heavy\n20", 300, gc.getHeight()-75, 150, 75 );

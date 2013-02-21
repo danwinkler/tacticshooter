@@ -6,8 +6,8 @@ import org.newdawn.slick.Graphics;
 
 import tacticshooter.GameStats;
 import tacticshooter.GameStats.TeamStats;
-import tacticshooter.Slick2DEventMapper;
-import tacticshooter.Slick2DRenderer;
+import tacticshooter.GdxEventMapper;
+import tacticshooter.GdxRenderer;
 import tacticshooter.StaticFiles;
 
 import com.phyloa.dlib.dui.DButton;
@@ -28,13 +28,13 @@ public class PostGameScreen extends DScreen<GameContainer, Graphics> implements 
 	DButton okay;
 	DButton rejoin;
 	
-	Slick2DRenderer r = new Slick2DRenderer();
+	GdxRenderer r = new GdxRenderer();
 	
 	GameStats stats;
 	
 	public void onActivate( GameContainer e, DScreenHandler<GameContainer, Graphics> dsh )
 	{
-		dui = new DUI( new Slick2DEventMapper( e.getInput() ) );
+		dui = new DUI( new GdxEventMapper( e.getInput() ) );
 		
 		dui.add( new DText( "Post Game Stats", e.getWidth()/2 - 300, 30, true ) );
 		

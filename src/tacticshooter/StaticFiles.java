@@ -20,6 +20,8 @@ import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.Sound;
 
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.danwink.tacticshooter.screens.DScreenSlideTransition;
 import com.phyloa.dlib.renderer.DScreenTransition;
 import com.phyloa.dlib.util.DFile;
@@ -42,6 +44,8 @@ public class StaticFiles
 	private static boolean started = false;
 	public static String names;
 	
+	static BitmapFont f;
+	
 	static
 	{
 		try
@@ -51,6 +55,8 @@ public class StaticFiles
 		{
 			System.err.println( "Make sure the names file is located at: data" + File.separator + "dist.male.first.txt" );
 		}
+		
+		f = new BitmapFont( new FileHandle( "data" + File.separator + "pixelfont1_16px.fnt" ), new FileHandle( "data" + File.separator + "pixelfont1_16px_0.png" ), false );
 	}
 	
 	public static void loadAllMusic()

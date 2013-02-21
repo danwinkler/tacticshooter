@@ -4,24 +4,19 @@ import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import org.newdawn.slick.Color;
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
-import org.newdawn.slick.Music;
-import org.newdawn.slick.SlickException;
-import org.newdawn.slick.opengl.shader.ShaderProgram;
-
 import tacticshooter.AutoTileDrawer;
 import tacticshooter.Level;
 import tacticshooter.ServerNetworkInterface;
-import tacticshooter.Slick2DEventMapper;
-import tacticshooter.Slick2DRenderer;
+import tacticshooter.GdxEventMapper;
+import tacticshooter.GdxRenderer;
 import tacticshooter.StaticFiles;
 import tacticshooter.TacticServer;
 import tacticshooter.Unit.UnitType;
 import tacticshooter.UserInfo;
 
+import com.badlogic.gdx.Application;
+import com.badlogic.gdx.Graphics;
+import com.badlogic.gdx.graphics.Texture;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DUI;
 import com.phyloa.dlib.dui.DUIElement;
@@ -33,7 +28,7 @@ import com.phyloa.dlib.util.DMath;
 import com.phyloa.dlib.util.DOptions;
 import com.phyloa.dlib.util.ImprovedNoise;
 
-public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIListener
+public class HomeScreen extends DScreen<Graphics, Graphics> implements DUIListener
 {
 	TacticServer server;
 	
@@ -46,17 +41,17 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 	
 	DButton login;
 	
-	Slick2DRenderer r = new Slick2DRenderer();
+	GdxRenderer r = new GdxRenderer();
 	
 	String ip;
 	
-	Image title;
+	Texture title;
 	
-	public void onActivate( GameContainer e, DScreenHandler<GameContainer, Graphics> dsh )
+	public void onActivate( Graphics e, DScreenHandler<Graphics, Graphics> dsh )
 	{
 		if( dui == null )
 		{
-			dui = new DUI( new Slick2DEventMapper( e.getInput() ) );
+			dui = new DUI( new GdxEventMapper() );
 			
 			singlePlayer = new DButton( "Start Local Server", e.getWidth() / 2 - 200, e.getHeight()/2 - 200, 400, 100 );
 			multiPlayer = new DButton( "Multiplayer", e.getWidth() / 2 - 200, e.getHeight()/2 - 100, 400, 100 );
@@ -91,24 +86,17 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 			login.setText( "Logout" );
 		}
 		
-		try
-		{
-			title = new Image( "img" + File.separator + "title.png" );
-		} catch( SlickException e1 )
-		{
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		title = new Texture( "img" + File.separator + "title.png" );		
 	}
 	
-	public void update( GameContainer gc, int delta )
+	public void update( Graphics gc, int delta )
 	{
 		dui.update();
 	}
 
-	public void render( GameContainer gc, Graphics g )
+	public void render( Graphics gc, Graphics g )
 	{
-		dui.render( r.renderTo( g ) );
+		dui.render( r );
 		if( ip != null )
 		{
 			g.setColor( Color.white );

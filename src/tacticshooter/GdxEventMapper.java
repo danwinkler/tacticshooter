@@ -1,21 +1,17 @@
 package tacticshooter;
 
-import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
-
-import org.newdawn.slick.Input;
-import org.newdawn.slick.InputListener;
-
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.phyloa.dlib.dui.DEventMapper;
 import com.phyloa.dlib.dui.DKeyEvent;
 import com.phyloa.dlib.dui.DKeyListener;
 import com.phyloa.dlib.dui.DMouseEvent;
 import com.phyloa.dlib.dui.DMouseListener;
-import com.phyloa.dlib.util.DMath;
 
-public class Slick2DEventMapper implements DEventMapper, InputListener
+public class GdxEventMapper implements DEventMapper, InputProcessor
 {
 	public static final int[] KEYTABLE =
 	{
@@ -247,22 +243,18 @@ public class Slick2DEventMapper implements DEventMapper, InputListener
 	ArrayList<DKeyListener> keyListeners = new ArrayList<DKeyListener>();
 	ArrayList<DMouseListener> mouseListeners = new ArrayList<DMouseListener>();
 	
-	Input input;
-	
 	int lastButton;
 
 	private boolean enabled = true;
 	
-	public Slick2DEventMapper( Input input )
+	public GdxEventMapper()
 	{
-		register( input );
+		register();
 	}
 	
-	public void register( Input input )
+	public void register()
 	{
-		input.removeAllListeners();
-		this.input = input;
-		input.addListener( this );
+		Gdx.input.setInputProcessor( this );
 	}
 	
 	public void addDKeyListener( DKeyListener l )
@@ -307,9 +299,9 @@ public class Slick2DEventMapper implements DEventMapper, InputListener
 	}
 
 	@Override
-	public void mouseDragged( int oldx, int oldy, int newx, int newy )
+	public boolean touchDragged( int x, int y, int pointer )
 	{
-		if( !enabled ) return;
+		if( !enabled ) return false;
 		ArrayList<DMouseListener> tempMLs;
 		synchronized( mouseListeners )
 		{
@@ -317,19 +309,20 @@ public class Slick2DEventMapper implements DEventMapper, InputListener
 		}
 		
 		DMouseEvent dme = new DMouseEvent();
-		dme.x = newx;
-		dme.y = newy;
+		dme.x = x;
+		dme.y = y;
 		for( int i = 0; i < tempMLs.size(); i++ )
 		{
 			DMouseListener l = tempMLs.get( i );
 			l.mouseDragged( dme );
 		}
+		return true;
 	}
 
 	@Override
-	public void mouseMoved( int oldx, int oldy, int newx, int newy )
+	public boolean mouseMoved( int x, int y )
 	{
-		if( !enabled ) return;
+		if( !enabled ) return false;
 		ArrayList<DMouseListener> tempMLs;
 		synchronized( mouseListeners )
 		{
@@ -337,19 +330,20 @@ public class Slick2DEventMapper implements DEventMapper, InputListener
 		}
 		
 		DMouseEvent dme = new DMouseEvent();
-		dme.x = newx;
-		dme.y = newy;
+		dme.x = x;
+		dme.y = y;
 		for( int i = 0; i < tempMLs.size(); i++ )
 		{
 			DMouseListener l = tempMLs.get( i );
 			l.mouseMoved( dme );
 		}
+		return true;
 	}
 
 	@Override
-	public void mousePressed( int button, int x, int y )
+	public boolean touchDown( int x, int y, int pointer, int button )
 	{
-		if( !enabled ) return;
+		if( !enabled ) return false;
 		ArrayList<DMouseListener> tempMLs;
 		synchronized( mouseListeners )
 		{
@@ -365,12 +359,13 @@ public class Slick2DEventMapper implements DEventMapper, InputListener
 			DMouseListener l = tempMLs.get( i );
 			l.mousePressed( dme );
 		}
+		return true;
 	}
 
 	@Override
-	public void mouseReleased( int button, int x, int y )
+	public boolean touchUp( int x, int y, int pointer, int button )
 	{
-		if( !enabled ) return;
+		if( !enabled ) return false;
 		ArrayList<DMouseListener> tempMLs;
 		synchronized( mouseListeners )
 		{
@@ -385,12 +380,13 @@ public class Slick2DEventMapper implements DEventMapper, InputListener
 			DMouseListener l = tempMLs.get( i );
 			l.mouseReleased( dme );
 		}
+		return true;
 	}
 
 	@Override
-	public void mouseWheelMoved( int a )
+	public boolean scrolled( int a )
 	{
-		if( !enabled ) return;
+		if( !enabled ) return false;
 		ArrayList<DMouseListener> tempMLs;
 		synchronized( mouseListeners )
 		{
@@ -399,141 +395,65 @@ public class Slick2DEventMapper implements DEventMapper, InputListener
 		
 		DMouseEvent dme = new DMouseEvent();
 		dme.wheel = a;
-		dme.x = input.getMouseX();
-		dme.y = input.getMouseY();
+		dme.x = Gdx.input.getX();
+		dme.y = Gdx.input.getY();
 		for( int i = 0; i < tempMLs.size(); i++ )
 		{
 			DMouseListener l = tempMLs.get( i );
 			l.mouseWheel( dme );
 		}
-	}
-
-	@Override
-	public void inputEnded()
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void inputStarted()
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean isAcceptingInput()
-	{
 		return true;
 	}
 
 	@Override
-	public void setInput( Input input )
+	public boolean keyDown( int key )
 	{
-		this.input = input;
-	}
-
-	@Override
-	public void keyPressed( int key, char c )
-	{
+		if( !enabled ) return false;
 		ArrayList<DKeyListener> tempKLs = new ArrayList<DKeyListener>( keyListeners );
 		DKeyEvent dke = new DKeyEvent();
-		dke.keyCode = KEYTABLE[key];
-		dke.keyChar = c;
+		dke.keyCode = key;
 		dke.isActionKey = false;
-		dke.lctrl = input.isKeyDown( Input.KEY_LCONTROL );
+		dke.lctrl = Gdx.input.isKeyPressed( Input.Keys.CONTROL_LEFT );
 		for( int i = 0; i < tempKLs.size(); i++ )
 		{
 			DKeyListener l = tempKLs.get( i );
 			l.keyPressed( dke );
 		}
+		return true;
 	}
 
 	@Override
-	public void keyReleased( int key, char c )
+	public boolean keyUp( int key )
 	{
+		if( !enabled ) return false;
 		ArrayList<DKeyListener> tempKLs = new ArrayList<DKeyListener>( keyListeners );
 		DKeyEvent dke = new DKeyEvent();
-		dke.keyCode = KEYTABLE[key];
-		dke.keyChar = c;
+		dke.keyCode = key;
 		dke.isActionKey = false;
-		dke.lctrl = input.isKeyDown( Input.KEY_LCONTROL );
+		dke.lctrl = Gdx.input.isKeyPressed( Input.Keys.CONTROL_LEFT );
 		for( int i = 0; i < tempKLs.size(); i++ )
 		{
 			DKeyListener l = tempKLs.get( i );
 			l.keyReleased( dke );
 		}
+		return true;
 	}
-
+	
 	@Override
-	public void controllerButtonPressed( int arg0, int arg1 )
+	public boolean keyTyped( char c )
 	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void controllerButtonReleased( int arg0, int arg1 )
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void controllerDownPressed( int arg0 )
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void controllerDownReleased( int arg0 )
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void controllerLeftPressed( int arg0 )
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void controllerLeftReleased( int arg0 )
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void controllerRightPressed( int arg0 )
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void controllerRightReleased( int arg0 )
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void controllerUpPressed( int arg0 )
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void controllerUpReleased( int arg0 )
-	{
-		// TODO Auto-generated method stub
-		
+		if( !enabled ) return false;
+		ArrayList<DKeyListener> tempKLs = new ArrayList<DKeyListener>( keyListeners );
+		DKeyEvent dke = new DKeyEvent();
+		dke.keyChar = c;
+		dke.isActionKey = false;
+		dke.lctrl = Gdx.input.isKeyPressed( Input.Keys.CONTROL_LEFT );
+		for( int i = 0; i < tempKLs.size(); i++ )
+		{
+			DKeyListener l = tempKLs.get( i );
+			l.keyPressed( dke );
+		}
+		return true;
 	}
 
 	@Override
@@ -542,8 +462,7 @@ public class Slick2DEventMapper implements DEventMapper, InputListener
 		this.enabled = enabled;
 		if( enabled )
 		{
-			input.removeAllListeners();
-			input.addListener( this );
+			Gdx.input.setInputProcessor( this );
 		}
 	}
 }

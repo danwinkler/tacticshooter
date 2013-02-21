@@ -14,8 +14,8 @@ import org.apache.http.message.BasicNameValuePair;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
-import tacticshooter.Slick2DEventMapper;
-import tacticshooter.Slick2DRenderer;
+import tacticshooter.GdxEventMapper;
+import tacticshooter.GdxRenderer;
 import tacticshooter.StaticFiles;
 
 import com.phyloa.dlib.dui.DButton;
@@ -37,7 +37,7 @@ public class LevelEditorSetup extends DScreen<GameContainer, Graphics> implement
 	DButton downloadAllMaps;
 	DButton back;
 	
-	Slick2DRenderer r = new Slick2DRenderer();
+	GdxRenderer r = new GdxRenderer();
 	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
@@ -53,7 +53,7 @@ public class LevelEditorSetup extends DScreen<GameContainer, Graphics> implement
 	{
 		if( dui == null )
 		{
-			dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
+			dui = new DUI( new GdxEventMapper( gc.getInput() ) );
 			
 			newMap = new DButton( "New Map", gc.getWidth()/2 - 100, gc.getHeight()/2 - 250, 200, 100 );
 			loadMap = new DButton( "Load Map", gc.getWidth()/2 - 100, gc.getHeight()/2 - 150, 200, 100 );

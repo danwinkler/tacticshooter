@@ -8,8 +8,8 @@ import java.util.Map.Entry;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
-import tacticshooter.Slick2DEventMapper;
-import tacticshooter.Slick2DRenderer;
+import tacticshooter.GdxEventMapper;
+import tacticshooter.GdxRenderer;
 import tacticshooter.StaticFiles;
 
 import com.phyloa.dlib.dui.DButton;
@@ -35,7 +35,7 @@ public class OptionsScreen extends DScreen<GameContainer, Graphics> implements D
 	
 	DButton back;
 	
-	Slick2DRenderer r = new Slick2DRenderer();
+	GdxRenderer r = new GdxRenderer();
 	
 	ArrayList<DUIElement> boxes = new ArrayList<DUIElement>();
 
@@ -51,7 +51,7 @@ public class OptionsScreen extends DScreen<GameContainer, Graphics> implements D
 	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
-		dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
+		dui = new DUI( new GdxEventMapper( gc.getInput() ) );
 		
 		DOptions options = new DOptions( optionsFile );
 		

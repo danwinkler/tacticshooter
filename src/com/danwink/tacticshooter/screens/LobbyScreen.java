@@ -14,8 +14,8 @@ import tacticshooter.ComputerPlayer.PlayType;
 import tacticshooter.Message;
 import tacticshooter.MessageType;
 import tacticshooter.Player;
-import tacticshooter.Slick2DEventMapper;
-import tacticshooter.Slick2DRenderer;
+import tacticshooter.GdxEventMapper;
+import tacticshooter.GdxRenderer;
 import tacticshooter.StaticFiles;
 
 import com.phyloa.dlib.dui.DButton;
@@ -34,7 +34,7 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 	ClientInterface ci;
 	
 	DUI dui;
-	Slick2DRenderer r = new Slick2DRenderer();
+	GdxRenderer r = new GdxRenderer();
 	
 	DButton[] names = new DButton[16];
 	DDropDown[] humanOrBot = new DDropDown[16];
@@ -51,7 +51,7 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{	
 		messages.clear();
-		dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
+		dui = new DUI( new GdxEventMapper( gc.getInput() ) );
 		dui.addDUIListener( this );
 		for( int i = 0; i < 16; i++ )
 		{

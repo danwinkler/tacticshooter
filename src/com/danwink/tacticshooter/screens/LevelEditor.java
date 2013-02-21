@@ -17,8 +17,8 @@ import tacticshooter.Level;
 import tacticshooter.Level.Link;
 import tacticshooter.Level.TileType;
 import tacticshooter.LevelFileHelper;
-import tacticshooter.Slick2DEventMapper;
-import tacticshooter.Slick2DRenderer;
+import tacticshooter.GdxEventMapper;
+import tacticshooter.GdxRenderer;
 import tacticshooter.StaticFiles;
 import tacticshooter.Team;
 
@@ -65,7 +65,7 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 	
 	Brush brush = Brush.WALL;
 	
-	Slick2DRenderer renderer = new Slick2DRenderer();
+	GdxRenderer renderer = new GdxRenderer();
 	
 	MirrorType mirrorType = MirrorType.NONE;
 	int nextMirror = 1;
@@ -86,7 +86,7 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 
 		if( dui == null )
 		{
-			dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
+			dui = new DUI( new GdxEventMapper( gc.getInput() ) );
 			
 			wall = new DButton( "Wall", 0, gc.getHeight()-100, 100, 50 );
 			floor = new DButton( "Floor", 100, gc.getHeight()-100, 100, 50 );
