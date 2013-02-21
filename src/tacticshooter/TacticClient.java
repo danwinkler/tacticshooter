@@ -57,11 +57,13 @@ public class TacticClient extends Game
 
 	public void create()
 	{
-		home = new HomeScreen( this );
-		/*login = new LoginScreen();
+		StaticFiles.load();
 		
-		multiplayersetup = new MultiplayerSetupScreen();
-		multiplayergame = new MultiplayerGameScreen();
+		home = new HomeScreen( this );
+		//login = new LoginScreen();
+		
+		multiplayersetup = new MultiplayerSetupScreen( this );
+		/*multiplayergame = new MultiplayerGameScreen();
 		connect = new ServerConnectScreen();
 		lobby = new LobbyScreen();
 		

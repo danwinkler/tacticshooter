@@ -73,6 +73,7 @@ public class HomeScreen implements Screen, EventListener
 		login = new TextButton( "Login", tbs );
 
 		singlePlayer.addListener( this );
+		multiPlayer.addListener( this );
 		exit.addListener( this );
 		
 		Table table = new Table();
@@ -118,11 +119,6 @@ public class HomeScreen implements Screen, EventListener
 		
 		//g.drawImage( title, gc.getWidth()/2 - title.getWidth()/2, 150, new Color( 0, 0, 0, 128 ) );
 	}
-
-	public void onExit()
-	{
-		stage.dispose();
-	}
 	
 	public boolean handle( Event event )
 	{
@@ -157,7 +153,7 @@ public class HomeScreen implements Screen, EventListener
 				} 
 				else if( e == multiPlayer )
 				{
-					//tc.setScreen( tc.multiplayersetup );
+					tc.setScreen( tc.multiplayersetup );
 				} 
 				else if( e == levelEditor )
 				{
@@ -210,7 +206,6 @@ public class HomeScreen implements Screen, EventListener
 
 	public void resume()
 	{
-		// TODO Auto-generated method stub
 		
 	}
 }

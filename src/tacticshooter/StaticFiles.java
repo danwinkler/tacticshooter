@@ -50,7 +50,10 @@ public class StaticFiles
 		{
 			System.err.println( "Make sure the names file is located at: data" + File.separator + "dist.male.first.txt" );
 		}
-		
+	}
+	
+	public static void load()
+	{
 		skin = new Skin( new FileHandle( "data" + File.separator + "uiskin.json" ) );
 	}
 	

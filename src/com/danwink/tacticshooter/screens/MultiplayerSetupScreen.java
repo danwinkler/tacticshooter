@@ -1,13 +1,18 @@
 package com.danwink.tacticshooter.screens;
 
-import java.awt.event.KeyEvent;
-
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
 
 import tacticshooter.StaticFiles;
 import tacticshooter.TacticClient;
@@ -31,67 +36,92 @@ public class MultiplayerSetupScreen implements Screen, EventListener
 	{
 		stage = new Stage();
 		Gdx.input.setInputProcessor( stage );
-		address = new DTextBox( e.getWidth() / 2 - 200, e.getHeight()/2 - 120, 400, 100 );
-		back = new DButton( "Back", e.getWidth() / 2 - 200, e.getHeight()/2 + 20, 200, 100 );
-		enter = new DButton( "Join", e.getWidth() / 2, e.getHeight()/2 + 20, 200, 100 );
 		
-		dui.add( address );
-		dui.add( enter );
-		dui.add( back );
+		Skin skin = StaticFiles.skin;
 		
-		dui.setFocus( address );
+		TextFieldStyle tfs = skin.get( TextFieldStyle.class );
+		TextButtonStyle tbs = skin.get( TextButtonStyle.class );
 		
-		dui.addDUIListener( this );
+		address = new TextField( "", tfs );
+		back = new TextButton( "Back", tbs );
+		enter = new TextButton( "Join", tbs );
 		
-		if( ((HomeScreen)dsh.get( "home" )).server != null )
+		address.addListener( this );
+		back.addListener( this );
+		enter.addListener( this );
+		
+		Table table = new Table();
+		table.setFillParent( true );
+		
+		table.add( address );
+		table.row();
+		table.add( back );
+		table.add( enter );
+		
+		stage.addActor( table );
+		
+		if( tc.home.server != null )
 		{
 			address.setText( "localhost" );
 		}
 	}
 	
-	public void update( GameContainer gc, int delta )
+	public void render( float d )
 	{
-		dui.update();
+		if( Gdx.input.isKeyPressed( Input.Keys.ENTER ) )
+		{
+			tc.connect.address = address.getText();
+			//tc.setScreen( tc.connect );
+		}
+		
+		stage.act( Gdx.graphics.getDeltaTime() );
+		stage.draw();
 	}
 
-	public void render( GameContainer gc, Graphics g )
+	public void hide()
 	{
-		dui.render( r.renderTo( g ) );
-	}
-
-	public void onExit()
-	{
-		dui.setEnabled( false );
+		
 	}
 	
-	public void event( DUIEvent event )
+	public boolean handle( Event event )
 	{
-		DUIElement e = event.getElement();
-		if( e instanceof DButton && event.getType() == DButton.MOUSE_UP )
+		Actor e = event.getListenerActor();
+		if( e instanceof TextButton )
 		{
-			if( e == enter )
+			TextButton button = (TextButton)e;
+			if( button.isPressed() )
 			{
-				dsh.message( "connect", address.getText().trim() );
-				dsh.activate( "connect", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
-			} 
-			else if( e == back )
-			{
-				dsh.activate( "home", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
-			}
-		} else if( e instanceof DTextBox )
-		{
-			if( event.getType() == KeyEvent.VK_ENTER )
-			{
-				dsh.message( "connect", address.getText().trim() );
-				dsh.activate( "connect", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
+				if( e == enter )
+				{
+					tc.connect.address = address.getText();
+					//tc.setScreen( tc.connect );
+				} 
+				else if( e == back )
+				{
+					tc.setScreen( tc.home );
+				}
 			}
 		}
+		return true;
 	}
 
-	@Override
-	public void message( Object o )
+	public void dispose()
 	{
-		// TODO Auto-generated method stub
+		stage.dispose();
+	}
+
+	public void pause()
+	{
 		
-	} 
+	}
+
+	public void resize( int width, int height )
+	{
+		stage.setViewport(width, height, true);
+	}
+
+	public void resume()
+	{
+		
+	}
 }
