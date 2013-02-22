@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import javax.vecmath.Point2i;
 import javax.vecmath.Point3f;
@@ -54,6 +55,7 @@ import com.phyloa.dlib.dui.DUI;
 import com.phyloa.dlib.dui.DUIElement;
 import com.phyloa.dlib.dui.DUIEvent;
 import com.phyloa.dlib.dui.DUIListener;
+import com.phyloa.dlib.particle.Particle;
 import com.phyloa.dlib.particle.ParticleSystem;
 import com.phyloa.dlib.renderer.DScreen;
 import com.phyloa.dlib.renderer.DScreenHandler;
@@ -448,6 +450,18 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		}
 		
 		ps.update( d );
+		ps.sort( new Comparator<Particle<MultiplayerGameScreen>>() {
+			public int compare( Particle<MultiplayerGameScreen> p1, Particle<MultiplayerGameScreen> p2 )
+			{
+				Vector3f d1 = new Vector3f( p1.pos );
+				d1.sub( eye );
+				
+				Vector3f d2 = new Vector3f( p2.pos );
+				d2.sub( eye );
+				
+				return d1.lengthSquared() > d2.lengthSquared() ? -1 : 1;
+			} 
+		} );
 	}
 
 	public void render( GameContainer gc, Graphics g )

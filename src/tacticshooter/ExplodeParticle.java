@@ -47,7 +47,7 @@ public class ExplodeParticle extends Particle<MultiplayerGameScreen>
 		GL11.glPopMatrix();
 	}
 	
-	static Vector3f up = new Vector3f( 0, -1, -1 );
+	static Vector3f up = new Vector3f( 0, -2, -1 );
 	void rotateToFace( Point3f point )
 	{
 	  Vector3f d = new Vector3f();
