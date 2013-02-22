@@ -12,12 +12,12 @@ public class WallParticle extends Particle<MultiplayerGameScreen>
 	public static WallParticle makeParticle( float x, float y )
 	{
 		float angle = DMath.randomf( 0, DMath.PI2F );
-		return new WallParticle( x, y, DMath.cosf( angle ) * 5.f, DMath.sinf( angle ) * 5.f, DMath.randomf( .4f, 2f ) );
+		return new WallParticle( x, y, -Level.tileSize/2, DMath.cosf( angle ) * 5.f, DMath.sinf( angle ) * 5.f, DMath.randomf( -2, 2 ), DMath.randomf( .4f, 2f ) );
 	}
 	
-	public WallParticle( float x, float y, float dx, float dy, float duration )
+	public WallParticle( float x, float y, float z, float dx, float dy, float dz, float duration )
 	{
-		super( x, y, 0, dx, dy, 0, duration );
+		super( x, y, z, dx, dy, dz, duration );
 	}
 
 	public void render( MultiplayerGameScreen r )

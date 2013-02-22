@@ -129,6 +129,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	public Point3f eye = new Point3f();
 	Point3f center = new Point3f();
 	
+	int wallsidelist;
+	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
 		this.dsh = dsh;
@@ -484,6 +486,42 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 					}
 				}
 				
+				wallsidelist = GL11.glGenLists( 1 );
+				GL11.glNewList( wallsidelist, GL11.GL_COMPILE );
+				for( int y = 0; y < cs.l.height; y++ )
+				{
+					for( int x = 0; x < cs.l.width; x++ )
+					{
+						if( cs.l.getTile( x, y ) == TileType.WALL )
+						{
+							if( cs.l.getTile( x, y+1 ) != TileType.WALL )
+							{
+								GL11.glPushMatrix();
+								GL11.glTranslatef( x*Level.tileSize, (y+1) * Level.tileSize, -Level.tileSize );
+								GL11.glRotatef( 90, 1, 0, 0 );
+								AutoTileDrawer.draw( g, cs.l.wall, Level.tileSize, 0, true, true, true, true, true, false, false, false );
+								GL11.glPopMatrix();
+							}
+							if( cs.l.getTile( x-1, y ) != TileType.WALL )
+							{
+								GL11.glPushMatrix();
+								GL11.glTranslatef( (x)*Level.tileSize, (y) * Level.tileSize, 0 );
+								GL11.glRotatef( 90, 0, 1, 0 );
+								AutoTileDrawer.draw( g, cs.l.wall, Level.tileSize, 0, false, true, true, false, true, false, true, true );
+								GL11.glPopMatrix();
+							}
+							if( cs.l.getTile( x+1, y ) != TileType.WALL )
+							{
+								GL11.glPushMatrix();
+								GL11.glTranslatef( (x+1)*Level.tileSize, (y) * Level.tileSize, -Level.tileSize );
+								GL11.glRotatef( -90, 0, 1, 0 );
+								AutoTileDrawer.draw( g, cs.l.wall, Level.tileSize, 0, true, true, false, true, false, true, true, false );
+								GL11.glPopMatrix();
+							}
+						}
+					}
+				}
+				GL11.glEndList();
 			} catch( SlickException e )
 			{
 				e.printStackTrace();
@@ -544,6 +582,10 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			u.renderBody( g, cs.player );
 		}
 		
+		GL11.glEnable( GL11.GL_DEPTH_TEST );
+		GL11.glCallList( wallsidelist );
+		GL11.glDisable( GL11.GL_DEPTH_TEST );
+		
 		GL11.glPushMatrix();
 		GL11.glTranslatef( 0, 0, -Level.tileSize );
 		g.drawImage( wallTexture, 0, 0 );
@@ -551,11 +593,16 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		
 		g.setColor( Color.black );
 		
+		GL11.glPushMatrix();
+		GL11.glTranslatef( 0, 0, -Level.tileSize/2 );
 		for( int i = 0; i < cs.bullets.size(); i++ )
 		{
 			Bullet b = cs.bullets.get( i );
 			b.render( g );
 		}
+		GL11.glPopMatrix();
+		
+		
 		
 		for( int i = 0; i < cs.units.size(); i++ )
 		{
@@ -569,7 +616,9 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		GL11.glEnable( GL11.GL_BLEND );
 		GL11.glEnable( GL11.GL_TEXTURE_2D );
 		
+		GL11.glEnable( GL11.GL_DEPTH_TEST );
 		ps.render( this );
+		GL11.glDisable( GL11.GL_DEPTH_TEST );
 		
 		if( selecting )
 		{
@@ -708,7 +757,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	
 	public void make2D() {
 	    //GL11.glEnable( GL11.GL_BLEND );
-		//GL11.glDisable(GL11.GL_DEPTH_TEST);
+		GL11.glDisable(GL11.GL_DEPTH_TEST);
 	    GL11.glMatrixMode( GL11.GL_PROJECTION );
 	    GL11.glLoadIdentity();
 	    GL11.glOrtho( 0.0f, gc.getWidth(), gc.getHeight(), 0.0f, 0.0f, 1.0f );
@@ -719,7 +768,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 
 	public void make3D() {
 		//GL11.glDisable( GL11.GL_BLEND );
-		//GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
 	    GL11.glMatrixMode( GL11.GL_PROJECTION );
 	    GL11.glLoadIdentity(); // Reset The Projection Matrix
 	    GLU.gluPerspective( 45.0f, ((float) gc.getWidth() / (float) gc.getHeight()), 5, 5000.0f ); // Calculate The Aspect Ratio Of The Window
