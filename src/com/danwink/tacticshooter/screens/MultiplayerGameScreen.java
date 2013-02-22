@@ -1,11 +1,16 @@
 package com.danwink.tacticshooter.screens;
 
 import java.io.File;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 
 import javax.vecmath.Point2i;
 import javax.vecmath.Vector3f;
 
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.glu.GLU;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -114,6 +119,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	ArrayList<Vector3f> pings = new ArrayList<Vector3f>();
 	
 	ArrayList<Integer>[] battleGroups = new ArrayList[10];
+	
+	Point2i mouseOnMap = new Point2i();
 	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
@@ -475,12 +482,20 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			mapChanged = false;
 		}
 		
+		//make2D();
+		
+		make3D();
+		
+		GLU.gluLookAt( cs.scrollx, cs.scrolly+500, -1000, cs.scrollx, cs.scrolly, 0, 0, 0, -1 );
+		
+		mouseOnMap = getMouseOnMap();
+		
 		g.drawImage( backgroundTexture, -Level.tileSize-(cs.scrollx - ((int)(cs.scrollx/Level.tileSize))*Level.tileSize), -Level.tileSize-(cs.scrolly - ((int)(cs.scrolly/Level.tileSize)*Level.tileSize)) );
 		
 		g.setColor( Color.black );
 		
 		g.pushTransform();
-		g.translate( -cs.scrollx, -cs.scrolly );
+		//g.translate( -cs.scrollx, -cs.scrolly );
 		
 		g.drawImage( bloodTexture, 0, 0 );
 		cs.l.renderBuildings( g );
@@ -524,6 +539,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		}
 		
 		g.popTransform();
+		
+		make2D();
 		
 		g.setColor( new Color( 0, 0, 0, 128 ) );
 		g.fillRect( 0, 0, gc.getWidth(), 30 );
@@ -628,6 +645,26 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			}
 		}
 	}
+	
+	public void make2D() {
+	    //GL11.glEnable( GL11.GL_BLEND );
+	    GL11.glMatrixMode( GL11.GL_PROJECTION );
+	    GL11.glLoadIdentity();
+	    GL11.glOrtho(0.0f, gc.getWidth(), gc.getHeight(), 0.0f, 0.0f, 1.0f);
+
+	    GL11.glMatrixMode( GL11.GL_MODELVIEW );
+	    GL11.glLoadIdentity();
+	}
+
+	public void make3D() {
+		//GL11.glDisable( GL11.GL_BLEND );
+	    GL11.glMatrixMode( GL11.GL_PROJECTION );
+	    GL11.glLoadIdentity(); // Reset The Projection Matrix
+	    GLU.gluPerspective(45.0f, ((float) gc.getWidth() / (float) gc.getHeight()), 3, 5000.0f); // Calculate The Aspect Ratio Of The Window
+
+	    GL11.glMatrixMode(GL11.GL_MODELVIEW);
+	    GL11.glLoadIdentity();
+	}
 
 	public void onExit()
 	{
@@ -682,6 +719,9 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 
 	public void mousePressed( int button, int x, int y )
 	{
+		Point2i mapPos = mouseOnMap;
+		x = mapPos.x;
+		y = mapPos.y;
 		if( x > gc.getWidth()-200 && y > gc.getHeight()-200 && !selecting )
 		{	
 			if( input.isKeyDown( Input.KEY_LCONTROL ) )
@@ -734,6 +774,9 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 
 	public void mouseReleased( int button, int x, int y )
 	{
+		Point2i mapPos = mouseOnMap;
+		x = mapPos.x;
+		y = mapPos.y;
 		if( button == Input.MOUSE_LEFT_BUTTON && selecting )
 		{
 			cs.selected.clear();
@@ -778,6 +821,9 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 
 	public void mouseDragged( int oldx, int oldy, int newx, int newy )
 	{
+		Point2i mapPos = mouseOnMap;
+		newx = mapPos.x;
+		newy = mapPos.y;
 		if( newx > gc.getWidth()-200 && newy > gc.getHeight()-200 && !selecting )
 		{	
 			if( input.isMouseButtonDown( Input.MOUSE_LEFT_BUTTON ) && !input.isKeyDown( Input.KEY_LCONTROL ) )
@@ -838,6 +884,24 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	public boolean isAcceptingInput()
 	{
 		return true;
+	}
+	
+	public Point2i getMouseOnMap()
+	{
+		IntBuffer viewport = BufferUtils.createIntBuffer(16); 
+		FloatBuffer modelview = BufferUtils.createFloatBuffer(16); 
+		FloatBuffer projection = BufferUtils.createFloatBuffer(16); 
+		FloatBuffer winZ = BufferUtils.createFloatBuffer(1); 
+		float winX, winY; 
+		FloatBuffer position = BufferUtils.createFloatBuffer(3); 
+		GL11.glGetFloat( GL11.GL_MODELVIEW_MATRIX, modelview ); 
+		GL11.glGetFloat( GL11.GL_PROJECTION_MATRIX, projection ); 
+		GL11.glGetInteger( GL11.GL_VIEWPORT, viewport ); 
+		winX = (float)input.getMouseX(); 
+		winY = (float)gc.getHeight() - (float)input.getMouseY(); 
+		GL11.glReadPixels( input.getMouseX(), (int)winY, 1, 1, GL11.GL_DEPTH_COMPONENT, GL11.GL_FLOAT, winZ ); 
+		GLU.gluUnProject( winX, winY, winZ.get(), modelview, projection, viewport, position ); 
+		return new Point2i( (int)position.get( 0 ), (int)position.get( 1 ) );
 	}
 
 	@Override
