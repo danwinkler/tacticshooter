@@ -100,6 +100,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	
 	int bottomOffset = 200;
 	
+	float zoom = 700;
+	
 	boolean running = false;
 	
 	Image wallTexture;
@@ -114,7 +116,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	
 	ShaderProgram shader;
 	
-	public ParticleSystem<Graphics> ps = new ParticleSystem<Graphics>();
+	public ParticleSystem<MultiplayerGameScreen> ps = new ParticleSystem<MultiplayerGameScreen>();
 	
 	boolean mapChanged = true;
 	
@@ -124,7 +126,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	
 	Point2i mouseOnMap = new Point2i();
 	
-	Point3f eye = new Point3f();
+	public Point3f eye = new Point3f();
 	Point3f center = new Point3f();
 	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
@@ -320,9 +322,9 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			Rectangle screenBounds = getScreenBounds();
 			
 			boolean scrollup = cs.scrolly > screenBounds.getMinY() && (input.isKeyDown( Input.KEY_UP ) || input.isKeyDown( Input.KEY_W ) || (gc.isFullscreen() && input.getMouseY() < 10 ));
-			boolean scrolldown = cs.scrolly+gc.getHeight() < screenBounds.getMaxY() && (input.isKeyDown( Input.KEY_DOWN ) || input.isKeyDown( Input.KEY_S ) || (gc.isFullscreen() && input.getMouseY() > gc.getHeight()-10));
+			boolean scrolldown = cs.scrolly < screenBounds.getMaxY() && (input.isKeyDown( Input.KEY_DOWN ) || input.isKeyDown( Input.KEY_S ) || (gc.isFullscreen() && input.getMouseY() > gc.getHeight()-10));
 			boolean scrollleft = cs.scrollx > screenBounds.getMinX() && (input.isKeyDown( Input.KEY_LEFT ) || input.isKeyDown( Input.KEY_A ) || (gc.isFullscreen() && input.getMouseX() < 10));
-			boolean scrollright = cs.scrollx+gc.getWidth() < screenBounds.getMaxX() && (input.isKeyDown( Input.KEY_RIGHT ) || input.isKeyDown( Input.KEY_D ) || (gc.isFullscreen() && input.getMouseX() > gc.getWidth()-10));
+			boolean scrollright = cs.scrollx < screenBounds.getMaxX() && (input.isKeyDown( Input.KEY_RIGHT ) || input.isKeyDown( Input.KEY_D ) || (gc.isFullscreen() && input.getMouseX() > gc.getWidth()-10));
 			
 			if( scrollup ) cs.scrolly-=scrollSpeed*d;
 			if( scrolldown ) cs.scrolly+=scrollSpeed*d;
@@ -364,7 +366,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 							float r = DMath.lerp( mag, .5f, 1f );
 							float g = DMath.lerp( mag, .5f, .25f );
 							float b = DMath.lerp( mag, .5f, 0f );
-							ExplodeParticle p = new ExplodeParticle( u.x, u.y, DMath.cosf( heading ) * 25 * mag * magmax, DMath.sinf( heading ) * 25 * mag * magmax, 30 );
+							ExplodeParticle p = new ExplodeParticle( u.x, u.y, 0, DMath.cosf( heading ) * 25 * mag * magmax, DMath.sinf( heading ) * 25 * mag * magmax, -DMath.randomf( 1, 25 ), 30 );
 							p.c = new Color( r, g, b );
 							p.friction = .075f;
 							p.im = smoke1;
@@ -492,8 +494,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		make3D();
 		
 		eye.x = cs.scrollx;
-		eye.y = cs.scrolly+700;
-		eye.z = -1000;
+		eye.y = cs.scrolly+zoom;
+		eye.z = -zoom*2;
 		
 		center.x = cs.scrollx;
 		center.y = cs.scrolly;
@@ -503,19 +505,16 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		
 		GL11.glEnable( GL11.GL_DEPTH_TEST );
 		GL11.glBegin( GL11.GL_QUADS );
-		GL11.glVertex3f( -10000, -10000, 0 );
-		GL11.glVertex3f( 10000, -10000, 0 );
-		GL11.glVertex3f( 10000, 10000, 0 );
-		GL11.glVertex3f( -10000, 10000, 0 );
+		GL11.glVertex3f( -10000, -10000, 1 );
+		GL11.glVertex3f( 10000, -10000, 1 );
+		GL11.glVertex3f( 10000, 10000, 1 );
+		GL11.glVertex3f( -10000, 10000, 1 );
 		GL11.glEnd();
 		GL11.glDisable( GL11.GL_DEPTH_TEST );
-		
-		//g.drawImage( backgroundTexture, -Level.tileSize-(cs.scrollx - ((int)(cs.scrollx/Level.tileSize))*Level.tileSize), -Level.tileSize-(cs.scrolly - ((int)(cs.scrolly/Level.tileSize)*Level.tileSize)) );
 		
 		g.setColor( Color.black );
 		
 		g.pushTransform();
-		//g.translate( -cs.scrollx, -cs.scrolly );
 		
 		g.drawImage( bloodTexture, 0, 0 );
 		cs.l.renderBuildings( g );
@@ -542,11 +541,16 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		for( int i = 0; i < cs.units.size(); i++ )
 		{
 			Unit u = cs.units.get( i );
-			u.render( g, cs.player, input.getMouseX() + cs.scrollx, input.getMouseY() + cs.scrolly, cs.l );
+			Point2i m = getMouseOnMap( input.getMouseX(), input.getMouseY() );
+			u.render( g, cs.player, m.x, m.y, cs.l );
 		}
 		
 		g.setColor( Color.darkGray );
-		ps.render( g );
+		
+		GL11.glEnable( GL11.GL_BLEND );
+		GL11.glEnable( GL11.GL_TEXTURE_2D );
+		
+		ps.render( this );
 		
 		if( selecting )
 		{
@@ -561,14 +565,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		g.popTransform();
 		
 		mouseOnMap = getMouseOnMap( input.getMouseX(), input.getMouseY() );
-		
-		GL11.glColor3f( 255, 0, 0 );
-		GL11.glBegin( GL11.GL_QUADS );
-		GL11.glVertex3f( 0, 0, -100 );
-		GL11.glVertex3f( 0, 0, 0 );
-		GL11.glVertex3f( 0, 100, 0 );
-		GL11.glVertex3f( 0, 100, -100 );
-		GL11.glEnd();
 		
 		make2D();
 		
@@ -705,7 +701,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		//GL11.glEnable(GL11.GL_DEPTH_TEST);
 	    GL11.glMatrixMode( GL11.GL_PROJECTION );
 	    GL11.glLoadIdentity(); // Reset The Projection Matrix
-	    GLU.gluPerspective( 45.0f, ((float) gc.getWidth() / (float) gc.getHeight()), 500, 5000.0f ); // Calculate The Aspect Ratio Of The Window
+	    GLU.gluPerspective( 45.0f, ((float) gc.getWidth() / (float) gc.getHeight()), 5, 5000.0f ); // Calculate The Aspect Ratio Of The Window
 
 	    GL11.glMatrixMode( GL11.GL_MODELVIEW );
 	    GL11.glLoadIdentity();
@@ -743,8 +739,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		}
 		
 		Rectangle screenBounds = getScreenBounds();
-		cs.scrollx = DMath.bound( destX-gc.getWidth()/2, screenBounds.getMinX(), screenBounds.getMaxX() );
-		cs.scrolly = DMath.bound( destY-gc.getHeight()/2, screenBounds.getMinY(), screenBounds.getMaxY() );
+		cs.scrollx = DMath.bound( destX, screenBounds.getMinX(), screenBounds.getMaxX() );
+		cs.scrolly = DMath.bound( destY, screenBounds.getMinY(), screenBounds.getMaxY() );
 	}
 	
 	public static Color bloodColor = new Color( 255, 0, 0 );
@@ -759,7 +755,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	
 	public Rectangle getScreenBounds()
 	{
-		return new Rectangle( -gc.getWidth()/2, -gc.getHeight()/2, cs.l.width*Level.tileSize + gc.getWidth(), cs.l.height*Level.tileSize + gc.getHeight() );
+		return new Rectangle( 0, 0, cs.l.width*Level.tileSize, cs.l.height*Level.tileSize );
 	}
 
 	public void mousePressed( int button, int x, int y )
@@ -778,8 +774,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 					float minimapX = x - (gc.getWidth()-200);
 					float minimapY = y - (gc.getHeight()-200);
 					Rectangle screenBounds = getScreenBounds();
-					cs.scrollx = DMath.bound( (minimapX / 200.f) * cs.l.width*Level.tileSize - gc.getWidth()/2, screenBounds.getMinX(), screenBounds.getMaxX() );
-					cs.scrolly = DMath.bound( (minimapY / 200.f) * cs.l.height*Level.tileSize - gc.getHeight()/2, screenBounds.getMinY(), screenBounds.getMaxY() );
+					cs.scrollx = DMath.bound( (minimapX / 200.f) * cs.l.width*Level.tileSize, screenBounds.getMinX(), screenBounds.getMaxX() );
+					cs.scrolly = DMath.bound( (minimapY / 200.f) * cs.l.height*Level.tileSize, screenBounds.getMinY(), screenBounds.getMaxY() );
 				}
 				else if( button == Input.MOUSE_RIGHT_BUTTON )
 				{
@@ -874,8 +870,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				float minimapX = newx - (gc.getWidth()-200);
 				float minimapY = newy - (gc.getHeight()-200);
 				Rectangle screenBounds = getScreenBounds();
-				cs.scrollx = DMath.bound( (minimapX / 200.f) * cs.l.width*Level.tileSize - gc.getWidth()/2, screenBounds.getMinX(), screenBounds.getMaxX() );
-				cs.scrolly = DMath.bound( (minimapY / 200.f) * cs.l.height*Level.tileSize - gc.getHeight()/2, screenBounds.getMinY(), screenBounds.getMaxY() );
+				cs.scrollx = DMath.bound( (minimapX / 200.f) * cs.l.width*Level.tileSize, screenBounds.getMinX(), screenBounds.getMaxX() );
+				cs.scrolly = DMath.bound( (minimapY / 200.f) * cs.l.height*Level.tileSize, screenBounds.getMinY(), screenBounds.getMaxY() );
 			}
 		}	
 		else
@@ -906,10 +902,9 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	}
 
 	@Override
-	public void mouseWheelMoved( int arg0 )
+	public void mouseWheelMoved( int a )
 	{
-		// TODO Auto-generated method stub
-		
+		zoom += zoom * .003f * -a;
 	}
 
 	@Override

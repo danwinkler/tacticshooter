@@ -3,10 +3,11 @@ package tacticshooter;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 
+import com.danwink.tacticshooter.screens.MultiplayerGameScreen;
 import com.phyloa.dlib.particle.Particle;
 import com.phyloa.dlib.util.DMath;
 
-public class WallParticle extends Particle<Graphics>
+public class WallParticle extends Particle<MultiplayerGameScreen>
 {
 	public static WallParticle makeParticle( float x, float y )
 	{
@@ -16,11 +17,13 @@ public class WallParticle extends Particle<Graphics>
 	
 	public WallParticle( float x, float y, float dx, float dy, float duration )
 	{
-		super( x, y, dx, dy, duration );
+		super( x, y, 0, dx, dy, 0, duration );
 	}
 
-	public void render( Graphics g )
+	public void render( MultiplayerGameScreen r )
 	{
-		g.drawLine( x, y, x+dx, y+dy );
+		Graphics g = r.gc.getGraphics();
+		g.setColor( Color.black );
+		g.drawLine( pos.x, pos.y, pos.x+speed.x, pos.y+speed.y );
 	}
 }
