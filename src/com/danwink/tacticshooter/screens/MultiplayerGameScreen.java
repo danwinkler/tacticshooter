@@ -569,6 +569,17 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		
 		mouseOnMap = getMouseOnMap( input.getMouseX(), input.getMouseY() );
 		
+		//Find minimap view box before you go back to 2d
+		Polygon poly = new Polygon();
+		Point2i a = getMouseOnMap( 1, 1 );
+		poly.addPoint( a.x, a.y );
+		Point2i b = getMouseOnMap( 1, gc.getHeight()-1 );
+		poly.addPoint( b.x, b.y );
+		Point2i c = getMouseOnMap( gc.getWidth()-1, gc.getHeight()-1 );
+		poly.addPoint( c.x, c.y );
+		Point2i d = getMouseOnMap( gc.getWidth()-1, 1 );
+		poly.addPoint( d.x, d.y );
+		
 		make2D();
 		
 		g.setColor( new Color( 0, 0, 0, 128 ) );
@@ -625,15 +636,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		}
 		
 		g.setColor( Color.blue );
-		Polygon poly = new Polygon();
-		Point2i a = getMouseOnMap( 1, 1 );
-		poly.addPoint( a.x, a.y );
-		Point2i b = getMouseOnMap( 1, gc.getHeight()-1 );
-		poly.addPoint( b.x, b.y );
-		Point2i c = getMouseOnMap( gc.getWidth()-1, gc.getHeight()-1 );
-		poly.addPoint( c.x, c.y );
-		Point2i d = getMouseOnMap( gc.getWidth()-1, 1 );
-		poly.addPoint( d.x, d.y );
 		
 		g.pushTransform();
 		g.scale( xScale, yScale );
