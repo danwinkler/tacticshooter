@@ -6,6 +6,7 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 
 import javax.vecmath.Point2i;
+import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
 import org.lwjgl.BufferUtils;
@@ -20,6 +21,7 @@ import org.newdawn.slick.InputListener;
 import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.Sound;
+import org.newdawn.slick.geom.Polygon;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.opengl.shader.ShaderProgram;
 
@@ -121,6 +123,9 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	ArrayList<Integer>[] battleGroups = new ArrayList[10];
 	
 	Point2i mouseOnMap = new Point2i();
+	
+	Point3f eye = new Point3f();
+	Point3f center = new Point3f();
 	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
@@ -486,11 +491,26 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		
 		make3D();
 		
-		GLU.gluLookAt( cs.scrollx, cs.scrolly+500, -1000, cs.scrollx, cs.scrolly, 0, 0, 0, -1 );
+		eye.x = cs.scrollx;
+		eye.y = cs.scrolly+700;
+		eye.z = -1000;
 		
-		mouseOnMap = getMouseOnMap();
+		center.x = cs.scrollx;
+		center.y = cs.scrolly;
+		center.z = 0;
 		
-		g.drawImage( backgroundTexture, -Level.tileSize-(cs.scrollx - ((int)(cs.scrollx/Level.tileSize))*Level.tileSize), -Level.tileSize-(cs.scrolly - ((int)(cs.scrolly/Level.tileSize)*Level.tileSize)) );
+		GLU.gluLookAt( eye.x, eye.y, eye.z, center.x, center.y, center.z, 0, 0, -1 );
+		
+		GL11.glEnable( GL11.GL_DEPTH_TEST );
+		GL11.glBegin( GL11.GL_QUADS );
+		GL11.glVertex3f( -10000, -10000, 0 );
+		GL11.glVertex3f( 10000, -10000, 0 );
+		GL11.glVertex3f( 10000, 10000, 0 );
+		GL11.glVertex3f( -10000, 10000, 0 );
+		GL11.glEnd();
+		GL11.glDisable( GL11.GL_DEPTH_TEST );
+		
+		//g.drawImage( backgroundTexture, -Level.tileSize-(cs.scrollx - ((int)(cs.scrollx/Level.tileSize))*Level.tileSize), -Level.tileSize-(cs.scrolly - ((int)(cs.scrolly/Level.tileSize)*Level.tileSize)) );
 		
 		g.setColor( Color.black );
 		
@@ -539,6 +559,16 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		}
 		
 		g.popTransform();
+		
+		mouseOnMap = getMouseOnMap( input.getMouseX(), input.getMouseY() );
+		
+		GL11.glColor3f( 255, 0, 0 );
+		GL11.glBegin( GL11.GL_QUADS );
+		GL11.glVertex3f( 0, 0, -100 );
+		GL11.glVertex3f( 0, 0, 0 );
+		GL11.glVertex3f( 0, 100, 0 );
+		GL11.glVertex3f( 0, 100, -100 );
+		GL11.glEnd();
 		
 		make2D();
 		
@@ -596,7 +626,20 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		}
 		
 		g.setColor( Color.blue );
-		g.drawRect( cs.scrollx*xScale, cs.scrolly * yScale, gc.getWidth() * xScale, gc.getHeight() * yScale );
+		Polygon poly = new Polygon();
+		Point2i a = getMouseOnMap( 1, 1 );
+		poly.addPoint( a.x, a.y );
+		Point2i b = getMouseOnMap( 1, gc.getHeight()-1 );
+		poly.addPoint( b.x, b.y );
+		Point2i c = getMouseOnMap( gc.getWidth()-1, gc.getHeight()-1 );
+		poly.addPoint( c.x, c.y );
+		Point2i d = getMouseOnMap( gc.getWidth()-1, 1 );
+		poly.addPoint( d.x, d.y );
+		
+		g.pushTransform();
+		g.scale( xScale, yScale );
+		g.draw( poly );
+		g.popTransform();
 		
 		g.setColor( Color.black );
 		g.setLineWidth( 2 );
@@ -648,9 +691,10 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	
 	public void make2D() {
 	    //GL11.glEnable( GL11.GL_BLEND );
+		//GL11.glDisable(GL11.GL_DEPTH_TEST);
 	    GL11.glMatrixMode( GL11.GL_PROJECTION );
 	    GL11.glLoadIdentity();
-	    GL11.glOrtho(0.0f, gc.getWidth(), gc.getHeight(), 0.0f, 0.0f, 1.0f);
+	    GL11.glOrtho( 0.0f, gc.getWidth(), gc.getHeight(), 0.0f, 0.0f, 1.0f );
 
 	    GL11.glMatrixMode( GL11.GL_MODELVIEW );
 	    GL11.glLoadIdentity();
@@ -658,11 +702,12 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 
 	public void make3D() {
 		//GL11.glDisable( GL11.GL_BLEND );
+		//GL11.glEnable(GL11.GL_DEPTH_TEST);
 	    GL11.glMatrixMode( GL11.GL_PROJECTION );
 	    GL11.glLoadIdentity(); // Reset The Projection Matrix
-	    GLU.gluPerspective(45.0f, ((float) gc.getWidth() / (float) gc.getHeight()), 3, 5000.0f); // Calculate The Aspect Ratio Of The Window
+	    GLU.gluPerspective( 45.0f, ((float) gc.getWidth() / (float) gc.getHeight()), 500, 5000.0f ); // Calculate The Aspect Ratio Of The Window
 
-	    GL11.glMatrixMode(GL11.GL_MODELVIEW);
+	    GL11.glMatrixMode( GL11.GL_MODELVIEW );
 	    GL11.glLoadIdentity();
 	}
 
@@ -719,9 +764,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 
 	public void mousePressed( int button, int x, int y )
 	{
-		Point2i mapPos = mouseOnMap;
-		x = mapPos.x;
-		y = mapPos.y;
 		if( x > gc.getWidth()-200 && y > gc.getHeight()-200 && !selecting )
 		{	
 			if( input.isKeyDown( Input.KEY_LCONTROL ) )
@@ -752,18 +794,21 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		}	
 		else
 		{
+			Point2i mapPos = mouseOnMap;
+			x = mapPos.x;
+			y = mapPos.y;
 			if( button == Input.MOUSE_LEFT_BUTTON )
 			{
-				sx = x + cs.scrollx;
-				sy = y + cs.scrolly;
+				sx = x;
+				sy = y;
 				sx2 = sx;
 				sy2 = sy;
 				selecting = true;
 			} 
 			else if( button == Input.MOUSE_RIGHT_BUTTON )
 			{
-				int tx = (int)((x+cs.scrollx) / Level.tileSize);
-				int ty = (int)((y+cs.scrolly) / Level.tileSize);
+				int tx = (int)((x) / Level.tileSize);
+				int ty = (int)((y) / Level.tileSize);
 				ci.sendToServer( new Message( input.isKeyDown( Input.KEY_LCONTROL ) ? MessageType.SETATTACKPOINTCONTINUE : MessageType.SETATTACKPOINT, new Object[]{ new Point2i( tx, ty ), cs.selected } ) );
 				this.waitingForMoveConfirmation = true;
 				mx = tx;
@@ -821,9 +866,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 
 	public void mouseDragged( int oldx, int oldy, int newx, int newy )
 	{
-		Point2i mapPos = mouseOnMap;
-		newx = mapPos.x;
-		newy = mapPos.y;
 		if( newx > gc.getWidth()-200 && newy > gc.getHeight()-200 && !selecting )
 		{	
 			if( input.isMouseButtonDown( Input.MOUSE_LEFT_BUTTON ) && !input.isKeyDown( Input.KEY_LCONTROL ) )
@@ -840,8 +882,11 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		{
 			if( input.isMouseButtonDown( Input.MOUSE_LEFT_BUTTON ) )
 			{
-				sx2 = newx+cs.scrollx;
-				sy2 = newy+cs.scrolly;
+				Point2i mapPos = mouseOnMap;
+				newx = mapPos.x;
+				newy = mapPos.y;
+				sx2 = newx;
+				sy2 = newy;
 			}
 		}
 	}
@@ -886,22 +931,24 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		return true;
 	}
 	
-	public Point2i getMouseOnMap()
+	public Point2i getMouseOnMap( int x, int y )
 	{
-		IntBuffer viewport = BufferUtils.createIntBuffer(16); 
+		int winX = x;
+		int winY = gc.getHeight() - y;
+		FloatBuffer winZ = BufferUtils.createFloatBuffer(1); //the x coordinate of the click, will be calculated
+		FloatBuffer pos = BufferUtils.createFloatBuffer(3); // the final position of the click
 		FloatBuffer modelview = BufferUtils.createFloatBuffer(16); 
 		FloatBuffer projection = BufferUtils.createFloatBuffer(16); 
-		FloatBuffer winZ = BufferUtils.createFloatBuffer(1); 
-		float winX, winY; 
-		FloatBuffer position = BufferUtils.createFloatBuffer(3); 
-		GL11.glGetFloat( GL11.GL_MODELVIEW_MATRIX, modelview ); 
-		GL11.glGetFloat( GL11.GL_PROJECTION_MATRIX, projection ); 
-		GL11.glGetInteger( GL11.GL_VIEWPORT, viewport ); 
-		winX = (float)input.getMouseX(); 
-		winY = (float)gc.getHeight() - (float)input.getMouseY(); 
-		GL11.glReadPixels( input.getMouseX(), (int)winY, 1, 1, GL11.GL_DEPTH_COMPONENT, GL11.GL_FLOAT, winZ ); 
-		GLU.gluUnProject( winX, winY, winZ.get(), modelview, projection, viewport, position ); 
-		return new Point2i( (int)position.get( 0 ), (int)position.get( 1 ) );
+		IntBuffer viewport = BufferUtils.createIntBuffer(16); 
+
+		GL11.glGetInteger( GL11.GL_VIEWPORT, viewport );
+		GL11.glGetFloat( GL11.GL_MODELVIEW_MATRIX, modelview );
+		GL11.glGetFloat( GL11.GL_PROJECTION_MATRIX, projection );
+
+		GL11.glReadPixels( winX, winY, 1, 1, GL11.GL_DEPTH_COMPONENT, GL11.GL_FLOAT, winZ ); //calculate the Z Coordinate of the Click
+		GLU.gluUnProject((float)(winX), (float)(winY), (float)(winZ.get(0)), modelview, projection, viewport, pos);
+		
+		return new Point2i( (int)pos.get( 0 ), (int)pos.get( 1 ) );
 	}
 
 	@Override
