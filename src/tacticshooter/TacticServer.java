@@ -291,7 +291,7 @@ public class TacticServer
 					String text = (String)m.message;
 					for( int i = 0; i < slots.length; i++ )
 					{
-						if( slots[i].id == m.sender )
+						if( slots[i] != null && slots[i].id == m.sender )
 						{
 							si.sendToAllClients( new Message( MessageType.MESSAGE, slots[i].name + ": " + text ) );
 							break;
