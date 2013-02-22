@@ -528,7 +528,10 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			u.renderBody( g, cs.player );
 		}
 		
+		GL11.glPushMatrix();
+		GL11.glTranslatef( 0, 0, -Level.tileSize );
 		g.drawImage( wallTexture, 0, 0 );
+		GL11.glPopMatrix();
 		
 		g.setColor( Color.black );
 		
