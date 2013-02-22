@@ -210,9 +210,25 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		running = true;
 	}
 	
+	long lastClean;
 	public void update( GameContainer gc, int delta )
 	{
 		if( !running ) return;
+		if( System.currentTimeMillis()-lastClean > 1000 )
+		{
+			Runtime runtime = Runtime.getRuntime();
+			if( runtime.totalMemory() - runtime.freeMemory() > 400000000 )
+			{
+				new Thread( new Runnable() {
+					public void run()
+					{
+						System.gc();
+					}
+				} ).start();
+			}
+			lastClean = System.currentTimeMillis();
+		}
+		
 		
 		float d = delta / 60.f;
 		
@@ -827,10 +843,10 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		{
 			cs.selected.clear();
 			
-			float x1 = Math.min( sx, x+cs.scrollx );
-			float y1 = Math.min( sy, y+cs.scrolly );
-			float x2 = Math.max( sx, x+cs.scrollx );
-			float y2 = Math.max( sy, y+cs.scrolly );
+			float x1 = Math.min( sx, x );
+			float y1 = Math.min( sy, y );
+			float x2 = Math.max( sx, x );
+			float y2 = Math.max( sy, y );
 			
 			if( x2 - x1 > 2 || y2 - y1 > 2 )
 			{
