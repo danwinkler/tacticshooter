@@ -1,6 +1,6 @@
 varying vec3 Normal;
 
-uniform vec4 color;
+varying vec4 pos;
 
 void main()
 {
@@ -9,5 +9,6 @@ void main()
     gl_ClipVertex = gl_ModelViewMatrix * gl_Vertex;
    	#endif
     gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-    color = gl_Color;
+    
+    pos = gl_ModelViewMatrix * gl_Vertex;
 }

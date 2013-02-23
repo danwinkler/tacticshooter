@@ -135,12 +135,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	int wallsidelist;
 	int unitList;
 	
-	private FloatBuffer matSpecular;
-	private FloatBuffer lightPosition;
-	private FloatBuffer whiteLight; 
-	private FloatBuffer lModelAmbient;
-	
-	ShaderProgram shader;
+	ShaderProgram toonShader;
 	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
@@ -509,7 +504,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 					}
 				}
 				
-				shader = ShaderProgram.loadProgram( "data" + File.separator + "shaders" + File.separator + "toon.vert", "data" + File.separator + "shaders" + File.separator + "toon.frag" );
+				toonShader = ShaderProgram.loadProgram( "data" + File.separator + "shaders" + File.separator + "toon.vert", "data" + File.separator + "shaders" + File.separator + "toon.frag" );
 				
 				try
 				{
@@ -527,28 +522,43 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 					{
 						if( cs.l.getTile( x, y ) == TileType.WALL )
 						{
+							GL11.glPushMatrix();
+							GL11.glTranslatef( 0, 0, -Level.tileSize );
+							
+							GL11.glPopMatrix();
 							if( cs.l.getTile( x, y+1 ) != TileType.WALL )
 							{
 								GL11.glPushMatrix();
 								GL11.glTranslatef( x*Level.tileSize, (y+1) * Level.tileSize, -Level.tileSize );
-								GL11.glRotatef( 90, 1, 0, 0 );
-								AutoTileDrawer.draw( g, cs.l.wall, Level.tileSize, 0, true, true, true, true, true, false, false, false );
+								
+								GL11.glBegin( GL11.GL_QUADS );
+								GL11.glNormal3f( 0, 1, 0 );
+								GL11.glVertex3f( 0, 0, 0 );
+								
+								GL11.glNormal3f( 0, 1, 0 );
+								GL11.glVertex3f( 0, 0, Level.tileSize );
+								
+								GL11.glNormal3f( 0, 1, 0 );
+								GL11.glVertex3f( Level.tileSize, 0, Level.tileSize );
+								
+								GL11.glNormal3f( 0, 1, 0 );
+								GL11.glVertex3f( Level.tileSize, 0, 0 );
+								GL11.glEnd();
+								
 								GL11.glPopMatrix();
 							}
 							if( cs.l.getTile( x-1, y ) != TileType.WALL )
 							{
 								GL11.glPushMatrix();
 								GL11.glTranslatef( (x)*Level.tileSize, (y) * Level.tileSize, 0 );
-								GL11.glRotatef( 90, 0, 1, 0 );
-								AutoTileDrawer.draw( g, cs.l.wall, Level.tileSize, 0, false, true, true, false, true, false, true, true );
+								
 								GL11.glPopMatrix();
 							}
 							if( cs.l.getTile( x+1, y ) != TileType.WALL )
 							{
 								GL11.glPushMatrix();
 								GL11.glTranslatef( (x+1)*Level.tileSize, (y) * Level.tileSize, -Level.tileSize );
-								GL11.glRotatef( -90, 0, 1, 0 );
-								AutoTileDrawer.draw( g, cs.l.wall, Level.tileSize, 0, true, true, false, true, false, true, true, false );
+								
 								GL11.glPopMatrix();
 							}
 						}
@@ -603,7 +613,16 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		
 		g.pushTransform();
 		
+		
+		toonShader.bind();
+		toonShader.setUniform4f( "tcol", Color.white );
+		toonShader.setUniform1i( "useTexture", 1 );
 		g.drawImage( bloodTexture, 0, 0 );
+		toonShader.setUniform1i( "useTexture", 0 );
+		toonShader.unbind();
+		
+		
+		
 		cs.l.renderBuildings( g );
 		
 		g.setColor( this.waitingForMoveConfirmation ? Color.gray : Color.green );
@@ -615,14 +634,11 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			u.renderBody( g, cs.player );
 		}
 		
+		//toonShader.bind();
 		GL11.glEnable( GL11.GL_DEPTH_TEST );
 		GL11.glCallList( wallsidelist );
 		GL11.glDisable( GL11.GL_DEPTH_TEST );
-		
-		GL11.glPushMatrix();
-		GL11.glTranslatef( 0, 0, -Level.tileSize );
-		g.drawImage( wallTexture, 0, 0 );
-		GL11.glPopMatrix();
+		//toonShader.unbind();
 		
 		g.setColor( Color.black );
 		
@@ -663,20 +679,24 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		
 		GL11.glEnable( GL11.GL_BLEND );
 		
-		shader.bind();
+		toonShader.bind();
+		
 		Vector3f lightPosition = new Vector3f();
+		
+		//That this works confuses the shit out of me. I'm transforming the map coords to some other space i guess, 
+		//and then taking the dist from the fragment which is in eye coords then works? I don't fucking know 
+		lightPosition.set( mouseOnMap.x - cs.scrollx, mouseOnMap.y - cs.scrolly, 50 );
+		
+		//toonShader.setUniform2f( "res", gc.getWidth(), gc.getHeight() );
+		toonShader.setUniform4f( "LightPosition", lightPosition.x, -lightPosition.y, lightPosition.z, 0 );
+		toonShader.setUniform1f( "lightscalar", 400 );
 		for( int i = 0; i < cs.units.size(); i++ )
 		{
 			Unit u = cs.units.get( i );
 			Color c = u.owner.team.getColor();
-			shader.setUniform4f( "tcol", c );
+			toonShader.setUniform4f( "tcol", c );
 			
-			lightPosition.set( mouseOnMap.x, mouseOnMap.y, 100 );
-			lightPosition.x -= u.x;
-			lightPosition.y -= u.y;
-			
-			shader.setUniform3f( "LightPosition", lightPosition.x, -lightPosition.y, lightPosition.z );
-			
+			GL11.glColor3f( c.r, c.g, c.b );
 			GL11.glPushMatrix();
 			GL11.glTranslatef( u.x, u.y, 0 );
 			GL11.glRotatef( (u.heading/DMath.PI2F) * 360, 0, 0, 1 );
@@ -686,7 +706,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			GL11.glPopMatrix();
 		}
 		
-		shader.unbind();
+		toonShader.unbind();
 		
 		GL11.glEnable( GL11.GL_TEXTURE_2D );
 		

@@ -1,6 +1,6 @@
 uniform sampler2D tex;
-uniform float width = 1440;
-uniform float height = 900;
+uniform float width;
+uniform float height;
 
 float threshold(in float thr1, in float thr2 , in float val) {
  if (val < thr1) {return 0.0;}
