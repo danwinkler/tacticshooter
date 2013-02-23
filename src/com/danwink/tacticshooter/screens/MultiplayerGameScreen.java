@@ -1,6 +1,7 @@
 package com.danwink.tacticshooter.screens;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import javax.vecmath.Vector3f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
+import org.lwjgl.util.glu.Sphere;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -37,6 +39,7 @@ import tacticshooter.Level.TileType;
 import tacticshooter.AutoTileDrawer;
 import tacticshooter.Message;
 import tacticshooter.MessageType;
+import tacticshooter.ModelHelpers;
 import tacticshooter.MusicQueuer;
 import tacticshooter.Player;
 import tacticshooter.Slick2DEventMapper;
@@ -116,8 +119,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	
 	ArrayList<String> messages = new ArrayList<String>();
 	
-	ShaderProgram shader;
-	
 	public ParticleSystem<MultiplayerGameScreen> ps = new ParticleSystem<MultiplayerGameScreen>();
 	
 	boolean mapChanged = true;
@@ -132,6 +133,14 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	Point3f center = new Point3f();
 	
 	int wallsidelist;
+	int unitList;
+	
+	private FloatBuffer matSpecular;
+	private FloatBuffer lightPosition;
+	private FloatBuffer whiteLight; 
+	private FloatBuffer lModelAmbient;
+	
+	ShaderProgram shader;
 	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
@@ -500,6 +509,16 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 					}
 				}
 				
+				shader = ShaderProgram.loadProgram( "data" + File.separator + "shaders" + File.separator + "toon.vert", "data" + File.separator + "shaders" + File.separator + "toon.frag" );
+				
+				try
+				{
+					unitList = ModelHelpers.loadModel( "data" + File.separator + "models" + File.separator + "simpleman1.obj" );
+				} catch( FileNotFoundException e )
+				{
+					e.printStackTrace();
+				}
+				
 				wallsidelist = GL11.glGenLists( 1 );
 				GL11.glNewList( wallsidelist, GL11.GL_COMPILE );
 				for( int y = 0; y < cs.l.height; y++ )
@@ -616,7 +635,60 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		}
 		GL11.glPopMatrix();
 		
+		GL11.glEnable( GL11.GL_DEPTH_TEST );
 		
+		GL11.glDisable( GL11.GL_BLEND );
+		GL11.glDisable( GL11.GL_TEXTURE_2D );
+		GL11.glEnable( GL11.GL_CULL_FACE );
+		GL11.glCullFace( GL11.GL_FRONT );
+		GL11.glLineWidth( 3 );
+		GL11.glPolygonMode( GL11.GL_BACK, GL11.GL_LINE );
+		GL11.glColor3f( 0, 0, 0 );
+		
+		for( int i = 0; i < cs.units.size(); i++ )
+		{
+			Unit u = cs.units.get( i );
+			GL11.glPushMatrix();
+			GL11.glTranslatef( u.x, u.y, 0 );
+			GL11.glRotatef( (u.heading/DMath.PI2F) * 360, 0, 0, 1 );
+			GL11.glScalef( 5, 5, 5 );
+			GL11.glRotatef( -90, 1, 0, 0 );
+			GL11.glCallList( unitList );
+			GL11.glPopMatrix();
+		}
+		
+		GL11.glDisable( GL11.GL_CULL_FACE );
+		GL11.glPolygonMode( GL11.GL_BACK, GL11.GL_FILL );
+		GL11.glLineWidth( 1 );
+		
+		GL11.glEnable( GL11.GL_BLEND );
+		
+		shader.bind();
+		Vector3f lightPosition = new Vector3f();
+		for( int i = 0; i < cs.units.size(); i++ )
+		{
+			Unit u = cs.units.get( i );
+			Color c = u.owner.team.getColor();
+			shader.setUniform4f( "tcol", c );
+			
+			lightPosition.set( mouseOnMap.x, mouseOnMap.y, 100 );
+			lightPosition.x -= u.x;
+			lightPosition.y -= u.y;
+			
+			shader.setUniform3f( "LightPosition", lightPosition.x, -lightPosition.y, lightPosition.z );
+			
+			GL11.glPushMatrix();
+			GL11.glTranslatef( u.x, u.y, 0 );
+			GL11.glRotatef( (u.heading/DMath.PI2F) * 360, 0, 0, 1 );
+			GL11.glScalef( 5, 5, 5 );
+			GL11.glRotatef( -90, 1, 0, 0 );
+			GL11.glCallList( unitList );
+			GL11.glPopMatrix();
+		}
+		
+		shader.unbind();
+		
+		GL11.glEnable( GL11.GL_TEXTURE_2D );
 		
 		for( int i = 0; i < cs.units.size(); i++ )
 		{
@@ -626,11 +698,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		}
 		
 		g.setColor( Color.darkGray );
-		
-		GL11.glEnable( GL11.GL_BLEND );
-		GL11.glEnable( GL11.GL_TEXTURE_2D );
-		
-		GL11.glEnable( GL11.GL_DEPTH_TEST );
+			
 		ps.render( this );
 		GL11.glDisable( GL11.GL_DEPTH_TEST );
 		
