@@ -1,27 +1,30 @@
 varying vec3 Normal;
 varying vec4 pos;
 
-varying vec2 texcoordVarying;
-
-uniform sampler2D backbuffer;
-
 uniform vec4 LightPosition; // = vec3(10.0, 10.0, 20.0);
 uniform vec4 tcol;
 uniform int useTexture = 0;
+
+uniform sampler2D tex;
 
 uniform float lightscalar;
 
 void main()
 {
     vec4 color1 = tcol;
-    if( useTexture )
+    if( useTexture == 1 )
     {
-    	color1 *= texture2D(backbuffer, texcoordVarying);
+    	color1 *= texture( tex, gl_TexCoord[0].xy );
     }
     vec4 color2;
 	
+	float z = LightPosition.z;
+	
+	LightPosition = gl_ModelViewMatrix * LightPosition;
+	
 	LightPosition.x -= pos.x;
 	LightPosition.y -= pos.y;
+	LightPosition.z = z;
 	
 	float length = sqrt((LightPosition.x*LightPosition.x)+(LightPosition.y*LightPosition.y)+(LightPosition.z*LightPosition.z));
 	

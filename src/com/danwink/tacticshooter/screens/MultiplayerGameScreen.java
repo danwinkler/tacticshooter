@@ -614,10 +614,29 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		g.pushTransform();
 		
 		
+		GL11.glEnable( GL11.GL_TEXTURE_2D );
+		GL11.glColor3f( 1, 1, 1 );
 		toonShader.bind();
 		toonShader.setUniform4f( "tcol", Color.white );
 		toonShader.setUniform1i( "useTexture", 1 );
-		g.drawImage( bloodTexture, 0, 0 );
+		bloodTexture.bind();
+		GL11.glBegin( GL11.GL_QUADS );
+		GL11.glNormal3f( 0, 0, 1 );
+		GL11.glTexCoord2f( bloodTexture.getTextureOffsetX(), bloodTexture.getTextureOffsetY() );
+		GL11.glVertex3f( 0, 0, 0 );
+		
+		GL11.glNormal3f( 0, 0, 1 );
+		GL11.glTexCoord2f( bloodTexture.getTextureOffsetX(), bloodTexture.getTextureOffsetY() + bloodTexture.getTextureHeight() );
+		GL11.glVertex3f( 0, bloodTexture.getHeight(), 0 );
+		
+		GL11.glNormal3f( 0, 0, 1 );
+		GL11.glTexCoord2f( bloodTexture.getTextureOffsetX() + bloodTexture.getTextureWidth(), bloodTexture.getTextureOffsetY() + bloodTexture.getTextureHeight() );
+		GL11.glVertex3f( bloodTexture.getWidth(), bloodTexture.getHeight(), 0 );
+		
+		GL11.glNormal3f( 0, 0, 1 );
+		GL11.glTexCoord2f( bloodTexture.getTextureOffsetX() + bloodTexture.getTextureWidth(), bloodTexture.getTextureOffsetY() );
+		GL11.glVertex3f( bloodTexture.getWidth(), 0, 0 );
+		GL11.glEnd();
 		toonShader.setUniform1i( "useTexture", 0 );
 		toonShader.unbind();
 		
@@ -634,11 +653,25 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			u.renderBody( g, cs.player );
 		}
 		
-		//toonShader.bind();
+		GL11.glEnable( GL11.GL_CULL_FACE );
+		GL11.glCullFace( GL11.GL_FRONT );
+		GL11.glLineWidth( 3 );
+		GL11.glPolygonMode( GL11.GL_BACK, GL11.GL_LINE );
+		GL11.glColor3f( 0, 0, 0 );
+		
 		GL11.glEnable( GL11.GL_DEPTH_TEST );
 		GL11.glCallList( wallsidelist );
 		GL11.glDisable( GL11.GL_DEPTH_TEST );
-		//toonShader.unbind();
+		
+		GL11.glDisable( GL11.GL_CULL_FACE );
+		GL11.glPolygonMode( GL11.GL_BACK, GL11.GL_FILL );
+		GL11.glLineWidth( 1 );
+		
+		toonShader.bind();
+		GL11.glEnable( GL11.GL_DEPTH_TEST );
+		GL11.glCallList( wallsidelist );
+		GL11.glDisable( GL11.GL_DEPTH_TEST );
+		toonShader.unbind();
 		
 		g.setColor( Color.black );
 		
@@ -688,7 +721,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		lightPosition.set( mouseOnMap.x - cs.scrollx, mouseOnMap.y - cs.scrolly, 50 );
 		
 		//toonShader.setUniform2f( "res", gc.getWidth(), gc.getHeight() );
-		toonShader.setUniform4f( "LightPosition", lightPosition.x, -lightPosition.y, lightPosition.z, 0 );
+		toonShader.setUniform4f( "LightPosition", lightPosition.x, lightPosition.y, lightPosition.z, 0 );
 		toonShader.setUniform1f( "lightscalar", 400 );
 		for( int i = 0; i < cs.units.size(); i++ )
 		{
