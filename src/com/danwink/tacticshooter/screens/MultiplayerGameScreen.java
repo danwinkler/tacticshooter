@@ -127,7 +127,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	
 	ArrayList<Integer>[] battleGroups = new ArrayList[10];
 	
-	Point2i mouseOnMap = new Point2i();
+	public Point2i mouseOnMap = new Point2i();
 	
 	public Point3f eye = new Point3f();
 	Point3f center = new Point3f();
@@ -212,6 +212,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			e.printStackTrace();
 		}
 		
+		lr = new GLLevelRenderer( this );
+		
 		running = true;
 	}
 	
@@ -249,6 +251,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				{
 					cs.unitMap.put( u.id, u );
 					cs.units.add( u );
+					lr.addUnit( u );
+					
 					cs.ping1.play( 1.f, cs.getSoundMag( gc, u.x, u.y ) );
 					tu = u;
 				}
@@ -261,6 +265,11 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 					scrollToTeamBase( cs.player.team );
 					cs.l.loadTextures();
 					Unit.loadTextures( cs.l );
+					
+					for( Building b : cs.l.buildings )
+					{
+						lr.updateBuilding( b );
+					}
 				}
 				else
 				{
@@ -289,6 +298,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				if( cs.l != null )
 				{
 					Building building = (Building)m.message;
+					lr.updateBuilding( building );
 					for( int i = 0; i < cs.l.buildings.size(); i++ )
 					{
 						Building bt = cs.l.buildings.get( i );
@@ -367,6 +377,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				cs.units.remove( i );
 				cs.unitMap.remove( u );
 				cs.selected.remove( (Object)u.id );
+				lr.removeUnit( u );
 				u.renderDead( btg );
 				for( int j = 0; j < 10; j++ )
 				{
@@ -495,7 +506,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 					}
 				}
 				
-				lr = new GLLevelRenderer( this );
+				lr.setupMap();
 			}
 			catch( SlickException ex )
 			{
@@ -519,10 +530,10 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		GL11.glDisable( GL11.GL_TEXTURE_2D );
 		GL11.glColor3f( 1, 1, 1 );
 		GL11.glBegin( GL11.GL_QUADS );
-		GL11.glVertex3f( -10000, -10000, -1 );
-		GL11.glVertex3f( 10000, -10000, -1 );
-		GL11.glVertex3f( 10000, 10000, -1 );
-		GL11.glVertex3f( -10000, 10000, -1 );
+		GL11.glVertex3f( -10000, -10000, 1 );
+		GL11.glVertex3f( 10000, -10000, 1 );
+		GL11.glVertex3f( 10000, 10000, 1 );
+		GL11.glVertex3f( -10000, 10000, 1 );
 		GL11.glEnd();
 		GL11.glEnable( GL11.GL_TEXTURE_2D );
 		

@@ -40,6 +40,7 @@ public class Level implements TileBasedMap
 	
 	public Image floor;
 	public Image wall;
+	public Image wall3d;
 	public Image grate;
 	
 	public float[][] lightMap;
@@ -251,8 +252,14 @@ public class Level implements TileBasedMap
 		try
 		{
 			wall = new Image( "img" + File.separator + new DOptions( "themes" + File.separator + theme ).getS( "wall" ) );
+			wall3d = new Image( "img" + File.separator + new DOptions( "themes" + File.separator + theme ).getS( "wall3d" ) );
 			floor = new Image( "img" + File.separator + new DOptions( "themes" + File.separator + theme ).getS( "floor" ) );
 			grate = new Image( "img" + File.separator + new DOptions( "themes" + File.separator + theme ).getS( "grate" ) );
+			
+			wall.setFilter( Image.FILTER_NEAREST );
+			wall3d.setFilter( Image.FILTER_NEAREST );
+			floor.setFilter( Image.FILTER_NEAREST );
+			grate.setFilter( Image.FILTER_NEAREST );
 		} catch( SlickException e )
 		{
 			e.printStackTrace();

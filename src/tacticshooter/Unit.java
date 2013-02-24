@@ -14,6 +14,9 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.util.pathfinding.Path;
+
+import tacticshooter.scenegraph.Node;
+
 import com.phyloa.dlib.util.DMath;
 import com.phyloa.dlib.util.DOptions;
 
