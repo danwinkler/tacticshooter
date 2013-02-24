@@ -34,6 +34,7 @@ import tacticshooter.Building.BuildingType;
 import tacticshooter.Bullet;
 import tacticshooter.ClientInterface;
 import tacticshooter.ClientState;
+import tacticshooter.GLLevelRenderer;
 import tacticshooter.Level;
 import tacticshooter.Level.TileType;
 import tacticshooter.AutoTileDrawer;
@@ -105,12 +106,11 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	
 	int bottomOffset = 200;
 	
-	float zoom = 700;
+	public float zoom = 700;
 	
 	boolean running = false;
 	
-	Image wallTexture;
-	Image bloodTexture;
+	public Image bloodTexture;
 	Graphics btg;
 	
 	Image backgroundTexture;
@@ -132,10 +132,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	public Point3f eye = new Point3f();
 	Point3f center = new Point3f();
 	
-	int wallsidelist;
-	int unitList;
-	
-	ShaderProgram toonShader;
+	GLLevelRenderer lr;
 	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
@@ -484,12 +481,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				cs.l.renderFloor( btg );
 				btg.flush();
 				btg.setColor( new Color( 255, 0, 0, 200 ) );
-				wallTexture = new Image( cs.l.width * Level.tileSize, cs.l.height * Level.tileSize );
-				
-				Graphics wtg = wallTexture.getGraphics();
-				wtg.clearAlphaMap();
-				cs.l.render( wtg );
-				wtg.flush();
 				
 				backgroundTexture = new Image( gc.getWidth() + Level.tileSize*2, gc.getHeight() + Level.tileSize*2 );
 				Graphics bgg = backgroundTexture.getGraphics();
@@ -504,268 +495,37 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 					}
 				}
 				
-				toonShader = ShaderProgram.loadProgram( "data" + File.separator + "shaders" + File.separator + "toon.vert", "data" + File.separator + "shaders" + File.separator + "toon.frag" );
-				
-				try
-				{
-					unitList = ModelHelpers.loadModel( "data" + File.separator + "models" + File.separator + "simpleman1.obj" );
-				} catch( FileNotFoundException e )
-				{
-					e.printStackTrace();
-				}
-				
-				wallsidelist = GL11.glGenLists( 1 );
-				GL11.glNewList( wallsidelist, GL11.GL_COMPILE );
-				for( int y = 0; y < cs.l.height; y++ )
-				{
-					for( int x = 0; x < cs.l.width; x++ )
-					{
-						if( cs.l.getTile( x, y ) == TileType.WALL )
-						{
-							GL11.glPushMatrix();
-							GL11.glTranslatef( 0, 0, -Level.tileSize );
-							
-							GL11.glPopMatrix();
-							if( cs.l.getTile( x, y+1 ) != TileType.WALL )
-							{
-								GL11.glPushMatrix();
-								GL11.glTranslatef( x*Level.tileSize, (y+1) * Level.tileSize, -Level.tileSize );
-								
-								GL11.glBegin( GL11.GL_QUADS );
-								GL11.glNormal3f( 0, 1, 0 );
-								GL11.glVertex3f( 0, 0, 0 );
-								
-								GL11.glNormal3f( 0, 1, 0 );
-								GL11.glVertex3f( 0, 0, Level.tileSize );
-								
-								GL11.glNormal3f( 0, 1, 0 );
-								GL11.glVertex3f( Level.tileSize, 0, Level.tileSize );
-								
-								GL11.glNormal3f( 0, 1, 0 );
-								GL11.glVertex3f( Level.tileSize, 0, 0 );
-								GL11.glEnd();
-								
-								GL11.glPopMatrix();
-							}
-							if( cs.l.getTile( x-1, y ) != TileType.WALL )
-							{
-								GL11.glPushMatrix();
-								GL11.glTranslatef( (x)*Level.tileSize, (y) * Level.tileSize, 0 );
-								
-								GL11.glPopMatrix();
-							}
-							if( cs.l.getTile( x+1, y ) != TileType.WALL )
-							{
-								GL11.glPushMatrix();
-								GL11.glTranslatef( (x+1)*Level.tileSize, (y) * Level.tileSize, -Level.tileSize );
-								
-								GL11.glPopMatrix();
-							}
-						}
-					}
-				}
-				GL11.glEndList();
-			} catch( SlickException e )
+				lr = new GLLevelRenderer( this );
+			}
+			catch( SlickException ex )
 			{
-				e.printStackTrace();
+				ex.printStackTrace();
 			}
 		}
 		
 		if( mapChanged )
 		{
-			try
-			{	
-				Graphics wtg = wallTexture.getGraphics();
-				wtg.clear();
-				cs.l.render( wtg );
-				wtg.flush();
-			} catch( SlickException e )
-			{
-				e.printStackTrace();
-			}
+			//update map
+			lr.setupMap();
+			
 			mapChanged = false;
 		}
 		
-		//make2D();
-		
 		make3D();
 		
-		eye.x = cs.scrollx;
-		eye.y = cs.scrolly+zoom;
-		eye.z = -zoom*2;
+		lr.render();
 		
-		center.x = cs.scrollx;
-		center.y = cs.scrolly;
-		center.z = 0;
-		
-		GLU.gluLookAt( eye.x, eye.y, eye.z, center.x, center.y, center.z, 0, 0, -1 );
-		
-		GL11.glEnable( GL11.GL_DEPTH_TEST );
-		GL11.glBegin( GL11.GL_QUADS );
-		GL11.glVertex3f( -10000, -10000, 1 );
-		GL11.glVertex3f( 10000, -10000, 1 );
-		GL11.glVertex3f( 10000, 10000, 1 );
-		GL11.glVertex3f( -10000, 10000, 1 );
-		GL11.glEnd();
-		GL11.glDisable( GL11.GL_DEPTH_TEST );
-		
-		g.setColor( Color.black );
-		
-		g.pushTransform();
-		
-		
-		GL11.glEnable( GL11.GL_TEXTURE_2D );
-		GL11.glColor3f( 1, 1, 1 );
-		toonShader.bind();
-		toonShader.setUniform4f( "tcol", Color.white );
-		toonShader.setUniform1i( "useTexture", 1 );
-		bloodTexture.bind();
-		GL11.glBegin( GL11.GL_QUADS );
-		GL11.glNormal3f( 0, 0, 1 );
-		GL11.glTexCoord2f( bloodTexture.getTextureOffsetX(), bloodTexture.getTextureOffsetY() );
-		GL11.glVertex3f( 0, 0, 0 );
-		
-		GL11.glNormal3f( 0, 0, 1 );
-		GL11.glTexCoord2f( bloodTexture.getTextureOffsetX(), bloodTexture.getTextureOffsetY() + bloodTexture.getTextureHeight() );
-		GL11.glVertex3f( 0, bloodTexture.getHeight(), 0 );
-		
-		GL11.glNormal3f( 0, 0, 1 );
-		GL11.glTexCoord2f( bloodTexture.getTextureOffsetX() + bloodTexture.getTextureWidth(), bloodTexture.getTextureOffsetY() + bloodTexture.getTextureHeight() );
-		GL11.glVertex3f( bloodTexture.getWidth(), bloodTexture.getHeight(), 0 );
-		
-		GL11.glNormal3f( 0, 0, 1 );
-		GL11.glTexCoord2f( bloodTexture.getTextureOffsetX() + bloodTexture.getTextureWidth(), bloodTexture.getTextureOffsetY() );
-		GL11.glVertex3f( bloodTexture.getWidth(), 0, 0 );
-		GL11.glEnd();
-		toonShader.setUniform1i( "useTexture", 0 );
-		toonShader.unbind();
-		
-		
-		
-		cs.l.renderBuildings( g );
-		
-		g.setColor( this.waitingForMoveConfirmation ? Color.gray : Color.green );
-		g.drawRect( mx * Level.tileSize, my * Level.tileSize, Level.tileSize, Level.tileSize );
-		
-		for( int i = 0; i < cs.units.size(); i++ )
-		{
-			Unit u = cs.units.get( i );
-			u.renderBody( g, cs.player );
-		}
-		
-		GL11.glEnable( GL11.GL_CULL_FACE );
-		GL11.glCullFace( GL11.GL_FRONT );
-		GL11.glLineWidth( 3 );
-		GL11.glPolygonMode( GL11.GL_BACK, GL11.GL_LINE );
-		GL11.glColor3f( 0, 0, 0 );
-		
-		GL11.glEnable( GL11.GL_DEPTH_TEST );
-		GL11.glCallList( wallsidelist );
-		GL11.glDisable( GL11.GL_DEPTH_TEST );
-		
-		GL11.glDisable( GL11.GL_CULL_FACE );
-		GL11.glPolygonMode( GL11.GL_BACK, GL11.GL_FILL );
-		GL11.glLineWidth( 1 );
-		
-		toonShader.bind();
-		GL11.glEnable( GL11.GL_DEPTH_TEST );
-		GL11.glCallList( wallsidelist );
-		GL11.glDisable( GL11.GL_DEPTH_TEST );
-		toonShader.unbind();
-		
-		g.setColor( Color.black );
-		
-		GL11.glPushMatrix();
-		GL11.glTranslatef( 0, 0, -Level.tileSize/2 );
-		for( int i = 0; i < cs.bullets.size(); i++ )
-		{
-			Bullet b = cs.bullets.get( i );
-			b.render( g );
-		}
-		GL11.glPopMatrix();
-		
-		GL11.glEnable( GL11.GL_DEPTH_TEST );
-		
-		GL11.glDisable( GL11.GL_BLEND );
+		//Hack for finding mouseCoords on surface
 		GL11.glDisable( GL11.GL_TEXTURE_2D );
-		GL11.glEnable( GL11.GL_CULL_FACE );
-		GL11.glCullFace( GL11.GL_FRONT );
-		GL11.glLineWidth( 3 );
-		GL11.glPolygonMode( GL11.GL_BACK, GL11.GL_LINE );
-		GL11.glColor3f( 0, 0, 0 );
-		
-		for( int i = 0; i < cs.units.size(); i++ )
-		{
-			Unit u = cs.units.get( i );
-			GL11.glPushMatrix();
-			GL11.glTranslatef( u.x, u.y, 0 );
-			GL11.glRotatef( (u.heading/DMath.PI2F) * 360, 0, 0, 1 );
-			GL11.glScalef( 5, 5, 5 );
-			GL11.glRotatef( -90, 1, 0, 0 );
-			GL11.glCallList( unitList );
-			GL11.glPopMatrix();
-		}
-		
-		GL11.glDisable( GL11.GL_CULL_FACE );
-		GL11.glPolygonMode( GL11.GL_BACK, GL11.GL_FILL );
-		GL11.glLineWidth( 1 );
-		
-		GL11.glEnable( GL11.GL_BLEND );
-		
-		toonShader.bind();
-		
-		Vector3f lightPosition = new Vector3f();
-		
-		//That this works confuses the shit out of me. I'm transforming the map coords to some other space i guess, 
-		//and then taking the dist from the fragment which is in eye coords then works? I don't fucking know 
-		lightPosition.set( mouseOnMap.x - cs.scrollx, mouseOnMap.y - cs.scrolly, 50 );
-		
-		//toonShader.setUniform2f( "res", gc.getWidth(), gc.getHeight() );
-		toonShader.setUniform4f( "LightPosition", lightPosition.x, lightPosition.y, lightPosition.z, 0 );
-		toonShader.setUniform1f( "lightscalar", 400 );
-		for( int i = 0; i < cs.units.size(); i++ )
-		{
-			Unit u = cs.units.get( i );
-			Color c = u.owner.team.getColor();
-			toonShader.setUniform4f( "tcol", c );
-			
-			GL11.glColor3f( c.r, c.g, c.b );
-			GL11.glPushMatrix();
-			GL11.glTranslatef( u.x, u.y, 0 );
-			GL11.glRotatef( (u.heading/DMath.PI2F) * 360, 0, 0, 1 );
-			GL11.glScalef( 5, 5, 5 );
-			GL11.glRotatef( -90, 1, 0, 0 );
-			GL11.glCallList( unitList );
-			GL11.glPopMatrix();
-		}
-		
-		toonShader.unbind();
-		
+		GL11.glColor3f( 1, 1, 1 );
+		GL11.glBegin( GL11.GL_QUADS );
+		GL11.glVertex3f( -10000, -10000, -1 );
+		GL11.glVertex3f( 10000, -10000, -1 );
+		GL11.glVertex3f( 10000, 10000, -1 );
+		GL11.glVertex3f( -10000, 10000, -1 );
+		GL11.glEnd();
 		GL11.glEnable( GL11.GL_TEXTURE_2D );
 		
-		for( int i = 0; i < cs.units.size(); i++ )
-		{
-			Unit u = cs.units.get( i );
-			Point2i m = getMouseOnMap( input.getMouseX(), input.getMouseY() );
-			u.render( g, cs.player, m.x, m.y, cs.l );
-		}
-		
-		g.setColor( Color.darkGray );
-			
-		ps.render( this );
-		GL11.glDisable( GL11.GL_DEPTH_TEST );
-		
-		if( selecting )
-		{
-			g.setColor( Color.blue );
-			float x1 = Math.min( sx, sx2 );
-			float y1 = Math.min( sy, sy2 );
-			float x2 = Math.max( sx, sx2 );
-			float y2 = Math.max( sy, sy2 );
-			g.drawRect( x1, y1, x2-x1, y2-y1 );
-		}
-		
-		g.popTransform();
 		
 		mouseOnMap = getMouseOnMap( input.getMouseX(), input.getMouseY() );
 		
@@ -891,8 +651,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	}
 	
 	public void make2D() {
-	    //GL11.glEnable( GL11.GL_BLEND );
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		GL11.glDisable (GL11.GL_DEPTH_TEST );
 	    GL11.glMatrixMode( GL11.GL_PROJECTION );
 	    GL11.glLoadIdentity();
 	    GL11.glOrtho( 0.0f, gc.getWidth(), gc.getHeight(), 0.0f, 0.0f, 1.0f );
@@ -902,8 +661,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	}
 
 	public void make3D() {
-		//GL11.glDisable( GL11.GL_BLEND );
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GL11.glEnable( GL11.GL_DEPTH_TEST );
 	    GL11.glMatrixMode( GL11.GL_PROJECTION );
 	    GL11.glLoadIdentity(); // Reset The Projection Matrix
 	    GLU.gluPerspective( 45.0f, ((float) gc.getWidth() / (float) gc.getHeight()), 5, 5000.0f ); // Calculate The Aspect Ratio Of The Window
@@ -922,7 +680,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		cs.resetState();
 		miniMap = null;
 		bloodTexture = null;
-		wallTexture = null;
 		mapChanged = true;
 		dui.setEnabled( false );
 		messages.clear();
