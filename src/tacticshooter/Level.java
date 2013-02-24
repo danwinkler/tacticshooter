@@ -472,7 +472,7 @@ public class Level implements TileBasedMap
 	{
 		if( x < 0 || x >= width || y < 0 || y >= height )
 		{
-			return TileType.WALL;
+			return TileType.FLOOR;
 		}
 		return tiles[x][y];
 	}

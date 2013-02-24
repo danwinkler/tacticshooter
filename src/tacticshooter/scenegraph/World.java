@@ -18,12 +18,17 @@ public class World
 	
 	ArrayList<Light> lights = new ArrayList<Light>();
 	boolean lightsEnabled = false;
+
+	boolean plainRender;
+	
+	public void setUpCamera()
+	{
+		GLU.gluLookAt( camera.x, camera.y, camera.z, focus.x, focus.y, focus.z, up.x, up.y, up.z );
+	}
 	
 	public void render()
 	{
-		GLU.gluLookAt( camera.x, camera.y, camera.z, focus.x, focus.y, focus.z, up.x, up.y, up.z );
-		
-		if( lightsEnabled )
+		if( lightsEnabled && !plainRender )
 		{
 			GL11.glEnable( GL11.GL_LIGHTING );
 			GL11.glLightModeli( GL11.GL_LIGHT_MODEL_TWO_SIDE, GL11.GL_TRUE );
@@ -37,9 +42,9 @@ public class World
 			}
 		}
 		
-		root.render();
+		root.render( this );
 		
-		if( lightsEnabled )
+		if( lightsEnabled && !plainRender )
 		{
 			for( int i = 0; i < lights.size(); i++ )
 			{
@@ -69,6 +74,11 @@ public class World
 	public void setLightsEnabled( boolean enabled )
 	{
 		this.lightsEnabled = enabled;
+	}
+	
+	public void setPlainRender( boolean enabled )
+	{
+		this.plainRender = enabled;
 	}
 
 	public void add( Light light )

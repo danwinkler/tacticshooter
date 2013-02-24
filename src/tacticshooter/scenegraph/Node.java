@@ -36,7 +36,7 @@ public class Node extends Transformable
 		
 	}
 	
-	public void render()
+	public void render( World world )
 	{
 		GL11.glPushMatrix();
 		GL11.glTranslatef( position.x, position.y, position.z );
@@ -47,18 +47,21 @@ public class Node extends Transformable
 							mat.m03, mat.m13, mat.m23, mat.m33 } );
 		fb.flip();
 		GL11.glMultMatrix( fb );
-		GL11.glScalef( scale.x, scale.y, scale.z );
-		GL11.glColor3f( color.r, color.g, color.b );
+		GL11.glScalef( scale.x, scale.y, scale.z );	
 		if( model != null )
 		{
-			if( toBind != null )
-			{	
-				toBind.bind();
-				GL11.glEnable( GL11.GL_TEXTURE_2D );
-			}
-			else
+			if( !world.plainRender )
 			{
-				GL11.glDisable( GL11.GL_TEXTURE_2D );
+				GL11.glColor3f( color.r, color.g, color.b );
+				if( toBind != null )
+				{	
+					toBind.bind();
+					GL11.glEnable( GL11.GL_TEXTURE_2D );
+				}
+				else
+				{
+					GL11.glDisable( GL11.GL_TEXTURE_2D );
+				}
 			}
 			model.render();
 		}
@@ -66,7 +69,7 @@ public class Node extends Transformable
 		while( i.hasNext() )
 		{
 			Node n = i.next();
-			n.render();
+			n.render( world );
 			if( n.remove )
 			{
 				i.remove();

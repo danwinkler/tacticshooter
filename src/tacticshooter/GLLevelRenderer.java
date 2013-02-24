@@ -127,8 +127,25 @@ public class GLLevelRenderer
 			n.setPosition( u.x, u.y, 0 );
 		}
 		
-		GL11.glColor3f( 1, 1, 1 );
+		world.setUpCamera();
 		
+		world.setPlainRender( true );
+		GL11.glDisable( GL11.GL_BLEND );
+		GL11.glDisable( GL11.GL_TEXTURE_2D );
+		GL11.glEnable( GL11.GL_CULL_FACE );
+		GL11.glCullFace( GL11.GL_FRONT );
+		GL11.glLineWidth( 3 );
+		GL11.glPolygonMode( GL11.GL_BACK, GL11.GL_LINE );
+		GL11.glColor3f( 0, 0, 0 );
+		world.render();
+		GL11.glDisable( GL11.GL_CULL_FACE );
+		GL11.glPolygonMode( GL11.GL_BACK, GL11.GL_FILL );
+		GL11.glLineWidth( 1 );
+		GL11.glEnable( GL11.GL_TEXTURE_2D );
+		GL11.glEnable( GL11.GL_BLEND );
+		
+		GL11.glColor3f( 1, 1, 1 );
+		world.setPlainRender( false );
 		shader.bind();
 		world.render();
 		shader.unbind();
@@ -200,6 +217,23 @@ public class GLLevelRenderer
 						
 						GL11.glTexCoord2f( 1, 0 );
 						GL11.glVertex3f( Level.tileSize*(x+1), Level.tileSize*(y+1), -Level.tileSize );
+					}
+					
+					if( l.getTile( x, y-1 ) != TileType.WALL )
+					{
+						GL11.glNormal3f( 0, -1, 0 );
+						
+						GL11.glTexCoord2f( 0, 0 );
+						GL11.glVertex3f( Level.tileSize*(x+1), Level.tileSize*y, -Level.tileSize );
+						
+						GL11.glTexCoord2f( 0, 1 );
+						GL11.glVertex3f( Level.tileSize*(x+1), Level.tileSize*y, 0 );
+						
+						GL11.glTexCoord2f( 1, 1 );
+						GL11.glVertex3f( Level.tileSize*(x+0), Level.tileSize*y, 0 );
+						
+						GL11.glTexCoord2f( 1, 0 );
+						GL11.glVertex3f( Level.tileSize*(x+0), Level.tileSize*y, -Level.tileSize );
 					}
 					
 					if( l.getTile( x-1, y ) != TileType.WALL )
