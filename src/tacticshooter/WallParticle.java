@@ -1,5 +1,6 @@
 package tacticshooter;
 
+import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 
@@ -22,8 +23,11 @@ public class WallParticle extends Particle<MultiplayerGameScreen>
 
 	public void render( MultiplayerGameScreen r )
 	{
-		Graphics g = r.gc.getGraphics();
-		g.setColor( Color.black );
-		g.drawLine( pos.x, pos.y, pos.x+speed.x, pos.y+speed.y );
+		GL11.glColor3f( 0, 0, 0 );
+		GL11.glLineWidth( 2 );
+		GL11.glBegin( GL11.GL_LINES );
+		GL11.glVertex3f( pos.x, pos.y, -Level.tileSize/2 );
+		GL11.glVertex3f( pos.x+speed.x*.5f, pos.y+speed.y*.5f, -Level.tileSize/2 );
+		GL11.glEnd();
 	}
 }

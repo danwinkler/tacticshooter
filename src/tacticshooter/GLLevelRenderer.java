@@ -144,11 +144,23 @@ public class GLLevelRenderer
 		GL11.glEnable( GL11.GL_TEXTURE_2D );
 		GL11.glEnable( GL11.GL_BLEND );
 		
-		GL11.glColor3f( 1, 1, 1 );
 		world.setPlainRender( false );
 		shader.bind();
 		world.render();
 		shader.unbind();
+		mgs.ps.render( mgs );
+		
+		GL11.glColor3f( 0, 0, 0 );
+		GL11.glLineWidth( 3 );
+		GL11.glBegin( GL11.GL_LINES );
+		for( int i = 0; i < mgs.cs.bullets.size(); i++ )
+		{
+			Bullet b = mgs.cs.bullets.get( i );
+			GL11.glVertex3f( b.loc.x, b.loc.y, -Level.tileSize/2 );
+			GL11.glVertex3f( b.loc.x+b.dir.x*.5f, b.loc.y+b.dir.y*.5f, -Level.tileSize/2 );
+		}
+		GL11.glEnd();
+		GL11.glLineWidth( 1 );
 	}
 	
 	public void setupMap()
