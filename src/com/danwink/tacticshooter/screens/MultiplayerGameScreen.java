@@ -107,6 +107,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	int bottomOffset = 200;
 	
 	public float zoom = 700;
+	public float targetZoom = 700;
 	
 	boolean running = false;
 	
@@ -474,6 +475,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				return d1.lengthSquared() > d2.lengthSquared() ? -1 : 1;
 			} 
 		} );
+		
+		zoom += (targetZoom-zoom) * .4f * d;
 	}
 
 	public void render( GameContainer gc, Graphics g )
@@ -897,7 +900,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	@Override
 	public void mouseWheelMoved( int a )
 	{
-		zoom += zoom * .003f * -a;
+		targetZoom += targetZoom * .003f * -a;
 	}
 
 	@Override
