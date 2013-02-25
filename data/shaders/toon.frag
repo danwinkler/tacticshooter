@@ -50,7 +50,7 @@ void main()
        	//NdotHV = max(dot(n,halfV),0.0);
         //color += att * gl_FrontMaterial.specular * gl_LightSource[0].specular * pow(NdotHV,gl_FrontMaterial.shininess);
         
-        bright = color.r;
+        bright = max( max( color.r, color.g ), color.b );
     } else {
      	bright = 0;
     }
@@ -60,6 +60,6 @@ void main()
     else if (bright > 0.50) color = vec4(0.6, 0.6, 0.6, 1.0);
     else if (bright > 0.25) color = vec4(0.4, 0.4, 0.4, 1.0);
     else     				 color = vec4(0.2, 0.2, 0.2, 1.0);
- 
+	 
     gl_FragColor = color * color1;
 }

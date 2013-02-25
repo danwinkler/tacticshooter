@@ -548,7 +548,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		GL11.glEnd();
 		GL11.glEnable( GL11.GL_TEXTURE_2D );
 		
-		
 		mouseOnMap = getMouseOnMap( input.getMouseX(), input.getMouseY() );
 		
 		//Find minimap view box before you go back to 2d

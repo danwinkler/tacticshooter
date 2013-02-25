@@ -7,7 +7,7 @@ public class Team
 	public static Team a = new Team( 0 );
 	public static Team b = new Team( 1 );
 	
-	public static final Color[] teamColors = { Color.yellow, new Color( 255, 0, 255 ), Color.blue, Color.orange };
+	public static final Color[] teamColors = { Color.red, Color.green, Color.yellow, new Color( 255, 0, 255 ), Color.blue, Color.orange };
 	
 	public int id;
 	
