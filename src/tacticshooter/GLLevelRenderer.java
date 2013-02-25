@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 
+import javax.vecmath.Point2i;
+
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Image;
@@ -11,6 +13,7 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.opengl.shader.ShaderProgram;
 
 import tacticshooter.Level.TileType;
+import tacticshooter.Unit.UnitState;
 import tacticshooter.scenegraph.Light;
 import tacticshooter.scenegraph.Model;
 import tacticshooter.scenegraph.Node;
@@ -137,6 +140,8 @@ public class GLLevelRenderer
 		mouseLight.setPosition( mgs.mouseOnMap.x, mgs.mouseOnMap.y, -200 );
 		mouseLight.setDiffuse( 1.0f, 1.0f, 1.0f, 1.0f );
 		
+		world.setUpCamera();
+		
 		for( Unit u : mgs.cs.units )
 		{
 			Node n = units.get( u.id );
@@ -151,12 +156,10 @@ public class GLLevelRenderer
 				}
 				else if( c.getModel() == flag )
 				{
-					c.setScale( DMath.map( u.health, 0, u.type.health, 0, 2 ), .2f, 1 );
+					c.setScale( DMath.map( u.health, 0, u.type.health, 0, 2 ), .3f, 1 );
 				}
-			}
+			}	
 		}
-		
-		world.setUpCamera();
 		
 		world.setPlainRender( true );
 		GL11.glDisable( GL11.GL_BLEND );
@@ -189,6 +192,22 @@ public class GLLevelRenderer
 			GL11.glVertex3f( b.loc.x+b.dir.x*.5f, b.loc.y+b.dir.y*.5f, -Level.tileSize/2 );
 		}
 		GL11.glEnd();
+		
+		for( Unit u : mgs.cs.units )
+		{
+			if( u.selected && u.state == UnitState.MOVING )
+			{
+				GL11.glColor3f( .5f, .5f, .8f );
+				
+				GL11.glBegin( GL11.GL_LINE_STRIP );
+				for( int i = Math.max( u.onStep-2, 0 ); i < u.path.size(); i++ )
+				{
+					Point2i p1 = u.path.get( i );
+					GL11.glVertex3f( (p1.x+.5f) * Level.tileSize, (p1.y+.5f) * Level.tileSize, -Level.tileSize/2 );
+				}
+				GL11.glEnd();
+			}
+		}
 		GL11.glLineWidth( 1 );
 	}
 	
@@ -327,6 +346,7 @@ public class GLLevelRenderer
 			bn.rotateX( -DMath.PIF/2 );
 			bn.setPosition( b.x, b.y, 0 );
 			bn.setScale( 20, 20, 20 );
+			bn.setColor( new Color( 240, 230, 200 ) );
 			world.add( bn );
 			buildings.put( b.id, bn );
 			
@@ -365,7 +385,7 @@ public class GLLevelRenderer
 		health.setModel( flag );
 		health.setPosition( -1, 4, 0 );
 		health.setColor( new Color( 150, 255, 150 ) );
-		health.setScale( 2, .2f, 1 );
+		health.setScale( 2, .3f, 1 );
 		unit.add( health );
 	}
 	
