@@ -133,7 +133,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	public Point3f eye = new Point3f();
 	Point3f center = new Point3f();
 	
-	GLLevelRenderer lr;
+	public GLLevelRenderer lr;
 	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
@@ -467,10 +467,10 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			public int compare( Particle<MultiplayerGameScreen> p1, Particle<MultiplayerGameScreen> p2 )
 			{
 				Vector3f d1 = new Vector3f( p1.pos );
-				d1.sub( eye );
+				d1.sub( lr.world.getCamera() );
 				
 				Vector3f d2 = new Vector3f( p2.pos );
-				d2.sub( eye );
+				d2.sub( lr.world.getCamera() );
 				
 				return d1.lengthSquared() > d2.lengthSquared() ? -1 : 1;
 			} 

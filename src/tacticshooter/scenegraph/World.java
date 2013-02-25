@@ -137,4 +137,9 @@ public class World
 			sno.execute( shader, node );
 		}
 	}
+
+	public Point3f getCamera()
+	{
+		return camera;
+	}
 }

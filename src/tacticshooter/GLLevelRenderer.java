@@ -27,7 +27,7 @@ public class GLLevelRenderer
 {
 	MultiplayerGameScreen mgs;
 	
-	World world;
+	public World world;
 	
 	Node floor;
 	Node wall;
@@ -166,7 +166,7 @@ public class GLLevelRenderer
 		GL11.glDisable( GL11.GL_TEXTURE_2D );
 		GL11.glEnable( GL11.GL_CULL_FACE );
 		GL11.glCullFace( GL11.GL_FRONT );
-		GL11.glLineWidth( 3 );
+		GL11.glLineWidth( 2 );
 		GL11.glPolygonMode( GL11.GL_BACK, GL11.GL_LINE );
 		GL11.glColor3f( 0, 0, 0 );
 		world.render();

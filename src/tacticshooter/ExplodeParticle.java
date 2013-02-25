@@ -41,7 +41,7 @@ public class ExplodeParticle extends Particle<MultiplayerGameScreen>
 		r.setColor( c );
 		GL11.glPushMatrix();
 		GL11.glTranslatef( pos.x, pos.y, pos.z );
-		rotateToFace( g.eye );
+		rotateToFace( g.lr.world.getCamera() );
 		GL11.glBegin( GL11.GL_QUADS );
 		GL11.glNormal3f( 0, 0, -1 );
 		
@@ -62,6 +62,11 @@ public class ExplodeParticle extends Particle<MultiplayerGameScreen>
 	}
 	
 	static Vector3f up = new Vector3f( 0, -2, -1 );
+	static
+	{
+		up.normalize();
+	}
+	
 	void rotateToFace( Point3f point )
 	{
 	  Vector3f d = new Vector3f();
