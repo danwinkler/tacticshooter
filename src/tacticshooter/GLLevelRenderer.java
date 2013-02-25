@@ -31,6 +31,7 @@ public class GLLevelRenderer
 	Model simpleMan;
 	Model house;
 	Model flag;
+	Model torus;
 	
 	Light mouseLight;
 	
@@ -67,11 +68,22 @@ public class GLLevelRenderer
 		}
 		house.end();
 		
+		torus = new Model();
+		torus.begin();
+		try
+		{
+			ModelHelpers.loadModel( "data" + File.separator + "models" + File.separator + "torus1.obj" );
+		} catch( FileNotFoundException e )
+		{
+			e.printStackTrace();
+		}
+		torus.end();
+		
 		flag = new Model();
 		flag.begin();
 		GL11.glBegin( GL11.GL_QUADS );
 		
-		GL11.glNormal3f( 0, 0, 1 );
+		GL11.glNormal3f( 0, 1, 0 );
 		
 		GL11.glTexCoord2f( 0, 0 );
 		GL11.glVertex3f( 0, 0, 0 );
@@ -125,6 +137,17 @@ public class GLLevelRenderer
 			n.mat.setIdentity();
 			n.rotateX( -DMath.PIF/2 );
 			n.setPosition( u.x, u.y, 0 );
+			for( Node c : n.getChildren() )
+			{
+				if( c.getModel() == torus )
+				{
+					c.setVisible( u.selected );
+				}
+				else if( c.getModel() == flag )
+				{
+					c.setScale( DMath.map( u.health, 0, u.type.health, 0, 2 ), .2f, 1 );
+				}
+			}
 		}
 		
 		world.setUpCamera();
@@ -148,6 +171,7 @@ public class GLLevelRenderer
 		shader.bind();
 		world.render();
 		shader.unbind();
+		
 		mgs.ps.render( mgs );
 		
 		GL11.glColor3f( 0, 0, 0 );
@@ -324,6 +348,20 @@ public class GLLevelRenderer
 		unit.setColor( u.owner.team.getColor() );
 		units.put( u.id, unit );
 		world.add( unit );
+		
+		Node t = new Node();
+		t.setModel( torus );
+		t.setVisible( false );
+		t.setColor( new Color( 150, 150, 255 ) );
+		t.setPosition( 0, 2, 0 );
+		unit.add( t );
+		
+		Node health = new Node();
+		health.setModel( flag );
+		health.setPosition( -1, 4, 0 );
+		health.setColor( new Color( 150, 255, 150 ) );
+		health.setScale( 2, .2f, 1 );
+		unit.add( health );
 	}
 	
 	public void removeUnit( Unit u )

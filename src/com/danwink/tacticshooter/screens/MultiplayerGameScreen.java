@@ -349,7 +349,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		
 		if( !chatPanel.isVisible() && !escapeMenu.isVisible() )
 		{
-			float scrollSpeed = 20;
+			float scrollSpeed = .1f*zoom;
 			Rectangle screenBounds = getScreenBounds();
 			
 			boolean scrollup = cs.scrolly > screenBounds.getMinY() && (input.isKeyDown( Input.KEY_UP ) || input.isKeyDown( Input.KEY_W ) || (gc.isFullscreen() && input.getMouseY() < 10 ));
@@ -490,6 +490,14 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				bloodTexture = new Image( cs.l.width * Level.tileSize, cs.l.height * Level.tileSize );
 				btg = bloodTexture.getGraphics();
 				cs.l.renderFloor( btg );
+				btg.setColor( Color.black );
+				for( Building b : cs.l.buildings )
+				{
+					btg.pushTransform();
+					btg.translate( b.x, b.y );
+					btg.drawOval( -b.bt.bu.getRadius(), -b.bt.bu.getRadius(), b.bt.bu.getRadius()*2, b.bt.bu.getRadius()*2 );
+					btg.popTransform();
+				}
 				btg.flush();
 				btg.setColor( new Color( 255, 0, 0, 200 ) );
 				
@@ -550,6 +558,18 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		poly.addPoint( c.x, c.y );
 		Point2i d = getMouseOnMap( gc.getWidth()-1, 1 );
 		poly.addPoint( d.x, d.y );
+		
+		GL11.glDisable( GL11.GL_DEPTH_TEST );
+		
+		if( selecting )
+		{
+			g.setColor( Color.blue );
+			float x1 = Math.min( sx, sx2 );
+			float y1 = Math.min( sy, sy2 );
+			float x2 = Math.max( sx, sx2 );
+			float y2 = Math.max( sy, sy2 );
+			g.drawRect( x1, y1, x2-x1, y2-y1 );
+		}
 		
 		make2D();
 		

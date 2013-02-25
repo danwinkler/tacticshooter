@@ -31,6 +31,8 @@ public class Node extends Transformable
 	
 	private Texture toBind;
 	
+	boolean visible = true;
+	
 	public Node()
 	{
 		
@@ -38,6 +40,8 @@ public class Node extends Transformable
 	
 	public void render( World world )
 	{
+		if( !visible ) return;
+		
 		GL11.glPushMatrix();
 		GL11.glTranslatef( position.x, position.y, position.z );
 		FloatBuffer fb = BufferUtils.createFloatBuffer( 16 );
@@ -127,4 +131,15 @@ public class Node extends Transformable
 	{
 		return children;
 	}
+	
+	public boolean isVisible()
+	{
+		return visible;
+	}
+
+	public void setVisible( boolean visible )
+	{
+		this.visible = visible;
+	}
+
 }

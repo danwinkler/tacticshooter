@@ -43,7 +43,21 @@ public class ExplodeParticle extends Particle<MultiplayerGameScreen>
 		GL11.glTranslatef( pos.x, pos.y, pos.z );
 		rotateToFace( g.eye );
 		GL11.glBegin( GL11.GL_QUADS );
-		r.drawImage( im, -size/2, -size/2, size/2, size/2, 0, 0, 64, 64, c );
+		GL11.glNormal3f( 0, 0, -1 );
+		
+		GL11.glTexCoord2f( 0, 0 );
+		GL11.glVertex3f( -size/2, -size/2, 0 );
+		
+		GL11.glTexCoord2f( 0, 1 );
+		GL11.glVertex3f( -size/2, size/2, 0 );
+		
+		GL11.glTexCoord2f( 1, 1 );
+		GL11.glVertex3f( size/2, size/2, 0 );
+		
+		GL11.glTexCoord2f( 1, 0 );
+		GL11.glVertex3f( size/2, -size/2, 0 );
+		
+		GL11.glEnd();
 		GL11.glPopMatrix();
 	}
 	

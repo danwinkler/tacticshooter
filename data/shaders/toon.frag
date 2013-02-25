@@ -28,7 +28,9 @@ void main()
      
     /* compute the dot product between normal and ldir */
     NdotL = max(dot(n,normalize(lightDir)),0.0);
- 
+ 	
+ 	float bright;
+ 	
     if( NdotL > 0.0 ){
      
         att = 1.0 / (gl_LightSource[0].constantAttenuation +
@@ -40,14 +42,16 @@ void main()
         //halfV = normalize(halfVector);
        	//NdotHV = max(dot(n,halfV),0.0);
         //color += att * gl_FrontMaterial.specular * gl_LightSource[0].specular * pow(NdotHV,gl_FrontMaterial.shininess);
+        
+        bright = color.r;
     } else {
-     	color.x = 0;
+     	bright = 0;
     }
     
-    if (color.x > 0.95)      color = vec4(1.0, 1.0, 1.0, 1.0);
-    else if (color.x > 0.75) color = vec4(0.8, 0.8, 0.8, 1.0);
-    else if (color.x > 0.50) color = vec4(0.6, 0.6, 0.6, 1.0);
-    else if (color.x > 0.25) color = vec4(0.4, 0.4, 0.4, 1.0);
+    if (bright > 0.95)      color = vec4(1.0, 1.0, 1.0, 1.0);
+    else if (bright > 0.75) color = vec4(0.8, 0.8, 0.8, 1.0);
+    else if (bright > 0.50) color = vec4(0.6, 0.6, 0.6, 1.0);
+    else if (bright > 0.25) color = vec4(0.4, 0.4, 0.4, 1.0);
     else     				 color = vec4(0.2, 0.2, 0.2, 1.0);
  
     gl_FragColor = color * color1;

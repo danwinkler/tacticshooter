@@ -171,7 +171,7 @@ public class Building
 		POINT( new PointInfo() ),
 		PRESSUREPAD( new PressurePadInfo() );
 		
-		BuildingInfo bu;
+		public BuildingInfo bu;
 		
 		BuildingType( BuildingInfo bu )
 		{
