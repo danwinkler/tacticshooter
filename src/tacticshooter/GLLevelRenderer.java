@@ -14,6 +14,7 @@ import tacticshooter.Level.TileType;
 import tacticshooter.scenegraph.Light;
 import tacticshooter.scenegraph.Model;
 import tacticshooter.scenegraph.Node;
+import tacticshooter.scenegraph.ShaderNodeOp;
 import tacticshooter.scenegraph.World;
 
 import com.danwink.tacticshooter.screens.MultiplayerGameScreen;
@@ -34,8 +35,6 @@ public class GLLevelRenderer
 	Model torus;
 	
 	Light mouseLight;
-	
-	ShaderProgram shader;
 	
 	HashMap<Integer, Node> units = new HashMap<Integer, Node>();
 	HashMap<Integer, Node> buildings = new HashMap<Integer, Node>();
@@ -116,7 +115,14 @@ public class GLLevelRenderer
 		
 		try
 		{
-			shader = ShaderProgram.loadProgram( "data" + File.separator + "shaders" + File.separator + "toon.vert", "data" + File.separator + "shaders" + File.separator + "toon.frag" );
+			world.setShader( ShaderProgram.loadProgram( "data" + File.separator + "shaders" + File.separator + "toon.vert", "data" + File.separator + "shaders" + File.separator + "toon.frag" ) );
+			world.setShaderEnabled( true );
+			world.addShaderNodeOp( new ShaderNodeOp() {
+				public void execute( ShaderProgram shader, Node n )
+				{
+					shader.setUniform1i( "texenabled", n.getTexture() != null ? 1 : 0 );
+				} 
+			});
 		} catch( SlickException e )
 		{
 			e.printStackTrace();
@@ -168,9 +174,8 @@ public class GLLevelRenderer
 		GL11.glEnable( GL11.GL_BLEND );
 		
 		world.setPlainRender( false );
-		shader.bind();
+		
 		world.render();
-		shader.unbind();
 		
 		mgs.ps.render( mgs );
 		

@@ -66,6 +66,11 @@ public class Node extends Transformable
 				{
 					GL11.glDisable( GL11.GL_TEXTURE_2D );
 				}
+				
+				if( world.shaderEnabled )
+				{
+					world.executeSNOs( this );
+				}
 			}
 			model.render();
 		}

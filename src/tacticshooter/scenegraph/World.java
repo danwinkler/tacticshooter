@@ -7,6 +7,7 @@ import javax.vecmath.Vector3f;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
+import org.newdawn.slick.opengl.shader.ShaderProgram;
 
 public class World
 {
@@ -20,6 +21,12 @@ public class World
 	boolean lightsEnabled = false;
 
 	boolean plainRender;
+	
+	ShaderProgram shader;
+	
+	ArrayList<ShaderNodeOp> snos = new ArrayList<ShaderNodeOp>();
+	
+	boolean shaderEnabled;
 	
 	public void setUpCamera()
 	{
@@ -42,7 +49,17 @@ public class World
 			}
 		}
 		
+		if( shaderEnabled && !plainRender )
+		{
+			shader.bind();
+		}
+		
 		root.render( this );
+		
+		if( shaderEnabled && !plainRender )
+		{
+			shader.unbind();
+		}
 		
 		if( lightsEnabled && !plainRender )
 		{
@@ -51,6 +68,33 @@ public class World
 				lights.get( i ).disable( i );
 			}
 			GL11.glDisable( GL11.GL_LIGHTING );
+		}
+	}
+	
+	public void setShader( ShaderProgram shader )
+	{
+		this.shader = shader;
+	}
+	
+	public void setShaderEnabled( boolean enabled )
+	{
+		this.shaderEnabled = enabled;
+	}
+	
+	public void addShaderNodeOp( ShaderNodeOp sno )
+	{
+		snos.add( sno );
+	}
+	
+	public void setTextureEnabled( boolean enabled )
+	{
+		if( enabled )
+		{
+			GL11.glEnable( GL11.GL_TEXTURE_2D );
+		}
+		else
+		{
+			GL11.glDisable( GL11.GL_TEXTURE_2D );
 		}
 	}
 	
@@ -84,5 +128,13 @@ public class World
 	public void add( Light light )
 	{
 		lights.add( light );
+	}
+
+	public void executeSNOs( Node node )
+	{
+		for( ShaderNodeOp sno : snos )
+		{
+			sno.execute( shader, node );
+		}
 	}
 }

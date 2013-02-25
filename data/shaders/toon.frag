@@ -5,6 +5,8 @@ varying float dist;
 uniform sampler2D tex;
 
 uniform float maxl; 
+
+uniform int texenabled = 1;
  
 void main()
 {
@@ -13,7 +15,12 @@ void main()
     vec4 color = ambientGlobal;
     float att;
     
-    vec4 color1 = texture( tex, gl_TexCoord[0].xy ) * gl_Color;
+    vec4 color1 = gl_Color;
+    
+    if( texenabled )
+    {
+    	 color1 *= texture( tex, gl_TexCoord[0].xy );
+    }
      
     /* a fragment shader can't write a varying variable, hence we need
     a new variable to store the normalized interpolated normal */
