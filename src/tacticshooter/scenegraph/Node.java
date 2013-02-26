@@ -147,4 +147,9 @@ public class Node extends Transformable
 		this.visible = visible;
 	}
 
+	public Point3f getPosition()
+	{
+		return position;
+	}
+
 }

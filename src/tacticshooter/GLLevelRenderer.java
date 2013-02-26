@@ -14,6 +14,7 @@ import org.newdawn.slick.opengl.shader.ShaderProgram;
 
 import tacticshooter.Level.TileType;
 import tacticshooter.Unit.UnitState;
+import tacticshooter.Unit.UnitType;
 import tacticshooter.scenegraph.Light;
 import tacticshooter.scenegraph.Model;
 import tacticshooter.scenegraph.Node;
@@ -36,6 +37,7 @@ public class GLLevelRenderer
 	Model house;
 	Model flag;
 	Model torus;
+	Model mech;
 	
 	Light mouseLight;
 	
@@ -58,6 +60,17 @@ public class GLLevelRenderer
 			e.printStackTrace();
 		}
 		simpleMan.end();
+		
+		mech = new Model();
+		mech.begin();
+		try
+		{
+			ModelHelpers.loadModel( "data" + File.separator + "models" + File.separator + "mech1.obj" );
+		} catch( FileNotFoundException e )
+		{
+			e.printStackTrace();
+		}
+		mech.end();
 		
 		house = new Model();
 		house.begin();
@@ -147,7 +160,8 @@ public class GLLevelRenderer
 			Node n = units.get( u.id );
 			n.mat.setIdentity();
 			n.rotateX( -DMath.PIF/2 );
-			n.setPosition( u.x, u.y, 0 );
+			n.rotateY( -u.heading + DMath.PIF/2 );
+			n.setPosition( u.x, u.y, n.getPosition().z );
 			for( Node c : n.getChildren() )
 			{
 				if( c.getModel() == torus )
@@ -366,10 +380,18 @@ public class GLLevelRenderer
 	public void addUnit( Unit u )
 	{
 		Node unit = new Node();
-		unit.setModel( simpleMan );
-		unit.rotateY( -DMath.PIF/2 );
-		unit.setPosition( u.x, u.y, 0 );
-		unit.setScale( 4, 4, 4 );
+		if( u.type == UnitType.HEAVY || true )
+		{
+			unit.setModel( mech );
+			unit.setPosition( u.x, u.y, -3 );
+			unit.setScale( 8, 8, 8 );
+		}
+		else
+		{
+			unit.setModel( simpleMan );
+			unit.setPosition( u.x, u.y, 0 );
+			unit.setScale( 4, 4, 4 );
+		}
 		unit.setColor( u.owner.team.getColor() );
 		units.put( u.id, unit );
 		world.add( unit );
@@ -378,7 +400,8 @@ public class GLLevelRenderer
 		t.setModel( torus );
 		t.setVisible( false );
 		t.setColor( new Color( 150, 150, 255 ) );
-		t.setPosition( 0, 2, 0 );
+		t.setPosition( 0, 0, 0 );
+		t.setScale( .5f, .5f, .5f );
 		unit.add( t );
 		
 		/*

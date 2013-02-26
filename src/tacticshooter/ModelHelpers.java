@@ -43,9 +43,12 @@ public class ModelHelpers
 				{
 					String[] parts = line[j].split( "//" );
 					Point3f p = points.get( Integer.parseInt( parts[0] )-1 );
-					Vector3f n = normals.get( Integer.parseInt( parts[1] )-1 );
-					n.normalize();
-					GL11.glNormal3f( n.x, n.y, n.z );
+					if( parts.length > 1 )
+					{
+						Vector3f n = normals.get( Integer.parseInt( parts[1] )-1 );
+						n.normalize();
+						GL11.glNormal3f( n.x, n.y, n.z );
+					}
 					GL11.glVertex3f( p.x, p.y, p.z );
 				}
 			}
