@@ -381,12 +381,14 @@ public class GLLevelRenderer
 		t.setPosition( 0, 2, 0 );
 		unit.add( t );
 		
+		/*
 		Node health = new Node();
 		health.setModel( flag );
 		health.setPosition( -1, 4, 0 );
 		health.setColor( new Color( 150, 255, 150 ) );
 		health.setScale( 2, .3f, 1 );
 		unit.add( health );
+		*/
 	}
 	
 	public void removeUnit( Unit u )

@@ -563,6 +563,11 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		
 		GL11.glDisable( GL11.GL_DEPTH_TEST );
 		
+		for( Unit u : cs.units )
+		{
+			u.render( g, cs.player, mouseOnMap.x, mouseOnMap.y, cs.l );
+		}
+		
 		if( selecting )
 		{
 			g.setColor( Color.blue );

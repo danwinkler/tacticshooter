@@ -266,6 +266,7 @@ public class Unit
 	
 	public void render( Graphics g, Player p, float mx, float my, Level l )
 	{
+		/*
 		if( selected && state == UnitState.MOVING )
 		{
 			g.setColor( Color.black );
@@ -286,16 +287,17 @@ public class Unit
 				g.drawLine( (p1.x+.5f) * Level.tileSize, (p1.y+.5f) * Level.tileSize, (p2.x+.5f) * Level.tileSize, (p2.y+.5f) * Level.tileSize );
 			}
 		}
+		*/
 		
 		g.pushTransform();
 		g.translate( x, y );
-		
+		/*
 		if( selected )
 		{
 			g.setColor( Color.blue );
 			g.drawRect( -10, -10, 20, 20 );
 		}
-		
+		*/
 		int healthBarDist = 0;
 		switch( type )
 		{
@@ -304,10 +306,10 @@ public class Unit
 		case LIGHT:
 		case SNIPER:
 		case SABOTEUR:
-			healthBarDist = -11;
+			healthBarDist = -15;
 			break;
 		case HEAVY:
-			healthBarDist = -14;
+			healthBarDist = -20;
 			break;
 		}
 		
