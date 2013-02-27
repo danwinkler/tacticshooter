@@ -17,6 +17,7 @@ import tacticshooter.Unit.UnitState;
 import tacticshooter.Unit.UnitType;
 import tacticshooter.scenegraph.Light;
 import tacticshooter.scenegraph.Model;
+import tacticshooter.scenegraph.ModelHelpers;
 import tacticshooter.scenegraph.Node;
 import tacticshooter.scenegraph.ShaderNodeOp;
 import tacticshooter.scenegraph.World;
@@ -38,6 +39,7 @@ public class GLLevelRenderer
 	Model flag;
 	Model torus;
 	Model mech;
+	Model sniper;
 	
 	Light mouseLight;
 	
@@ -50,49 +52,18 @@ public class GLLevelRenderer
 		
 		world = new World();
 		
-		simpleMan = new Model();
-		simpleMan.begin();
-		try
-		{
-			ModelHelpers.loadModel( "data" + File.separator + "models" + File.separator + "simpleman1.obj" );
-		} catch( FileNotFoundException e )
-		{
-			e.printStackTrace();
-		}
-		simpleMan.end();
+		mech = new Model( "data" + File.separator + "models" + File.separator + "voxelmech1.obj" );
+		mech.rotateX( -DMath.PIF/2 );
+		mech.rotateY( DMath.PIF/2 );
 		
-		mech = new Model();
-		mech.begin();
-		try
-		{
-			ModelHelpers.loadModel( "data" + File.separator + "models" + File.separator + "voxelmech1.obj" );
-		} catch( FileNotFoundException e )
-		{
-			e.printStackTrace();
-		}
-		mech.end();
+		house = new Model( "data" + File.separator + "models" + File.separator + "house1.obj" );
+		house.rotateX( -DMath.PIF/2 );
 		
-		house = new Model();
-		house.begin();
-		try
-		{
-			ModelHelpers.loadModel( "data" + File.separator + "models" + File.separator + "house1.obj" );
-		} catch( FileNotFoundException e )
-		{
-			e.printStackTrace();
-		}
-		house.end();
+		torus = new Model( "data" + File.separator + "models" + File.separator + "torus1.obj" );
+		torus.rotateX( -DMath.PIF/2 );
 		
-		torus = new Model();
-		torus.begin();
-		try
-		{
-			ModelHelpers.loadModel( "data" + File.separator + "models" + File.separator + "torus1.obj" );
-		} catch( FileNotFoundException e )
-		{
-			e.printStackTrace();
-		}
-		torus.end();
+		sniper = new Model( "data" + File.separator + "models" + File.separator + "voxelsniper1.obj" );
+		sniper.rotateX( -DMath.PIF/2 );
 		
 		flag = new Model();
 		flag.begin();
@@ -159,8 +130,7 @@ public class GLLevelRenderer
 		{
 			Node n = units.get( u.id );
 			n.mat.setIdentity();
-			n.rotateX( -DMath.PIF/2 );
-			n.rotateY( -u.heading + DMath.PIF/2 );
+			n.rotateZ( u.heading );
 			n.setPosition( u.x, u.y, n.getPosition().z );
 			for( Node c : n.getChildren() )
 			{
@@ -357,7 +327,6 @@ public class GLLevelRenderer
 		{
 			bn = new Node();
 			bn.setModel( house );
-			bn.rotateX( -DMath.PIF/2 );
 			bn.setPosition( b.x, b.y, 0 );
 			bn.setScale( 20, 20, 20 );
 			bn.setColor( new Color( 240, 230, 200 ) );
@@ -385,6 +354,12 @@ public class GLLevelRenderer
 			unit.setModel( mech );
 			unit.setPosition( u.x, u.y, -8 );
 			unit.setScale( 1.5f, 1.5f, 1.5f );
+		}
+		else if( u.type == UnitType.SNIPER )
+		{
+			unit.setModel( sniper );
+			unit.setPosition( u.x, u.y, -6 );
+			unit.setScale( 1.0f, 1.0f, 1.0f );
 		}
 		else
 		{

@@ -40,7 +40,6 @@ import tacticshooter.Level.TileType;
 import tacticshooter.AutoTileDrawer;
 import tacticshooter.Message;
 import tacticshooter.MessageType;
-import tacticshooter.ModelHelpers;
 import tacticshooter.MusicQueuer;
 import tacticshooter.Player;
 import tacticshooter.Slick2DEventMapper;
@@ -49,6 +48,7 @@ import tacticshooter.StaticFiles;
 import tacticshooter.Team;
 import tacticshooter.Unit;
 import tacticshooter.Unit.UnitType;
+import tacticshooter.scenegraph.ModelHelpers;
 
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DCheckBox;

@@ -1,4 +1,4 @@
-package tacticshooter;
+package tacticshooter.scenegraph;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -7,6 +7,7 @@ import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
 import org.lwjgl.opengl.GL11;
+
 
 import com.phyloa.dlib.util.DFile;
 
@@ -58,5 +59,44 @@ public class ModelHelpers
 		GL11.glEndList();
 		
 		return list;
+	}
+
+	public static void loadModel( String filename, Model model ) throws FileNotFoundException
+	{
+		String file = DFile.loadText( filename );
+		String[] lines = file.split( "\n" );
+		
+		ArrayList<Point3f> points = new ArrayList<Point3f>();
+		ArrayList<Vector3f> normals = new ArrayList<Vector3f>();
+		
+		for( int i = 0; i < lines.length; i++ )
+		{
+			String[] line = lines[i].split( " " );
+			if( line[0].equals( "v" ) )
+			{
+				points.add( new Point3f( Float.parseFloat( line[1] ), Float.parseFloat( line[2] ), Float.parseFloat( line[3] ) ) );
+			}
+			else if( line[0].equals( "vn" ) )
+			{
+				normals.add( new Vector3f( Float.parseFloat( line[1] ), Float.parseFloat( line[2] ), Float.parseFloat( line[3] ) ) );
+			}
+			else if( line[0].equals( "f" ) )
+			{
+				Triangle t = new Triangle();
+				for( int j = 1; j < line.length; j++ )
+				{
+					String[] parts = line[j].split( "//" );
+					Point3f p = points.get( Integer.parseInt( parts[0] )-1 );
+					if( parts.length > 1 )
+					{
+						Vector3f n = normals.get( Integer.parseInt( parts[1] )-1 );
+						n.normalize();
+						t.normals[j-1].set( n.x, n.y, n.z );
+					}
+					t.points[j-1].set( p.x, p.y, p.z );
+				}
+				model.triangles.add( t );
+			}
+		}
 	}
 }
