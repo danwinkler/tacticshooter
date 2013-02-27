@@ -65,7 +65,7 @@ public class GLLevelRenderer
 		mech.begin();
 		try
 		{
-			ModelHelpers.loadModel( "data" + File.separator + "models" + File.separator + "mech1.obj" );
+			ModelHelpers.loadModel( "data" + File.separator + "models" + File.separator + "voxelmech1.obj" );
 		} catch( FileNotFoundException e )
 		{
 			e.printStackTrace();
@@ -380,17 +380,17 @@ public class GLLevelRenderer
 	public void addUnit( Unit u )
 	{
 		Node unit = new Node();
-		if( u.type == UnitType.HEAVY || true )
+		if( u.type == UnitType.HEAVY )
 		{
 			unit.setModel( mech );
-			unit.setPosition( u.x, u.y, -3 );
-			unit.setScale( 8, 8, 8 );
+			unit.setPosition( u.x, u.y, -8 );
+			unit.setScale( 1.5f, 1.5f, 1.5f );
 		}
 		else
 		{
-			unit.setModel( simpleMan );
-			unit.setPosition( u.x, u.y, 0 );
-			unit.setScale( 4, 4, 4 );
+			unit.setModel( mech );
+			unit.setPosition( u.x, u.y, -6 );
+			unit.setScale( 1, 1, 1 );
 		}
 		unit.setColor( u.owner.team.getColor() );
 		units.put( u.id, unit );
