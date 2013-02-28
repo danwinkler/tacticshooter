@@ -123,7 +123,7 @@ public class GLLevelRenderer
 	public void render()
 	{
 		world.setCamera( mgs.cs.scrollx, mgs.cs.scrolly+mgs.zoom, -mgs.zoom*2 );
-		world.setFocus( mgs.cs.scrollx, mgs.cs.scrolly, 0 );
+		world.setFocus( mgs.cs.scrollx, mgs.cs.scrolly-100, 0 );
 		
 		mouseLight.setPosition( mgs.mouseOnMap.x, mgs.mouseOnMap.y, -200 );
 		mouseLight.setDiffuse( 1.0f, 1.0f, 1.0f, 1.0f );

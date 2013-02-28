@@ -131,9 +131,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	
 	public Point2i mouseOnMap = new Point2i();
 	
-	public Point3f eye = new Point3f();
-	Point3f center = new Point3f();
-	
 	public GLLevelRenderer lr;
 	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
@@ -351,7 +348,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		
 		if( !chatPanel.isVisible() && !escapeMenu.isVisible() )
 		{
-			float scrollSpeed = .1f*zoom;
+			float scrollSpeed = .1f*zoom + 5;
 			Rectangle screenBounds = getScreenBounds();
 			
 			boolean scrollup = cs.scrolly > screenBounds.getMinY() && (input.isKeyDown( Input.KEY_UP ) || input.isKeyDown( Input.KEY_W ) || (gc.isFullscreen() && input.getMouseY() < 10 ));

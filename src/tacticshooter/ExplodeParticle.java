@@ -41,7 +41,7 @@ public class ExplodeParticle extends Particle<MultiplayerGameScreen>
 		GL11.glColor3f( c.r, c.g, c.b );
 		GL11.glPushMatrix();
 		GL11.glTranslatef( pos.x, pos.y, pos.z );
-		rotateToFace( g.lr.world.getCamera() );
+		billboard();
 		GL11.glBegin( GL11.GL_QUADS );
 		GL11.glNormal3f( 0, 0, -1 );
 		
@@ -49,44 +49,37 @@ public class ExplodeParticle extends Particle<MultiplayerGameScreen>
 		GL11.glVertex3f( -size/2, -size/2, 0 );
 		
 		GL11.glTexCoord2f( 0, 1 );
-		GL11.glVertex3f( -size/2, size/2, 0 );
+		GL11.glVertex3f( size/2, -size/2, 0 );
 		
 		GL11.glTexCoord2f( 1, 1 );
 		GL11.glVertex3f( size/2, size/2, 0 );
 		
 		GL11.glTexCoord2f( 1, 0 );
-		GL11.glVertex3f( size/2, -size/2, 0 );
+		GL11.glVertex3f( -size/2, size/2, 0 );
 		
 		GL11.glEnd();
 		GL11.glPopMatrix();
 	}
 	
-	static Vector3f up = new Vector3f( 0, -2, -1 );
-	static
+	void billboard()
 	{
-		up.normalize();
-	}
-	
-	void rotateToFace( Point3f point )
-	{
-	  Vector3f d = new Vector3f();
-	  d.set( pos );
-	  d.sub( point );
-	  Vector3f right = new Vector3f();
-	  right.cross( up, d );
-	  right.normalize();
-	  Vector3f backwards = new Vector3f();
-	  backwards.cross( right, up );
-	  backwards.normalize();
-	  Vector3f up2 = new Vector3f();
-	  up2.cross( backwards, right );
-	  FloatBuffer fb = BufferUtils.createFloatBuffer( 16 );
-	  fb.put( new float[] { 
-			  right.x, right.y, right.z, 0, 
-			  up.x, up.y, up.z, 0, 
-			  backwards.x, backwards.y, backwards.z, 0, 
-			  0, 0, 0, 1 } );
-	  fb.flip();
-	  GL11.glMultMatrix( fb );
+		FloatBuffer buf = BufferUtils.createFloatBuffer(16 * 4);
+		// Get your current model view matrix from OpenGL. 
+		GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, buf);
+		buf.rewind();
+
+		buf.put(0, 1.0f);
+		buf.put(1, 0.0f);
+		buf.put(2, 0.0f);
+
+		buf.put(4, 0.0f);
+		buf.put(5, 1.0f);
+		buf.put(6, 0.0f);
+		         
+		buf.put(8, 0.0f);
+		buf.put(9, 0.0f);
+		buf.put(10, 1.0f);
+		         
+		GL11.glLoadMatrix(buf);
 	}
 }
