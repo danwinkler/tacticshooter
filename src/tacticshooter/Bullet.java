@@ -108,7 +108,7 @@ public class Bullet
 					alive = false;
 					
 					ts.hit1.play( DMath.randomf( .9f, 1.1f ), ts.getSoundMag( gc, loc.x, loc.y ) * .3f );
-					cs.drawBlood( loc.x, loc.y );
+					cs.drawBlood( loc.x + DMath.randomf( -8, 8 ), loc.y + DMath.randomf( -8, 8 ), u.owner.team.getColor() );
 					break;
 				}
 			}

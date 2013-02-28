@@ -40,6 +40,7 @@ public class GLLevelRenderer
 	Model torus;
 	Model mech;
 	Model sniper;
+	Model cube;
 	
 	Light mouseLight;
 	
@@ -64,6 +65,8 @@ public class GLLevelRenderer
 		
 		sniper = new Model( "data" + File.separator + "models" + File.separator + "voxelsniper1.obj" );
 		sniper.rotateX( -DMath.PIF/2 );
+		
+		cube = new Model( "data" + File.separator + "models" + File.separator + "cube.obj" );
 		
 		flag = new Model();
 		flag.begin();
@@ -154,6 +157,7 @@ public class GLLevelRenderer
 		GL11.glPolygonMode( GL11.GL_BACK, GL11.GL_LINE );
 		GL11.glColor3f( 0, 0, 0 );
 		world.render();
+		mgs.ps.render( mgs );
 		GL11.glDisable( GL11.GL_CULL_FACE );
 		GL11.glPolygonMode( GL11.GL_BACK, GL11.GL_FILL );
 		GL11.glLineWidth( 1 );
@@ -163,7 +167,6 @@ public class GLLevelRenderer
 		world.setPlainRender( false );
 		
 		world.render();
-		
 		mgs.ps.render( mgs );
 		
 		GL11.glColor3f( 0, 0, 0 );

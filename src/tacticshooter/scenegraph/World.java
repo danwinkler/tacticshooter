@@ -142,4 +142,9 @@ public class World
 	{
 		return camera;
 	}
+
+	public boolean isPlainRender()
+	{
+		return plainRender;
+	}
 }

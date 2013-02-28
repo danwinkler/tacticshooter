@@ -28,6 +28,7 @@ import org.newdawn.slick.geom.Polygon;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.opengl.shader.ShaderProgram;
 
+import tacticshooter.CubeParticle;
 import tacticshooter.ExplodeParticle;
 import tacticshooter.Building;
 import tacticshooter.Building.BuildingType;
@@ -379,10 +380,15 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				cs.unitMap.remove( u );
 				cs.selected.remove( (Object)u.id );
 				lr.removeUnit( u );
-				u.renderDead( btg );
+				//u.renderDead( btg );
 				for( int j = 0; j < 10; j++ )
 				{
-					drawBlood( u.x, u.y );
+					float mag = DMath.randomf( 1, 4 );
+					float heading = DMath.randomf( 0, DMath.PI2F );
+					CubeParticle cp = new CubeParticle( u.x, u.y, -1, DMath.cosf( heading ) * mag, DMath.sinf( mag ), DMath.randomf( -1, -4 ) );
+					cp.c = u.owner.team.getColor();
+					cp.mgs = this;
+					ps.add( cp );
 				}
 				if( u.type == UnitType.SABOTEUR )
 				{
@@ -743,11 +749,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		cs.scrolly = DMath.bound( destY, screenBounds.getMinY(), screenBounds.getMaxY() );
 	}
 	
-	public static Color bloodColor = new Color( 255, 0, 0 );
-	public void drawBlood( float x, float y )
+	public void drawBlood( float x, float y, Color bloodColor )
 	{
-		x += DMath.randomf( -8, 8 );
-		y += DMath.randomf( -8, 8 );
 		//btg.fillOval( x-2, y-2, 4, 4 );
 		btg.drawImage( smoke1, x-4, y-4, x+4, y+4, 0, 0, 64, 64, bloodColor );
 		btg.flush();
@@ -905,6 +908,10 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	public void mouseWheelMoved( int a )
 	{
 		targetZoom += targetZoom * .003f * -a;
+		if( targetZoom < 1 )
+		{
+			targetZoom = 1;
+		}
 	}
 
 	@Override
