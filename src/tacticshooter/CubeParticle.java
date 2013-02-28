@@ -42,6 +42,7 @@ public class CubeParticle extends Particle<MultiplayerGameScreen>
 	
 	public void render( MultiplayerGameScreen r )
 	{
+		GL11.glDisable( GL11.GL_TEXTURE_2D );
 		if( !r.lr.world.isPlainRender() )
 		{
 			GL11.glColor3f( c.r, c.g, c.b );

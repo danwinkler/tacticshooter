@@ -12,6 +12,7 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.opengl.shader.ShaderProgram;
 
+import tacticshooter.Building.BuildingType;
 import tacticshooter.Level.TileType;
 import tacticshooter.Unit.UnitState;
 import tacticshooter.Unit.UnitType;
@@ -72,16 +73,16 @@ public class GLLevelRenderer
 		flag.begin();
 		GL11.glBegin( GL11.GL_QUADS );
 		
-		GL11.glNormal3f( 0, 1, 0 );
+		GL11.glNormal3f( 0, 0, -1 );
 		
 		GL11.glTexCoord2f( 0, 0 );
 		GL11.glVertex3f( 0, 0, 0 );
 	
 		GL11.glTexCoord2f( 0, 1 );
-		GL11.glVertex3f( 0, 1, 0 );
+		GL11.glVertex3f( 0, 0, -1 );
 		
 		GL11.glTexCoord2f( 1, 1 );
-		GL11.glVertex3f( 1, 1, 0 );
+		GL11.glVertex3f( 1, 0, -1 );
 		
 		GL11.glTexCoord2f( 1, 0 );
 		GL11.glVertex3f( 1, 0, 0 );
@@ -149,7 +150,6 @@ public class GLLevelRenderer
 		}
 		
 		world.setPlainRender( true );
-		GL11.glDisable( GL11.GL_BLEND );
 		GL11.glDisable( GL11.GL_TEXTURE_2D );
 		GL11.glEnable( GL11.GL_CULL_FACE );
 		GL11.glCullFace( GL11.GL_FRONT );
@@ -162,13 +162,13 @@ public class GLLevelRenderer
 		GL11.glPolygonMode( GL11.GL_BACK, GL11.GL_FILL );
 		GL11.glLineWidth( 1 );
 		GL11.glEnable( GL11.GL_TEXTURE_2D );
-		GL11.glEnable( GL11.GL_BLEND );
 		
 		world.setPlainRender( false );
 		
 		world.render();
 		mgs.ps.render( mgs );
 		
+		GL11.glDisable( GL11.GL_TEXTURE_2D );
 		GL11.glColor3f( 0, 0, 0 );
 		GL11.glLineWidth( 3 );
 		GL11.glBegin( GL11.GL_LINES );
@@ -328,25 +328,30 @@ public class GLLevelRenderer
 		Node bn = buildings.get( b.id );
 		if( bn == null )
 		{
-			bn = new Node();
-			bn.setModel( house );
-			bn.setPosition( b.x, b.y, 0 );
-			bn.setScale( 20, 20, 20 );
-			bn.setColor( new Color( 240, 230, 200 ) );
-			world.add( bn );
-			buildings.put( b.id, bn );
-			
-			Node fn = new Node();
-			fn.setScale( .4f, .3f, 0 );
-			fn.setModel( flag );
-			bn.add( fn );
+			if( b.bt == BuildingType.CENTER || b.bt == BuildingType.POINT )
+			{
+				bn = new Node();
+				bn.setModel( house );
+				bn.setPosition( b.x, b.y, 0 );
+				bn.setScale( 20, 20, 20 );
+				bn.setColor( new Color( 240, 230, 200 ) );
+				world.add( bn );
+				buildings.put( b.id, bn );
+				
+				Node fn = new Node();
+				fn.setScale( .4f, .3f, 1 );
+				fn.setModel( flag );
+				bn.add( fn );
+			}
 		}
-		
-		Node fn = bn.getChildren().getFirst();
-		fn.setScale( .4f, .3f, 0 );
-		Color c = b.t == null ? Color.white : b.t.getColor();
-		fn.setColor( c );
-		fn.setPosition( .33f, DMath.map( b.hold, 0, Building.HOLDMAX, .3f, 1.1f ), .37f );
+		if( b.bt == BuildingType.CENTER || b.bt == BuildingType.POINT )
+		{
+			Node fn = bn.getChildren().getFirst();
+			fn.setScale( .4f, 1, .3f );
+			Color c = b.t == null ? Color.white : b.t.getColor();
+			fn.setColor( c );
+			fn.setPosition( .33f, .37f, DMath.map( b.hold, 0, Building.HOLDMAX, -.3f, -1.1f ) );
+		}
 	}
 
 	public void addUnit( Unit u )
@@ -379,7 +384,7 @@ public class GLLevelRenderer
 		t.setVisible( false );
 		t.setColor( new Color( 150, 150, 255 ) );
 		t.setPosition( 0, 0, 0 );
-		t.setScale( .5f, .5f, .5f );
+		t.setScale( 6, 6, 6 );
 		unit.add( t );
 		
 		/*

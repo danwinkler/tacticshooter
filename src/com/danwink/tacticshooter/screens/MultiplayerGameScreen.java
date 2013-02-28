@@ -385,7 +385,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				{
 					float mag = DMath.randomf( 1, 4 );
 					float heading = DMath.randomf( 0, DMath.PI2F );
-					CubeParticle cp = new CubeParticle( u.x, u.y, -1, DMath.cosf( heading ) * mag, DMath.sinf( mag ), DMath.randomf( -1, -4 ) );
+					CubeParticle cp = new CubeParticle( u.x, u.y, -1, DMath.cosf( heading ) * mag, DMath.sinf( heading ) * mag, DMath.randomf( -1, -4 ) );
 					cp.c = u.owner.team.getColor();
 					cp.mgs = this;
 					ps.add( cp );
@@ -395,7 +395,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 					cs.explode1.play();
 					btg.drawImage( craterTexture, u.x - 16, u.y - 16, u.x + 16, u.y + 16, 0, 0, 32, 32 );
 					btg.flush();
-					
 					for( int j = 0; j < 7; j++ )
 					{
 						float magmax = DMath.randomf( .4f, 1 );

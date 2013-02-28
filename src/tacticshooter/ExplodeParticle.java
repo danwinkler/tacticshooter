@@ -36,9 +36,9 @@ public class ExplodeParticle extends Particle<MultiplayerGameScreen>
 	
 	public void render( MultiplayerGameScreen g )
 	{
+		GL11.glEnable( GL11.GL_TEXTURE_2D );
 		im.bind();
-		Graphics r = g.gc.getGraphics();
-		r.setColor( c );
+		GL11.glColor3f( c.r, c.g, c.b );
 		GL11.glPushMatrix();
 		GL11.glTranslatef( pos.x, pos.y, pos.z );
 		rotateToFace( g.lr.world.getCamera() );
