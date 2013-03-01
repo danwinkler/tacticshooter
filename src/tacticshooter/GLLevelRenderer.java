@@ -42,6 +42,8 @@ public class GLLevelRenderer
 	Model mech;
 	Model sniper;
 	Model cube;
+	Model saboteur;
+	Model shotgun;
 	
 	Light mouseLight;
 	
@@ -66,6 +68,14 @@ public class GLLevelRenderer
 		
 		sniper = new Model( "data" + File.separator + "models" + File.separator + "voxelsniper1.obj" );
 		sniper.rotateX( -DMath.PIF/2 );
+		
+		shotgun = new Model( "data" + File.separator + "models" + File.separator + "voxelshotgun.obj" );
+		shotgun.rotateX( -DMath.PIF/2 );
+		shotgun.rotateY( DMath.PIF/2 );
+		
+		saboteur = new Model( "data" + File.separator + "models" + File.separator + "voxelsaboteur.obj" );
+		saboteur.rotateX( -DMath.PIF/2 );
+		saboteur.rotateY( DMath.PIF/2 );
 		
 		cube = new Model( "data" + File.separator + "models" + File.separator + "cube.obj" );
 		
@@ -374,6 +384,18 @@ public class GLLevelRenderer
 		{
 			unit.setModel( sniper );
 			unit.setPosition( u.x, u.y, -6 );
+			unit.setScale( 1.0f, 1.0f, 1.0f );
+		}
+		else if( u.type == UnitType.SHOTGUN )
+		{
+			unit.setModel( shotgun );
+			unit.setPosition( u.x, u.y, -11 );
+			unit.setScale( 1.0f, 1.0f, 1.0f );
+		}
+		else if( u.type == UnitType.SABOTEUR )
+		{
+			unit.setModel( saboteur );
+			unit.setPosition( u.x, u.y, -8 );
 			unit.setScale( 1.0f, 1.0f, 1.0f );
 		}
 		else
