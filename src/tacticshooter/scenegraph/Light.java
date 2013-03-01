@@ -53,4 +53,10 @@ public class Light
 		int light = GL11.GL_LIGHT0 + index;
 		GL11.glDisable( light );
 	}
+
+	public void setAmbient( float x, float y, float z, float w )
+	{
+		ambient.put( new float[] { x, y, z, w } );
+		ambient.flip();
+	}
 }

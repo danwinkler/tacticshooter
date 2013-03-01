@@ -100,7 +100,6 @@ public class GLLevelRenderer
 		
 		world.setLightsEnabled( true );
 		
-		
 		mouseLight = new Light();
 		world.add( mouseLight );
 		
@@ -126,7 +125,8 @@ public class GLLevelRenderer
 		world.setFocus( mgs.cs.scrollx, mgs.cs.scrolly-100, 0 );
 		
 		mouseLight.setPosition( mgs.mouseOnMap.x, mgs.mouseOnMap.y, -200 );
-		mouseLight.setDiffuse( 1.0f, 1.0f, 1.0f, 1.0f );
+		mouseLight.setDiffuse( 1f, 1, 1.0f, 1.0f );
+		mouseLight.setAmbient( 0, 0, 0, 0 );
 		
 		world.setUpCamera();
 		
@@ -149,6 +149,8 @@ public class GLLevelRenderer
 			}	
 		}
 		
+		world.setTransparency( 1 );
+		
 		world.setPlainRender( true );
 		GL11.glDisable( GL11.GL_TEXTURE_2D );
 		GL11.glEnable( GL11.GL_CULL_FACE );
@@ -165,7 +167,12 @@ public class GLLevelRenderer
 		
 		world.setPlainRender( false );
 		
+		GL11.glEnable( GL11.GL_BLEND );
 		world.render();
+		mouseLight.setPosition( mgs.mouseOnMap.x + 200, mgs.mouseOnMap.y, -200 );
+		world.setTransparency( .5f );
+		world.render();
+		
 		mgs.ps.render( mgs );
 		
 		GL11.glDisable( GL11.GL_TEXTURE_2D );

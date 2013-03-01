@@ -540,12 +540,19 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		lr.render();
 		
 		//Hack for finding mouseCoords on surface
-		GL11.glDisable( GL11.GL_TEXTURE_2D );
+		GL11.glEnable( GL11.GL_TEXTURE_2D );
+		cs.l.wall3d.bind();
 		GL11.glColor3f( 1, 1, 1 );
 		GL11.glBegin( GL11.GL_QUADS );
+		GL11.glNormal3f( 0, 0, -1 );
+		
+		GL11.glTexCoord2f( 0, 0 );
 		GL11.glVertex3f( -10000, -10000, 1 );
+		GL11.glTexCoord2f( 100, 0 );
 		GL11.glVertex3f( 10000, -10000, 1 );
+		GL11.glTexCoord2f( 100, 100 );
 		GL11.glVertex3f( 10000, 10000, 1 );
+		GL11.glTexCoord2f( 0, 100 );
 		GL11.glVertex3f( -10000, 10000, 1 );
 		GL11.glEnd();
 		GL11.glEnable( GL11.GL_TEXTURE_2D );
@@ -704,7 +711,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		GL11.glEnable( GL11.GL_DEPTH_TEST );
 	    GL11.glMatrixMode( GL11.GL_PROJECTION );
 	    GL11.glLoadIdentity(); // Reset The Projection Matrix
-	    GLU.gluPerspective( 45.0f, ((float) gc.getWidth() / (float) gc.getHeight()), 5, 5000.0f ); // Calculate The Aspect Ratio Of The Window
+	    GLU.gluPerspective( 45.0f, ((float) gc.getWidth() / (float) gc.getHeight()), 5, 10000.0f ); // Calculate The Aspect Ratio Of The Window
 
 	    GL11.glMatrixMode( GL11.GL_MODELVIEW );
 	    GL11.glLoadIdentity();
@@ -907,6 +914,10 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		if( targetZoom < 1 )
 		{
 			targetZoom = 1;
+		}
+		if( targetZoom > 2000 )
+		{
+			targetZoom = 2000;
 		}
 	}
 

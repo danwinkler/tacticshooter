@@ -56,7 +56,7 @@ public class Node extends Transformable
 		{
 			if( !world.plainRender )
 			{
-				GL11.glColor3f( color.r, color.g, color.b );
+				GL11.glColor4f( color.r, color.g, color.b, world.transparency );
 				if( toBind != null )
 				{	
 					toBind.bind();

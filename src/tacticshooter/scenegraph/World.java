@@ -28,6 +28,8 @@ public class World
 	
 	boolean shaderEnabled;
 	
+	float transparency = 1;
+	
 	public void setUpCamera()
 	{
 		GLU.gluLookAt( camera.x, camera.y, camera.z, focus.x, focus.y, focus.z, up.x, up.y, up.z );
@@ -146,5 +148,20 @@ public class World
 	public boolean isPlainRender()
 	{
 		return plainRender;
+	}
+
+	public ShaderProgram getShader()
+	{
+		return shader;
+	}
+
+	public float getTransparency()
+	{
+		return transparency;
+	}
+
+	public void setTransparency( float transparency )
+	{
+		this.transparency = transparency;
 	}
 }
