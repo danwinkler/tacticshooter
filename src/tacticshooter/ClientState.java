@@ -21,7 +21,7 @@ public class ClientState
 	
 	public Player player;
 	
-	public Sound bullet1, bullet2, ping1, death1, death2, hit1, explode1;
+	public Sound bullet1, bullet2, ping1, death1, death2, hit1, explode1, yes1, moving1;
 	
 	public float scrollx = 0;
 	public float scrolly = 0;
@@ -44,6 +44,8 @@ public class ClientState
 		death1 = null;
 		death2 = null;
 		hit1 = null;
+		yes1 = null;
+		moving1 = null;
 	}
 	
 	public float getSoundMag( GameContainer gc, float x, float y )
