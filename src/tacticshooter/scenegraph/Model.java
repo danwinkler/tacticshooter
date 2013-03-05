@@ -23,6 +23,8 @@ public class Model extends Transformable
 	
 	ArrayList<Triangle> triangles = new ArrayList<Triangle>();
 	
+	FloatBuffer fb = null;
+	
 	public Model()
 	{
 		callList = GL11.glGenLists( 1 );
@@ -75,12 +77,16 @@ public class Model extends Transformable
 	public void render()
 	{
 		GL11.glPushMatrix();
-		FloatBuffer fb = BufferUtils.createFloatBuffer( 16 );
-		fb.put( new float[] { mat.m00, mat.m10, mat.m20, mat.m30,
-							mat.m01, mat.m11, mat.m21, mat.m31,
-							mat.m02, mat.m12, mat.m22, mat.m32,
-							mat.m03, mat.m13, mat.m23, mat.m33 } );
-		fb.flip();
+		if( fb == null )
+		{
+			fb = BufferUtils.createFloatBuffer( 16 );
+			fb.put( new float[] { mat.m00, mat.m10, mat.m20, mat.m30,
+					mat.m01, mat.m11, mat.m21, mat.m31,
+					mat.m02, mat.m12, mat.m22, mat.m32,
+					mat.m03, mat.m13, mat.m23, mat.m33 } );
+			fb.flip();
+		}
+		
 		GL11.glMultMatrix( fb );
 		GL11.glScalef( scale.x, scale.y, scale.z );	
 		GL11.glCallList( callList );

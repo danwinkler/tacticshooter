@@ -33,6 +33,9 @@ public class Node extends Transformable
 	
 	boolean visible = true;
 	
+	FloatBuffer fb;
+	float[] fba = new float[16];
+	
 	public Node()
 	{
 		
@@ -44,12 +47,32 @@ public class Node extends Transformable
 		
 		GL11.glPushMatrix();
 		GL11.glTranslatef( position.x, position.y, position.z );
-		FloatBuffer fb = BufferUtils.createFloatBuffer( 16 );
-		fb.put( new float[] { mat.m00, mat.m10, mat.m20, mat.m30,
-							mat.m01, mat.m11, mat.m21, mat.m31,
-							mat.m02, mat.m12, mat.m22, mat.m32,
-							mat.m03, mat.m13, mat.m23, mat.m33 } );
+		if( fb == null )
+		{
+			fb = BufferUtils.createFloatBuffer( 16 );
+		}
+		
+		fba[0] = mat.m00;
+		fba[1] = mat.m10;
+		fba[2] = mat.m20;
+		fba[3] = mat.m30;
+		fba[4] = mat.m01;
+		fba[5] = mat.m11;
+		fba[6] = mat.m21;
+		fba[7] = mat.m31;
+		fba[8] = mat.m02;
+		fba[9] = mat.m12;
+		fba[10] = mat.m22;
+		fba[11] = mat.m32;
+		fba[12] = mat.m03;
+		fba[13] = mat.m13;
+		fba[14] = mat.m23;
+		fba[15] = mat.m33;
+		
+		fb.put( fba );
 		fb.flip();
+		
+		
 		GL11.glMultMatrix( fb );
 		GL11.glScalef( scale.x, scale.y, scale.z );	
 		if( model != null )

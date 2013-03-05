@@ -12,6 +12,8 @@ public class Light
 	FloatBuffer specular = BufferUtils.createFloatBuffer( 4 );
 	FloatBuffer position = BufferUtils.createFloatBuffer( 4 );
 	
+	float[] positionArr = { 0, 0, 0, 1 };
+	
 	public Light()
 	{
 		diffuse.put( new float[] { 1.0f, 1.0f, 1.0f, 1.0f } );
@@ -27,7 +29,10 @@ public class Light
 	
 	public void setPosition( float x, float y, float z )
 	{
-		position.put( new float[] { x, y, z, 1.0f } );
+		positionArr[0] = x;
+		positionArr[1] = y;
+		positionArr[2] = z;
+		position.put( positionArr );
 		position.flip();
 	}
 	
