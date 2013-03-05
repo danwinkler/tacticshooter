@@ -37,6 +37,7 @@ public class CubeParticle extends Particle<MultiplayerGameScreen>
 		{
 			alive = false;
 			mgs.drawBlood( pos.x, pos.y, c );
+			(Math.random() > .5 ? mgs.cs.death1 : mgs.cs.death2).play( 1.f, mgs.cs.getSoundMag( mgs.gc, pos.x, pos.y ) * 1.5f );
 		}
 	}
 	

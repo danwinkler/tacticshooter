@@ -204,6 +204,9 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			cs.explode1 = new Sound( "sound" + File.separator + "explode1.wav" );
 			cs.yes1 = new Sound( "sound" + File.separator + "yes1.wav" );
 			cs.moving1 = new Sound( "sound" + File.separator + "moving1.wav" );
+			cs.noproblem1 = new Sound( "sound" + File.separator + "noproblem1.wav" );
+			cs.rightaway1 = new Sound( "sound" + File.separator + "rightaway1.wav" );
+			cs.boom1 = new Sound( "sound" + File.separator + "boom1.wav" );
 			
 			craterTexture = new Image( "img" + File.separator + "crater1.png" );
 			smoke1 = new Image( "img" + File.separator + "smoke1.png" );
@@ -288,7 +291,13 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				this.waitingForMoveConfirmation = false;
 				if( cs.selected.size() > 0 )
 				{
-					cs.moving1.play();
+					int i = DMath.randomi( 0, 3 );
+					switch( i )
+					{
+					case 0: cs.moving1.play(); break;
+					case 1: cs.rightaway1.play(); break;
+					case 2: cs.noproblem1.play(); break;
+					}
 				}
 				break;
 			case PLAYERUPDATE:
@@ -418,7 +427,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				}
 				else
 				{
-					(Math.random() > .5 ? cs.death1 : cs.death2).play( 1.f, cs.getSoundMag( gc, u.x, u.y ) );
+					cs.boom1.play( 1.f, cs.getSoundMag( gc, u.x, u.y ) * 2f );
 				}
 				i--;
 				continue;
