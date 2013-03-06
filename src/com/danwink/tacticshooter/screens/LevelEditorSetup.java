@@ -111,19 +111,27 @@ public class LevelEditorSetup extends DScreen<GameContainer, Graphics> implement
 			}
 			else if( e == uploadAllMaps )
 			{
-				File[] files = new File( "levels" ).listFiles();
-				if( files != null )
+				if( StaticFiles.user != null )
 				{
-					for( int i = 0; i < files.length; i++ )
+					File[] files = new File( "levels" ).listFiles();
+					if( files != null )
 					{
-						String name = files[i].getName().replace( ".xml", "" );
-						if( name.contains( "." ) && !name.startsWith( StaticFiles.user.username + "." ) )
+						for( int i = 0; i < files.length; i++ )
 						{
-							continue;
+							String name = files[i].getName().replace( ".xml", "" );
+							if( name.contains( "." ) && !name.startsWith( StaticFiles.user.username + "." ) )
+							{
+								continue;
+							}
+							
+							new Thread( new FileUploader( name ) ).start();
 						}
-						
-						new Thread( new FileUploader( name ) ).start();
 					}
+				}
+				else
+				{
+					dsh.message( "message", "You must be logged in to upload your maps" );
+					dsh.activate( "message", gc );
 				}
 			}
 			else if( e == downloadAllMaps )
