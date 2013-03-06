@@ -313,11 +313,13 @@ public class Unit
 			break;
 		}
 		
+		/*
 		g.setColor( Color.black );
 		g.fillRect( -9, healthBarDist, (18.f * health/type.health), 4 );
 		
 		g.setColor( new Color( DMath.bound( 1.f - health/type.health, 0, 1 ), DMath.bound(health/type.health, 0, 1 ), 0 ) );
 		g.fillRect( -8, healthBarDist+1, (16.f * health/type.health), 2 );
+		*/
 		
 		float dmx = x - mx;
 		float dmy = y - my;

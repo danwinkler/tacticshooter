@@ -44,6 +44,7 @@ public class GLLevelRenderer
 	Model cube;
 	Model saboteur;
 	Model shotgun;
+	Model healthBarModel;
 	
 	Light mouseLight;
 	
@@ -100,6 +101,27 @@ public class GLLevelRenderer
 		GL11.glEnd();
 		flag.end();
 		
+		healthBarModel = new Model();
+		healthBarModel.begin();
+		GL11.glBegin( GL11.GL_QUADS );
+		
+		GL11.glNormal3f( 0, 0, -1 );
+		
+		GL11.glTexCoord2f( 0, 0 );
+		GL11.glVertex3f( -1, 0, -1 );
+	
+		GL11.glTexCoord2f( 0, 1 );
+		GL11.glVertex3f( -1, 0, 1 );
+		
+		GL11.glTexCoord2f( 1, 1 );
+		GL11.glVertex3f( 1, 0, 1 );
+		
+		GL11.glTexCoord2f( 1, 0 );
+		GL11.glVertex3f( 1, 0, -1 );
+		
+		GL11.glEnd();
+		healthBarModel.end();
+		
 		floor = new Node();
 		floor.setModel( new Model() );
 		world.add( floor );
@@ -152,9 +174,12 @@ public class GLLevelRenderer
 				{
 					c.setVisible( u.selected );
 				}
-				else if( c.getModel() == flag )
+				else if( c.getModel() == healthBarModel )
 				{
-					c.setScale( DMath.map( u.health, 0, u.type.health, 0, 2 ), .3f, 1 );
+					c.mat.setIdentity();
+					c.rotateZ( -u.heading + DMath.PIF );
+					c.rotateX( DMath.PIF/4f );
+					c.setScale( DMath.map( u.health, 0, u.type.health, 0, 12 ), .6f, 2 );
 				}
 			}	
 		}
@@ -416,14 +441,13 @@ public class GLLevelRenderer
 		t.setScale( 6, 6, 6 );
 		unit.add( t );
 		
-		/*
 		Node health = new Node();
-		health.setModel( flag );
-		health.setPosition( -1, 4, 0 );
+		health.setModel( healthBarModel );
+		health.rotateX( -DMath.PIF/4f );
+		health.setPosition( 0, 0, -12 );
 		health.setColor( new Color( 150, 255, 150 ) );
-		health.setScale( 2, .3f, 1 );
+		health.setScale( 12, .6f, 1 );
 		unit.add( health );
-		*/
 	}
 	
 	public void removeUnit( Unit u )
