@@ -992,6 +992,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		if( keyCode == Input.KEY_ESCAPE )
 		{
 			escapeMenu.setVisible( !escapeMenu.isVisible() );
+			chatPanel.setVisible( false );
+			chatBox.setText( "" );
 		}
 		else if( keyCode == Input.KEY_ENTER )
 		{
