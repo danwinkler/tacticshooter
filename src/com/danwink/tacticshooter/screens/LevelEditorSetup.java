@@ -34,7 +34,7 @@ public class LevelEditorSetup extends DScreen<GameContainer, Graphics> implement
 	DButton newMap;
 	DButton loadMap;
 	DButton uploadAllMaps;
-	DButton downloadAllMaps;
+	DButton browseonlinelevels;
 	DButton back;
 	
 	Slick2DRenderer r = new Slick2DRenderer();
@@ -45,7 +45,7 @@ public class LevelEditorSetup extends DScreen<GameContainer, Graphics> implement
 		{
 			dui.setEnabled( true );
 			uploadAllMaps.setVisible( StaticFiles.user != null );
-			downloadAllMaps.setVisible( StaticFiles.user != null );
+			browseonlinelevels.setVisible( StaticFiles.user != null );
 		}
 	}
 	
@@ -60,14 +60,14 @@ public class LevelEditorSetup extends DScreen<GameContainer, Graphics> implement
 			back = new DButton( "Back", gc.getWidth()/2 - 100, gc.getHeight()/2 - 50, 200, 100 );
 			
 			uploadAllMaps = new DButton( "Upload All Maps", gc.getWidth()/2 - 100, gc.getHeight()/2 + 50, 200, 100 );
-			downloadAllMaps = new DButton( "Download All Maps", gc.getWidth()/2 - 100, gc.getHeight()/2 + 150, 200, 100 );
+			browseonlinelevels = new DButton( "Browse Online Levels", gc.getWidth()/2 - 100, gc.getHeight()/2 + 150, 200, 100 );
 			
 			dui.add( newMap );
 			dui.add( loadMap );
 			dui.add( back );
 			
 			dui.add( uploadAllMaps );
-			dui.add( downloadAllMaps );
+			dui.add( browseonlinelevels );
 			
 			dui.addDUIListener( this );
 			dui.setEnabled( true );
@@ -131,12 +131,20 @@ public class LevelEditorSetup extends DScreen<GameContainer, Graphics> implement
 				else
 				{
 					dsh.message( "message", "You must be logged in to upload your maps" );
-					dsh.activate( "message", gc );
+					dsh.activate( "message", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
 				}
 			}
-			else if( e == downloadAllMaps )
+			else if( e == browseonlinelevels )
 			{
-				
+				if( StaticFiles.user != null )
+				{
+					dsh.activate( "levelbrowser", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
+				}
+				else
+				{
+					dsh.message( "message", "You must be logged in to browse online maps" );
+					dsh.activate( "message", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
+				}
 			}
 		}
 	}

@@ -10,6 +10,8 @@ import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
+
+import com.danwink.tacticshooter.screens.BrowseOnlineLevelsScreen;
 import com.danwink.tacticshooter.screens.HomeScreen;
 import com.danwink.tacticshooter.screens.LevelEditor;
 import com.danwink.tacticshooter.screens.LevelEditorLoadMap;
@@ -55,6 +57,7 @@ public class TacticClient extends BasicGame
 		dsh.register( "newmap", new LevelEditorNewMapSetup() );
 		dsh.register( "loadmap", new LevelEditorLoadMap() );
 		dsh.register( "editor", new LevelEditor() );
+		dsh.register( "levelbrowser", new BrowseOnlineLevelsScreen() );
 		
 		dsh.register( "settings", new SettingsScreen() );
 		dsh.register( "options", new OptionsScreen( "options.txt", "settings" ) );
