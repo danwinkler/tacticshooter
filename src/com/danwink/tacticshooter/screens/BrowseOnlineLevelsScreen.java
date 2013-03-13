@@ -18,12 +18,14 @@ import org.newdawn.slick.Graphics;
 
 import tacticshooter.Slick2DEventMapper;
 import tacticshooter.Slick2DRenderer;
+import tacticshooter.StaticFiles;
 
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DPanel;
 import com.phyloa.dlib.dui.DScrollPane;
 import com.phyloa.dlib.dui.DTextBox;
 import com.phyloa.dlib.dui.DUI;
+import com.phyloa.dlib.dui.DUIElement;
 import com.phyloa.dlib.dui.DUIEvent;
 import com.phyloa.dlib.dui.DUIListener;
 import com.phyloa.dlib.renderer.DScreen;
@@ -47,6 +49,8 @@ public class BrowseOnlineLevelsScreen extends DScreen<GameContainer, Graphics> i
 	DButton creatorSort;
 	
 	Slick2DRenderer r = new Slick2DRenderer();
+	
+	Thread t = new Thread();
 	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
@@ -78,17 +82,27 @@ public class BrowseOnlineLevelsScreen extends DScreen<GameContainer, Graphics> i
 		back = new DButton( "Back", 0, 550, 100, 50 );
 		panel.add( back );
 		
-		new Thread( new LevelListDownloader() ).start();
+		dui.addDUIListener( this );
+		
+		t.interrupt();
+		t = new Thread( new LevelListDownloader() );
+		t.start();
 	}
 	
 	public void update( GameContainer gc, int delta )
 	{
-		dui.update();
+		synchronized( dui )
+		{
+			dui.update();
+		}
 	}
 
 	public void render( GameContainer gc, Graphics g )
 	{
-		dui.render( r.renderTo( g ) );
+		synchronized( dui )
+		{
+			dui.render( r.renderTo( g ) );
+		}
 	}
 
 	public void onExit()
@@ -103,38 +117,84 @@ public class BrowseOnlineLevelsScreen extends DScreen<GameContainer, Graphics> i
 	
 	public void event( DUIEvent event )
 	{
-		
+		DUIElement element = event.getElement();
+		if( element instanceof DButton )
+		{
+			DButton but = (DButton)element;
+			if( event.getType() == DButton.MOUSE_UP )
+			{
+				if( but == back )
+				{
+					dsh.activate( "editorsetup", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
+				}
+			}
+		}
+		else if( element instanceof DTextBox )
+		{
+			DTextBox textBox = (DTextBox)element;
+			
+			if( element == search )
+			{
+				t.interrupt();
+				t = new Thread( new LevelListDownloader( textBox.getText() ) );
+				t.start();
+			}
+		}
 	}
 	
 	public class LevelListDownloader implements Runnable
 	{
 		String filter = "";
+		
+		public LevelListDownloader()
+		{
+			
+		}
+		
+		public LevelListDownloader( String filter )
+		{
+			this.filter = filter;
+		}
+		
 		public void run()
 		{
 			try
-			{
-				HttpClient client = new DefaultHttpClient();
-				HttpGet httpget = new HttpGet( "http://www.tacticshooter.com/levellist" );
-		
+			{					
+				String addr = "http://www.tacticshooter.com/levellist?";
+				
 				if( filter.length() > 0 )
 				{
-					httpget.addHeader( "filter", filter );
+					addr += "filter=" + filter;
 				}
 				
+				HttpClient client = new DefaultHttpClient();
+				HttpGet httpget = new HttpGet( addr );
 				HttpResponse r = client.execute( httpget );
-			
-				String s = EntityUtils.toString( r.getEntity() );
-				String[] lines = s.split( "\n" );
-				for( int i = 0; i < lines.length; i += 4 )
+		
+				synchronized( dui )
 				{
-					scroll.add( new DButton( lines[i], 0, (i/4) * 50, 400, 50 ) );
-					scroll.add( new DButton( lines[i+3], 400, (i/4) * 50, 100, 50 ) );
-					scroll.add( new DButton( lines[i+2], 500, (i/4) * 50, 100, 50 ) );
-					scroll.add( new DButton( lines[i+1], 600, (i/4) * 50, 150, 50 ) );
-					scroll.add( new DButton( "DL", 750, (i/4) * 50, 50, 50 ) );
-				}
+					if( Thread.interrupted() ) 
+					{
+				        return;
+					}
+					scroll.clearChildren();
 				
-				scroll.setInnerPaneHeight( lines.length/4 * 50 );
+					String s = EntityUtils.toString( r.getEntity() );
+					String[] lines = s.split( "\n" );
+					if( lines.length >= 4 )
+					{
+						for( int i = 0; i < lines.length; i += 4 )
+						{
+							scroll.add( new DButton( lines[i], 0, (i/4) * 50, 400, 50 ) );
+							scroll.add( new DButton( lines[i+3], 400, (i/4) * 50, 100, 50 ) );
+							scroll.add( new DButton( lines[i+2], 500, (i/4) * 50, 100, 50 ) );
+							scroll.add( new DButton( lines[i+1], 600, (i/4) * 50, 150, 50 ) );
+							scroll.add( new DButton( "DL", 750, (i/4) * 50, 40, 50 ) );
+						}
+					}
+					
+					scroll.setInnerPaneHeight( lines.length/4 * 50 );
+				}
 			} catch( ParseException e )
 			{
 				e.printStackTrace();
