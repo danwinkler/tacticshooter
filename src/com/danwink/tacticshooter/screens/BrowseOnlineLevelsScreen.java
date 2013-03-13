@@ -48,6 +48,9 @@ public class BrowseOnlineLevelsScreen extends DScreen<GameContainer, Graphics> i
 	DButton downloadSort;
 	DButton creatorSort;
 	
+	String sortBy = "";
+	boolean desc = false;
+	
 	Slick2DRenderer r = new Slick2DRenderer();
 	
 	Thread t = new Thread();
@@ -127,6 +130,26 @@ public class BrowseOnlineLevelsScreen extends DScreen<GameContainer, Graphics> i
 				{
 					dsh.activate( "editorsetup", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
 				}
+				else if( but == nameSort )
+				{
+					setSort( "name" );
+					getNewList();
+				}
+				else if( but == creatorSort )
+				{
+					setSort( "owner" );
+					getNewList();
+				}
+				else if( but == downloadSort )
+				{
+					setSort( "download" );
+					getNewList();
+				}
+				else if( but == ratingSort )
+				{
+					setSort( "rating" );
+					getNewList();
+				}
 			}
 		}
 		else if( element instanceof DTextBox )
@@ -135,11 +158,29 @@ public class BrowseOnlineLevelsScreen extends DScreen<GameContainer, Graphics> i
 			
 			if( element == search )
 			{
-				t.interrupt();
-				t = new Thread( new LevelListDownloader( textBox.getText() ) );
-				t.start();
+				getNewList();
 			}
 		}
+	}
+	
+	public void setSort( String sortName )
+	{
+		if( sortBy.equals( sortName ) )
+		{
+			desc = !desc;
+		}
+		else
+		{
+			sortBy = sortName;
+			desc = false;
+		}
+	}
+	
+	public void getNewList()
+	{
+		t.interrupt();
+		t = new Thread( new LevelListDownloader( search.getText() ) );
+		t.start();
 	}
 	
 	public class LevelListDownloader implements Runnable
@@ -164,8 +205,12 @@ public class BrowseOnlineLevelsScreen extends DScreen<GameContainer, Graphics> i
 				
 				if( filter.length() > 0 )
 				{
-					addr += "filter=" + filter;
+					addr += "&filter=" + filter;
 				}
+				
+				addr += "&sort=" + sortBy;
+				addr += "&order=" + (desc ? "DESC" : "ASC");
+				
 				
 				HttpClient client = new DefaultHttpClient();
 				HttpGet httpget = new HttpGet( addr );
