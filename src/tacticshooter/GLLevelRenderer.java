@@ -9,6 +9,7 @@ import javax.vecmath.Point2i;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Image;
+import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.opengl.shader.ShaderProgram;
 
@@ -45,8 +46,6 @@ public class GLLevelRenderer
 	Model saboteur;
 	Model shotgun;
 	Model healthBarModel;
-	
-	Light mouseLight;
 	
 	HashMap<Integer, Node> units = new HashMap<Integer, Node>();
 	HashMap<Integer, Node> buildings = new HashMap<Integer, Node>();
@@ -130,11 +129,6 @@ public class GLLevelRenderer
 		wall.setModel( new Model() );
 		world.add( wall );
 		
-		world.setLightsEnabled( true );
-		
-		mouseLight = new Light();
-		world.add( mouseLight );
-		
 		try
 		{
 			world.setShader( ShaderProgram.loadProgram( "data" + File.separator + "shaders" + File.separator + "toon.vert", "data" + File.separator + "shaders" + File.separator + "toon.frag" ) );
@@ -156,11 +150,21 @@ public class GLLevelRenderer
 		world.setCamera( mgs.cs.scrollx, mgs.cs.scrolly+mgs.zoom, -mgs.zoom*2 );
 		world.setFocus( mgs.cs.scrollx, mgs.cs.scrolly-100, 0 );
 		
-		mouseLight.setPosition( mgs.mouseOnMap.x, mgs.mouseOnMap.y, -200 );
-		mouseLight.setDiffuse( 1f, 1, 1.0f, 1.0f );
-		mouseLight.setAmbient( 0, 0, 0, 0 );
-		
 		world.setUpCamera();
+		
+		//world.shader.setUniform3f( "LightPosition", 0, 0, 1 );
+		
+		if( mgs.gc.getInput().isKeyPressed( Input.KEY_R ) )
+		{
+			try
+			{
+				world.setShader( ShaderProgram.loadProgram( "data" + File.separator + "shaders" + File.separator + "toon.vert", "data" + File.separator + "shaders" + File.separator + "toon.frag" ) );
+			} catch( SlickException e )
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		
 		for( Unit u : mgs.cs.units )
 		{
@@ -204,7 +208,6 @@ public class GLLevelRenderer
 		
 		GL11.glEnable( GL11.GL_BLEND );
 		world.render();
-		mouseLight.setPosition( mgs.mouseOnMap.x + 200, mgs.mouseOnMap.y, -200 );
 		world.setTransparency( .5f );
 		world.render();
 		

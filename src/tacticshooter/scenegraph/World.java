@@ -22,7 +22,7 @@ public class World
 
 	boolean plainRender;
 	
-	ShaderProgram shader;
+	public ShaderProgram shader;
 	
 	ArrayList<ShaderNodeOp> snos = new ArrayList<ShaderNodeOp>();
 	
