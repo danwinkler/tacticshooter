@@ -47,6 +47,8 @@ public class GLLevelRenderer
 	Model shotgun;
 	Model healthBarModel;
 	
+	Light sun;
+	
 	HashMap<Integer, Node> units = new HashMap<Integer, Node>();
 	HashMap<Integer, Node> buildings = new HashMap<Integer, Node>();
 	
@@ -129,6 +131,12 @@ public class GLLevelRenderer
 		wall.setModel( new Model() );
 		world.add( wall );
 		
+		sun = new Light();
+		sun.setPosition( -1, 1, -1, true );
+		world.add( sun );
+		world.setLightsEnabled( true );
+		
+		/*
 		try
 		{
 			world.setShader( ShaderProgram.loadProgram( "data" + File.separator + "shaders" + File.separator + "toon.vert", "data" + File.separator + "shaders" + File.separator + "toon.frag" ) );
@@ -143,6 +151,7 @@ public class GLLevelRenderer
 		{
 			e.printStackTrace();
 		}
+		*/
 	}
 	
 	public void render()
@@ -152,7 +161,7 @@ public class GLLevelRenderer
 		
 		world.setUpCamera();
 		
-		//world.shader.setUniform3f( "LightPosition", 0, 0, 1 );
+		sun.setPosition( mgs.mouseOnMap.x, mgs.mouseOnMap.y, -200, false );  
 		
 		if( mgs.gc.getInput().isKeyPressed( Input.KEY_R ) )
 		{
@@ -208,8 +217,6 @@ public class GLLevelRenderer
 		
 		GL11.glEnable( GL11.GL_BLEND );
 		world.render();
-		world.setTransparency( .5f );
-		world.render();
 		
 		mgs.ps.render( mgs );
 		
@@ -252,18 +259,27 @@ public class GLLevelRenderer
 		GL11.glBegin( GL11.GL_QUADS );
 		GL11.glNormal3f( 0, 0, -1 );
 		
-		GL11.glTexCoord2f( bloodTexture.getTextureOffsetX(), bloodTexture.getTextureOffsetY() );
-		GL11.glVertex3f( 0, 0, 0 );
-		
-		GL11.glTexCoord2f( bloodTexture.getTextureOffsetX(), bloodTexture.getTextureOffsetY() + bloodTexture.getTextureHeight() );
-		GL11.glVertex3f( 0, bloodTexture.getHeight(), 0 );
-
-		GL11.glTexCoord2f( bloodTexture.getTextureOffsetX() + bloodTexture.getTextureWidth(), bloodTexture.getTextureOffsetY() + bloodTexture.getTextureHeight() );
-		GL11.glVertex3f( bloodTexture.getWidth(), bloodTexture.getHeight(), 0 );
-
-		GL11.glTexCoord2f( bloodTexture.getTextureOffsetX() + bloodTexture.getTextureWidth(), bloodTexture.getTextureOffsetY() );
-		GL11.glVertex3f( bloodTexture.getWidth(), 0, 0 );
-		
+		for( int y = 0; y < mgs.cs.l.height-1; y++ )
+		{
+			for( int x = 0; x < mgs.cs.l.width-1; x++ )
+			{
+				GL11.glTexCoord2f( bloodTexture.getTextureOffsetX() + bloodTexture.getTextureWidth()*((float)x/mgs.cs.l.width), 
+						bloodTexture.getTextureOffsetY() + bloodTexture.getTextureHeight()*((float)y/mgs.cs.l.height) );
+				GL11.glVertex3f( x*Level.tileSize, y*Level.tileSize, 0 );
+				
+				GL11.glTexCoord2f( bloodTexture.getTextureOffsetX() + bloodTexture.getTextureWidth()*((float)x/mgs.cs.l.width), 
+						bloodTexture.getTextureOffsetY() + bloodTexture.getTextureHeight()*((float)(y+1)/mgs.cs.l.height) );
+				GL11.glVertex3f( x*Level.tileSize, (y+1)*Level.tileSize, 0 );
+				
+				GL11.glTexCoord2f( bloodTexture.getTextureOffsetX() + bloodTexture.getTextureWidth()*((float)(x+1)/mgs.cs.l.width), 
+						bloodTexture.getTextureOffsetY() + bloodTexture.getTextureHeight()*((float)(y+1)/mgs.cs.l.height) );
+				GL11.glVertex3f( (x+1)*Level.tileSize, (y+1)*Level.tileSize, 0 );
+				
+				GL11.glTexCoord2f( bloodTexture.getTextureOffsetX() + bloodTexture.getTextureWidth()*((float)(x+1)/mgs.cs.l.width), 
+						bloodTexture.getTextureOffsetY() + bloodTexture.getTextureHeight()*((float)y/mgs.cs.l.height) );
+				GL11.glVertex3f( (x+1)*Level.tileSize, y*Level.tileSize, 0 );
+			}
+		}
 		GL11.glEnd();
 		fm.end();
 		

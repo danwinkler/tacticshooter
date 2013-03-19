@@ -27,11 +27,12 @@ public class Light
 		position.flip();
 	}
 	
-	public void setPosition( float x, float y, float z )
+	public void setPosition( float x, float y, float z, boolean directional )
 	{
 		positionArr[0] = x;
 		positionArr[1] = y;
 		positionArr[2] = z;
+		positionArr[3] = directional ? 0 : 1;
 		position.put( positionArr );
 		position.flip();
 	}

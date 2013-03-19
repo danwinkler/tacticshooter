@@ -52,6 +52,7 @@ public class Model extends Transformable
 			for( int i = 0; i < 3; i++ )
 			{
 				Vector3f n = t.normals[i];
+				n.normalize();
 				Point3f p = t.points[i];
 				Vector2f tc = t.texCoords[i];
 				
