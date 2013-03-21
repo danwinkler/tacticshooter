@@ -2,10 +2,14 @@ package tacticshooter;
 
 import java.io.File;
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.util.HashMap;
 
+import javax.vecmath.Matrix4f;
 import javax.vecmath.Point2i;
+import javax.vecmath.Vector3f;
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
@@ -15,6 +19,7 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL21;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL31;
+import org.lwjgl.util.glu.GLU;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
@@ -58,8 +63,6 @@ public class GLLevelRenderer
 	HashMap<Integer, Node> units = new HashMap<Integer, Node>();
 	HashMap<Integer, Node> buildings = new HashMap<Integer, Node>();
 	
-	int shadowFrameBuffer;
-	
 	public GLLevelRenderer( MultiplayerGameScreen mgs )
 	{
 		this.mgs = mgs;
@@ -93,7 +96,7 @@ public class GLLevelRenderer
 		flag.begin();
 		GL11.glBegin( GL11.GL_QUADS );
 		
-		GL11.glNormal3f( 0, 0, -1 );
+		GL11.glNormal3f( 0, -1, 0 );
 		
 		GL11.glTexCoord2f( 0, 0 );
 		GL11.glVertex3f( 0, 0, 0 );
@@ -114,7 +117,7 @@ public class GLLevelRenderer
 		healthBarModel.begin();
 		GL11.glBegin( GL11.GL_QUADS );
 		
-		GL11.glNormal3f( 0, 0, -1 );
+		GL11.glNormal3f( 0, 1, 0 );
 		
 		GL11.glTexCoord2f( 0, 0 );
 		GL11.glVertex3f( -1, 0, -1 );
@@ -140,10 +143,17 @@ public class GLLevelRenderer
 		world.add( wall );
 		
 		sun = new Light();
-		sun.setPosition( -1, 1, -1, true );
+		sun.setPosition( 0, 1000, -200, false );
 		world.add( sun );
-		world.setLightsEnabled( true );
 		
+		Light dimSum = new Light();
+		dimSum.setPosition( 0, 1000, -200, false );
+		dimSum.setAmbient( .2f, .2f, .2f, .2f );
+		dimSum.setDiffuse( .2f, .2f, .2f, .2f );
+		world.add( dimSum );
+		
+		world.setLightsEnabled( true );
+		/*
 		try
 		{
 			world.setShader( ShaderProgram.loadProgram( "data" + File.separator + "shaders" + File.separator + "shadow.vert", "data" + File.separator + "shaders" + File.separator + "shadow.frag" ) );
@@ -151,39 +161,11 @@ public class GLLevelRenderer
 		{
 			e.printStackTrace();
 		}
-		
-		//Set up shadow framebuffer
-		shadowFrameBuffer = GL30.glGenFramebuffers();
-        GL30.glBindFramebuffer( GL30.GL_FRAMEBUFFER, shadowFrameBuffer );
-
-        // Depth texture. Slower than a depth buffer, but you can sample it later in your shader
-        int depthTexture = GL11.glGenTextures();
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, depthTexture);
-        GL11.glTexImage2D( GL11.GL_TEXTURE_2D, 0, GL14.GL_DEPTH_COMPONENT16, 1024, 1024, 0, GL11.GL_DEPTH_COMPONENT, GL11.GL_FLOAT, (ByteBuffer)null );
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR); 
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL14.GL_TEXTURE_COMPARE_FUNC, GL11.GL_LEQUAL);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL14.GL_TEXTURE_COMPARE_MODE, GL14.GL_COMPARE_R_TO_TEXTURE);
-                 
-        GL30.glFramebufferRenderbuffer( GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT, depthTexture, 0 );
-
-        // No color output in the bound framebuffer, only depth.
-        GL11.glDrawBuffer( GL11.GL_NONE );
+		*/
 	}
 	
 	public void render()
 	{
-		
-		
-		world.setCamera( mgs.cs.scrollx, mgs.cs.scrolly+mgs.zoom, -mgs.zoom*2 );
-		world.setFocus( mgs.cs.scrollx, mgs.cs.scrolly-100, 0 );
-		
-		world.setUpCamera();
-		
-		sun.setPosition( mgs.mouseOnMap.x, mgs.mouseOnMap.y, -200, false );  
-		
 		for( Unit u : mgs.cs.units )
 		{
 			Node n = units.get( u.id );
@@ -205,27 +187,18 @@ public class GLLevelRenderer
 				}
 			}	
 		}
-		
-		//Render shadow map
-		GL30.glBindFramebuffer( GL30.GL_FRAMEBUFFER, shadowFrameBuffer );
-        GL11.glViewport( 0, 0, 1024, 1024 ); // Render on the whole framebuffer, complete from the lower left corner to the upper right
 
-        // We don't use bias in the shader, but instead we draw back faces, 
-        // which are already separated from the front faces by a small distance 
-        // (if your geometry is made this way)
-        GL11.glEnable( GL11.GL_CULL_FACE );
-        GL11.glCullFace( GL11.GL_BACK ); // Cull back-facing triangles -> draw only front-facing triangles
-
-        // Clear the screen
-        GL11.glClear( GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT );
+        GL11.glEnable( GL11.GL_BLEND );
+        GL11.glEnable( GL11.GL_NORMALIZE );
 		
-        world.setShaderEnabled( true );
-		world.render();
-		mgs.ps.render( mgs );
-		world.setShaderEnabled( false );
+		world.setCamera( mgs.cs.scrollx, mgs.cs.scrolly+mgs.zoom, -mgs.zoom*2 );
+		world.setFocus( mgs.cs.scrollx, mgs.cs.scrolly-100, 0 );
 		
-		GL11.glEnable( GL11.GL_BLEND );
-		world.render();
+		world.setUpCamera();
+		
+		//world.setShaderEnabled( true );
+		world.render( mgs.gc.getWidth(), mgs.gc.getHeight() );
+		//world.setShaderEnabled( false );
 		
 		mgs.ps.render( mgs );
 		

@@ -1,25 +1,23 @@
-#version 330 core
+uniform sampler2D ShadowMap;
 
-// Interpolated values from the vertex shaders
-in vec2 UV;
-in vec4 ShadowCoord;
-
-// Ouput data
-layout(location = 0) out vec3 color;
-
-// Values that stay constant for the whole mesh.
-uniform sampler2D myTextureSampler;
-uniform sampler2DShadow shadowMap;
+varying vec4 ShadowCoord;
 
 void main()
-{
-	// Light emission properties
-	vec3 LightColor = vec3(1,1,1);
+{	
+	vec4 shadowCoordinateWdivide = ShadowCoord / ShadowCoord.w ;
 	
-	// Material properties
-	vec3 MaterialDiffuseColor = texture2D( myTextureSampler, UV ).rgb;
-
-	float visibility = texture( shadowMap, vec3(ShadowCoord.xy, (ShadowCoord.z)/ShadowCoord.w) );
-
-	color = visibility * MaterialDiffuseColor * LightColor;
+	// Used to lower moire pattern and self-shadowing
+	shadowCoordinateWdivide.z += 0.0005;
+	
+	
+	float distanceFromLight = texture2D(ShadowMap,shadowCoordinateWdivide.st).z;
+	
+	
+ 	float shadow = 1.0;
+ 	if (ShadowCoord.w > 0.0)
+ 		shadow = distanceFromLight < shadowCoordinateWdivide.z ? 0.5 : 1.0 ;
+  	
+	
+  	gl_FragColor =	 shadow * gl_Color;
+  
 }

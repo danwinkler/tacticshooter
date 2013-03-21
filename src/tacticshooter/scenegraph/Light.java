@@ -65,4 +65,8 @@ public class Light
 		ambient.put( new float[] { x, y, z, w } );
 		ambient.flip();
 	}
+
+	public FloatBuffer getPosition() {
+		return position;
+	}
 }
