@@ -120,12 +120,13 @@ public class World
 		
 		if( shadows && lights.size() >= 2 )
 		{
+			GL11.glPushAttrib( GL11.GL_ENABLE_BIT );
 			Light l = lights.get( 0 );
 			
 			//Draw from lights pov
 			GL11.glMatrixMode( GL11.GL_PROJECTION );
 			GL11.glLoadIdentity();
-			GLU.gluPerspective(45.0f, 1.0f, 2.0f, 8.0f);
+			GLU.gluPerspective(45.0f, 1.0f, 5.0f, 10000.0f);
 			
 			GL11.glMatrixMode( GL11.GL_MODELVIEW );
 			GL11.glLoadIdentity();
@@ -150,6 +151,15 @@ public class World
 			
 			GL11.glViewport( 0, 0, width, height );
 			
+			GL11.glClear( GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT );
+			
+			GL11.glMatrixMode( GL11.GL_PROJECTION );
+			GL11.glLoadIdentity();
+			GLU.gluPerspective( 45.0f, ((float)width)/((float)height), 5.0f, 10000.0f );
+			
+			GL11.glMatrixMode( GL11.GL_MODELVIEW );
+			GL11.glLoadIdentity();
+			
 			setUpCamera();
 			
 			//Use dim light to represent shadowed areas
@@ -172,8 +182,11 @@ public class World
 			
 			float[] rowArr = new float[4];
 			
+			row.rewind();
 			textureMatrix.getRow( 0, rowArr );
 			row.put( rowArr );
+			row.flip();
+			row.rewind();
 			//Set up texture coordinate generation.
 			GL11.glTexGeni( GL11.GL_S, GL11.GL_TEXTURE_GEN_MODE, GL11.GL_EYE_LINEAR );
 			GL11.glTexGen( GL11.GL_S, GL11.GL_EYE_PLANE, row );
@@ -181,6 +194,8 @@ public class World
 
 			textureMatrix.getRow( 1, rowArr );
 			row.put( rowArr );
+			row.flip();
+			row.rewind();
 			
 			GL11.glTexGeni( GL11.GL_T, GL11.GL_TEXTURE_GEN_MODE, GL11.GL_EYE_LINEAR);
 			GL11.glTexGen( GL11.GL_T, GL11.GL_EYE_PLANE, row );
@@ -188,6 +203,8 @@ public class World
 
 			textureMatrix.getRow( 2, rowArr );
 			row.put( rowArr );
+			row.flip();
+			row.rewind();
 			
 			GL11.glTexGeni( GL11.GL_R, GL11.GL_TEXTURE_GEN_MODE, GL11.GL_EYE_LINEAR);
 			GL11.glTexGen( GL11.GL_R, GL11.GL_EYE_PLANE, row );
@@ -195,6 +212,8 @@ public class World
 
 			textureMatrix.getRow( 3, rowArr );
 			row.put( rowArr );
+			row.flip();
+			row.rewind();
 			
 			GL11.glTexGeni( GL11.GL_Q, GL11.GL_TEXTURE_GEN_MODE, GL11.GL_EYE_LINEAR );
 			GL11.glTexGen( GL11.GL_Q, GL11.GL_EYE_PLANE, row );
@@ -220,9 +239,13 @@ public class World
 			root.render( this );
 			
 			lights.get( 0 ).disable( 0 );
+			
+			GL11.glPopAttrib();
 		}
-		
-		root.render( this );
+		else
+		{
+			root.render( this );
+		}
 		
 		if( shaderEnabled && !plainRender )
 		{
