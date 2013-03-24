@@ -4,20 +4,30 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
-import javax.vecmath.Matrix4f;
 import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.ARBDepthTexture;
 import org.lwjgl.opengl.ARBShadow;
+import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL14;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL32;
+import org.lwjgl.opengl.GLContext;
 import org.lwjgl.util.glu.GLU;
+import org.lwjgl.util.vector.Matrix4f;
 import org.newdawn.slick.opengl.shader.ShaderProgram;
+
+import static org.lwjgl.opengl.ARBShadowAmbient.GL_TEXTURE_COMPARE_FAIL_VALUE_ARB;
+import static org.lwjgl.opengl.EXTFramebufferObject.*;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
+import static org.lwjgl.opengl.GL14.*;
+import static org.lwjgl.util.glu.GLU.gluLookAt;
+import static org.lwjgl.util.glu.GLU.gluPerspective;
 
 public class World
 {
@@ -30,26 +40,36 @@ public class World
 	ArrayList<Light> lights = new ArrayList<Light>();
 	boolean lightsEnabled = false;
 
-	boolean plainRender;
+	boolean plainRender = false;
 	
 	public ShaderProgram shader;
 	
 	ArrayList<ShaderNodeOp> snos = new ArrayList<ShaderNodeOp>();
 	
 	boolean shaderEnabled;
-	boolean shadows = true;
 	
 	float transparency = 1;
 	
+	boolean shadows = true;
 	boolean shadowsSetUp = false;
-	int shadowMapTexture;
-	Matrix4f biasMatrix = new Matrix4f( 0.5f, 0.0f, 0.0f, 0.0f,
-										0.0f, 0.5f, 0.0f, 0.0f,
-										0.0f, 0.0f, 0.5f, 0.0f,
-										0.5f, 0.5f, 0.5f, 1.0f);
 	
-	Matrix4f lightProjectionMatrix = new Matrix4f();
-	Matrix4f lightViewMatrix = new Matrix4f();
+	 // This represents if the clients computer has the ambient shadow extention
+    private static boolean ambientShadowsAvailable;
+    // Enable this if you want to see the depth texture for debugging purposes.
+    private static boolean showShadowMap = false;
+	private static boolean useFBO = false;
+	private static int shadowWidth = 1024;
+    private static int shadowHeight = 1024;
+
+    private static int frameBuffer;
+    private static int renderBuffer;
+
+    private static final FloatBuffer ambientLight = BufferUtils.createFloatBuffer(4);
+    private static final FloatBuffer diffuseLight = BufferUtils.createFloatBuffer(4);
+    private static final FloatBuffer lightPosition = BufferUtils.createFloatBuffer(4);
+    private static final FloatBuffer tempBuffer = BufferUtils.createFloatBuffer(4);
+
+    private static final Matrix4f textureMatrix = new Matrix4f();
 	
 	FloatBuffer row = BufferUtils.createFloatBuffer( 4 );
 	
@@ -57,41 +77,65 @@ public class World
 	{
 		GLU.gluLookAt( camera.x, camera.y, camera.z, focus.x, focus.y, focus.z, up.x, up.y, up.z );
 		
-		if( shadows && !shadowsSetUp && lights.size() >= 2 )
+		if( shadows )
 		{
-			//Create the shadow map texture
-			shadowMapTexture = GL11.glGenTextures();
-			GL11.glBindTexture( GL11.GL_TEXTURE_2D, shadowMapTexture);
-			GL11.glTexImage2D( GL11.GL_TEXTURE_2D, 0, GL11.GL_DEPTH_COMPONENT, 1024, 1024, 0, GL11.GL_DEPTH_COMPONENT, GL11.GL_UNSIGNED_BYTE, (ByteBuffer)null );
-			GL11.glTexParameteri( GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST );
-			GL11.glTexParameteri( GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST );
-			GL11.glTexParameteri( GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_CLAMP );
-			GL11.glTexParameteri( GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_CLAMP );
+			setUpBufferValues();
 			
-			FloatBuffer buf = BufferUtils.createFloatBuffer( 16 );
-			float[] arr = new float[16];
-			Light l = lights.get( 0 );
+			glEnable(GL_DEPTH_TEST);
+	        glDepthFunc(GL_LEQUAL);
+	        glPolygonOffset( 4.0f, 0.0F);
+
+	        glShadeModel(GL_SMOOTH);
+	        glEnable(GL_LIGHTING);
+	        glEnable(GL_COLOR_MATERIAL);
+	        glEnable(GL_NORMALIZE);
+	        glEnable(GL_LIGHT0);
+
+	        // Setup some texture states
+	        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	        glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
+
+	        // If ambient shadows are availible then we can skip a rendering pass.
+	        if (ambientShadowsAvailable) {
+	            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FAIL_VALUE_ARB, 0.5F);
+	        }
+
+	        glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
+	        glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
+	        glTexGeni(GL_R, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
+	        glTexGeni(GL_Q, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
+
+	        // If we are using a FBO, we need to setup the framebuffer.
+	        if (useFBO) {
+	            frameBuffer = glGenFramebuffersEXT();
+	            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, frameBuffer);
+
+	            renderBuffer = glGenRenderbuffersEXT();
+	            glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, renderBuffer);
+
+	            glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT32, 8192, 8192);
+
+	            glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT,
+	                    renderBuffer);
+
+	            glDrawBuffer(GL_NONE);
+	            glReadBuffer(GL_NONE);
+
+	            int FBOStatus = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+	            if (FBOStatus != GL_FRAMEBUFFER_COMPLETE_EXT) {
+	                System.out.println("Framebuffer error!");
+	            }
+
+	            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	        }
 			
-			GL11.glPushMatrix();
-			GL11.glLoadIdentity();
-			GLU.gluPerspective(45.0f, 1.0f, 2.0f, 8.0f);
-			GL11.glGetFloat( GL11.GL_MODELVIEW_MATRIX, buf );
-			buf.get( arr );
-			
-			lightProjectionMatrix.set( arr );
-			buf.rewind();
-			
-			GL11.glLoadIdentity();
-			GLU.gluLookAt( l.positionArr[0], l.positionArr[1], l.positionArr[2],
-						focus.x, focus.y, focus.z,
-						up.x, up.y, up.z );
-			GL11.glGetFloat( GL11.GL_MODELVIEW_MATRIX, buf );
-			buf.get( arr );
-			
-			lightViewMatrix.set( arr );
-			
-			GL11.glPopMatrix();
-			
+			if( GLContext.getCapabilities().GL_ARB_shadow_ambient ) 
+			{
+	            ambientShadowsAvailable = true;
+			}
 			shadowsSetUp = true;
 		}
 	}
@@ -120,133 +164,138 @@ public class World
 		
 		if( shadows && lights.size() >= 2 )
 		{
-			GL11.glPushAttrib( GL11.GL_ENABLE_BIT );
-			Light l = lights.get( 0 );
-			
-			//Draw from lights pov
-			GL11.glMatrixMode( GL11.GL_PROJECTION );
-			GL11.glLoadIdentity();
-			GLU.gluPerspective(45.0f, 1.0f, 5.0f, 10000.0f);
-			
-			GL11.glMatrixMode( GL11.GL_MODELVIEW );
-			GL11.glLoadIdentity();
-			GLU.gluLookAt( l.positionArr[0], l.positionArr[1], l.positionArr[2],
-						focus.x, focus.y, focus.z,
-						up.x, up.y, up.z );
-			
-			GL11.glViewport( 0, 0, 1024, 1024 );
-			GL11.glCullFace( GL11.GL_FRONT );
-			GL11.glShadeModel( GL11.GL_FLAT );
-			GL11.glColorMask( false, false, false, false );
-			
-			root.render( this );
-			
-			GL11.glBindTexture( GL11.GL_TEXTURE_2D, shadowMapTexture );
-			GL11.glCopyTexSubImage2D( GL11.GL_TEXTURE_2D, 0, 0, 0, 0, 0, 1024, 1024 );
+			setUpBufferValues();
+			generateShadowMap();
+			 glMatrixMode(GL_PROJECTION);
+		        glLoadIdentity();
+		        gluPerspective(40, (float) Display.getWidth() / (float) Display.getHeight(), 5.0F, 10000.0F);
+		        glMatrixMode(GL_MODELVIEW);
+		        glLoadIdentity();
+		        
+		        
+		        setUpCamera();
+		        
+		        glViewport( 0, 0, Display.getWidth(), Display.getHeight() );
 
-			//restore states
-			GL11.glCullFace( GL11.GL_BACK );
-			GL11.glShadeModel( GL11.GL_SMOOTH );
-			GL11.glColorMask( true, true, true, true );
-			
-			GL11.glViewport( 0, 0, width, height );
-			
-			GL11.glClear( GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT );
-			
-			GL11.glMatrixMode( GL11.GL_PROJECTION );
-			GL11.glLoadIdentity();
-			GLU.gluPerspective( 45.0f, ((float)width)/((float)height), 5.0f, 10000.0f );
-			
-			GL11.glMatrixMode( GL11.GL_MODELVIEW );
-			GL11.glLoadIdentity();
-			
-			setUpCamera();
-			
-			//Use dim light to represent shadowed areas
-			lights.get( 1 ).enable( 0 );
+		        glLight(GL_LIGHT0, GL_POSITION, lightPosition);
+		        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			root.render( this );
-			
-			lights.get( 1 ).disable( 0 );
-			
-			//3rd pass
-			//Draw with bright light
-			lights.get( 0 ).enable( 0 );
-			
-			//Calculate texture matrix for projection
-			//This matrix takes us from eye space to the light's clip space
-			//It is postmultiplied by the inverse of the current view matrix when specifying texgen
-			Matrix4f textureMatrix = new Matrix4f( biasMatrix );
-			textureMatrix.mul( lightProjectionMatrix );
-			textureMatrix.mul( lightViewMatrix );
-			
-			float[] rowArr = new float[4];
-			
-			row.rewind();
-			textureMatrix.getRow( 0, rowArr );
-			row.put( rowArr );
-			row.flip();
-			row.rewind();
-			//Set up texture coordinate generation.
-			GL11.glTexGeni( GL11.GL_S, GL11.GL_TEXTURE_GEN_MODE, GL11.GL_EYE_LINEAR );
-			GL11.glTexGen( GL11.GL_S, GL11.GL_EYE_PLANE, row );
-			GL11.glEnable( GL11.GL_TEXTURE_GEN_S );
+		        if ( showShadowMap ) {
+		            glMatrixMode(GL_PROJECTION);
+		            glLoadIdentity();
+		            glMatrixMode(GL_MODELVIEW);
+		            glLoadIdentity();
+		            glMatrixMode(GL_TEXTURE);
+		            glPushMatrix();
+		            glLoadIdentity();
+		            glEnable(GL_TEXTURE_2D);
+		            glDisable(GL_LIGHTING);
+		            glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+		            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
 
-			textureMatrix.getRow( 1, rowArr );
-			row.put( rowArr );
-			row.flip();
-			row.rewind();
-			
-			GL11.glTexGeni( GL11.GL_T, GL11.GL_TEXTURE_GEN_MODE, GL11.GL_EYE_LINEAR);
-			GL11.glTexGen( GL11.GL_T, GL11.GL_EYE_PLANE, row );
-			GL11.glEnable( GL11.GL_TEXTURE_GEN_T );
+		            glBegin(GL_QUADS);
+		            glTexCoord2f(0.0F, 0.0F);
+		            glVertex2f(-1.0F, -1.0F);
+		            glTexCoord2f(1.0F, 0.0F);
+		            glVertex2f(1.0F, -1.0F);
+		            glTexCoord2f(1.0F, 1.0F);
+		            glVertex2f(1.0F, 1.0F);
+		            glTexCoord2f(0.0F, 1.0F);
+		            glVertex2f(-1.0F, 1.0F);
+		            glEnd();
 
-			textureMatrix.getRow( 2, rowArr );
-			row.put( rowArr );
-			row.flip();
-			row.rewind();
-			
-			GL11.glTexGeni( GL11.GL_R, GL11.GL_TEXTURE_GEN_MODE, GL11.GL_EYE_LINEAR);
-			GL11.glTexGen( GL11.GL_R, GL11.GL_EYE_PLANE, row );
-			GL11.glEnable( GL11.GL_TEXTURE_GEN_R );
+		            glDisable(GL_TEXTURE_2D);
+		            glEnable(GL_LIGHTING);
+		            glPopMatrix();
+		            glMatrixMode(GL_PROJECTION);
+		            gluPerspective(45.0F, 1.0F, 1.0F, 1000.0F);
+		            glMatrixMode(GL_MODELVIEW);
+		        } else {
+		            /*
+		                    * If we dont have the ambient shadow extention, we will need to
+		                    * add an extra rendering pass.
+		                    */
+		            if ( !ambientShadowsAvailable ) {
+		                FloatBuffer lowAmbient = BufferUtils.createFloatBuffer(4);
+		                lowAmbient.put(new float[]{0.1F, 0.1F, 0.1F, 1.0F});
+		                lowAmbient.flip();
 
-			textureMatrix.getRow( 3, rowArr );
-			row.put( rowArr );
-			row.flip();
-			row.rewind();
-			
-			GL11.glTexGeni( GL11.GL_Q, GL11.GL_TEXTURE_GEN_MODE, GL11.GL_EYE_LINEAR );
-			GL11.glTexGen( GL11.GL_Q, GL11.GL_EYE_PLANE, row );
-			GL11.glEnable( GL11.GL_TEXTURE_GEN_Q );
+		                FloatBuffer lowDiffuse = BufferUtils.createFloatBuffer(4);
+		                lowDiffuse.put(new float[]{0.35F, 0.35F, 0.35F, 1.0F});
+		                lowDiffuse.flip();
 
-			//Bind & enable shadow map texture
-			GL11.glBindTexture( GL11.GL_TEXTURE_2D, shadowMapTexture );
-			GL11.glEnable( GL11.GL_TEXTURE_2D );
+		                glLight(GL_LIGHT0, GL_AMBIENT, lowAmbient);
+		                glLight(GL_LIGHT0, GL_DIFFUSE, lowDiffuse);
 
-			//Enable shadow comparison
-			GL11.glTexParameteri( GL11.GL_TEXTURE_2D, ARBShadow.GL_TEXTURE_COMPARE_MODE_ARB, GL14.GL_COMPARE_R_TO_TEXTURE );
+		                plainRender = true;
+			            root.render( this );
+			            plainRender = false;
 
-			//Shadow comparison should be true (ie not in shadow) if r<=texture
-			GL11.glTexParameteri( GL11.GL_TEXTURE_2D, ARBShadow.GL_TEXTURE_COMPARE_FUNC_ARB, GL11.GL_LEQUAL);
+		                glAlphaFunc(GL_GREATER, 0.9F);
+		                glEnable(GL_ALPHA_TEST);
+		            }
 
-			//Shadow comparison should generate an INTENSITY result
-			GL11.glTexParameteri( GL11.GL_TEXTURE_2D, ARBDepthTexture.GL_DEPTH_TEXTURE_MODE_ARB, GL11.GL_INTENSITY);
+		            glLight(GL_LIGHT0, GL_AMBIENT, ambientLight);
+		            glLight(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
 
-			//Set alpha test to discard false comparisons
-			GL11.glAlphaFunc( GL11.GL_GEQUAL, 0.99f );
-			GL11.glEnable( GL11.GL_ALPHA_TEST );
+		            glEnable(GL_TEXTURE_2D);
+		            glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
 
-			root.render( this );
-			
-			lights.get( 0 ).disable( 0 );
-			
-			GL11.glPopAttrib();
+		            glEnable(GL_TEXTURE_GEN_S);
+		            glEnable(GL_TEXTURE_GEN_T);
+		            glEnable(GL_TEXTURE_GEN_R);
+		            glEnable(GL_TEXTURE_GEN_Q);
+
+		            tempBuffer.put(0, textureMatrix.m00);
+		            tempBuffer.put(1, textureMatrix.m01);
+		            tempBuffer.put(2, textureMatrix.m02);
+		            tempBuffer.put(3, textureMatrix.m03);
+
+		            glTexGen(GL_S, GL_EYE_PLANE, tempBuffer);
+
+		            tempBuffer.put(0, textureMatrix.m10);
+		            tempBuffer.put(1, textureMatrix.m11);
+		            tempBuffer.put(2, textureMatrix.m12);
+		            tempBuffer.put(3, textureMatrix.m13);
+
+		            glTexGen(GL_T, GL_EYE_PLANE, tempBuffer);
+
+		            tempBuffer.put(0, textureMatrix.m20);
+		            tempBuffer.put(1, textureMatrix.m21);
+		            tempBuffer.put(2, textureMatrix.m22);
+		            tempBuffer.put(3, textureMatrix.m23);
+
+		            glTexGen(GL_R, GL_EYE_PLANE, tempBuffer);
+
+		            tempBuffer.put(0, textureMatrix.m30);
+		            tempBuffer.put(1, textureMatrix.m31);
+		            tempBuffer.put(2, textureMatrix.m32);
+		            tempBuffer.put(3, textureMatrix.m33);
+
+		            glTexGen(GL_Q, GL_EYE_PLANE, tempBuffer);
+		            
+		            plainRender = true;
+		            root.render( this );
+		            plainRender = false;
+		            
+		            glDisable(GL_ALPHA_TEST);
+		            glDisable(GL_TEXTURE_2D);
+		            glDisable(GL_TEXTURE_GEN_S);
+		            glDisable(GL_TEXTURE_GEN_T);
+		            glDisable(GL_TEXTURE_GEN_R);
+		            glDisable(GL_TEXTURE_GEN_Q);
+		        }
+
+		        if (glGetError() != GL_NO_ERROR) {
+		            System.out.println("An OpenGL error occurred");
+		        }
 		}
 		else
 		{
 			root.render( this );
 		}
-		
+			
 		if( shaderEnabled && !plainRender )
 		{
 			shader.unbind();
@@ -354,4 +403,91 @@ public class World
 	{
 		this.transparency = transparency;
 	}
+	
+	 private void generateShadowMap() 
+	 {
+		 float lightToSceneDistance, nearPlane, fieldOfView;
+		 FloatBuffer lightModelView = BufferUtils.createFloatBuffer(16);
+		 FloatBuffer lightProjection = BufferUtils.createFloatBuffer(16);
+		 Matrix4f lightProjectionTemp = new Matrix4f();
+		 Matrix4f lightModelViewTemp = new Matrix4f();
+		 
+		 float sceneBoundingRadius = 250.0F;
+		
+		lightToSceneDistance = (float) Math.sqrt(lightPosition.get(0) * lightPosition.get(0) + lightPosition.get(1) *
+		        lightPosition.get(1) + lightPosition.get(2) * lightPosition.get(2));
+		
+		nearPlane = lightToSceneDistance - sceneBoundingRadius;
+		
+		fieldOfView = (float) Math.toDegrees(2.0F * Math.atan(sceneBoundingRadius / lightToSceneDistance));
+		
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho( focus.x - 100, focus.x + 100, focus.y + 100, focus.x - 100, -100, 100 );
+		glGetFloat(GL_PROJECTION_MATRIX, lightProjection);
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		gluLookAt(lightPosition.get(0), lightPosition.get(1), lightPosition.get(2), focus.x, focus.y, 0.0F, 0.0F, 0.0F, -1.0F);
+		glGetFloat(GL_MODELVIEW_MATRIX, lightModelView);
+		glViewport(0, 0, shadowWidth, shadowHeight);
+		
+		if (useFBO) {
+		    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, frameBuffer);
+		}
+	
+	        glClear(GL_DEPTH_BUFFER_BIT);
+	
+	        // Set rendering states to the minimum required, for speed.
+	glShadeModel(GL_FLAT);
+	glDisable(GL_LIGHTING);
+	glDisable(GL_COLOR_MATERIAL);
+	glDisable(GL_NORMALIZE);
+	glColorMask(false, false, false, false);
+	
+	glEnable(GL_POLYGON_OFFSET_FILL);
+	
+	plainRender = true;
+	root.render( this );
+	plainRender = false;
+	
+	glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 0, 0, shadowWidth, shadowHeight, 0);
+	
+	// Unbind the framebuffer if we are using them.
+	if (useFBO) {
+	    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	}
+	
+	// Setup the rendering states.
+	    glShadeModel(GL_SMOOTH);
+	    glEnable(GL_LIGHTING);
+	    glEnable(GL_COLOR_MATERIAL);
+	    glEnable(GL_NORMALIZE);
+	    glColorMask(true, true, true, true);
+	    glDisable(GL_POLYGON_OFFSET_FILL);
+	
+	    lightProjectionTemp.load(lightProjection);
+	    lightModelViewTemp.load(lightModelView);
+	    lightProjection.flip();
+	    lightModelView.flip();
+	
+	    Matrix4f tempMatrix = new Matrix4f();
+	    tempMatrix.setIdentity();
+	    tempMatrix.translate( new org.lwjgl.util.vector.Vector3f( 0.5F, 0.5F, 0.5F ) );
+	    tempMatrix.scale( new org.lwjgl.util.vector.Vector3f( .5F, 0.5F, 0.5F ) );
+	    Matrix4f.mul(tempMatrix, lightProjectionTemp, textureMatrix);
+	    Matrix4f.mul(textureMatrix, lightModelViewTemp, tempMatrix);
+	    Matrix4f.transpose(tempMatrix, textureMatrix);
+	}
+	 
+	 private void setUpBufferValues() 
+	 {
+		ambientLight.put(new float[]{0.2F, 0.2F, 0.2F, 1.0F});
+		ambientLight.flip();
+		
+		diffuseLight.put(new float[]{0.7F, 0.7F, 0.7F, 1.0F});
+		diffuseLight.flip();
+		
+		lightPosition.put(new float[]{ focus.x - 200, focus.y - 200, -200, 0.0F});
+		lightPosition.flip();
+	 }
 }
