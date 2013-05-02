@@ -18,10 +18,12 @@ import tacticshooter.ServerNetworkInterface;
 import tacticshooter.Slick2DEventMapper;
 import tacticshooter.Slick2DRenderer;
 import tacticshooter.StaticFiles;
+import tacticshooter.TacticClient;
 import tacticshooter.TacticServer;
 import tacticshooter.Unit.UnitType;
 import tacticshooter.UserInfo;
 
+import com.jme3.app.state.AbstractAppState;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DUI;
 import com.phyloa.dlib.dui.DUIElement;
@@ -33,7 +35,7 @@ import com.phyloa.dlib.util.DMath;
 import com.phyloa.dlib.util.DOptions;
 import com.phyloa.dlib.util.ImprovedNoise;
 
-public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIListener
+public class HomeScreen extends AbstractAppState
 {
 	TacticServer server;
 	
@@ -52,7 +54,7 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 	
 	Image title;
 	
-	public void onActivate( GameContainer e, DScreenHandler<GameContainer, Graphics> dsh )
+	public void onActivate( TacticClient e, DScreenHandler<GameContainer, Graphics> dsh )
 	{
 		if( dui == null )
 		{

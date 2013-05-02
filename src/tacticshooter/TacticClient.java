@@ -3,6 +3,7 @@ package tacticshooter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.HashMap;
 
 import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.AppGameContainer;
@@ -26,23 +27,27 @@ import com.danwink.tacticshooter.screens.OptionsScreen;
 import com.danwink.tacticshooter.screens.PostGameScreen;
 import com.danwink.tacticshooter.screens.ServerConnectScreen;
 import com.danwink.tacticshooter.screens.SettingsScreen;
+import com.jme3.app.SimpleApplication;
+import com.jme3.app.state.AppState;
+import com.jme3.app.state.AppStateManager;
 import com.phyloa.dlib.renderer.DScreenHandler;
 import com.phyloa.dlib.util.DFile;
 
-public class TacticClient extends BasicGame
+public class TacticClient extends SimpleApplication
 {
-	DScreenHandler<GameContainer, Graphics> dsh = new DScreenHandler<GameContainer, Graphics>();
-	
-	org.newdawn.slick.Font f;
+	HashMap<String, AppState> states = new HashMap<String, AppState>();
 	
 	public TacticClient()
 	{
-		super( "Tactic Shooter Client" );
+		
 	}
 
-	public void init( GameContainer gc ) throws SlickException
+	@Override
+	public void simpleInitApp() 
 	{
-		dsh.register( "home", new HomeScreen() );
+		AppStateManager asm = this.getStateManager();
+		
+		states.put( "home", new HomeScreen() );
 		dsh.register( "login", new LoginScreen() );
 		
 		dsh.register( "multiplayersetup", new MultiplayerSetupScreen() );
@@ -63,7 +68,7 @@ public class TacticClient extends BasicGame
 		dsh.register( "options", new OptionsScreen( "options.txt", "settings" ) );
 		dsh.register( "advoptions", new OptionsScreen( "data" + File.separator + "advoptions.txt", "settings" ) );
 		
-		dsh.activate( "home", gc );
+		dsh.activate( "home", null );
 		
 		new Thread( new Runnable() {
 			public void run()
@@ -81,65 +86,27 @@ public class TacticClient extends BasicGame
 			}
 		}).start();
 		
-		f = new AngelCodeFont( "data" + File.separator + "pixelfont1_16px.fnt", "data" + File.separator + "pixelfont1_16px_0.png" );
+		try
+		{
+			f = new AngelCodeFont( "data" + File.separator + "pixelfont1_16px.fnt", "data" + File.separator + "pixelfont1_16px_0.png" );
+		} catch( SlickException e )
+		{
+			e.printStackTrace();
+		}
 		
-		gc.setMusicVolume( StaticFiles.options.getF( "slider.music" ) );
-		gc.setSoundVolume( StaticFiles.options.getF( "slider.sound" ) );
+		//gc.setMusicVolume( StaticFiles.options.getF( "slider.music" ) );
+		//gc.setSoundVolume( StaticFiles.options.getF( "slider.sound" ) );
 	}
 	
-	public void update( GameContainer gc, int delta ) throws SlickException
+	@Override
+	public void simpleUpdate( float delta ) 
 	{
-		dsh.update( gc, delta );
-		
-		if( !(dsh.get() instanceof MultiplayerGameScreen) && !(dsh.get() instanceof LevelEditor) )
-		{
-			StaticFiles.bgd.update( delta );
-		}
-	}
-
-	public void render( GameContainer gc, Graphics g ) throws SlickException 
-	{
-		g.setFont( f );
-		g.setAntiAlias( StaticFiles.advOptions.getB( "antialias" ) );
-		
-		if( !(dsh.get() instanceof MultiplayerGameScreen) && !(dsh.get() instanceof LevelEditor) )
-		{
-			StaticFiles.bgd.render( gc, g );
-		}
-		
-		dsh.render( gc, g );
+		dsh.update( null, (int)(delta*1000) );
 	}
 	
 	public static void main( String[] args )
 	{
-		try
-		{
-			//Attempt to avoid sealed exception errors on zoe's mac
-			Class.forName( "javax.vecmath.Point2i" );
-			
-			AppGameContainer app = new AppGameContainer( new TacticClient() );
-			app.setDisplayMode( StaticFiles.options.getI( "windowWidth" ), StaticFiles.options.getI( "windowHeight" ), StaticFiles.options.getB( "fullscreen" ) );
-			app.setVSync( StaticFiles.options.getB( "vsync" ) );
-			app.setUpdateOnlyWhenVisible( false );
-			app.setAlwaysRender( true );
-			app.start();
-		} catch( Exception ex )
-		{
-			ex.printStackTrace();
-			
-			PrintWriter pw = null;
-			try {
-				pw = new PrintWriter( "tmp/error.log" );
-			} catch (FileNotFoundException e) {
-				System.exit( 0 );
-				e.printStackTrace();
-			}
-			ex.printStackTrace( pw );
-			
-			pw.flush();
-			pw.close();
-			
-			System.exit( 1 );
-		}
+		TacticClient tc = new TacticClient();
+		tc.start();
 	}
 }
