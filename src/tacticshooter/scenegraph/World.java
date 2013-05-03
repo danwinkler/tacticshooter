@@ -50,7 +50,7 @@ public class World
 	
 	float transparency = 1;
 	
-	boolean shadows = true;
+	boolean shadows = false;
 	boolean shadowsSetUp = false;
 	
 	 // This represents if the clients computer has the ambient shadow extention
