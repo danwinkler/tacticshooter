@@ -118,7 +118,6 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			dui.add( wall );
 			dui.add( floor );
 			dui.add( edge );
-			dui.add( light );
 			dui.add( teamACenter );
 			dui.add( teamBCenter );
 			dui.add( point );
