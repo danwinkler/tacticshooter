@@ -63,6 +63,10 @@ public class GLLevelRenderer
 	HashMap<Integer, Node> units = new HashMap<Integer, Node>();
 	HashMap<Integer, Node> buildings = new HashMap<Integer, Node>();
 	
+	Image man1Tex;
+	
+	Model[][] man1Models = new Model[4][4];
+	
 	public GLLevelRenderer( MultiplayerGameScreen mgs )
 	{
 		this.mgs = mgs;
@@ -153,15 +157,44 @@ public class GLLevelRenderer
 		world.add( dimSum );
 		
 		world.setLightsEnabled( true );
-		/*
+		
 		try
 		{
-			world.setShader( ShaderProgram.loadProgram( "data" + File.separator + "shaders" + File.separator + "shadow.vert", "data" + File.separator + "shaders" + File.separator + "shadow.frag" ) );
+			man1Tex = new Image( "img" + File.separator + "chicken.png" );
+			
+			float w4 = man1Tex.getWidth()/4;
+			float h4 = man1Tex.getHeight()/4; 
+			for( int x = 0; x < 4; x++ )
+			{
+				for( int y = 0; y < 4; y++ )
+				{	
+					Model m = new Model();
+					m.begin();
+					GL11.glBegin( GL11.GL_QUADS );
+					GL11.glNormal3f( 0, 1, 0 );
+					
+					GL11.glTexCoord2f( x*.25f, y*.25f );
+					GL11.glVertex3f( 0, 0, -1 );
+					
+					GL11.glTexCoord2f( x*.25f, (y+1)*.25f );
+					GL11.glVertex3f( 0, 0, 0 );
+					
+					GL11.glTexCoord2f( (x+1)*.25f, (y+1)*.25f );
+					GL11.glVertex3f( 1, 0, 0 );
+					
+					GL11.glTexCoord2f( (x+1)*.25f, y*.25f );
+					GL11.glVertex3f( 1, 0, -1 );
+					
+					GL11.glEnd();
+					m.end();
+					man1Models[x][y] = m;
+				}
+			}
+			
 		} catch( SlickException e )
 		{
 			e.printStackTrace();
 		}
-		*/
 	}
 	
 	public void render()
@@ -170,7 +203,7 @@ public class GLLevelRenderer
 		{
 			Node n = units.get( u.id );
 			n.mat.setIdentity();
-			n.rotateZ( u.heading );
+			//n.rotateZ( u.heading );
 			n.setPosition( u.x, u.y, n.getPosition().z );
 			for( Node c : n.getChildren() )
 			{
@@ -426,11 +459,13 @@ public class GLLevelRenderer
 		}
 		else
 		{
-			unit.setModel( mech );
-			unit.setPosition( u.x, u.y, -6 );
-			unit.setScale( 1, 1, 1 );
+			unit.setModel( man1Models[0][0] );
+			unit.setPosition( u.x, u.y, 0 );
+			unit.setScale( 10, 10, 10 );
+			unit.setTexture( man1Tex.getTexture() );
+			unit.setColor( Color.white );
 		}
-		unit.setColor( u.owner.team.getColor() );
+		//unit.setColor( u.owner.team.getColor() );
 		units.put( u.id, unit );
 		world.add( unit );
 		
