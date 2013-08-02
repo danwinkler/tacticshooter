@@ -532,7 +532,6 @@ public class TacticServer
 				if( player.money >= type.price )
 				{
 					player.money -= type.price;
-					si.sendToClient( m.sender, new Message( MessageType.PLAYERUPDATE, player ) );
 					Building base = null;
 					for( Building bu : l.buildings )
 					{
@@ -551,6 +550,7 @@ public class TacticServer
 						gs.get( u.owner.team ).unitsCreated++;
 					}
 				}
+				si.sendToClient( m.sender, new Message( MessageType.PLAYERUPDATE, player ) );
 				break;
 			}
 			case DISCONNECTED:
