@@ -16,11 +16,11 @@ public class WallParticle extends Particle<Graphics>
 	
 	public WallParticle( float x, float y, float dx, float dy, float duration )
 	{
-		super( x, y, dx, dy, duration );
+		super( x, y, 0, dx, dy, 0, duration );
 	}
 
 	public void render( Graphics g )
 	{
-		g.drawLine( x, y, x+dx, y+dy );
+		g.drawLine( pos.x, pos.y, pos.x+speed.x, pos.y+speed.y );
 	}
 }

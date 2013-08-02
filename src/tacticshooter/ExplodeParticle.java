@@ -16,7 +16,7 @@ public class ExplodeParticle extends Particle<Graphics>
 	
 	public ExplodeParticle( float x, float y, float dx, float dy, float duration )
 	{
-		super( x, y, dx, dy, duration );
+		super( x, y, 0, dx, dy, 0, duration );
 		maxdur = duration;
 	}
 
@@ -29,6 +29,6 @@ public class ExplodeParticle extends Particle<Graphics>
 	public void render( Graphics r )
 	{
 		r.setColor( c );
-		r.drawImage( im, x-size, y-size, x+size, y+size, 0, 0, 64, 64, c );
+		r.drawImage( im, pos.x-size, pos.y-size, pos.x+size, pos.y+size, 0, 0, 64, 64, c );
 	}
 }
