@@ -471,11 +471,14 @@ public class Unit
 				float dy = u.y - y;
 				float dist = dx*dx+dy*dy;
 				float dmg = Math.max( 0, 1500-(dist) );
-				Bullet b = new Bullet( x, y, heading );
-				b.owner = this.owner;
-				b.damage = (int)dmg;
-				b.shooter = this;
-				u.hit( b, ts );
+				if( dmg > 0 )
+				{
+					Bullet b = new Bullet( x, y, heading );
+					b.owner = this.owner;
+					b.damage = (int)dmg;
+					b.shooter = this;
+					u.hit( b, ts );
+				}
 			}
 		}
 	}
