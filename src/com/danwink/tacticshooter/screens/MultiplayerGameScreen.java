@@ -856,10 +856,13 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		}
 		else if( keyCode == Input.KEY_ENTER )
 		{
-			if( chatPanel.isVisible() && chatBox.getText().trim().length() > 0 )
+			if( chatPanel.isVisible() )
 			{
+				if( chatBox.getText().trim().length() > 0 )
+				{
+					ci.sendToServer( new Message( MessageType.MESSAGE, (teamChat.checked ? "/team " : "") + chatBox.getText().trim() ) );
+				}
 				chatPanel.setVisible( false );
-				ci.sendToServer( new Message( MessageType.MESSAGE, (teamChat.checked ? "/team " : "") + chatBox.getText().trim() ) );
 				chatBox.setText( "" );
 			}
 			else
