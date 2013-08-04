@@ -58,7 +58,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	public ClientState cs = new ClientState();
 	
 	boolean waitingForMoveConfirmation = false;
-	float mx = -1, my = -1;
 	
 	float sx, sy, sx2, sy2;
 	boolean selecting = false;
@@ -485,9 +484,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		g.drawImage( bloodTexture, 0, 0 );
 		cs.l.renderBuildings( g );
 		
-		g.setColor( this.waitingForMoveConfirmation ? Color.gray : Color.green );
-		g.drawRect( mx * Level.tileSize, my * Level.tileSize, Level.tileSize, Level.tileSize );
-		
 		for( int i = 0; i < cs.units.size(); i++ )
 		{
 			Unit u = cs.units.get( i );
@@ -705,8 +701,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 					int ty = cs.l.getTileY( ((y - (gc.getHeight()-200.f)) / 200.f) * cs.l.height*Level.tileSize );
 					ci.sendToServer( new Message( input.isKeyDown( Input.KEY_LCONTROL ) ? MessageType.SETATTACKPOINTCONTINUE : MessageType.SETATTACKPOINT, new Object[]{ new Point2i( tx, ty ), cs.selected } ) );
 					this.waitingForMoveConfirmation = true;
-					mx = tx;
-					my = ty;
 				}
 			}
 		}	
@@ -726,8 +720,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				int ty = (int)((y+cs.scrolly) / Level.tileSize);
 				ci.sendToServer( new Message( input.isKeyDown( Input.KEY_LCONTROL ) ? MessageType.SETATTACKPOINTCONTINUE : MessageType.SETATTACKPOINT, new Object[]{ new Point2i( tx, ty ), cs.selected } ) );
 				this.waitingForMoveConfirmation = true;
-				mx = tx;
-				my = ty;
 			}
 		}
 	}
