@@ -2,8 +2,11 @@ package com.danwink.tacticshooter.screens;
 
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
+import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
@@ -160,7 +163,21 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 		{
 			g.drawString( messages.get( i ), gc.getWidth() - 600 + 10, gc.getHeight() - 230 + count * -20 );
 			count++;
-		}	
+		}
+		
+		g.setColor( Color.white );
+		String hostname = ci.getServerAddr();
+		if( hostname.equals( "localhost" ) || hostname.equals( "127.0.0.1" ) )
+		{
+			try
+			{
+				InetAddress thisIp = InetAddress.getLocalHost();
+				hostname = thisIp.getHostAddress();
+			} catch( UnknownHostException e1 )
+			{
+			}
+		}
+		g.drawString( "Server Address: " + hostname, 30, 30 );
 	}
 
 	public void onExit() 

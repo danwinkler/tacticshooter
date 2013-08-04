@@ -10,8 +10,8 @@ import com.esotericsoftware.kryonet.Listener;
 
 public class ClientNetworkInterface implements ClientInterface
 {
-	Client client;
-	LinkedList<Message> messages = new LinkedList<Message>();
+	public Client client;
+	public LinkedList<Message> messages = new LinkedList<Message>();
 	
 	public ClientNetworkInterface( String address ) throws IOException
 	{
@@ -62,5 +62,10 @@ public class ClientNetworkInterface implements ClientInterface
 	public void stop()
 	{
 		client.close();
+	}
+	
+	public String getServerAddr()
+	{
+		return client.getRemoteAddressTCP().getHostName();
 	}
 }

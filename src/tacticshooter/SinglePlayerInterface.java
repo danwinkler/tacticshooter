@@ -63,4 +63,11 @@ public class SinglePlayerInterface implements ServerInterface, ClientInterface
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public String getServerAddr()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

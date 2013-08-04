@@ -6,4 +6,5 @@ public interface ClientInterface
 	public abstract Message getNextClientMessage();
 	public abstract boolean hasClientMessages();
 	public abstract void stop();
+	public String getServerAddr();
 }
