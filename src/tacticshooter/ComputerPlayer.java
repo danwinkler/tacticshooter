@@ -172,7 +172,7 @@ public class ComputerPlayer implements Runnable
 						float enemyUnits = 0;
 						for( Unit u : units )
 						{
-							if( u.owner.id == player.id && u.stoppedAt != null && u.stoppedAt.id == closeb.id )
+							if( u.owner.id == player.id && u.stoppedAt != null && closeb != null && u.stoppedAt.id == closeb.id )
 							{
 								ownUnits++;
 							} 

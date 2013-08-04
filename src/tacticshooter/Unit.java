@@ -535,7 +535,10 @@ public class Unit
 		}
 		else if( state == UnitState.STOPPED )
 		{
-			pathTo( l.getTileX( bullet.shooter.x ), l.getTileY( bullet.shooter.y ), ts );
+			//People didn't like the units running off
+			//pathTo( l.getTileX( bullet.shooter.x ), l.getTileY( bullet.shooter.y ), ts );
+			state = UnitState.TURNTO;
+			turnToAngle = (float) Math.atan2( -bullet.dir.y, -bullet.dir.x );
 		}
 	}
 	
