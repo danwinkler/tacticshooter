@@ -24,5 +24,6 @@ public enum MessageType
 	KICK, 
 	SETBOT,
 	SETPLAYTYPE,
-	STARTGAME;
+	STARTGAME, 
+	LOOKTOWARD;
 }

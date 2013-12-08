@@ -122,6 +122,7 @@ public class TacticClient extends BasicGame
 			Class.forName( "javax.vecmath.Point2i" );
 			
 			AppGameContainer app = new AppGameContainer( new TacticClient() );
+			app.setMultiSample( StaticFiles.advOptions.getI( "multisample" ) );
 			app.setDisplayMode( StaticFiles.options.getI( "windowWidth" ), StaticFiles.options.getI( "windowHeight" ), StaticFiles.options.getB( "fullscreen" ) );
 			app.setVSync( StaticFiles.options.getB( "vsync" ) );
 			app.setUpdateOnlyWhenVisible( false );

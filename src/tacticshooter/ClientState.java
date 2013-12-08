@@ -51,6 +51,6 @@ public class ClientState
 		float dx = (scrollx+(gc.getWidth()/2)) - x;
 		float dy = (scrolly+(gc.getHeight()/2)) - y;
 		float dist = (float)Math.sqrt( (dx*dx)+(dy*dy) );
-		return (float)((soundFadeDist - dist) / soundFadeDist);
+		return Math.max( (float)((soundFadeDist - dist) / soundFadeDist), 0 );
 	}
 }

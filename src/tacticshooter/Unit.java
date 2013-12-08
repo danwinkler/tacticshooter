@@ -175,7 +175,7 @@ public class Unit
 		case TURNTO:
 			float turnAmount = DMath.turnTowards( heading, turnToAngle ) * .4f;
 			heading += turnAmount;
-			if( turnAmount < .001f )
+			if( turnAmount < .00005f )
 			{
 				state = UnitState.STOPPED;
 			}

@@ -17,6 +17,7 @@ import org.newdawn.slick.util.pathfinding.PathFinder;
 
 import tacticshooter.Building.BuildingType;
 import tacticshooter.ComputerPlayer.PlayType;
+import tacticshooter.Unit.UnitState;
 import tacticshooter.Unit.UnitType;
 
 import com.phyloa.dlib.dui.DButton;
@@ -523,6 +524,21 @@ public class TacticServer
 					}
 				}
 				si.sendToClient( m.sender, new Message( MessageType.MOVESUCCESS, null ) );
+				break;
+			}
+			case LOOKTOWARD:
+			{
+				Object[] oa = (Object[])m.message;
+				Point2i p = (Point2i)oa[0];
+				ArrayList<Integer> selected = (ArrayList<Integer>)oa[1];
+				for( Unit unit : units )
+				{
+					if( unit.owner.id == m.sender && selected.contains( unit.id ) )
+					{
+						unit.state = UnitState.TURNTO;
+						unit.turnToAngle = (float) Math.atan2( p.y - unit.y, p.x - unit.x );
+					}
+				}
 				break;
 			}
 			case BUILDUNIT:
