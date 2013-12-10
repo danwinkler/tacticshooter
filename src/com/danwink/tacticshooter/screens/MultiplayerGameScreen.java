@@ -801,6 +801,11 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				sx2 = newx+cs.scrollx;
 				sy2 = newy+cs.scrolly;
 			}
+			else if( input.isMouseButtonDown( Input.MOUSE_MIDDLE_BUTTON ) )
+			{
+				cs.scrollx += oldx - newx;
+				cs.scrolly += oldy - newy;
+			}
 		}
 	}
 
