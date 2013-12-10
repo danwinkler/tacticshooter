@@ -723,6 +723,13 @@ public class TacticServer
 		si.sendToAllClients( new Message( MessageType.BULLETUPDATE, b ) );
 	}
 	
+	public void addBullet( Bullet b )
+	{
+		gs.get( b.owner.team ).bulletsShot++;
+		bullets.add( b );
+		si.sendToAllClients( new Message( MessageType.BULLETUPDATE, b ) );
+	}
+	
 	public class ServerLoop implements Runnable 
 	{
 		long lastTime;

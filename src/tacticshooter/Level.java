@@ -327,6 +327,11 @@ public class Level implements TileBasedMap
 	
 	public boolean hitwall( Point2f start, Vector2f direction )
 	{
+		return hitwall( start, direction, new Point2f() );
+	}
+	
+	public boolean hitwall( Point2f start, Vector2f direction, Point2f result )
+	{
 		Level l = this;
 		int cx, cy; // current x, y, in tiles
 		float cbx, cby; // starting tile cell bounds, in pixels
@@ -341,8 +346,6 @@ public class Level implements TileBasedMap
 		float tResult = 0;
 		
 		if( start == null ) return false;
-		
-		Point2f result = new Point2f();
 		
 		if( direction == null || (direction.x == 0 && direction.y == 0) )
 		{
@@ -452,11 +455,17 @@ public class Level implements TileBasedMap
 		// result time
 		tResult = (tMaxX < tMaxY) ? tMaxX : tMaxY;
 		
+		
+		// store the result 
+		result.x = start.x + (direction.x * tResult);
+		result.y = start.y + (direction.y * tResult);
+		
 		/*
-		 * // store the result result.x = start.x + (direction.x * tResult);
-		 * result.y = start.y + (direction.y * tResult); if(resultInTiles !=
-		 * null) { resultInTiles.x = cx; resultInTiles.y = cy; }
-		 */
+		if( resultInTiles != null ) { 
+			resultInTiles.x = cx; 
+			resultInTiles.y = cy; 
+		}
+		*/
 
 		return hitTile && tResult < 1;
 	}

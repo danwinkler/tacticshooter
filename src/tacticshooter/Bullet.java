@@ -42,6 +42,15 @@ public class Bullet
 		lastLoc = new Point2f( x - dir.x, y - dir.y );
 	}
 	
+	public Bullet( float x, float y, float dx, float dy )
+	{
+		loc = new Point2f( x, y );
+		dir = new Vector2f( dx, dy );
+		dir.normalize();
+		dir.scale( bulletSpeed );
+		lastLoc = new Point2f( x - dir.x, y - dir.y );
+	}
+	
 	public void update( TacticServer ts )
 	{
 		lastLoc.set( loc );
@@ -65,9 +74,38 @@ public class Bullet
 		}
 		
 		// Test if hits wall
-		if( l.hitwall( lastLoc, dir ) )
+		Point2f hitPoint = new Point2f();
+		if( l.hitwall( lastLoc, dir, hitPoint ) )
 		{
 			alive = false;
+			
+			Bullet b = null;
+			if( Math.abs( hitPoint.x - Math.round( hitPoint.x ) ) < .001f )
+			{
+				//hit vertical
+				if( Math.random() * 2.0f < Math.abs( dir.y ) / Math.abs( dir.x ) )
+				{
+					b = new Bullet( hitPoint.x-(dir.x*.01f), hitPoint.y, -dir.x, dir.y );
+				}
+			}
+			else if( Math.abs( hitPoint.y - Math.round( hitPoint.y ) ) < .001f )
+			{
+				//hit horizontal
+				if( Math.random() * 2.0f < Math.abs( dir.x ) / Math.abs( dir.y ) )
+				{
+					b = new Bullet( hitPoint.x, hitPoint.y-(dir.y*.01f), dir.x, -dir.y );
+				}
+			}
+			
+			if( b != null )
+			{
+				b.owner = this.owner;
+				b.shooter = this.shooter;
+				b.damage = this.damage;
+				ts.addBullet( b );
+			}
+			
+			
 			return;
 		}
 		
