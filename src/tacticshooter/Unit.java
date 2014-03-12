@@ -2,6 +2,8 @@ package tacticshooter;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Random;
 
 import javax.vecmath.Point2f;
@@ -13,7 +15,9 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
+import org.newdawn.slick.geom.Polygon;
 import org.newdawn.slick.util.pathfinding.Path;
+
 import com.phyloa.dlib.util.DMath;
 import com.phyloa.dlib.util.DOptions;
 
@@ -261,7 +265,7 @@ public class Unit
 		timeSinceUpdate++;
 	}
 	
-	public void render( Graphics g, Player p, float mx, float my, Level l )
+	public void render( Graphics g, Player p, float mx, float my, Level l, Graphics fog )
 	{
 		if( selected && state == UnitState.MOVING )
 		{
@@ -324,6 +328,77 @@ public class Unit
 		}
 		
 		g.popTransform();
+		
+		//LOS test
+		if( this.owner.team.id == p.team.id )
+		{
+			fog.setColor( Color.white );
+			int lx = l.getTileX( this.x );
+			int ly = l.getTileY( this.y );
+			
+			Point2f loc = new Point2f( x, y );
+			Vector2f v = new Vector2f();
+			Point2f result = new Point2f();
+			
+			ArrayList<Vector2f> vecs = new ArrayList<Vector2f>();
+			
+			for( int xx = Math.max( lx-10, 0 ); xx <= Math.min( lx+10, l.width-1 ); xx++ )
+			{
+				for( int yy = Math.max( ly-10, 0 ); yy <= Math.min( ly+10, l.height-1 ); yy++ )
+				{
+					if( !l.getTile( xx, yy ).isPassable() || !l.getTile( xx-1, yy ).isPassable() || !l.getTile( xx, yy-1 ).isPassable() || !l.getTile( xx-1, yy-1 ).isPassable() )
+					{
+						v.set( xx*l.tileSize - x, yy*l.tileSize - y );
+						v.scale( .999f );
+						if( !l.hitwall( loc, v, result ) )
+						{
+							vecs.add( new Vector2f( v ) );
+							//fog.drawLine( x, y, xx*l.tileSize, yy*l.tileSize );
+						}
+						/*
+						if( lx <= xx || ly <= yy )
+						{
+							g.drawLine( x, y, xx*l.tileSize, yy*l.tileSize );
+						}
+						
+						if( lx >= xx || ly <= yy )
+						{
+							g.drawLine( x, y, (xx+1)*l.tileSize, yy*l.tileSize );
+						}
+						
+						if( lx <= xx || ly >= yy )
+						{
+							g.drawLine( x, y, xx*l.tileSize, (yy+1)*l.tileSize );
+						}
+						
+						if( lx >= xx || ly >= yy )
+						{
+							g.drawLine( x, y, (xx+1)*l.tileSize, (yy+1)*l.tileSize );
+						}
+						*/
+					}
+				}
+			}
+			
+			final Vector2f base = new Vector2f( 0, 1 );
+			Collections.sort( vecs, new Comparator<Vector2f>() {
+				public int compare( Vector2f v1, Vector2f v2 )
+				{
+					return v1.angle( base ) < v2.angle( base ) ? -1 : 1;
+				}
+			});
+			
+			for( int i = 0; i < vecs.size(); i++ )
+			{
+				Vector2f v1 = vecs.get( i );
+				Vector2f v2 = vecs.get( (i+1)%vecs.size() );
+				Polygon poly = new Polygon();
+				poly.addPoint( x, y );
+				poly.addPoint( x+v1.x, y+v1.y );
+				poly.addPoint( x+v2.x, y+v2.y );
+				fog.fill( poly );
+			}
+		}
 	}
 
 	public void renderBody( Graphics g, Player p )

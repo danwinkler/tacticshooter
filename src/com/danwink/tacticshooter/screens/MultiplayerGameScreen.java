@@ -102,6 +102,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	Image craterTexture;
 	Image smoke1;
 	
+	Image fog;
+	
 	ArrayList<String> messages = new ArrayList<String>();
 	
 	ShaderProgram shader;
@@ -443,6 +445,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				wtg.flush();
 				
 				backgroundTexture = new Image( gc.getWidth() + Level.tileSize*2, gc.getHeight() + Level.tileSize*2 );
+				fog = new Image( cs.l.width * Level.tileSize, cs.l.height * Level.tileSize );
 				Graphics bgg = backgroundTexture.getGraphics();
 				for( int y = 0; y < gc.getHeight() + Level.tileSize*2; y += Level.tileSize )
 				{
@@ -476,6 +479,18 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			mapChanged = false;
 		}
 		
+		Graphics fogG = null;
+		try
+		{
+			fogG = fog.getGraphics();
+			fogG.setColor( Color.black );
+			fogG.fillRect( 0, 0, fog.getWidth(), fog.getHeight() );
+		}
+		catch( SlickException e )
+		{
+			e.printStackTrace();
+		}
+		
 		g.drawImage( backgroundTexture, -Level.tileSize-(cs.scrollx - ((int)(cs.scrollx/Level.tileSize))*Level.tileSize), -Level.tileSize-(cs.scrolly - ((int)(cs.scrolly/Level.tileSize)*Level.tileSize)) );
 		
 		g.setColor( Color.black );
@@ -505,11 +520,15 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		for( int i = 0; i < cs.units.size(); i++ )
 		{
 			Unit u = cs.units.get( i );
-			u.render( g, cs.player, input.getMouseX() + cs.scrollx, input.getMouseY() + cs.scrolly, cs.l );
+			u.render( g, cs.player, input.getMouseX() + cs.scrollx, input.getMouseY() + cs.scrolly, cs.l, fogG );
 		}
 		
 		g.setColor( Color.darkGray );
 		ps.render( g );
+		
+		//g.setDrawMode( Graphics.MODE_COLOR_MULTIPLY );
+		g.drawImage( fog, 0, 0 );
+		g.setDrawMode( Graphics.MODE_NORMAL );
 		
 		if( selecting )
 		{
