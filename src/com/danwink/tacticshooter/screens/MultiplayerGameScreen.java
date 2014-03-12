@@ -526,7 +526,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		g.setColor( Color.darkGray );
 		ps.render( g );
 		
-		//g.setDrawMode( Graphics.MODE_COLOR_MULTIPLY );
+		g.setDrawMode( Graphics.MODE_COLOR_MULTIPLY );
 		g.drawImage( fog, 0, 0 );
 		g.setDrawMode( Graphics.MODE_NORMAL );
 		

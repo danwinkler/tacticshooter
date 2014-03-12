@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Random;
 
+import javax.vecmath.Matrix3f;
 import javax.vecmath.Point2f;
 import javax.vecmath.Point2i;
 import javax.vecmath.Vector2f;
@@ -340,21 +341,31 @@ public class Unit
 			Vector2f v = new Vector2f();
 			Point2f result = new Point2f();
 			
+			final Vector2f base = new Vector2f( 0, 1 );
+			
 			ArrayList<Vector2f> vecs = new ArrayList<Vector2f>();
 			
-			for( int xx = Math.max( lx-10, 0 ); xx <= Math.min( lx+10, l.width-1 ); xx++ )
+			for( int xx = 0; xx < l.width; xx++ )
 			{
-				for( int yy = Math.max( ly-10, 0 ); yy <= Math.min( ly+10, l.height-1 ); yy++ )
+				for( int yy =0; yy < l.height; yy++ )
 				{
 					if( !l.getTile( xx, yy ).isPassable() || !l.getTile( xx-1, yy ).isPassable() || !l.getTile( xx, yy-1 ).isPassable() || !l.getTile( xx-1, yy-1 ).isPassable() )
 					{
 						v.set( xx*l.tileSize - x, yy*l.tileSize - y );
-						v.scale( .999f );
-						if( !l.hitwall( loc, v, result ) )
-						{
-							vecs.add( new Vector2f( v ) );
-							//fog.drawLine( x, y, xx*l.tileSize, yy*l.tileSize );
-						}
+						
+						float angle = (float)Math.atan2( v.y, v.x );
+						v.set( DMath.cosf( angle ) * 1000, DMath.sinf( angle ) * 1000 );
+						l.hitwall( loc, v, result );
+						vecs.add( new Vector2f( result.x-loc.x, result.y-loc.y ) );
+						
+						v.set( DMath.cosf( angle-.001f ) * 1000, DMath.sinf( angle-.001f ) * 1000 );
+						l.hitwall( loc, v, result );
+						vecs.add( new Vector2f( result.x-loc.x, result.y-loc.y ) );
+						
+						v.set( DMath.cosf( angle+.001f ) * 1000, DMath.sinf( angle+.001f ) * 1000 );
+						l.hitwall( loc, v, result );
+						vecs.add( new Vector2f( result.x-loc.x, result.y-loc.y ) );
+						
 						/*
 						if( lx <= xx || ly <= yy )
 						{
@@ -380,11 +391,12 @@ public class Unit
 				}
 			}
 			
-			final Vector2f base = new Vector2f( 0, 1 );
 			Collections.sort( vecs, new Comparator<Vector2f>() {
 				public int compare( Vector2f v1, Vector2f v2 )
 				{
-					return v1.angle( base ) < v2.angle( base ) ? -1 : 1;
+					float a1 = (float)Math.atan2( v1.y, v1.x );
+					float a2 = (float)Math.atan2( v2.y, v2.x );
+					return a1 < a2 ? -1 : 1;
 				}
 			});
 			
