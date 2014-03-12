@@ -114,6 +114,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	
 	ArrayList<Integer>[] battleGroups = new ArrayList[10];
 	
+	Unit control;
+	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
 		this.dsh = dsh;
@@ -678,133 +680,153 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 
 	public void mousePressed( int button, int x, int y )
 	{
-		if( x > gc.getWidth()-200 && y > gc.getHeight()-200 && !selecting )
-		{	
-			if( input.isKeyDown( Input.KEY_LCONTROL ) )
-			{
-				ci.sendToServer( new Message( MessageType.MESSAGE, "/ping " + (input.getMouseX()-(gc.getWidth()-200)) + " " + (input.getMouseY()-(gc.getHeight()-200)) ) );
-			}
+		if( control == null )
+		{
+			if( x > gc.getWidth()-200 && y > gc.getHeight()-200 && !selecting )
+			{	
+				if( input.isKeyDown( Input.KEY_LCONTROL ) )
+				{
+					ci.sendToServer( new Message( MessageType.MESSAGE, "/ping " + (input.getMouseX()-(gc.getWidth()-200)) + " " + (input.getMouseY()-(gc.getHeight()-200)) ) );
+				}
+				else
+				{
+					if( button == Input.MOUSE_LEFT_BUTTON )
+					{
+						//miniMap
+						float minimapX = x - (gc.getWidth()-200);
+						float minimapY = y - (gc.getHeight()-200);
+						Rectangle screenBounds = getScreenBounds();
+						cs.scrollx = DMath.bound( (minimapX / 200.f) * cs.l.width*Level.tileSize - gc.getWidth()/2, screenBounds.getMinX(), screenBounds.getMaxX() );
+						cs.scrolly = DMath.bound( (minimapY / 200.f) * cs.l.height*Level.tileSize - gc.getHeight()/2, screenBounds.getMinY(), screenBounds.getMaxY() );
+					}
+					else if( button == Input.MOUSE_RIGHT_BUTTON )
+					{
+						int tx = cs.l.getTileX( ((x - (gc.getWidth()-200.f)) / 200.f) * cs.l.width*Level.tileSize );
+						int ty = cs.l.getTileY( ((y - (gc.getHeight()-200.f)) / 200.f) * cs.l.height*Level.tileSize );
+						ci.sendToServer( new Message( input.isKeyDown( Input.KEY_LCONTROL ) ? MessageType.SETATTACKPOINTCONTINUE : MessageType.SETATTACKPOINT, new Object[]{ new Point2i( tx, ty ), cs.selected } ) );
+						this.waitingForMoveConfirmation = true;
+					}
+				}
+			}	
 			else
 			{
 				if( button == Input.MOUSE_LEFT_BUTTON )
 				{
-					//miniMap
-					float minimapX = x - (gc.getWidth()-200);
-					float minimapY = y - (gc.getHeight()-200);
-					Rectangle screenBounds = getScreenBounds();
-					cs.scrollx = DMath.bound( (minimapX / 200.f) * cs.l.width*Level.tileSize - gc.getWidth()/2, screenBounds.getMinX(), screenBounds.getMaxX() );
-					cs.scrolly = DMath.bound( (minimapY / 200.f) * cs.l.height*Level.tileSize - gc.getHeight()/2, screenBounds.getMinY(), screenBounds.getMaxY() );
-				}
+					sx = x + cs.scrollx;
+					sy = y + cs.scrolly;
+					sx2 = sx;
+					sy2 = sy;
+					selecting = true;
+				} 
 				else if( button == Input.MOUSE_RIGHT_BUTTON )
 				{
-					int tx = cs.l.getTileX( ((x - (gc.getWidth()-200.f)) / 200.f) * cs.l.width*Level.tileSize );
-					int ty = cs.l.getTileY( ((y - (gc.getHeight()-200.f)) / 200.f) * cs.l.height*Level.tileSize );
-					ci.sendToServer( new Message( input.isKeyDown( Input.KEY_LCONTROL ) ? MessageType.SETATTACKPOINTCONTINUE : MessageType.SETATTACKPOINT, new Object[]{ new Point2i( tx, ty ), cs.selected } ) );
+					int tx = (int)((x+cs.scrollx) / Level.tileSize);
+					int ty = (int)((y+cs.scrolly) / Level.tileSize);
+					if( input.isKeyDown( Input.KEY_LCONTROL ) )
+					{
+						ci.sendToServer( new Message( MessageType.SETATTACKPOINTCONTINUE, new Object[]{ new Point2i( tx, ty ), cs.selected } ) );
+					}
+					else if( input.isKeyDown( Input.KEY_LSHIFT ) )
+					{
+						ci.sendToServer( new Message( MessageType.LOOKTOWARD, new Object[]{ new Point2i( tx * Level.tileSize, ty * Level.tileSize ), cs.selected } ) );
+					}
+					else
+					{
+						ci.sendToServer( new Message( MessageType.SETATTACKPOINT, new Object[]{ new Point2i( tx, ty ), cs.selected } ) );
+					}
+					
 					this.waitingForMoveConfirmation = true;
 				}
-			}
-		}	
-		else
-		{
-			if( button == Input.MOUSE_LEFT_BUTTON )
-			{
-				sx = x + cs.scrollx;
-				sy = y + cs.scrolly;
-				sx2 = sx;
-				sy2 = sy;
-				selecting = true;
-			} 
-			else if( button == Input.MOUSE_RIGHT_BUTTON )
-			{
-				int tx = (int)((x+cs.scrollx) / Level.tileSize);
-				int ty = (int)((y+cs.scrolly) / Level.tileSize);
-				if( input.isKeyDown( Input.KEY_LCONTROL ) )
-				{
-					ci.sendToServer( new Message( MessageType.SETATTACKPOINTCONTINUE, new Object[]{ new Point2i( tx, ty ), cs.selected } ) );
-				}
-				else if( input.isKeyDown( Input.KEY_LSHIFT ) )
-				{
-					ci.sendToServer( new Message( MessageType.LOOKTOWARD, new Object[]{ new Point2i( tx * Level.tileSize, ty * Level.tileSize ), cs.selected } ) );
-				}
-				else
-				{
-					ci.sendToServer( new Message( MessageType.SETATTACKPOINT, new Object[]{ new Point2i( tx, ty ), cs.selected } ) );
-				}
-				
-				this.waitingForMoveConfirmation = true;
 			}
 		}
 	}
 
 	public void mouseReleased( int button, int x, int y )
 	{
-		if( button == Input.MOUSE_LEFT_BUTTON && selecting )
+		if( control == null )
 		{
-			cs.selected.clear();
-			
-			float x1 = Math.min( sx, x+cs.scrollx );
-			float y1 = Math.min( sy, y+cs.scrolly );
-			float x2 = Math.max( sx, x+cs.scrollx );
-			float y2 = Math.max( sy, y+cs.scrolly );
-			
-			if( x2 - x1 > 2 || y2 - y1 > 2 )
+			if( button == Input.MOUSE_LEFT_BUTTON && selecting )
 			{
-				for( Unit u : cs.units )
+				cs.selected.clear();
+				
+				float x1 = Math.min( sx, x+cs.scrollx );
+				float y1 = Math.min( sy, y+cs.scrolly );
+				float x2 = Math.max( sx, x+cs.scrollx );
+				float y2 = Math.max( sy, y+cs.scrolly );
+				
+				if( x2 - x1 > 2 || y2 - y1 > 2 )
 				{
-					u.selected = u.owner.id == this.cs.player.id && u.x > x1 && u.x < x2 && u.y > y1 && u.y < y2;
-					if( u.selected )
+					for( Unit u : cs.units )
 					{
-						cs.selected.add( u.id );
+						u.selected = u.owner.id == this.cs.player.id && u.x > x1 && u.x < x2 && u.y > y1 && u.y < y2;
+						if( u.selected )
+						{
+							cs.selected.add( u.id );
+						}
 					}
 				}
-			}
-			else
-			{
-				for( Unit u : cs.units )
+				else
 				{
-					float dx = x2 - u.x;
-					float dy = y2 - u.y;
-					if( u.owner.id == this.cs.player.id && dx*dx + dy*dy < u.radius * u.radius )
+					for( Unit u : cs.units )
 					{
-						u.selected = true;
-						cs.selected.add( u.id );
-						break;
-					}
-					else
-					{
-						u.selected = false;
+						float dx = x2 - u.x;
+						float dy = y2 - u.y;
+						if( u.owner.id == this.cs.player.id && dx*dx + dy*dy < u.radius * u.radius )
+						{
+							u.selected = true;
+							cs.selected.add( u.id );
+							break;
+						}
+						else
+						{
+							u.selected = false;
+						}
+						
+						//Disabling this code for now. Taking control of a unit is kind of a dumb idea
+						/*
+						if( input.isKeyDown( Input.KEY_LCONTROL ) )
+						{
+							control = u;
+							u.selected = false;
+							cs.selected.clear();
+							ci.sendToServer( new Message( MessageType.TAKECONTROL, u.id ) );
+						}
+						*/
 					}
 				}
+				selecting = false;
 			}
-			selecting = false;
 		}
 	}
 
 	public void mouseDragged( int oldx, int oldy, int newx, int newy )
 	{
-		if( newx > gc.getWidth()-200 && newy > gc.getHeight()-200 && !selecting )
-		{	
-			if( input.isMouseButtonDown( Input.MOUSE_LEFT_BUTTON ) && !input.isKeyDown( Input.KEY_LCONTROL ) )
-			{
-				//miniMap
-				float minimapX = newx - (gc.getWidth()-200);
-				float minimapY = newy - (gc.getHeight()-200);
-				Rectangle screenBounds = getScreenBounds();
-				cs.scrollx = DMath.bound( (minimapX / 200.f) * cs.l.width*Level.tileSize - gc.getWidth()/2, screenBounds.getMinX(), screenBounds.getMaxX() );
-				cs.scrolly = DMath.bound( (minimapY / 200.f) * cs.l.height*Level.tileSize - gc.getHeight()/2, screenBounds.getMinY(), screenBounds.getMaxY() );
-			}
-		}	
-		else
+		if( control == null )
 		{
-			if( input.isMouseButtonDown( Input.MOUSE_LEFT_BUTTON ) )
+			if( newx > gc.getWidth()-200 && newy > gc.getHeight()-200 && !selecting )
+			{	
+				if( input.isMouseButtonDown( Input.MOUSE_LEFT_BUTTON ) && !input.isKeyDown( Input.KEY_LCONTROL ) )
+				{
+					//miniMap
+					float minimapX = newx - (gc.getWidth()-200);
+					float minimapY = newy - (gc.getHeight()-200);
+					Rectangle screenBounds = getScreenBounds();
+					cs.scrollx = DMath.bound( (minimapX / 200.f) * cs.l.width*Level.tileSize - gc.getWidth()/2, screenBounds.getMinX(), screenBounds.getMaxX() );
+					cs.scrolly = DMath.bound( (minimapY / 200.f) * cs.l.height*Level.tileSize - gc.getHeight()/2, screenBounds.getMinY(), screenBounds.getMaxY() );
+				}
+			}	
+			else
 			{
-				sx2 = newx+cs.scrollx;
-				sy2 = newy+cs.scrolly;
-			}
-			else if( input.isMouseButtonDown( Input.MOUSE_MIDDLE_BUTTON ) )
-			{
-				cs.scrollx += oldx - newx;
-				cs.scrolly += oldy - newy;
+				if( input.isMouseButtonDown( Input.MOUSE_LEFT_BUTTON ) )
+				{
+					sx2 = newx+cs.scrollx;
+					sy2 = newy+cs.scrolly;
+				}
+				else if( input.isMouseButtonDown( Input.MOUSE_MIDDLE_BUTTON ) )
+				{
+					cs.scrollx += oldx - newx;
+					cs.scrolly += oldy - newy;
+				}
 			}
 		}
 	}

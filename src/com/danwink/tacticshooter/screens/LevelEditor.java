@@ -566,6 +566,7 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			{
 				try
 				{
+					if( name.getText().trim().length() == 0 ) { return; }
 					LevelFileHelper.saveLevel( name.getText().replace( ".", "" ), l );
 				} catch( IOException e1 )
 				{
@@ -576,12 +577,13 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			{
 				try
 				{
+					if( name.getText().trim().length() == 0 ) { return; }
 					LevelFileHelper.saveLevel( name.getText().replace( ".", "" ), l );
+					dsh.activate( "home", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
 				} catch( IOException e1 )
 				{
 					e1.printStackTrace();
 				}
-				dsh.activate( "home", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
 			}
 			else if( e == exitWithoutSaving )
 			{
