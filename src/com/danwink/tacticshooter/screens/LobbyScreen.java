@@ -22,8 +22,10 @@ import tacticshooter.Slick2DRenderer;
 import tacticshooter.StaticFiles;
 
 import com.phyloa.dlib.dui.DButton;
+import com.phyloa.dlib.dui.DCheckBox;
 import com.phyloa.dlib.dui.DDropDown;
 import com.phyloa.dlib.dui.DPanel;
+import com.phyloa.dlib.dui.DText;
 import com.phyloa.dlib.dui.DTextBox;
 import com.phyloa.dlib.dui.DUI;
 import com.phyloa.dlib.dui.DUIEvent;
@@ -46,6 +48,7 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 	DTextBox chatBox;
 	DButton startGame;
 	DButton leaveGame;
+	DCheckBox fog;
 	
 	Player[] slots = new Player[16];
 	
@@ -89,6 +92,11 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 		
 		chatBox = new DTextBox( gc.getWidth()-600, gc.getHeight() - 200, 500, 50 );
 		dui.add( chatBox );
+		
+		fog = new DCheckBox( gc.getWidth()-600, gc.getHeight() - 130, 20, 20 );
+		dui.add( fog );
+		
+		dui.add( new DText( "Enable Fog", gc.getWidth()-570, gc.getHeight() - 126 ) );
 		
 		DPanel chatBackground = new DPanel( gc.getWidth() - 600, 100, 500, gc.getHeight() - 310 );
 		chatBackground.setDrawBackground( true );
@@ -151,6 +159,8 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 				maps.setSelected( selectedMap );
 				break;
 			}
+			case FOGUPDATE:
+				
 			}
 		}
 	}

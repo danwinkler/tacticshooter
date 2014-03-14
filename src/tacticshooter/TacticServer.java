@@ -62,6 +62,7 @@ public class TacticServer
 	//LOBBY
 	Player[] slots = new Player[16];
 	int selectedMap = 0;
+	boolean fogEnabled = false;
 	
 	public TacticServer( ServerInterface si )
 	{
@@ -236,6 +237,7 @@ public class TacticServer
 							}
 						}
 						si.sendToClient( m.sender, new Message( MessageType.LEVELUPDATE, new Object[] { selectedMap, maps } ) );
+						si.sendToClient( m.sender, new Message( MessageType.FOGUPDATE, fogEnabled ) );
 						si.sendToAllClients( new Message( MessageType.PLAYERUPDATE, new Object[] { player.slot, player } ) );
 						si.sendToAllClients( new Message( MessageType.MESSAGE, player.name + " joined." ) );
 					}
@@ -332,6 +334,10 @@ public class TacticServer
 					}
 					break;
 				}
+				case FOGUPDATE:
+					fogEnabled = (Boolean)m.message;
+					si.sendToAllClients( new Message( MessageType.FOGUPDATE, fogEnabled ) );
+					break;
 				}
 			}
 			return;
