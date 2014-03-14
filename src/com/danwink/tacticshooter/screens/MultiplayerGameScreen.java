@@ -103,6 +103,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	Image smoke1;
 	
 	Image fog;
+	Image localFog;
 	
 	ArrayList<String> messages = new ArrayList<String>();
 	
@@ -446,6 +447,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				
 				backgroundTexture = new Image( gc.getWidth() + Level.tileSize*2, gc.getHeight() + Level.tileSize*2 );
 				fog = new Image( cs.l.width * Level.tileSize, cs.l.height * Level.tileSize );
+				localFog = new Image( 20 * Level.tileSize, 20 * Level.tileSize );
 				Graphics bgg = backgroundTexture.getGraphics();
 				for( int y = 0; y < gc.getHeight() + Level.tileSize*2; y += Level.tileSize )
 				{
@@ -480,11 +482,16 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		}
 		
 		Graphics fogG = null;
+		Graphics localFogG = null;
 		try
 		{
 			fogG = fog.getGraphics();
 			fogG.setColor( Color.black );
 			fogG.fillRect( 0, 0, fog.getWidth(), fog.getHeight() );
+			
+			localFogG = localFog.getGraphics();
+			localFogG.setColor( Color.black );
+			localFogG.fillRect( 0, 0, localFog.getWidth(), localFog.getHeight() );
 		}
 		catch( SlickException e )
 		{
@@ -525,6 +532,17 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		
 		g.setColor( Color.darkGray );
 		ps.render( g );
+		
+		for( int y = 0; y < cs.l.height; y++ )
+		{
+			for( int x = 0; x < cs.l.width; x++ )
+			{
+				if( !cs.l.tiles[x][y].isShootable() )
+				{
+					fogG.fillRect( x*cs.l.tileSize, y*cs.l.tileSize, cs.l.tileSize, cs.l.tileSize );
+				}
+			}
+		}
 		
 		g.setDrawMode( Graphics.MODE_COLOR_MULTIPLY );
 		g.drawImage( fog, 0, 0 );
@@ -582,6 +600,10 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			Unit u = cs.units.get( i );
 			u.renderMinimap( g, cs.player );
 		}
+		
+		g.setDrawMode( Graphics.MODE_COLOR_MULTIPLY );
+		g.drawImage( fog, 0, 0 );
+		g.setDrawMode( Graphics.MODE_NORMAL );
 		
 		g.popTransform();
 		
