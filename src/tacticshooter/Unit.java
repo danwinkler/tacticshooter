@@ -330,7 +330,6 @@ public class Unit
 		
 		g.popTransform();
 		
-		//LOS test
 		if( this.owner.team.id == p.team.id )
 		{
 			fog.setColor( Color.white );
@@ -341,12 +340,10 @@ public class Unit
 			Vector2f v = new Vector2f();
 			Point2f result = new Point2f();
 			
-			ArrayList<Vector2f> vecs = new ArrayList<Vector2f>();
-			
-			int xmin = Math.max( lx-12, 0 );
-			int ymin = Math.max( ly-12, 0 );
-			int xmax = Math.min( lx+12, l.width-1 );
-			int ymax = Math.min( ly+12, l.height-1 );
+			int xmin = Math.max( lx-10, 0 );
+			int ymin = Math.max( ly-10, 0 );
+			int xmax = Math.min( lx+10, l.width-1 );
+			int ymax = Math.min( ly+10, l.height-1 );
 			
 			float maxView = 10*l.tileSize;
 			float maxView2 = maxView * maxView;
@@ -355,71 +352,12 @@ public class Unit
 			{
 				for( int yy = ymin; yy < ymax; yy++ )
 				{
-					if( !l.getTile( xx, yy ).isPassable() || !l.getTile( xx-1, yy ).isPassable() || !l.getTile( xx, yy-1 ).isPassable() || !l.getTile( xx-1, yy-1 ).isPassable() )
+					v.set( xx*l.tileSize - x + (l.tileSize*.5f), yy*l.tileSize - y + (l.tileSize*.5f) );
+					if( v.lengthSquared() < maxView2 && !l.hitwall( loc, v, result ) )
 					{
-						v.set( xx*l.tileSize - x, yy*l.tileSize - y );
-						
-						float angle = (float)Math.atan2( v.y, v.x );
-						//v.set( DMath.cosf( angle ) * 1000, DMath.sinf( angle ) * 1000 );
-						//l.hitwall( loc, v, result );
-						//vecs.add( new Vector2f( result.x-loc.x, result.y-loc.y ) );
-						
-						v.set( DMath.cosf( angle-.0001f ) * 10, DMath.sinf( angle-.0001f ) * 10 );
-						l.hitwall( loc, v, result );
-						Vector2f endV = new Vector2f( result.x-loc.x, result.y-loc.y );
-						if( endV.lengthSquared() < maxView2 ) 
-						{
-							vecs.add( endV );
-						}
-						
-						v.set( DMath.cosf( angle+.0001f ) * 10, DMath.sinf( angle+.0001f ) * 10 );
-						l.hitwall( loc, v, result );
-						endV = new Vector2f( result.x-loc.x, result.y-loc.y );
-						if( endV.lengthSquared() < maxView2 ) 
-						{
-							vecs.add( endV );
-						}
+						fog.fillOval( xx*l.tileSize-(l.tileSize*.5f), yy*l.tileSize-(l.tileSize*.5f), l.tileSize*2, l.tileSize*2 );
 					}
 				}
-			}
-			
-			for( float a = 0; a < DMath.PI2F; a += DMath.PI2F / 24.f )
-			{
-				v.set( DMath.cosf( a ) * 10 * l.tileSize, DMath.sinf( a ) * 10 * l.tileSize );
-				if( !l.hitwall( loc, v, result ) )
-				{
-					vecs.add( new Vector2f( v ) );
-				}
-				else
-				{
-					vecs.add( new Vector2f( result.x-loc.x, result.y-loc.y ) );
-				}
-			}
-			
-			try 
-			{
-			Collections.sort( vecs, new Comparator<Vector2f>() {
-				public int compare( Vector2f v1, Vector2f v2 )
-				{
-					float a1 = (float)Math.atan2( v1.y, v1.x );
-					float a2 = (float)Math.atan2( v2.y, v2.x );
-					return a1 < a2 ? -1 : 1;
-				}
-			});
-			} catch( Exception e )
-			{
-				
-			}
-			
-			for( int i = 0; i < vecs.size(); i++ )
-			{
-				Vector2f v1 = vecs.get( i );
-				Vector2f v2 = vecs.get( (i+1)%vecs.size() );
-				Polygon poly = new Polygon();
-				poly.addPoint( x, y );
-				poly.addPoint( x+v1.x, y+v1.y );
-				poly.addPoint( x+v2.x, y+v2.y );
-				fog.fill( poly );
 			}
 		}
 	}

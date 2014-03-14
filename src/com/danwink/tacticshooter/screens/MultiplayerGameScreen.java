@@ -102,9 +102,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	Image craterTexture;
 	Image smoke1;
 	
-	Image fog;
-	Image localFog;
-	
+	Image fog;	
 	ArrayList<String> messages = new ArrayList<String>();
 	
 	ShaderProgram shader;
@@ -447,7 +445,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				
 				backgroundTexture = new Image( gc.getWidth() + Level.tileSize*2, gc.getHeight() + Level.tileSize*2 );
 				fog = new Image( cs.l.width * Level.tileSize, cs.l.height * Level.tileSize );
-				localFog = new Image( 20 * Level.tileSize, 20 * Level.tileSize );
 				Graphics bgg = backgroundTexture.getGraphics();
 				for( int y = 0; y < gc.getHeight() + Level.tileSize*2; y += Level.tileSize )
 				{
@@ -482,16 +479,11 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		}
 		
 		Graphics fogG = null;
-		Graphics localFogG = null;
 		try
 		{
 			fogG = fog.getGraphics();
 			fogG.setColor( Color.black );
 			fogG.fillRect( 0, 0, fog.getWidth(), fog.getHeight() );
-			
-			localFogG = localFog.getGraphics();
-			localFogG.setColor( Color.black );
-			localFogG.fillRect( 0, 0, localFog.getWidth(), localFog.getHeight() );
 		}
 		catch( SlickException e )
 		{
