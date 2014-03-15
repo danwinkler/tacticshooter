@@ -330,7 +330,7 @@ public class Unit
 		
 		g.popTransform();
 		
-		if( this.owner.team.id == p.team.id )
+		if( fog != null && this.owner.team.id == p.team.id )
 		{
 			fog.setColor( Color.white );
 			int lx = l.getTileX( this.x );

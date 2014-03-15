@@ -160,7 +160,8 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 				break;
 			}
 			case FOGUPDATE:
-				
+				fog.checked = (Boolean)m.message;
+				break;
 			}
 		}
 	}
@@ -271,6 +272,13 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 						}
 					}
 				}
+			}
+		}
+		else if( event.getElement() instanceof DCheckBox )
+		{
+			if( event.getElement() == fog )
+			{
+				ci.sendToServer( new Message( MessageType.FOGUPDATE, fog.checked ) );
 			}
 		}
 	}

@@ -159,6 +159,7 @@ public class TacticServer
 			}
 		}
 		
+		si.sendToAllClients( new Message( MessageType.FOGUPDATE, fogEnabled ) );
 		si.sendToAllClients( new Message( MessageType.LEVELUPDATE, l ) );
 		
 		for( int i = 0; i < 16; i++ )

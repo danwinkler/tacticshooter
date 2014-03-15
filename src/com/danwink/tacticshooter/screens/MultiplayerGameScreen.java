@@ -102,7 +102,9 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	Image craterTexture;
 	Image smoke1;
 	
+	boolean fogEnabled;
 	Image fog;	
+	
 	ArrayList<String> messages = new ArrayList<String>();
 	
 	ShaderProgram shader;
@@ -296,6 +298,9 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				dsh.message( "postgame", m.message );
 				dsh.activate( "postgame", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
 				return;
+			case FOGUPDATE:
+				fogEnabled = (Boolean)m.message;
+				break;
 			}
 		}
 		
@@ -444,7 +449,12 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				wtg.flush();
 				
 				backgroundTexture = new Image( gc.getWidth() + Level.tileSize*2, gc.getHeight() + Level.tileSize*2 );
-				fog = new Image( cs.l.width * Level.tileSize, cs.l.height * Level.tileSize );
+				
+				if( fogEnabled )
+				{
+					fog = new Image( cs.l.width * Level.tileSize, cs.l.height * Level.tileSize );
+				}
+				
 				Graphics bgg = backgroundTexture.getGraphics();
 				for( int y = 0; y < gc.getHeight() + Level.tileSize*2; y += Level.tileSize )
 				{
@@ -479,15 +489,18 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		}
 		
 		Graphics fogG = null;
-		try
+		if( fogEnabled )
 		{
-			fogG = fog.getGraphics();
-			fogG.setColor( Color.black );
-			fogG.fillRect( 0, 0, fog.getWidth(), fog.getHeight() );
-		}
-		catch( SlickException e )
-		{
-			e.printStackTrace();
+			try
+			{
+				fogG = fog.getGraphics();
+				fogG.setColor( Color.black );
+				fogG.fillRect( 0, 0, fog.getWidth(), fog.getHeight() );
+			}
+			catch( SlickException e )
+			{
+				e.printStackTrace();
+			}
 		}
 		
 		g.drawImage( backgroundTexture, -Level.tileSize-(cs.scrollx - ((int)(cs.scrollx/Level.tileSize))*Level.tileSize), -Level.tileSize-(cs.scrolly - ((int)(cs.scrolly/Level.tileSize)*Level.tileSize)) );
@@ -499,6 +512,18 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		
 		g.drawImage( bloodTexture, 0, 0 );
 		cs.l.renderBuildings( g );
+		
+		if( fogEnabled ) {
+			for( int i = 0; i < cs.l.buildings.size(); i++ )
+			{
+				Building b = cs.l.buildings.get( i );
+				if( b.t.id == this.cs.player.team.id )
+				{
+					fogG.setColor( Color.white );
+					fogG.fillOval( b.x - b.bt.bu.getRadius(), b.y - b.bt.bu.getRadius(), b.bt.bu.getRadius()*2, b.bt.bu.getRadius()*2 );
+				}
+			}
+		}
 		
 		for( int i = 0; i < cs.units.size(); i++ )
 		{
@@ -525,20 +550,23 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		g.setColor( Color.darkGray );
 		ps.render( g );
 		
-		for( int y = 0; y < cs.l.height; y++ )
+		if( fogEnabled )
 		{
-			for( int x = 0; x < cs.l.width; x++ )
+			for( int y = 0; y < cs.l.height; y++ )
 			{
-				if( !cs.l.tiles[x][y].isShootable() )
+				for( int x = 0; x < cs.l.width; x++ )
 				{
-					fogG.fillRect( x*cs.l.tileSize, y*cs.l.tileSize, cs.l.tileSize, cs.l.tileSize );
+					if( !cs.l.tiles[x][y].isShootable() )
+					{
+						fogG.fillRect( x*cs.l.tileSize, y*cs.l.tileSize, cs.l.tileSize, cs.l.tileSize );
+					}
 				}
 			}
-		}
 		
-		g.setDrawMode( Graphics.MODE_COLOR_MULTIPLY );
-		g.drawImage( fog, 0, 0 );
-		g.setDrawMode( Graphics.MODE_NORMAL );
+			g.setDrawMode( Graphics.MODE_COLOR_MULTIPLY );
+			g.drawImage( fog, 0, 0 );
+			g.setDrawMode( Graphics.MODE_NORMAL );
+		}
 		
 		if( selecting )
 		{
@@ -593,9 +621,12 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			u.renderMinimap( g, cs.player );
 		}
 		
-		g.setDrawMode( Graphics.MODE_COLOR_MULTIPLY );
-		g.drawImage( fog, 0, 0 );
-		g.setDrawMode( Graphics.MODE_NORMAL );
+		if( fogEnabled )
+		{
+			g.setDrawMode( Graphics.MODE_COLOR_MULTIPLY );
+			g.drawImage( fog, 0, 0 );
+			g.setDrawMode( Graphics.MODE_NORMAL );
+		}
 		
 		g.popTransform();
 		
