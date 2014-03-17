@@ -30,7 +30,7 @@ import com.danwink.tacticshooter.screens.OptionsScreen;
 import com.danwink.tacticshooter.screens.PostGameScreen;
 import com.danwink.tacticshooter.screens.ServerConnectScreen;
 import com.danwink.tacticshooter.screens.SettingsScreen;
-import com.phyloa.dlib.renderer.DScreenHandler;
+import com.phyloa.dlib.game.DScreenHandler;
 import com.phyloa.dlib.util.DFile;
 
 public class TacticClient extends BasicGame

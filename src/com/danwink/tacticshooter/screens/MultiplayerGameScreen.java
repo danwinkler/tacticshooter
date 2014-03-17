@@ -47,9 +47,9 @@ import com.phyloa.dlib.dui.DUI;
 import com.phyloa.dlib.dui.DUIElement;
 import com.phyloa.dlib.dui.DUIEvent;
 import com.phyloa.dlib.dui.DUIListener;
+import com.phyloa.dlib.game.DScreen;
+import com.phyloa.dlib.game.DScreenHandler;
 import com.phyloa.dlib.particle.ParticleSystem;
-import com.phyloa.dlib.renderer.DScreen;
-import com.phyloa.dlib.renderer.DScreenHandler;
 import com.phyloa.dlib.util.DMath;
 
 public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> implements InputListener, DUIListener

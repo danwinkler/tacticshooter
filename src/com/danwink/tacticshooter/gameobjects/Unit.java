@@ -599,7 +599,7 @@ public class Unit
 		HEAVY( 1.5f, 3, .1f, 20, 200, 1, 10  ),
 		SHOTGUN( 3.0f, 30, .3f, 15, 150, 6, 10 ),
 		SCOUT( 6f, 30, .1f, 3, 30, 1, 10 ),
-		SNIPER( 2.5f, 100, 0, 20, 90, 1, 100 ),
+		SNIPER( 2.5f, 100, 0, 15, 90, 1, 100 ),
 		SABOTEUR( 4f, 10000, 0, 20, 150, 0, 0 );
 		
 		public float speed;

@@ -10,8 +10,8 @@ import com.danwink.tacticshooter.MessageType;
 import com.danwink.tacticshooter.TacticServer.ServerState;
 import com.danwink.tacticshooter.network.ClientNetworkInterface;
 import com.danwink.tacticshooter.network.Message;
-import com.phyloa.dlib.renderer.DScreen;
-import com.phyloa.dlib.renderer.DScreenHandler;
+import com.phyloa.dlib.game.DScreen;
+import com.phyloa.dlib.game.DScreenHandler;
 
 public class ServerConnectScreen extends DScreen<GameContainer, Graphics>
 {

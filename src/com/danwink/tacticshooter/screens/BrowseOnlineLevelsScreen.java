@@ -22,8 +22,8 @@ import com.phyloa.dlib.dui.DUI;
 import com.phyloa.dlib.dui.DUIElement;
 import com.phyloa.dlib.dui.DUIEvent;
 import com.phyloa.dlib.dui.DUIListener;
-import com.phyloa.dlib.renderer.DScreen;
-import com.phyloa.dlib.renderer.DScreenHandler;
+import com.phyloa.dlib.game.DScreen;
+import com.phyloa.dlib.game.DScreenHandler;
 
 public class BrowseOnlineLevelsScreen extends DScreen<GameContainer, Graphics> implements DUIListener
 {	
