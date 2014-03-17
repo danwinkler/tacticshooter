@@ -10,17 +10,16 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
-import tacticshooter.ClientInterface;
-import tacticshooter.ClientNetworkInterface;
-import tacticshooter.ComputerPlayer;
-import tacticshooter.ComputerPlayer.PlayType;
-import tacticshooter.Message;
-import tacticshooter.MessageType;
-import tacticshooter.Player;
-import tacticshooter.Slick2DEventMapper;
-import tacticshooter.Slick2DRenderer;
-import tacticshooter.StaticFiles;
 
+import com.danwink.tacticshooter.ComputerPlayer;
+import com.danwink.tacticshooter.MessageType;
+import com.danwink.tacticshooter.StaticFiles;
+import com.danwink.tacticshooter.ComputerPlayer.PlayType;
+import com.danwink.tacticshooter.gameobjects.Player;
+import com.danwink.tacticshooter.network.ClientInterface;
+import com.danwink.tacticshooter.network.Message;
+import com.danwink.tacticshooter.slick.Slick2DEventMapper;
+import com.danwink.tacticshooter.slick.Slick2DRenderer;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DCheckBox;
 import com.phyloa.dlib.dui.DDropDown;

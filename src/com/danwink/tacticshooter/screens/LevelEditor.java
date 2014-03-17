@@ -11,17 +11,17 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.InputListener;
 import org.newdawn.slick.SlickException;
 
-import tacticshooter.Building;
-import tacticshooter.Building.BuildingType;
-import tacticshooter.Level;
-import tacticshooter.Level.Link;
-import tacticshooter.Level.TileType;
-import tacticshooter.LevelFileHelper;
-import tacticshooter.Slick2DEventMapper;
-import tacticshooter.Slick2DRenderer;
-import tacticshooter.StaticFiles;
-import tacticshooter.Team;
 
+import com.danwink.tacticshooter.LevelFileHelper;
+import com.danwink.tacticshooter.StaticFiles;
+import com.danwink.tacticshooter.gameobjects.Building;
+import com.danwink.tacticshooter.gameobjects.Level;
+import com.danwink.tacticshooter.gameobjects.Team;
+import com.danwink.tacticshooter.gameobjects.Building.BuildingType;
+import com.danwink.tacticshooter.gameobjects.Level.Link;
+import com.danwink.tacticshooter.gameobjects.Level.TileType;
+import com.danwink.tacticshooter.slick.Slick2DEventMapper;
+import com.danwink.tacticshooter.slick.Slick2DRenderer;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DText;
 import com.phyloa.dlib.dui.DTextBox;

@@ -5,10 +5,10 @@ import java.awt.event.KeyEvent;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
-import tacticshooter.Slick2DEventMapper;
-import tacticshooter.Slick2DRenderer;
-import tacticshooter.StaticFiles;
 
+import com.danwink.tacticshooter.StaticFiles;
+import com.danwink.tacticshooter.slick.Slick2DEventMapper;
+import com.danwink.tacticshooter.slick.Slick2DRenderer;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DTextBox;
 import com.phyloa.dlib.dui.DUI;

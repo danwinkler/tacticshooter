@@ -24,12 +24,10 @@ import org.apache.http.util.EntityUtils;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
-import tacticshooter.Level;
-import tacticshooter.Slick2DEventMapper;
-import tacticshooter.Slick2DRenderer;
-import tacticshooter.StaticFiles;
-import tacticshooter.UserInfo;
 
+import com.danwink.tacticshooter.StaticFiles;
+import com.danwink.tacticshooter.slick.Slick2DEventMapper;
+import com.danwink.tacticshooter.slick.Slick2DRenderer;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DCheckBox;
 import com.phyloa.dlib.dui.DText;

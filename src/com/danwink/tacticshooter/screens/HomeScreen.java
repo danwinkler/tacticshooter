@@ -12,16 +12,13 @@ import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.opengl.shader.ShaderProgram;
 
-import tacticshooter.AutoTileDrawer;
-import tacticshooter.Level;
-import tacticshooter.ServerNetworkInterface;
-import tacticshooter.Slick2DEventMapper;
-import tacticshooter.Slick2DRenderer;
-import tacticshooter.StaticFiles;
-import tacticshooter.TacticServer;
-import tacticshooter.Unit.UnitType;
-import tacticshooter.UserInfo;
 
+import com.danwink.tacticshooter.StaticFiles;
+import com.danwink.tacticshooter.TacticServer;
+import com.danwink.tacticshooter.gameobjects.Unit.UnitType;
+import com.danwink.tacticshooter.network.ServerNetworkInterface;
+import com.danwink.tacticshooter.slick.Slick2DEventMapper;
+import com.danwink.tacticshooter.slick.Slick2DRenderer;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DUI;
 import com.phyloa.dlib.dui.DUIElement;

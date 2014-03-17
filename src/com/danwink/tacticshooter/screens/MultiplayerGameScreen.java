@@ -18,26 +18,26 @@ import org.newdawn.slick.Sound;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.opengl.shader.ShaderProgram;
 
-import tacticshooter.ExplodeParticle;
-import tacticshooter.Building;
-import tacticshooter.Building.BuildingType;
-import tacticshooter.Bullet;
-import tacticshooter.ClientInterface;
-import tacticshooter.ClientState;
-import tacticshooter.Level;
-import tacticshooter.Level.TileType;
-import tacticshooter.AutoTileDrawer;
-import tacticshooter.Message;
-import tacticshooter.MessageType;
-import tacticshooter.MusicQueuer;
-import tacticshooter.Player;
-import tacticshooter.Slick2DEventMapper;
-import tacticshooter.Slick2DRenderer;
-import tacticshooter.StaticFiles;
-import tacticshooter.Team;
-import tacticshooter.Unit;
-import tacticshooter.Unit.UnitType;
 
+import com.danwink.tacticshooter.AutoTileDrawer;
+import com.danwink.tacticshooter.ClientState;
+import com.danwink.tacticshooter.ExplodeParticle;
+import com.danwink.tacticshooter.MessageType;
+import com.danwink.tacticshooter.MusicQueuer;
+import com.danwink.tacticshooter.StaticFiles;
+import com.danwink.tacticshooter.gameobjects.Building;
+import com.danwink.tacticshooter.gameobjects.Bullet;
+import com.danwink.tacticshooter.gameobjects.Level;
+import com.danwink.tacticshooter.gameobjects.Player;
+import com.danwink.tacticshooter.gameobjects.Team;
+import com.danwink.tacticshooter.gameobjects.Unit;
+import com.danwink.tacticshooter.gameobjects.Building.BuildingType;
+import com.danwink.tacticshooter.gameobjects.Level.TileType;
+import com.danwink.tacticshooter.gameobjects.Unit.UnitType;
+import com.danwink.tacticshooter.network.ClientInterface;
+import com.danwink.tacticshooter.network.Message;
+import com.danwink.tacticshooter.slick.Slick2DEventMapper;
+import com.danwink.tacticshooter.slick.Slick2DRenderer;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DCheckBox;
 import com.phyloa.dlib.dui.DPanel;
@@ -517,7 +517,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			for( int i = 0; i < cs.l.buildings.size(); i++ )
 			{
 				Building b = cs.l.buildings.get( i );
-				if( b.t.id == this.cs.player.team.id )
+				if( b.t != null && b.t.id == this.cs.player.team.id )
 				{
 					fogG.setColor( Color.white );
 					fogG.fillOval( b.x - b.bt.bu.getRadius(), b.y - b.bt.bu.getRadius(), b.bt.bu.getRadius()*2, b.bt.bu.getRadius()*2 );
