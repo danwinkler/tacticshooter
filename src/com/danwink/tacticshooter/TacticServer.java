@@ -152,9 +152,16 @@ public class TacticServer
 				slots[i].team = i < 8 ? a : b;
 				if( slots[i].isBot )
 				{
-					ComputerPlayer cp = new ComputerPlayer( (ServerNetworkInterface)si );
+					ComputerPlayer cp = null;
+					try {
+						cp = (ComputerPlayer)slots[i].playType.c.newInstance();
+					} catch (InstantiationException e) {
+						e.printStackTrace();
+					} catch (IllegalAccessException e) {
+						e.printStackTrace();
+					}
+					cp.setup( (ServerNetworkInterface)si );
 					cp.player = slots[i];
-					cp.playType = slots[i].playType;
 					cp.l = l;
 					slots[i].id = cp.fc.id;
 					players.put( cp.fc.id, slots[i] );

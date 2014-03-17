@@ -1,6 +1,4 @@
 package com.danwink.tacticshooter;
-import java.awt.image.BufferedImage;
-
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 

@@ -1,35 +1,30 @@
 package com.danwink.tacticshooter;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map.Entry;
-
 import javax.vecmath.Point2i;
 
 import org.newdawn.slick.util.pathfinding.AStarPathFinder;
 import org.newdawn.slick.util.pathfinding.Path;
 import org.newdawn.slick.util.pathfinding.PathFinder;
 
+import com.danwink.tacticshooter.ai.Aggressive;
+import com.danwink.tacticshooter.ai.Masser;
+import com.danwink.tacticshooter.ai.Moderate;
+import com.danwink.tacticshooter.ai.Sneaky;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.gameobjects.Unit;
-import com.danwink.tacticshooter.gameobjects.Building.BuildingType;
 import com.danwink.tacticshooter.gameobjects.Level.TileType;
 import com.danwink.tacticshooter.gameobjects.Unit.UnitState;
 import com.danwink.tacticshooter.gameobjects.Unit.UnitType;
+import com.danwink.tacticshooter.network.FakeConnection;
 import com.danwink.tacticshooter.network.Message;
 import com.danwink.tacticshooter.network.ServerNetworkInterface;
-import com.esotericsoftware.kryonet.Connection;
-import com.phyloa.dlib.util.DFile;
 import com.phyloa.dlib.util.DMath;
 
-
-public class ComputerPlayer implements Runnable 
+public abstract class ComputerPlayer implements Runnable 
 {
 	public ServerNetworkInterface ci;
 	
@@ -42,25 +37,20 @@ public class ComputerPlayer implements Runnable
 	
 	boolean playing = true;
 	
-	public PlayType playType;
-	
 	public Player[] players = new Player[0];
 	
 	public PathFinder finder;
 	
-	//MASSER:
-	boolean attacking = false;
-	public ArrayList<Unit> attackForce = new ArrayList<Unit>();
-	float attackPropensity = DMath.randomf( 1.5f, 4 );
-	public Building target;
-	public Building closeb;
+	public int sleepDuration = 1000;
 	
-	public ComputerPlayer( ServerNetworkInterface si )
+	public void setup( ServerNetworkInterface si )
 	{
 		fc = new FakeConnection();
 		ci = si;
 		ci.sl.connected( fc );
 	}
+	
+	public abstract void update( PathFinder finder );
 	
 	public void run() 
 	{
@@ -128,197 +118,7 @@ public class ComputerPlayer implements Runnable
 			if( player != null && l != null )
 			{	
 				finder = new AStarPathFinder( l, 500, StaticFiles.options.getB( "diagonalMove" ) );
-				if( playType == PlayType.MASSER )
-				{
-					//Find enemy point with most units
-					int maxUnits = 0;
-					for( Building b : l.buildings )
-					{
-						if( b.t != null && b.t.id != this.player.team.id )
-						{
-							int count = 0;
-							for( Unit u : units )
-							{
-								if( u.stoppedAt != null && u.stoppedAt.id == b.id )
-								{
-									count++;
-								}
-							}
-							if( count > maxUnits )
-							{
-								maxUnits = count;
-								target = b;
-							}
-						}
-					}
-					
-					if( target == null ) continue;
-					//Find closest friendly building to target
-					closeb = null;
-					float closeDist = Float.MAX_VALUE;
-					for( Building b : l.buildings )
-					{
-						if( b.t != null && b.t.id == this.player.team.id && b.hold == Building.HOLDMAX )
-						{
-							Path p = finder.findPath( null, l.getTileX( b.x ), l.getTileY( b.y ), l.getTileX( target.x ), l.getTileY( target.y ) );
-							if( p == null ) continue;
-							float d2 = p.getLength();
-							if( d2 < closeDist )
-							{
-								closeDist = d2;
-								closeb = b;
-							}
-						}
-					}
-					
-					if( !attacking )
-					{
-						//count own units, enemy units
-						int ownUnits = 0;
-						float enemyUnits = 0;
-						for( Unit u : units )
-						{
-							if( u.owner.id == player.id && u.stoppedAt != null && closeb != null && u.stoppedAt.id == closeb.id )
-							{
-								ownUnits++;
-							} 
-							else if( u.stoppedAt != null && u.stoppedAt.id == target.id )
-							{
-								enemyUnits++;
-							}
-						}
-						
-						if( players.length == 0 ) continue;
-						
-						if( ownUnits >= (enemyUnits * attackPropensity) || Math.random() < .0025 )
-						{
-							attacking = true;
-							
-							attackForce.clear();
-							
-							ArrayList<Integer> selected = new ArrayList<Integer>();
-							
-							for( Unit u : units )
-							{
-								if( u.owner.id == player.id )
-								{
-									attackForce.add( u );
-									selected.add( u.id );
-								}
-							}
-							
-							ci.sl.received( fc, new Message( MessageType.SETATTACKPOINT, new Object[]{ new Point2i( target.x/Level.tileSize, target.y/Level.tileSize ), selected } ) );
-						}
-					}
-					else
-					{
-						for( int i = 0; i < attackForce.size(); i++ )
-						{
-							Unit u = unitMap.get( attackForce.get( i ).id );
-							if( u == null || !u.alive )
-							{
-								attackForce.remove( i );
-								i--;
-							}
-							else
-							{
-								//Not necessary now that guys don't lose their path
-								//ArrayList<Integer> selected = new ArrayList<Integer>();
-								//selected.add( u.id );
-								//ci.sl.received( fc, new Message( MessageType.SETATTACKPOINT, new Object[]{ new Point2i( target.x/Level.tileSize, target.y/Level.tileSize ), selected } ) );
-							}
-						}
-						if( attackForce.size() == 0 || (target.t != null && target.t.id == player.team.id) )
-						{
-							attacking = false;
-							attackPropensity = DMath.randomf( 1.5f, 4f );
-						}
-					}
-				}
-				
-				for( Unit u : units )
-				{
-					if( u.owner.id == player.id && (u.state == UnitState.STOPPED || (Math.random() < .1f && playType != PlayType.SNEAKY) ) )
-					{
-						if( playType == PlayType.MASSER )
-						{
-							if( !attacking )
-							{
-								if( closeb == null ) break;
-								if( u.stoppedAt != null && u.stoppedAt == closeb ) break;
-								
-								ArrayList<Integer> selected = new ArrayList<Integer>();
-								selected.add( u.id );
-								ci.sl.received( fc, new Message( MessageType.SETATTACKPOINT, new Object[]{ new Point2i( closeb.x/Level.tileSize, closeb.y/Level.tileSize ), selected } ) );
-							}
-						}
-						else if( playType == PlayType.SNEAKY )
-						{
-							Building closeb = null;
-							for( Building b : l.buildings )
-							{
-								boolean wantToTake = b.isCapturable( l, u, finder ) && (b.t == null || b.t.id != player.team.id);
-									
-								if( wantToTake )
-								{
-									float dx = u.x-b.x;
-									float dy = u.y-b.y;
-									float d2 = dx*dx + dy*dy;
-									if( d2 < 50 * 50 )
-									{
-										closeb = b;
-										break;
-									}
-								}
-							}
-							if( closeb == null )
-							{
-								Building b = l.buildings.get( DMath.randomi( 0, DMath.randomi( 0, l.buildings.size() ) ) );
-								if( b.isCapturable( l, u, finder ) && (b.t == null || b.t.id != player.team.id) )
-								{
-									ArrayList<Integer> selected = new ArrayList<Integer>();
-									selected.add( u.id );
-									ci.sl.received( fc, new Message( MessageType.SETATTACKPOINT, new Object[]{ new Point2i( b.x/Level.tileSize, b.y/Level.tileSize ), selected } ) );
-								}
-							}
-						}
-						else
-						{
-							Building closeb = null;
-							float closed2 = Float.MAX_VALUE;
-							for( Building b : l.buildings )
-							{
-								boolean wantToTake = false;
-								switch( playType )
-								{
-								case AGGRESSIVE:
-									wantToTake = (b.t == null || b.t.id != player.team.id) && b.isCapturable( l, u, finder );
-									break;
-								case MODERATE:
-									wantToTake = b.isCapturable( l, u, finder ) && (b.t == null || (b.t.id != player.team.id) || (b.t.id == player.team.id && b.hold < Building.HOLDMAX));
-									break;
-								}
-								if( wantToTake )
-								{
-									float dx = u.x-b.x;
-									float dy = u.y-b.y;
-									float d2 = dx*dx + dy*dy;
-									if( d2 < closed2 )
-									{
-										closeb = b;
-										closed2 = d2;
-									}
-								}
-							}
-							if( closeb != null )
-							{
-								ArrayList<Integer> selected = new ArrayList<Integer>();
-								selected.add( u.id );
-								ci.sl.received( fc, new Message( MessageType.SETATTACKPOINT, new Object[]{ new Point2i( closeb.x/Level.tileSize, closeb.y/Level.tileSize ), selected } ) );
-							}
-						}
-					}
-				}
+				update( finder );
 				
 				if( player.money > 20 )
 				{
@@ -327,11 +127,7 @@ public class ComputerPlayer implements Runnable
 				
 				try 
 				{	
-					Thread.sleep( 1000 );
-					if( playType == PlayType.MASSER )
-					{
-						Thread.sleep( 1000 );
-					}
+					Thread.sleep( sleepDuration );
 				} 
 				catch( InterruptedException e )
 				{
@@ -341,44 +137,18 @@ public class ComputerPlayer implements Runnable
 		}
 	}
 	
-	public class FakeConnection extends Connection
-	{
-		public int id = DMath.randomi( 0, Integer.MAX_VALUE );
-		public LinkedList<Message> messages = new LinkedList<Message>();
-		
-		public int getID()
-		{
-			return id;
-		}
-		
-		public int sendTCP( Object o )
-		{
-			synchronized( messages )
-			{
-				messages.push( (Message)o );
-			}
-			return 0;
-		}
-		
-		public Message getNextClientMessage()
-		{
-			synchronized( messages )
-			{
-				return messages.pop();
-			}
-		}
-
-		public boolean hasClientMessages() 
-		{
-			return !messages.isEmpty();
-		}
-	}
-
 	public enum PlayType
 	{
-		AGGRESSIVE,
-		MODERATE,
-		SNEAKY,
-		MASSER;
+		AGGRESSIVE( Aggressive.class ),
+		SNEAKY( Sneaky.class ),
+		MODERATE( Moderate.class ),
+		MASSER( Masser.class );
+		
+		Class c;
+		
+		PlayType( Class c )
+		{
+			this.c = c;
+		}
 	}
 }
