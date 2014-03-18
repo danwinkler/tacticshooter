@@ -699,10 +699,16 @@ public class TacticServer
 		for( int i = 0; i < units.size(); i++ )
 		{
 			Unit u = units.get( i );
-			if( u.update( this ) || !u.alive )
+			int update = u.update( this );
+			if( update == 2 )
 			{
 				si.sendToAllClients( new Message( MessageType.UNITUPDATE, u ) );
 			}
+			else if( update == 1 )
+			{
+				si.sendToAllClients( new Message( MessageType.UNITMINIUPDATE, new Unit.UnitUpdate( u.id, u.x, u.y, u.heading, u.health ) ) );
+			}
+			
 			if( !u.alive )
 			{
 				gs.get( u.owner.team ).unitsLost++;

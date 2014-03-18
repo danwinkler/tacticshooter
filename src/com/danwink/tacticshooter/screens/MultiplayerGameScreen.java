@@ -132,11 +132,11 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		if( dui == null )
 		{
 			dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
-			buildScoutUnit = new DButton( "Build Scout\n3", 0, gc.getHeight()-75, 150, 75 );
-			buildLightUnit = new DButton( "Build Light\n10", 150, gc.getHeight()-75, 150, 75 );
-			buildHeavyUnit = new DButton( "Build Heavy\n20", 300, gc.getHeight()-75, 150, 75 );
-			buildShotgunUnit = new DButton( "Build Shotgun\n15", 450, gc.getHeight()-75, 150, 75 );
-			buildSniperUnit = new DButton( "Build Sniper\n20", 600, gc.getHeight()-75, 150, 75 );
+			buildScoutUnit = new DButton( "Build Scout\n" + UnitType.SCOUT.price, 0, gc.getHeight()-75, 150, 75 );
+			buildLightUnit = new DButton( "Build Light\n" + UnitType.LIGHT.price, 150, gc.getHeight()-75, 150, 75 );
+			buildHeavyUnit = new DButton( "Build Heavy\n" + UnitType.HEAVY.price, 300, gc.getHeight()-75, 150, 75 );
+			buildShotgunUnit = new DButton( "Build Shotgun\n" + UnitType.SHOTGUN.price, 450, gc.getHeight()-75, 150, 75 );
+			buildSniperUnit = new DButton( "Build Sniper\n" + UnitType.SNIPER.price, 600, gc.getHeight()-75, 150, 75 );
 			buildSaboteurUnit = new DButton( "Build Saboteur\n" + UnitType.SABOTEUR.price, 750, gc.getHeight()-75, 150, 75 );
 			
 			
@@ -301,6 +301,19 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			case FOGUPDATE:
 				fogEnabled = (Boolean)m.message;
 				break;
+			case UNITMINIUPDATE:
+			{
+				Unit.UnitUpdate uu = (Unit.UnitUpdate)m.message;
+				Unit unit = cs.unitMap.get( uu.id );
+				if( unit != null )
+				{
+					unit.health = uu.health;
+					unit.sheading = uu.heading;
+					unit.sx = uu.x;
+					unit.sy = uu.y;
+				}
+				break;
+			}	
 			}
 		}
 		

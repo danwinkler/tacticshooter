@@ -38,7 +38,7 @@ public class Sneaky extends ComputerPlayer
 					}
 				});
 				
-				//If its not closeby
+				//If its not close by
 				if( closeb != null )
 				{
 					float dx = u.x-closeb.x;

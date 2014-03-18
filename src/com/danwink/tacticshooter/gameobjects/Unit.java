@@ -78,8 +78,6 @@ public class Unit
 	
 	public int updateCountdown = 0;
 	
-	public boolean update = false;
-	
 	public Building stoppedAt;
 	
 	//CLIENT ONLY
@@ -107,7 +105,7 @@ public class Unit
 		this.owner = owner;
 	}
 	
-	public boolean update( TacticServer ts )
+	public int update( TacticServer ts )
 	{
 		Level l = ts.l;
 		
@@ -213,21 +211,27 @@ public class Unit
 			}
 		}
 		
-		//To keep Unit updates from getting out of hand
-		if( updateCountdown > 0 )
+		int ret = 0;
+		
+		if( lastState != state || !alive )
 		{
-			updateCountdown--;
-			return false;
+			ret = 2;
+		}
+		else if( state != UnitState.STOPPED )
+		{
+			if( updateCountdown > 0 )
+			{
+				updateCountdown--;
+			}
+			else
+			{
+				updateCountdown = UPDATE_TIME;
+				ret = 1;
+			}
 		}
 		
-		boolean sendToClient = state != UnitState.STOPPED || lastState == state || update;
 		lastState = state;
-		update = false;
-		if( sendToClient )
-		{
-			updateCountdown = UPDATE_TIME;
-		}
-		return sendToClient;
+		return ret;
 	}
 	
 	public void clientUpdate( ClientState tc, float d )
@@ -626,5 +630,13 @@ public class Unit
 	{
 		g.setColor( this.owner.id == player.id ? Color.blue : this.owner.team.getColor() );
 		g.fillOval( x-20, y-20, 40, 40 );
+	}
+	
+	public static class UnitUpdate
+	{
+		public int id;
+		public float x, y, heading, health;
+		public UnitUpdate() {}
+		public UnitUpdate( int id, float x, float y, float heading, float health ) { this.id = id; this.x = x; this.y = y; this.heading = heading; this.health = health; }
 	}
 }
