@@ -2,6 +2,7 @@ package com.danwink.tacticshooter.ai;
 
 import java.util.ArrayList;
 
+import javax.vecmath.Point2f;
 import javax.vecmath.Point2i;
 
 import org.newdawn.slick.util.pathfinding.Path;
@@ -24,6 +25,10 @@ public class Masser extends ComputerPlayer
 	float attackPropensity = DMath.randomf( 1.5f, 4 );
 	public Building target;
 	public Building closeb;
+	
+	{
+		sleepDuration = 2000;
+	}
 	
 	public void update( PathFinder finder )
 	{		
@@ -50,23 +55,13 @@ public class Masser extends ComputerPlayer
 		}
 		
 		if( target == null ) return;
+		
 		//Find closest friendly building to target
-		closeb = null;
-		float closeDist = Float.MAX_VALUE;
-		for( Building b : l.buildings )
-		{
-			if( b.t != null && b.t.id == this.player.team.id && b.hold == Building.HOLDMAX )
-			{
-				Path p = finder.findPath( null, l.getTileX( b.x ), l.getTileY( b.y ), l.getTileX( target.x ), l.getTileY( target.y ) );
-				if( p == null ) continue;
-				float d2 = p.getLength();
-				if( d2 < closeDist )
-				{
-					closeDist = d2;
-					closeb = b;
-				}
+		closeb = findBuildingShortestPath( new Point2f( target.x, target.y ), finder, new Filter<Building>() {
+			public boolean valid( Building b ) {
+				return b.t != null && b.t.id == Masser.this.player.team.id && b.hold == Building.HOLDMAX;
 			}
-		}
+		});
 		
 		if( !attacking )
 		{

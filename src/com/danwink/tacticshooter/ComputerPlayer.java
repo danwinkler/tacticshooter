@@ -2,6 +2,8 @@ package com.danwink.tacticshooter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import javax.vecmath.Point2f;
 import javax.vecmath.Point2i;
 
 import org.newdawn.slick.util.pathfinding.AStarPathFinder;
@@ -9,6 +11,7 @@ import org.newdawn.slick.util.pathfinding.Path;
 import org.newdawn.slick.util.pathfinding.PathFinder;
 
 import com.danwink.tacticshooter.ai.Aggressive;
+import com.danwink.tacticshooter.ai.Fortifier;
 import com.danwink.tacticshooter.ai.Masser;
 import com.danwink.tacticshooter.ai.Moderate;
 import com.danwink.tacticshooter.ai.Sneaky;
@@ -137,18 +140,78 @@ public abstract class ComputerPlayer implements Runnable
 		}
 	}
 	
+	public Building findBuildingClosest( Point2f p, Filter<Building> f )
+	{
+		Building closeb = null;
+		float closed2 = Float.MAX_VALUE;
+		for( Building b : l.buildings )
+		{
+			if( f.valid( b ) )
+			{
+				float dx = p.x-b.x;
+				float dy = p.y-b.y;
+				float d2 = dx*dx + dy*dy;
+				if( d2 < closed2 )
+				{
+					closeb = b;
+					closed2 = d2;
+				}
+			}
+		}
+		return closeb;
+	}
+	
+	public Building findBuildingShortestPath( Point2f p, PathFinder finder, Filter<Building> f )
+	{
+		Building closeb = null;
+		float closeDist = Float.MAX_VALUE;
+		for( Building b : l.buildings )
+		{
+			if( f.valid( b ) )
+			{
+				Path path = finder.findPath( null, l.getTileX( b.x ), l.getTileY( b.y ), l.getTileX( p.x ), l.getTileY( p.y ) );
+				if( path == null ) continue;
+				float d2 = path.getLength();
+				if( d2 < closeDist )
+				{
+					closeDist = d2;
+					closeb = b;
+				}
+			}
+		}
+		return closeb;
+	}
+	
 	public enum PlayType
 	{
 		AGGRESSIVE( Aggressive.class ),
 		SNEAKY( Sneaky.class ),
 		MODERATE( Moderate.class ),
-		MASSER( Masser.class );
+		MASSER( Masser.class ),
+		FORTIFIER( Fortifier.class );
 		
-		Class c;
+		Class<? extends ComputerPlayer> c;
 		
-		PlayType( Class c )
+		PlayType( Class<? extends ComputerPlayer> c )
 		{
 			this.c = c;
 		}
+	}
+	
+	public abstract class Filter<E>
+	{
+		public Object[] o;
+		
+		public Filter()
+		{
+			
+		}
+		
+		public Filter( Object... o )
+		{
+			this.o = o;
+		}
+		
+		public abstract boolean valid( E e );
 	}
 }
