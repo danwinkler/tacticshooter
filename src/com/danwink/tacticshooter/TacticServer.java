@@ -530,6 +530,7 @@ public class TacticServer
 					{
 						unit.pathTo( p.x, p.y, this );
 					}
+					si.sendToAllClients( new Message( MessageType.UNITUPDATE, unit ) );
 				}
 				si.sendToClient( m.sender, new Message( MessageType.MOVESUCCESS, null ) );
 				break;

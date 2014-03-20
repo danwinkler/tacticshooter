@@ -26,6 +26,7 @@ public class Bullet
 	public int damage = 10;
 	
 	public boolean alive = true;
+	public boolean isRicochet = false;
 	
 	public Player owner;
 	public Unit shooter;
@@ -104,6 +105,7 @@ public class Bullet
 				b.owner = this.owner;
 				b.shooter = this.shooter;
 				b.damage = this.damage;
+				b.isRicochet = true;
 				ts.addBullet( b );
 			}
 			

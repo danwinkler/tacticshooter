@@ -561,7 +561,7 @@ public class Unit
 			}
 		}
 		
-		if( stoppedAt != null )
+		if( stoppedAt != null && !bullet.isRicochet )
 		{
 			state = UnitState.TURNTO;
 			turnToAngle = (float) Math.atan2( -bullet.dir.y, -bullet.dir.x );
