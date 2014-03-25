@@ -1,6 +1,7 @@
 package com.danwink.tacticshooter;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,6 +10,11 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map.Entry;
 
+import javax.script.Bindings;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import javax.vecmath.Point2i;
 
 import org.dom4j.DocumentException;
@@ -68,10 +74,16 @@ public class TacticServer
 	
 	ServerState state = ServerState.LOBBY;
 	
+	GameType gameType = GameType.POINTCONTROL;
+	
 	//LOBBY
 	Player[] slots = new Player[16];
 	int selectedMap = 0;
 	boolean fogEnabled = false;
+	
+	//SCRIPT
+	ScriptEngineManager mgr = new ScriptEngineManager();
+    ScriptEngine engine = mgr.getEngineByName("JavaScript");
 	
 	public TacticServer( ServerInterface si )
 	{
@@ -80,6 +92,15 @@ public class TacticServer
 	
 	public void begin()
 	{
+		Bindings bindings = engine.getBindings( ScriptContext.ENGINE_SCOPE );
+	    bindings.put("stdout", System.out);
+		
+		try {
+			engine.eval( DFile.loadText( "data/gamemodes/pointcapture.js" ) );
+		} catch( FileNotFoundException | ScriptException e ) {
+			e.printStackTrace();
+		}
+		
 		File[] files = new File( "levels" ).listFiles();
 		if( files != null )
 		{
@@ -366,6 +387,12 @@ public class TacticServer
 			lastTick += 100;
 			tick++;
 			
+			try {
+				engine.eval( "tick();" );
+			} catch (ScriptException e) {
+				e.printStackTrace();
+			}
+			
 			//Every 100 ticks
 			if( tick % 100 == 0 )
 			{
@@ -412,88 +439,8 @@ public class TacticServer
 				{
 					Player p = e.getValue();
 					playerArr[pi++] = p;
-					int bc = 0;
-					for( int i = 0; i < l.buildings.size(); i++ )
-					{
-						Building b = l.buildings.get( i );
-						if( b.t != null && b.t.id == p.team.id )
-						{
-							bc++;
-						}
-					}
-					p.money += bc;
-					gs.get( p.team ).moneyEarned += bc;
-					si.sendToClient( p.id, new Message( MessageType.PLAYERUPDATE, p ) );
 				}
-				
 				si.sendToAllClients( new Message( MessageType.PLAYERLIST, playerArr ) );
-				
-				Building first = l.buildings.get( 0 );
-				if( first.t != null )
-				{
-					boolean won = true;
-					for( int i = 1; i < l.buildings.size(); i++ )
-					{
-						Team test = l.buildings.get( i ).t;
-						if( test != null && test.id != first.t.id )
-						{
-							won = false;
-							break;
-						}
-					}
-					
-					if( won )
-					{
-						endGame();
-						setupLobby();
-						return;
-					}
-				}
-			}
-			
-			//Every 10 ticks test to see if player has no units. If the player has no units and it's been a little while, give them a unit.
-			if( tick % 10 == 0 )
-			{
-				for( Entry<Integer, Player> e : players.entrySet() )
-				{
-					Player p = e.getValue();
-					boolean contains = false;
-					for( Unit u : units )
-					{
-						if( u.owner.id == p.id )
-						{
-							contains = true;
-							break;
-						}
-					}
-					if( !contains )
-					{
-						if( p.respawn > 0 )
-						{
-							p.respawn--;
-						}
-						else
-						{
-							p.respawn = Player.MAX_RESPAWN;
-							Building base = null;
-							for( Building bu : l.buildings )
-							{
-								if( bu.bt == BuildingType.CENTER && bu.t.id == p.team.id )
-								{
-									base = bu;
-								}
-							}
-							if( base != null )
-							{
-								Unit u = new Unit( base.x, base.y, p );
-								units.add( u );
-								u.stoppedAt = base;
-								si.sendToAllClients( new Message( MessageType.UNITUPDATE, u ) );
-								gs.get( u.owner.team ).unitsCreated++;
-							}
-						}
-					}
-				}
 			}
 			
 			//Every tick
