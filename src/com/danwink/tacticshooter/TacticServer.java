@@ -82,8 +82,7 @@ public class TacticServer
 	boolean fogEnabled = false;
 	
 	//SCRIPT
-	ScriptEngineManager mgr = new ScriptEngineManager();
-    ScriptEngine engine = mgr.getEngineByName("JavaScript");
+	JSAPI js;
 	
 	public TacticServer( ServerInterface si )
 	{
@@ -92,14 +91,8 @@ public class TacticServer
 	
 	public void begin()
 	{
-		Bindings bindings = engine.getBindings( ScriptContext.ENGINE_SCOPE );
-	    bindings.put("stdout", System.out);
-		
-		try {
-			engine.eval( DFile.loadText( "data/gamemodes/pointcapture.js" ) );
-		} catch( FileNotFoundException | ScriptException e ) {
-			e.printStackTrace();
-		}
+		js = new JSAPI( this );
+		js.load( "data/gamemodes/pointcapture.js" );
 		
 		File[] files = new File( "levels" ).listFiles();
 		if( files != null )
@@ -387,11 +380,9 @@ public class TacticServer
 			lastTick += 100;
 			tick++;
 			
-			try {
-				engine.eval( "tick();" );
-			} catch (ScriptException e) {
-				e.printStackTrace();
-			}
+			js = new JSAPI( this );
+			js.load( "data/gamemodes/pointcapture.js" );
+			js.tick( tick );
 			
 			//Every 100 ticks
 			if( tick % 100 == 0 )
@@ -705,6 +696,11 @@ public class TacticServer
 		gs.get( b.owner.team ).bulletsShot++;
 		bullets.add( b );
 		si.sendToAllClients( new Message( MessageType.BULLETUPDATE, b ) );
+	}
+	
+	public void updatePlayer( int id )
+	{
+		si.sendToClient( id, new Message( MessageType.PLAYERUPDATE, players.get( id ) ) );
 	}
 	
 	public class ServerLoop implements Runnable 
