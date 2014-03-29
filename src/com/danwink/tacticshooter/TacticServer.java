@@ -384,6 +384,8 @@ public class TacticServer
 			js.load( "data/gamemodes/pointcapture.js" );
 			js.tick( tick );
 			
+			if( state == ServerState.LOBBY ) return;
+			
 			//Every 100 ticks
 			if( tick % 100 == 0 )
 			{

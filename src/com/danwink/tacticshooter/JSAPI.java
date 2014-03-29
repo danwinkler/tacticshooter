@@ -14,6 +14,10 @@ import javax.script.ScriptException;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.gameobjects.Team;
+import com.danwink.tacticshooter.gameobjects.Unit;
+import com.danwink.tacticshooter.gameobjects.Building.BuildingType;
+import com.danwink.tacticshooter.gameobjects.Unit.UnitType;
+import com.danwink.tacticshooter.network.Message;
 import com.phyloa.dlib.util.DFile;
 
 public class JSAPI
@@ -56,6 +60,13 @@ public class JSAPI
 		    }
 		    bindings.put( "buildings", buildings );
 		    
+		    int[] units = new int[ts.units.size()];
+		    for( int i = 0; i < ts.units.size(); i++ )
+		    {
+		    	units[i] = ts.units.get( i ).id;
+		    }
+		    bindings.put( "units", units );
+		    
 		    bindings.put( "out", System.out );
 		    
 			engine.eval( "tick( " + frame + " );" );
@@ -75,6 +86,10 @@ public class JSAPI
 			e.printStackTrace();
 		}
 	}
+	
+	//---------------------------------
+	// PLAYER
+	//---------------------------------
 	
 	public int getPlayerMoney( int id )
 	{
@@ -99,6 +114,10 @@ public class JSAPI
 		return t == null ? -1 : t.id;
 	}
 	
+	//---------------------------------
+	// BUILDING
+	//---------------------------------
+	
 	public int getBuildingTeam( int id )
 	{
 		for( Building b : ts.l.buildings )
@@ -109,5 +128,78 @@ public class JSAPI
 			}
 		}
 		return -1;
+	}
+	
+	public int getBaseX( int id )
+	{
+		Player p = ts.players.get( id );
+		Building base = null;
+		for( Building bu : ts.l.buildings )
+		{
+			if( bu.bt == BuildingType.CENTER && bu.t.id == p.team.id )
+			{
+				base = bu;
+			}
+		}
+		if( base != null )
+		{
+			return base.x;
+		}
+		return -1;
+	}
+	
+	public int getBaseY( int id )
+	{
+		Player p = ts.players.get( id );
+		Building base = null;
+		for( Building bu : ts.l.buildings )
+		{
+			if( bu.bt == BuildingType.CENTER && bu.t.id == p.team.id )
+			{
+				base = bu;
+			}
+		}
+		if( base != null )
+		{
+			return base.y;
+		}
+		return -1;
+	}
+	
+	//---------------------------------
+	// UNIT
+	//---------------------------------
+	
+	public int getUnitPlayer( int id )
+	{
+		for( Unit u : ts.units )
+		{
+			if( u.id == id )
+			{
+				return u.owner.id;
+			}
+		}
+		return -1;
+	}
+	
+	public void createUnit( int player, String type, float x, float y )
+	{
+		Player p = ts.players.get( player );
+		
+		Unit u = new Unit( x, y, p );
+		u.setType( UnitType.valueOf( type ) );
+		ts.units.add( u );
+		ts.si.sendToAllClients( new Message( MessageType.UNITUPDATE, u ) );
+		ts.gs.get( u.owner.team ).unitsCreated++;
+	}
+	
+	//---------------------------------
+	// GAME
+	//---------------------------------
+	
+	public void endGame()
+	{
+		ts.endGame();
+		ts.setupLobby();
 	}
 }
