@@ -2,11 +2,8 @@ package com.danwink.tacticshooter.gameobjects;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Random;
 
-import javax.vecmath.Matrix3f;
 import javax.vecmath.Point2f;
 import javax.vecmath.Point2i;
 import javax.vecmath.Vector2f;
@@ -16,7 +13,6 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
-import org.newdawn.slick.geom.Polygon;
 import org.newdawn.slick.util.pathfinding.Path;
 
 import com.danwink.tacticshooter.ClientState;

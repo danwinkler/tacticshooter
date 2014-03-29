@@ -1,20 +1,10 @@
 package com.danwink.tacticshooter;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.Map.Entry;
 
-import javax.script.Bindings;
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 import javax.vecmath.Point2i;
 
 import org.dom4j.DocumentException;
@@ -35,8 +25,6 @@ import com.danwink.tacticshooter.gameobjects.Unit.UnitType;
 import com.danwink.tacticshooter.network.Message;
 import com.danwink.tacticshooter.network.ServerInterface;
 import com.danwink.tacticshooter.network.ServerNetworkInterface;
-import com.phyloa.dlib.dui.DButton;
-import com.phyloa.dlib.util.DFile;
 import com.phyloa.dlib.util.DMath;
 
 /**

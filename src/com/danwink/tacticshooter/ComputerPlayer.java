@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.vecmath.Point2f;
-import javax.vecmath.Point2i;
-
 import org.newdawn.slick.util.pathfinding.AStarPathFinder;
 import org.newdawn.slick.util.pathfinding.Path;
 import org.newdawn.slick.util.pathfinding.PathFinder;
@@ -20,7 +18,6 @@ import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.gameobjects.Unit;
 import com.danwink.tacticshooter.gameobjects.Level.TileType;
-import com.danwink.tacticshooter.gameobjects.Unit.UnitState;
 import com.danwink.tacticshooter.gameobjects.Unit.UnitType;
 import com.danwink.tacticshooter.network.FakeConnection;
 import com.danwink.tacticshooter.network.Message;
