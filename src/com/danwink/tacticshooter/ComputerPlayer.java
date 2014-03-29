@@ -46,6 +46,8 @@ public abstract class ComputerPlayer implements Runnable
 	
 	public int sleepDuration = 1000;
 	
+	boolean hasSetup = false;
+	
 	public void setup( ServerNetworkInterface si )
 	{
 		fc = new FakeConnection();
@@ -120,7 +122,11 @@ public abstract class ComputerPlayer implements Runnable
 			
 			if( player != null && l != null )
 			{	
-				finder = new AStarPathFinder( l, 500, StaticFiles.options.getB( "diagonalMove" ) );
+				if( !hasSetup )
+				{
+					finder = new AStarPathFinder( l, 500, StaticFiles.options.getB( "diagonalMove" ) );
+					hasSetup = true;
+				}
 				update( finder );
 				
 				if( player.money > 20 )
