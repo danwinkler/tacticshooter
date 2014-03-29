@@ -419,11 +419,14 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		{
 			try
 			{
-				float xScale = 200.f / (cs.l.width*Level.tileSize);
-				float yScale = 200.f / (cs.l.height*Level.tileSize);
+				boolean xLarger = cs.l.width > cs.l.height;
+				float xOffset = xLarger ? 0 : 100 - 100 *  cs.l.width/(float)cs.l.height;
+				float yOffset = !xLarger ? 0 : 100 - 100 * (float)cs.l.height/cs.l.width;
+				float scale = 200.f / ((xLarger?cs.l.width:cs.l.height)*Level.tileSize);
 				miniMap = new Image( 200, 200 );
 				Graphics mg = miniMap.getGraphics();
-				mg.scale( xScale, yScale );
+				mg.translate( xOffset, yOffset );
+				mg.scale( scale, scale );
 				cs.l.renderFloor( mg );
 				cs.l.render( mg );
 				mg.flush();
@@ -614,19 +617,22 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		
 		//Draw minimap
 		g.setClip( gc.getWidth()-200, gc.getHeight()-200, 200, 200 );
-		float xScale = 200.f / (cs.l.width*Level.tileSize);
-		float yScale = 200.f / (cs.l.height*Level.tileSize);
+		boolean xLarger = cs.l.width > cs.l.height;
+		float xOffset = xLarger ? 0 : 100 - 100 *  cs.l.width/(float)cs.l.height;
+		float yOffset = !xLarger ? 0 : 100 - 100 * (float)cs.l.height/cs.l.width;
+		float scale = 200.f / ((xLarger?cs.l.width:cs.l.height)*Level.tileSize);
 		g.pushTransform();
 		g.translate( gc.getWidth()-200, gc.getHeight()-200 );
 		g.setColor( Color.white );
-		g.fillRect( 0, 0, 200, 300 );
+		g.fillRect( 0, 0, 200, 200 );
 		g.pushTransform();
 		
 		if( miniMap != null )
 		{
 			g.drawImage( miniMap, 0, 0 );
-			g.scale( xScale, yScale );
 		}
+		g.translate( xOffset, yOffset );
+		g.scale( scale, scale );
 		cs.l.renderBuildings( g );
 		for( int i = 0; i < cs.units.size(); i++ )
 		{
@@ -654,7 +660,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		}
 		
 		g.setColor( Color.blue );
-		g.drawRect( cs.scrollx*xScale, cs.scrolly * yScale, gc.getWidth() * xScale, gc.getHeight() * yScale );
+		g.drawRect( xOffset + cs.scrollx * scale, yOffset + cs.scrolly * scale, gc.getWidth() * scale, gc.getHeight() * scale );
 		
 		g.setColor( Color.black );
 		g.setLineWidth( 2 );
@@ -761,6 +767,15 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		{
 			if( x > gc.getWidth()-200 && y > gc.getHeight()-200 && !selecting )
 			{	
+				boolean xLarger = cs.l.width > cs.l.height;
+				float xOffset = xLarger ? 0 : 100 - 100 *  cs.l.width/(float)cs.l.height;
+				float yOffset = !xLarger ? 0 : 100 - 100 * (float)cs.l.height/cs.l.width;
+				float scale = 200.f / ((xLarger?cs.l.width:cs.l.height)*Level.tileSize);
+				float minimapX = (x - (gc.getWidth()-200+xOffset));
+				float minimapY = (y - (gc.getHeight()-200+yOffset));
+				float mapX = minimapX / scale;
+				float mapY = minimapY / scale;
+				
 				if( input.isKeyDown( Input.KEY_LCONTROL ) )
 				{
 					ci.sendToServer( new Message( MessageType.MESSAGE, "/ping " + (input.getMouseX()-(gc.getWidth()-200)) + " " + (input.getMouseY()-(gc.getHeight()-200)) ) );
@@ -768,13 +783,10 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				else
 				{
 					if( button == Input.MOUSE_LEFT_BUTTON )
-					{
-						//miniMap
-						float minimapX = x - (gc.getWidth()-200);
-						float minimapY = y - (gc.getHeight()-200);
+					{					
 						Rectangle screenBounds = getScreenBounds();
-						cs.scrollx = DMath.bound( (minimapX / 200.f) * cs.l.width*Level.tileSize - gc.getWidth()/2, screenBounds.getMinX(), screenBounds.getMaxX() );
-						cs.scrolly = DMath.bound( (minimapY / 200.f) * cs.l.height*Level.tileSize - gc.getHeight()/2, screenBounds.getMinY(), screenBounds.getMaxY() );
+						cs.scrollx = DMath.bound( mapX - gc.getWidth()/2, screenBounds.getMinX(), screenBounds.getMaxX() );
+						cs.scrolly = DMath.bound( mapY - gc.getHeight()/2, screenBounds.getMinY(), screenBounds.getMaxY() );
 					}
 					else if( button == Input.MOUSE_RIGHT_BUTTON )
 					{
@@ -884,12 +896,18 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			{	
 				if( input.isMouseButtonDown( Input.MOUSE_LEFT_BUTTON ) && !input.isKeyDown( Input.KEY_LCONTROL ) )
 				{
-					//miniMap
-					float minimapX = newx - (gc.getWidth()-200);
-					float minimapY = newy - (gc.getHeight()-200);
+					boolean xLarger = cs.l.width > cs.l.height;
+					float xOffset = xLarger ? 0 : 100 - 100 *  cs.l.width/(float)cs.l.height;
+					float yOffset = !xLarger ? 0 : 100 - 100 * (float)cs.l.height/cs.l.width;
+					float scale = 200.f / ((xLarger?cs.l.width:cs.l.height)*Level.tileSize);
+					float minimapX = (newx - (gc.getWidth()-200+xOffset));
+					float minimapY = (newy - (gc.getHeight()-200+yOffset));
+					float mapX = minimapX / scale;
+					float mapY = minimapY / scale;
+					
 					Rectangle screenBounds = getScreenBounds();
-					cs.scrollx = DMath.bound( (minimapX / 200.f) * cs.l.width*Level.tileSize - gc.getWidth()/2, screenBounds.getMinX(), screenBounds.getMaxX() );
-					cs.scrolly = DMath.bound( (minimapY / 200.f) * cs.l.height*Level.tileSize - gc.getHeight()/2, screenBounds.getMinY(), screenBounds.getMaxY() );
+					cs.scrollx = DMath.bound( mapX - gc.getWidth()/2, screenBounds.getMinX(), screenBounds.getMaxX() );
+					cs.scrolly = DMath.bound( mapY - gc.getHeight()/2, screenBounds.getMinY(), screenBounds.getMaxY() );
 				}
 			}	
 			else

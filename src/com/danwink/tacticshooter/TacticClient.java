@@ -1,10 +1,7 @@
 package com.danwink.tacticshooter;
 
-import java.awt.Font;
-import java.awt.FontFormatException;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintWriter;
 
 import org.newdawn.slick.AngelCodeFont;
@@ -13,8 +10,6 @@ import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.TrueTypeFont;
-
 import com.danwink.tacticshooter.screens.BrowseOnlineLevelsScreen;
 import com.danwink.tacticshooter.screens.HomeScreen;
 import com.danwink.tacticshooter.screens.LevelEditor;
