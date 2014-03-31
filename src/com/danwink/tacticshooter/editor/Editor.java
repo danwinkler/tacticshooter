@@ -1,27 +1,19 @@
 package com.danwink.tacticshooter.editor;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
-import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import net.miginfocom.swing.MigLayout;
-
+import com.danwink.tacticshooter.editor.BrushPanel.Brush;
+import com.danwink.tacticshooter.editor.ModePanel.EditMode;
+import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Level.TileType;
-import com.phyloa.dlib.renderer.Graphics2DIRenderer;
 
 public class Editor
 {	
@@ -31,12 +23,16 @@ public class Editor
 	public JFrame container;
 	public JMenuBar menubar;
 	
-	public BrushPanel bp;
-	public MapPane mp;
+	public BrushPanel brushPanel;
+	public BuildingPanel buildingPanel;
+	
+	public MapPane mapPane;
+	public ModePanel modePanel;
 	
 	public JScrollPane scrollPane;
 	
 	NewDialog newDialog;
+	BuildingDialog buildingDialog;
 	
 	Level l;
 	
@@ -61,16 +57,18 @@ public class Editor
 		
 		menubar.add( new FileMenu( this ) );
 		
-		bp = new BrushPanel( this );
-		container.add( bp, BorderLayout.NORTH );
+		modePanel = new ModePanel( this );
+		container.add( modePanel, BorderLayout.NORTH );
 		
-		mp = new MapPane( this );
+		mapPane = new MapPane( this );
 		
-		scrollPane = new JScrollPane( mp, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS );
+		scrollPane = new JScrollPane( mapPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS );
 		container.add( scrollPane, BorderLayout.CENTER );
 			
 		container.pack();
 		container.setVisible( true );
+		
+		newLevel( 20, 20 );
 	}
 	
 	public void showNewDialog()
@@ -81,8 +79,42 @@ public class Editor
 	public void newLevel( int width, int height )
 	{
 		l = new Level( width, height );
+		mapPane.updateLevel();
 		
-		mp.updateLevel();
+		setMode( EditMode.TILE );
+	}
+	
+	public void setMode( EditMode mode )
+	{
+		if( brushPanel != null )
+		{
+			container.remove( brushPanel );
+			brushPanel = null;
+		}
+		
+		if( buildingPanel != null )
+		{
+			container.remove( buildingPanel );
+			buildingPanel = null;
+		}
+		
+		switch( mode )
+		{
+		case BUILDING:
+			buildingPanel = new BuildingPanel( this );
+			container.add( buildingPanel, BorderLayout.WEST );
+			break;
+		case CODE:
+			break;
+		case TILE:
+			brushPanel = new BrushPanel( this );
+			container.add( brushPanel, BorderLayout.WEST );
+			break;
+		default:
+			break;
+		}
+		
+		container.pack();
 	}
 	
 	public static void main( String[] args )
@@ -90,13 +122,68 @@ public class Editor
 		Editor e = new Editor();
 	}
 
-	public TileType getTileBrush()
+	public Brush getBrush()
 	{
-		return bp.getTileBrush();
+		return brushPanel.getBrush();
 	}
 
 	public void redrawLevel()
 	{
-		mp.redrawLevel();
+		mapPane.redrawLevel();
+	}
+	
+	public void interact( int x, int y )
+	{
+		switch( modePanel.mode )
+		{
+		case BUILDING:
+			for( Building b : l.buildings )
+			{
+				if( b.x == x*l.tileSize + l.tileSize/2 && b.y == y*l.tileSize + l.tileSize/2 )
+				{
+					buildingDialog = new BuildingDialog( this, b );
+					break;
+				}
+			}
+			break;
+		case CODE:
+			break;
+		case TILE:
+			break;
+		default:
+			break;
+		
+		}
+	}
+
+	public void place( int x, int y )
+	{
+		switch( modePanel.mode )
+		{
+		case TILE:
+			switch( brushPanel.brush )
+			{
+			case FLOOR:
+				l.tiles[x][y] = TileType.FLOOR;
+				break;
+			case WALL:
+				l.tiles[x][y] = TileType.WALL;
+				break;
+			default:
+				break;
+			
+			}
+			break;
+		case BUILDING:
+				l.buildings.add( new Building( x*l.tileSize + l.tileSize/2, y*l.tileSize + l.tileSize/2, buildingPanel.type, null ) );
+			break;
+		case CODE:
+			break;
+		default:
+			break;
+		}
+		
+		redrawLevel();
+		container.repaint();
 	}
 }

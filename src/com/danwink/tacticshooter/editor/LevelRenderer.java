@@ -1,15 +1,15 @@
 package com.danwink.tacticshooter.editor;
 
-import java.awt.Graphics2D;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
 import com.danwink.tacticshooter.editor.AutoTileDrawer;
+import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Level.TileType;
 import com.phyloa.dlib.renderer.Graphics2DIRenderer;
-import com.phyloa.dlib.renderer.Renderer2D;
 import com.phyloa.dlib.util.DFile;
 import com.phyloa.dlib.util.DOptions;
 
@@ -27,7 +27,7 @@ public class LevelRenderer
 		try
 		{
 			floor = DFile.loadImage(  "img" + File.separator + new DOptions( "themes" + File.separator + l.theme ).getS( "floor" ) );
-			wall = DFile.loadImage(  "img" + File.separator + new DOptions( "themes" + File.separator + l.theme ).getS( "wall" ) );
+			wall  = DFile.loadImage(  "img" + File.separator + new DOptions( "themes" + File.separator + l.theme ).getS( "wall" ) );
 		}
 		catch( IOException e )
 		{
@@ -50,6 +50,16 @@ public class LevelRenderer
 					drawAutoTile( g, x, y, TileType.WALL, wall );
 				}
 			}
+		}
+		
+		for( Building b : l.buildings )
+		{
+			float rad = b.radius;
+			g.color( Color.black );
+			g.pushMatrix();
+			g.translate( b.x, b.y );
+			g.drawOval( -rad, -rad, rad*2, rad*2 );
+			g.popMatrix();
 		}
 	}
 	

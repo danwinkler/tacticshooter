@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 
+import com.danwink.tacticshooter.editor.ModePanel.EditMode;
 import com.phyloa.dlib.renderer.Graphics2DIRenderer;
 
 public class MapPane extends JPanel implements MouseListener, MouseMotionListener
@@ -67,9 +68,15 @@ public class MapPane extends JPanel implements MouseListener, MouseMotionListene
 	{
 		int x = editor.l.getTileX( e.getX() );
 		int y = editor.l.getTileY( e.getY() );
-		editor.l.setTile( x, y, editor.getTileBrush() );
-		editor.redrawLevel();
-		editor.container.repaint();
+		
+		if( e.getButton() == MouseEvent.BUTTON1 )
+		{
+			editor.place( x, y );
+		}
+		else if( e.getButton() == MouseEvent.BUTTON3 )
+		{
+			editor.interact( x, y );
+		}
 	}
 
 	public void mouseReleased( MouseEvent e )
@@ -79,11 +86,12 @@ public class MapPane extends JPanel implements MouseListener, MouseMotionListene
 
 	public void mouseDragged( MouseEvent e )
 	{
-		int x = editor.l.getTileX( e.getX() );
-		int y = editor.l.getTileY( e.getY() );
-		editor.l.setTile( x, y, editor.getTileBrush() );
-		editor.redrawLevel();
-		editor.container.repaint();
+		if( editor.modePanel.mode == EditMode.TILE )
+		{
+			int x = editor.l.getTileX( e.getX() );
+			int y = editor.l.getTileY( e.getY() );
+			editor.place( x, y );
+		}
 	}
 
 	public void mouseMoved( MouseEvent e )

@@ -26,6 +26,10 @@ public class Building
 	
 	public int updateCountdown = 0;
 	
+	public float radius;
+
+	public String name;
+	
 	public Building()
 	{
 		
@@ -39,6 +43,8 @@ public class Building
 		this.y = y;
 		if( t != null )
 			hold = HOLDMAX;
+	
+		radius = bt.bu.getRadius();
 	}
 
 	public void render( Graphics g )
