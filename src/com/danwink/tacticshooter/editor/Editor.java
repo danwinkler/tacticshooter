@@ -5,7 +5,9 @@ import java.awt.Dimension;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -22,6 +24,11 @@ public class Editor
 	
 	public JFrame container;
 	public JMenuBar menubar;
+	public JTabbedPane tabs;
+	
+	public JPanel mapEditTab;
+	public OptionsPanel optionsPanel;
+	public CodePanel codePanel;
 	
 	public BrushPanel brushPanel;
 	public BuildingPanel buildingPanel;
@@ -57,14 +64,28 @@ public class Editor
 		
 		menubar.add( new FileMenu( this ) );
 		
+		tabs = new JTabbedPane();
+		
+		mapEditTab = new JPanel();
+		mapEditTab.setLayout( new BorderLayout() );
+		
 		modePanel = new ModePanel( this );
-		container.add( modePanel, BorderLayout.NORTH );
+		mapEditTab.add( modePanel, BorderLayout.NORTH );
 		
 		mapPane = new MapPane( this );
 		
 		scrollPane = new JScrollPane( mapPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS );
-		container.add( scrollPane, BorderLayout.CENTER );
+		mapEditTab.add( scrollPane, BorderLayout.CENTER );
 			
+		optionsPanel = new OptionsPanel( this );
+		codePanel = new CodePanel( this );
+		
+		tabs.addTab( "Map", mapEditTab );
+		tabs.addTab( "Options", optionsPanel );
+		tabs.addTab( "Code", codePanel );
+		
+		container.add( tabs );
+		
 		container.pack();
 		container.setVisible( true );
 		
@@ -78,8 +99,14 @@ public class Editor
 	
 	public void newLevel( int width, int height )
 	{
-		l = new Level( width, height );
+		loadLevel( new Level( width, height ) );
+	}
+	
+	public void loadLevel( Level l )
+	{
+		this.l = l;
 		mapPane.updateLevel();
+		codePanel.updateCode();
 		
 		setMode( EditMode.TILE );
 	}
@@ -88,13 +115,13 @@ public class Editor
 	{
 		if( brushPanel != null )
 		{
-			container.remove( brushPanel );
+			mapEditTab.remove( brushPanel );
 			brushPanel = null;
 		}
 		
 		if( buildingPanel != null )
 		{
-			container.remove( buildingPanel );
+			mapEditTab.remove( buildingPanel );
 			buildingPanel = null;
 		}
 		
@@ -102,13 +129,13 @@ public class Editor
 		{
 		case BUILDING:
 			buildingPanel = new BuildingPanel( this );
-			container.add( buildingPanel, BorderLayout.WEST );
+			mapEditTab.add( buildingPanel, BorderLayout.WEST );
 			break;
 		case CODE:
 			break;
 		case TILE:
 			brushPanel = new BrushPanel( this );
-			container.add( brushPanel, BorderLayout.WEST );
+			mapEditTab.add( brushPanel, BorderLayout.WEST );
 			break;
 		default:
 			break;
@@ -130,6 +157,16 @@ public class Editor
 	public void redrawLevel()
 	{
 		mapPane.redrawLevel();
+	}
+	
+	public void toggleOptions()
+	{
+		
+	}
+
+	public void toggleCode()
+	{
+		
 	}
 	
 	public void interact( int x, int y )

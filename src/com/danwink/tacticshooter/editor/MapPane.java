@@ -23,6 +23,9 @@ public class MapPane extends JPanel implements MouseListener, MouseMotionListene
 	public MapPane( Editor editor )
 	{
 		this.editor = editor;
+		
+		this.addMouseListener( this );
+		this.addMouseMotionListener( this );
 	}
 	
 	public void updateLevel()
@@ -34,9 +37,6 @@ public class MapPane extends JPanel implements MouseListener, MouseMotionListene
 		setSize( editor.l.width * editor.l.tileSize, editor.l.height * editor.l.tileSize );
 		setPreferredSize( new Dimension( editor.l.width * editor.l.tileSize, editor.l.height * editor.l.tileSize ) );
 		image = (BufferedImage)r.getImage();
-		
-		this.addMouseListener( this );
-		this.addMouseMotionListener( this );
 	}
 	
 	public void redrawLevel()

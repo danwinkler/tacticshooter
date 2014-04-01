@@ -39,4 +39,9 @@ public class Team
 	{
 		return teamColors[id];
 	}
+	
+	public String toString()
+	{
+		return "Team " + (id == 0 ? "a" : "b");
+	}
 }

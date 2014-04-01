@@ -27,8 +27,13 @@ public class LevelFileHelper
 {
 	public static Level loadLevel( String name ) throws DocumentException
 	{
+		return loadLevel( new File( "levels" + File.separator + name + ".xml" ) );
+	}
+	
+	public static Level loadLevel( File file ) throws DocumentException
+	{
 		SAXReader reader = new SAXReader();
-		Document doc = reader.read( new File( "levels" + File.separator + name + ".xml" ) );
+		Document doc = reader.read( file );
 		Node level = doc.selectSingleNode( "//level" );
 		Level m = new Level( Integer.parseInt( level.valueOf( "@width" ) ), Integer.parseInt( level.valueOf( "@height" ) ) );
 		String theme = level.valueOf( "@theme" );
@@ -57,6 +62,12 @@ public class LevelFileHelper
 			{
 				b.id = Integer.parseInt( id );
 			}
+			String radius = n.valueOf( "@radius" );
+			if( radius != null && !radius.equals( "" ) )
+			{
+				b.radius = Float.parseFloat( radius );
+			}
+			b.name = n.valueOf( "@name" );
 			m.buildings.add( b );
 		}
 		
@@ -68,12 +79,23 @@ public class LevelFileHelper
 			m.links.add( l );
 		}
 		
+		//Load Code
+		Node code = level.selectSingleNode( "code" );
+		if( code != null )
+		{
+			m.code = code.getText();
+		}
+		
 		return m;
 	}
 	
 	public static void saveLevel( String name, Level m ) throws IOException
 	{
-		File file = new File( "levels" + File.separator + name + ".xml" );
+		saveLevel( new File( "levels" + File.separator + name + ".xml" ), m );
+	}
+	
+	public static void saveLevel( File file, Level m ) throws IOException
+	{
 		Document doc = DocumentHelper.createDocument();
 		Element level = doc.addElement( "level" );
 		level.addAttribute( "width", Integer.toString( m.width ) );
@@ -103,6 +125,8 @@ public class LevelFileHelper
 			building.addAttribute( "bt", b.bt.name() );
 			building.addAttribute( "team", b.t == null ? "null" : Integer.toString( b.t.id ) );
 			building.addAttribute( "id", Integer.toString( b.id ) );
+			building.addAttribute( "radius", Float.toString( b.radius ) );
+			building.addAttribute( "name", b.name );
 		}
 		
 		//ADD links
@@ -114,6 +138,13 @@ public class LevelFileHelper
 			link.addAttribute( "source", Integer.toString( l.source ) );
 			link.addAttribute( "targetX", Integer.toString( l.targetX ) );
 			link.addAttribute( "targetY", Integer.toString( l.targetY ) );
+		}
+		
+		//ADD code
+		if( m.code != null )
+		{
+			Element code = level.addElement( "code" );
+			code.setText( m.code );
 		}
 		
 		XMLWriter writer = new XMLWriter(

@@ -2,10 +2,17 @@ package com.danwink.tacticshooter.editor;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 
+import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
+
+import org.dom4j.DocumentException;
+
+import com.danwink.tacticshooter.LevelFileHelper;
 
 public class FileMenu extends JMenu implements ActionListener
 {
@@ -50,6 +57,40 @@ public class FileMenu extends JMenu implements ActionListener
 		case "new":
 			editor.showNewDialog();
 			break;
+		case "open":
+		{
+			JFileChooser ofc = new JFileChooser();
+			ofc.setCurrentDirectory( new File( System.getProperty("user.dir") ) );
+			int returnVal = ofc.showOpenDialog( editor.container );
+			if( returnVal == JFileChooser.APPROVE_OPTION ) {
+				try
+				{
+					editor.loadLevel( LevelFileHelper.loadLevel( ofc.getSelectedFile() ) );
+				}
+				catch( DocumentException e1 )
+				{
+					e1.printStackTrace();
+				}
+			}
+			break;
+		}
+		case "save":
+		{
+			JFileChooser sfc = new JFileChooser();
+			sfc.setCurrentDirectory( new File( System.getProperty("user.dir") ) );
+			int returnVal = sfc.showSaveDialog( editor.container );
+			if( returnVal == JFileChooser.APPROVE_OPTION ) {
+				try
+				{
+					LevelFileHelper.saveLevel( sfc.getSelectedFile(), editor.l );
+				}
+				catch( IOException e1 )
+				{
+					e1.printStackTrace();
+				}
+			}
+			break;
+		}
 		}
 	}
 }

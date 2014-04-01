@@ -17,6 +17,7 @@ import org.newdawn.slick.util.pathfinding.PathFindingContext;
 import org.newdawn.slick.util.pathfinding.TileBasedMap;
 
 
+
 import com.danwink.tacticshooter.AutoTileDrawer;
 import com.danwink.tacticshooter.MessageType;
 import com.danwink.tacticshooter.TacticServer;
@@ -47,6 +48,8 @@ public class Level implements TileBasedMap
 	public Image grate;
 	
 	public float[][] lightMap;
+
+	public String code;
 	
 	public Level()
 	{
