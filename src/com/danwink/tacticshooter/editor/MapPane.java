@@ -2,6 +2,8 @@ package com.danwink.tacticshooter.editor;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -12,7 +14,7 @@ import javax.swing.JPanel;
 import com.danwink.tacticshooter.editor.ModePanel.EditMode;
 import com.phyloa.dlib.renderer.Graphics2DIRenderer;
 
-public class MapPane extends JPanel implements MouseListener, MouseMotionListener
+public class MapPane extends JPanel implements MouseListener, MouseMotionListener, KeyListener
 {
 	Graphics2DIRenderer r;
 	LevelRenderer lr;
@@ -26,13 +28,14 @@ public class MapPane extends JPanel implements MouseListener, MouseMotionListene
 		
 		this.addMouseListener( this );
 		this.addMouseMotionListener( this );
+		this.addKeyListener( this );
 	}
 	
 	public void updateLevel()
 	{
 		r = new Graphics2DIRenderer( editor.l.width * editor.l.tileSize, editor.l.height * editor.l.tileSize );
 		lr = new LevelRenderer( editor.l );
-		lr.render( r );
+		redrawLevel();
 		
 		setSize( editor.l.width * editor.l.tileSize, editor.l.height * editor.l.tileSize );
 		setPreferredSize( new Dimension( editor.l.width * editor.l.tileSize, editor.l.height * editor.l.tileSize ) );
@@ -41,7 +44,7 @@ public class MapPane extends JPanel implements MouseListener, MouseMotionListene
 	
 	public void redrawLevel()
 	{
-		lr.render( r );
+		lr.render( r, editor.selected );
 	}
 
 	public void paintComponent( Graphics g )
@@ -51,7 +54,7 @@ public class MapPane extends JPanel implements MouseListener, MouseMotionListene
 
 	public void mouseClicked( MouseEvent e )
 	{
-		
+		requestFocus();
 	}
 
 	public void mouseEntered( MouseEvent e )
@@ -95,6 +98,24 @@ public class MapPane extends JPanel implements MouseListener, MouseMotionListene
 	}
 
 	public void mouseMoved( MouseEvent e )
+	{
+		
+	}
+
+	public void keyPressed( KeyEvent e )
+	{
+		if( e.getKeyCode() == KeyEvent.VK_DELETE )
+		{
+			editor.delete();
+		}
+	}
+
+	public void keyReleased( KeyEvent e )
+	{
+		
+	}
+
+	public void keyTyped( KeyEvent e )
 	{
 		
 	}

@@ -35,7 +35,7 @@ public class LevelRenderer
 		}
 	}
 	
-	public void render( Graphics2DIRenderer g )
+	public void render( Graphics2DIRenderer g, Building selected )
 	{
 		for( int y = 0; y < l.height; y++ )
 		{
@@ -55,7 +55,7 @@ public class LevelRenderer
 		for( Building b : l.buildings )
 		{
 			float rad = b.radius;
-			g.color( Color.black );
+			g.color( b == selected ? Color.red : Color.black );
 			g.pushMatrix();
 			g.translate( b.x, b.y );
 			g.drawOval( -rad, -rad, rad*2, rad*2 );

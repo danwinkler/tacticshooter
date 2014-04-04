@@ -722,4 +722,16 @@ public class Level implements TileBasedMap
 			}
 		}
 	}
+
+	public Building getBuilding( int x, int y )
+	{
+		for( Building b : buildings )
+		{
+			if( x*tileSize+tileSize/2 == b.x && y*tileSize+tileSize/2 == b.y )
+			{
+				return b;
+			}
+		}
+		return null;
+	}
 }

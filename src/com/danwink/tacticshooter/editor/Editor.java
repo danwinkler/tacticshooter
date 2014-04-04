@@ -42,6 +42,7 @@ public class Editor
 	BuildingDialog buildingDialog;
 	
 	Level l;
+	Building selected;
 	
 	public Editor()
 	{
@@ -141,7 +142,8 @@ public class Editor
 			break;
 		}
 		
-		container.pack();
+		mapEditTab.validate();
+		//container.pack();
 	}
 	
 	public static void main( String[] args )
@@ -201,10 +203,10 @@ public class Editor
 			switch( brushPanel.brush )
 			{
 			case FLOOR:
-				l.tiles[x][y] = TileType.FLOOR;
+				setTile( x, y, TileType.FLOOR );
 				break;
 			case WALL:
-				l.tiles[x][y] = TileType.WALL;
+				setTile( x, y, TileType.WALL );
 				break;
 			default:
 				break;
@@ -212,7 +214,15 @@ public class Editor
 			}
 			break;
 		case BUILDING:
-				l.buildings.add( new Building( x*l.tileSize + l.tileSize/2, y*l.tileSize + l.tileSize/2, buildingPanel.type, null ) );
+				Building b = l.getBuilding( x, y );
+				if( b == null )
+				{
+					l.buildings.add( new Building( x*l.tileSize + l.tileSize/2, y*l.tileSize + l.tileSize/2, buildingPanel.type, null ) );
+				}
+				else
+				{
+					selected = b;
+				}
 			break;
 		case CODE:
 			break;
@@ -222,5 +232,28 @@ public class Editor
 		
 		redrawLevel();
 		container.repaint();
+	}
+
+	public void setTile( int x, int y, TileType t )
+	{
+		l.tiles[x][y] = t;
+		switch( brushPanel.mirrorMode )
+		{
+		case "None": break;
+		case "X": l.tiles[(l.width-1)-x][y] = t; break;
+		case "Y": l.tiles[y][(l.height-1)-y] = t; break;
+		case "XY": l.tiles[(l.width-1)-x][(l.height-1)-y] = t; break;
+		}
+	}
+
+	public void delete()
+	{
+		if( selected != null )
+		{
+			l.buildings.remove( selected );
+			selected = null;
+			redrawLevel();
+			container.repaint();
+		}
 	}
 }

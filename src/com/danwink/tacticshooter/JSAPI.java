@@ -75,13 +75,25 @@ public class JSAPI
 		}
 	}
 	
-	public void load( String path )
+	public void load( String code )
 	{
 		try 
 		{
-			engine.eval( DFile.loadText( path ) );
+			engine.eval( code );
 		} 
-		catch( FileNotFoundException | ScriptException e ) 
+		catch( ScriptException e ) 
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	public void loadFile( String path )
+	{
+		try
+		{
+			load( DFile.loadText( path ) );
+		}
+		catch( FileNotFoundException e )
 		{
 			e.printStackTrace();
 		}

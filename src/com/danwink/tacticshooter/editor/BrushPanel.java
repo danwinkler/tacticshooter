@@ -5,8 +5,11 @@ import java.awt.event.ActionListener;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.JToggleButton;
+import javax.swing.SwingConstants;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -15,6 +18,7 @@ public class BrushPanel extends JPanel implements ActionListener
 	Editor editor;
 	
 	Brush brush = Brush.FLOOR;
+	String mirrorMode = "None";
 	
 	public BrushPanel( Editor editor )
 	{
@@ -39,6 +43,32 @@ public class BrushPanel extends JPanel implements ActionListener
 		this.add( wall, "wrap" );
 		
 		floor.setSelected( true );
+		
+		this.add( new JSeparator( SwingConstants.HORIZONTAL ), "growx, wrap" );
+		
+		this.add( new JLabel( "Mirror Mode", JLabel.CENTER ), "growx, wrap" );
+		
+		groupHelper( "None", "X", "Y", "XY", "/", "\\", "4" );
+	}
+	
+	private void groupHelper( String... a )
+	{
+		ButtonGroup b = new ButtonGroup();
+		boolean first = true;
+		for( String s : a )
+		{
+			JToggleButton x = new JToggleButton( s );
+			x.setActionCommand( s );
+			x.addActionListener( this );
+			b.add( x );
+			this.add( x, "growx, wrap" );
+			
+			if( first )
+			{
+				first = false;
+				x.setSelected( true );
+			}
+		}
 	}
 
 	public Brush getBrush()
@@ -52,6 +82,9 @@ public class BrushPanel extends JPanel implements ActionListener
 		{
 		case "floor": brush = Brush.FLOOR; break;
 		case "wall": brush = Brush.WALL; break;
+		default:
+			mirrorMode = e.getActionCommand();
+			break;
 		}
 	}
 	

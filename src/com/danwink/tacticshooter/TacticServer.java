@@ -79,9 +79,6 @@ public class TacticServer
 	
 	public void begin()
 	{
-		js = new JSAPI( this );
-		js.load( "data/gamemodes/pointcapture.js" );
-		
 		File[] files = new File( "levels" ).listFiles();
 		if( files != null )
 		{
@@ -146,6 +143,17 @@ public class TacticServer
 		} catch( DocumentException e ) {
 			e.printStackTrace();
 		}
+		
+		js = new JSAPI( this );
+		if( l.code != null )
+		{
+			js.load( l.code );
+		}
+		else
+		{
+			js.loadFile( "data/gamemodes/pointcapture.js" );
+		}
+			
 		gs.setup( a, b );
 		for( int i = 0; i < 16; i++ )
 		{
