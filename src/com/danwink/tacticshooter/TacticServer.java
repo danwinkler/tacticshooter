@@ -145,7 +145,7 @@ public class TacticServer
 		}
 		
 		js = new JSAPI( this );
-		if( l.code != null )
+		if( l.code != null && l.code.length() == 0 )
 		{
 			js.load( l.code );
 		}
@@ -376,11 +376,9 @@ public class TacticServer
 			lastTick += 100;
 			tick++;
 			
-			js = new JSAPI( this );
-			js.load( "data/gamemodes/pointcapture.js" );
-			js.tick( tick );
-			
 			if( state == ServerState.LOBBY ) return;
+			
+			js.tick( tick );
 			
 			//Every 100 ticks
 			if( tick % 100 == 0 )

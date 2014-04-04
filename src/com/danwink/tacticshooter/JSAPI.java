@@ -69,7 +69,7 @@ public class JSAPI
 		    
 		    bindings.put( "out", System.out );
 		    
-			engine.eval( "tick( " + frame + " );" );
+		    engine.eval( "tick( " + frame + " );" );
 		} catch( ScriptException e ) {
 			e.printStackTrace();
 		}

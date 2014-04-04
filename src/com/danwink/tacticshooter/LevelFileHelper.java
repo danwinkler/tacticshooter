@@ -1,8 +1,6 @@
 package com.danwink.tacticshooter;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
@@ -19,7 +17,6 @@ import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Team;
 import com.danwink.tacticshooter.gameobjects.Building.BuildingType;
-import com.danwink.tacticshooter.gameobjects.Level.Link;
 import com.danwink.tacticshooter.gameobjects.Level.TileType;
 
 
@@ -47,7 +44,7 @@ public class LevelFileHelper
 			String[] vals = rows.get( y ).getText().split( "," );
 			for( int x = 0; x < m.width; x++ )
 			{
-				m.tiles[x][y] = TileType.values()[Integer.parseInt( vals[x] )];
+				m.tiles[x][y] = TileType.getTile( Integer.parseInt( vals[x] ) );
 			}
 		}
 		
@@ -69,14 +66,6 @@ public class LevelFileHelper
 			}
 			b.name = n.valueOf( "@name" );
 			m.buildings.add( b );
-		}
-		
-		//Load Links
-		List<? extends Node> links = doc.selectNodes( "//level/links/link" );
-		for( Node n : links )
-		{
-			Link l = new Link( Integer.parseInt( n.valueOf( "@source" ) ), Integer.parseInt( n.valueOf( "@targetX" ) ), Integer.parseInt( n.valueOf( "@targetY" ) ) ) ;
-			m.links.add( l );
 		}
 		
 		//Load Code
@@ -109,7 +98,7 @@ public class LevelFileHelper
 			StringBuilder rows = new StringBuilder();
 			for( int x = 0; x < m.width; x++ )
 			{
-				rows.append( m.getTile( x, y ).ordinal() + "," );
+				rows.append( m.getTile( x, y ).data + "," );
 			}
 			row.setText( rows.toString() );
 		}
@@ -127,17 +116,6 @@ public class LevelFileHelper
 			building.addAttribute( "id", Integer.toString( b.id ) );
 			building.addAttribute( "radius", Float.toString( b.radius ) );
 			building.addAttribute( "name", b.name );
-		}
-		
-		//ADD links
-		Element links = level.addElement( "links" );
-		for( int i = 0; i < m.links.size(); i++ )
-		{
-			Link l = m.links.get( i );
-			Element link = links.addElement( "link" );
-			link.addAttribute( "source", Integer.toString( l.source ) );
-			link.addAttribute( "targetX", Integer.toString( l.targetX ) );
-			link.addAttribute( "targetY", Integer.toString( l.targetY ) );
 		}
 		
 		//ADD code

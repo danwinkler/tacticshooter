@@ -18,7 +18,6 @@ import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Team;
 import com.danwink.tacticshooter.gameobjects.Building.BuildingType;
-import com.danwink.tacticshooter.gameobjects.Level.Link;
 import com.danwink.tacticshooter.gameobjects.Level.TileType;
 import com.danwink.tacticshooter.slick.Slick2DEventMapper;
 import com.danwink.tacticshooter.slick.Slick2DRenderer;
@@ -203,15 +202,6 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 					if( dx*dx + dy*dy < 10 )
 					{
 						l.buildings.remove( i );
-						for( int j = 0; j < l.links.size(); j++ )
-						{
-							Link link = l.links.get( j );
-							if( link.source == b.id )
-							{
-								l.links.remove( j );
-								j--;
-							}
-						}
 						i--;
 					}
 					
@@ -222,15 +212,6 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 						if( dx*dx + dy*dy < 10 )
 						{
 							l.buildings.remove( i );
-							for( int j = 0; j < l.links.size(); j++ )
-							{
-								Link link = l.links.get( j );
-								if( link.source == b.id )
-								{
-									l.links.remove( j );
-									j--;
-								}
-							}
 							i--;
 						}
 					}
@@ -246,66 +227,17 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 				int y2 = mirrorType == MirrorType.Y || mirrorType == MirrorType.XY ? (l.height-1)-y : y;
 				switch( brush )
 				{
-				case ADDLINK:
-					tile = null;
-					break;
 				case WALL:
 					tile = TileType.WALL;
 					break;
 				case FLOOR:
 					tile = TileType.FLOOR;
 					break;
-				case LIGHT:
-					tile = TileType.LIGHT;
-					break;
-				case PASS:
-					tile = TileType.PASSOPEN;
-					break;
-				case GATE:
-					tile = TileType.GATECLOSED;
-					break;
 				case DOOR:
 					tile = TileType.DOOR;
 					break;
 				case GRATE:
 					tile = TileType.GRATE;
-					break;
-				case TRIANGLE:
-					if( l.getTile( x, y ) == TileType.WALL )
-					{
-						tile = TileType.WALL; 
-						break;
-					}
-					
-					TileType up = l.getTile( x, y-1 );
-					TileType down = l.getTile( x, y+1 );
-					TileType left = l.getTile( x-1, y );
-					TileType right = l.getTile( x+1, y );
-					
-					if( (up.connectsTo( TileType.WALL ) && down.connectsTo( TileType.WALL ) && left.connectsTo( TileType.WALL ) && right.connectsTo( TileType.WALL )) )
-					{
-						tile = TileType.WALL;
-					}
-					else if( up.connectsTo( TileType.WALL ) && !down.connectsTo( TileType.WALL ) && !left.connectsTo( TileType.WALL ) && right.connectsTo( TileType.WALL ) )
-					{
-						tile = TileType.TRIANGLENE;
-					}
-					else if( up.connectsTo( TileType.WALL ) && !down.connectsTo( TileType.WALL ) && left.connectsTo( TileType.WALL ) && !right.connectsTo( TileType.WALL ) )
-					{
-						tile = TileType.TRIANGLENW;
-					}
-					else if( !up.connectsTo( TileType.WALL ) && down.connectsTo( TileType.WALL ) && !left.connectsTo( TileType.WALL ) && right.connectsTo( TileType.WALL ) )
-					{
-						tile = TileType.TRIANGLESE;
-					}
-					else if( !up.connectsTo( TileType.WALL ) && down.connectsTo( TileType.WALL ) && left.connectsTo( TileType.WALL ) && !right.connectsTo( TileType.WALL ) )
-					{
-						tile = TileType.TRIANGLESW;
-					}
-					else
-					{
-						tile = TileType.FLOOR;
-					}
 					break;
 				}
 				if( tile != null )
@@ -428,7 +360,6 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 		g.drawRect( 0, 0, l.width*l.tileSize, l.height*l.tileSize );
 		g.drawImage( levelTexture, 0, 0 );
 		l.renderBuildings( g );
-		l.renderLinks( g );
 		
 		int x = l.getTileX( gc.getInput().getMouseX() + scrollx );
 		int y = l.getTileY( gc.getInput().getMouseY() + scrolly );
@@ -487,14 +418,9 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 	{
 		WALL,
 		FLOOR,
-		TRIANGLE,
-		LIGHT,
 		CENTERTEAMA,
 		CENTERTEAMB,
-		POINT,
-		PASS,
-		GATE,
-		ADDLINK, 
+		POINT, 
 		PRESSUREPAD,
 		DOOR,
 		GRATE;
@@ -513,14 +439,6 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			{
 				brush = Brush.FLOOR;
 			}
-			else if( e == edge )
-			{
-				brush = Brush.TRIANGLE;
-			}
-			else if( e == light )
-			{
-				brush = Brush.LIGHT;
-			}
 			else if( e == teamACenter )
 			{
 				brush = Brush.CENTERTEAMA;
@@ -532,18 +450,6 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 			else if( e == point )
 			{
 				brush = Brush.POINT;
-			}
-			else if( e == pass )
-			{
-				brush = Brush.PASS;
-			}
-			else if( e == gate )
-			{
-				brush = Brush.GATE;
-			}
-			else if( e == addLink )
-			{
-				brush = Brush.ADDLINK;
 			}
 			else if( e == pressurePad )
 			{
@@ -628,29 +534,6 @@ public class LevelEditor extends DScreen<GameContainer, Graphics> implements DUI
 		
 		int x = tileX * l.tileSize + l.tileSize/2;
 		int y = tileY * l.tileSize + l.tileSize/2;
-		
-		if( brush == Brush.ADDLINK )
-		{
-			if( addLinkSelected == null )
-			{
-				for( int i = 0; i < l.buildings.size(); i++ )
-				{
-					Building b = l.buildings.get( i );
-					int dx = b.x-x;
-					int dy = b.y-y;
-					if( dx*dx + dy*dy < 10 )
-					{
-						addLinkSelected = b;
-						break;
-					}
-				}
-			}
-			else
-			{
-				l.links.add( new Link( addLinkSelected.id, tileX, tileY ) );
-				addLinkSelected = null;
-			}
-		}
 	}
 
 	@Override

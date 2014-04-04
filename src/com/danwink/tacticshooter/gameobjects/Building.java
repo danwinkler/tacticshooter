@@ -266,7 +266,6 @@ public class Building
 				}
 			}
 			isSteppedOn = stepCheck;
-			ts.l.signal( b, isSteppedOn, ts );
 		}
 
 		public boolean isCapturable( Level l, Building tb )

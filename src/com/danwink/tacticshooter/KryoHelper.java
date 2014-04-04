@@ -14,7 +14,6 @@ import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.gameobjects.Team;
 import com.danwink.tacticshooter.gameobjects.Unit;
-import com.danwink.tacticshooter.gameobjects.Level.Link;
 import com.danwink.tacticshooter.gameobjects.Unit.UnitType;
 import com.danwink.tacticshooter.network.Message;
 import com.esotericsoftware.kryo.Kryo;
