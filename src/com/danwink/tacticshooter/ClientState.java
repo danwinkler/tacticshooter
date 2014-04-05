@@ -10,7 +10,6 @@ import com.danwink.tacticshooter.gameobjects.Bullet;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.gameobjects.Unit;
-import com.phyloa.dlib.util.DMath;
 
 public class ClientState
 {

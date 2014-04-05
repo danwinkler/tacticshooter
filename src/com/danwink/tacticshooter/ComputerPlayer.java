@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.vecmath.Point2f;
+
 import org.newdawn.slick.util.pathfinding.AStarPathFinder;
 import org.newdawn.slick.util.pathfinding.Path;
 import org.newdawn.slick.util.pathfinding.PathFinder;
@@ -54,6 +55,7 @@ public abstract class ComputerPlayer implements Runnable
 	
 	public abstract void update( PathFinder finder );
 	
+	@SuppressWarnings( "incomplete-switch" )
 	public void run() 
 	{
 		while( playing )

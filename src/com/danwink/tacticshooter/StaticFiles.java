@@ -15,7 +15,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
 import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.Sound;
@@ -24,6 +23,7 @@ import com.phyloa.dlib.renderer.DScreenTransition;
 import com.phyloa.dlib.util.DFile;
 import com.phyloa.dlib.util.DOptions;
 
+@SuppressWarnings( "deprecation" )
 public class StaticFiles
 {
 	static HashMap<String, Music> music = new HashMap<String, Music>(); 
@@ -138,6 +138,7 @@ public class StaticFiles
 		String s = "";
 		try
 		{
+			@SuppressWarnings( "resource" )
 			HttpClient client = new DefaultHttpClient();
 			HttpPost httppost = new HttpPost( "http://www.tacticshooter.com/user/checkLogin" );
 	

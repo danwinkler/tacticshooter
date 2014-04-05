@@ -37,7 +37,6 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 	DUI dui;
 	DButton singlePlayer;
 	DButton multiPlayer;
-	DButton levelEditor;
 	DButton settings;
 	DButton exit;
 	
@@ -55,17 +54,15 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 		{
 			dui = new DUI( new Slick2DEventMapper( e.getInput() ) );
 			
-			singlePlayer = new DButton( "Start Local Server", e.getWidth() / 2 - 200, e.getHeight()/2 - 200, 400, 100 );
-			multiPlayer = new DButton( "Multiplayer", e.getWidth() / 2 - 200, e.getHeight()/2 - 100, 400, 100 );
-			levelEditor = new DButton( "Level Editor", e.getWidth() / 2 - 200, e.getHeight()/2, 400, 100 );
-			settings = new DButton( "Settings", e.getWidth() / 2 - 200, e.getHeight()/2 + 100, 400, 100 );
-			exit = new DButton( "Exit", e.getWidth() / 2 - 200, e.getHeight()/2 + 200, 400, 100 );
+			singlePlayer = new DButton( "Start Local Server", e.getWidth() / 2 - 200, e.getHeight()/2 - 150, 400, 100 );
+			multiPlayer = new DButton( "Multiplayer", e.getWidth() / 2 - 200, e.getHeight()/2 - 50, 400, 100 );
+			settings = new DButton( "Settings", e.getWidth() / 2 - 200, e.getHeight()/2 + 50, 400, 100 );
+			exit = new DButton( "Exit", e.getWidth() / 2 - 200, e.getHeight()/2 + 150, 400, 100 );
 			
 			login = new DButton( "Login", 50, 50, 200, 100 );
 			
 			dui.add( singlePlayer );
 			dui.add( multiPlayer );
-			dui.add( levelEditor );
 			dui.add( settings );
 			dui.add( exit );
 			
@@ -151,10 +148,6 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 		{
 			dsh.activate( "multiplayersetup", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
 		} 
-		else if( e == levelEditor )
-		{
-			dsh.activate( "editorsetup", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
-		}
 		else if( e == settings )
 		{
 			dsh.activate( "settings", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );

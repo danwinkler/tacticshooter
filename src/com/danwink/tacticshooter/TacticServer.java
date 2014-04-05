@@ -12,6 +12,7 @@ import org.newdawn.slick.util.pathfinding.AStarPathFinder;
 import org.newdawn.slick.util.pathfinding.PathFinder;
 
 
+
 import com.danwink.tacticshooter.ComputerPlayer.PlayType;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Bullet;
@@ -202,6 +203,7 @@ public class TacticServer
 		state = ServerState.PLAYING;
 	}
 	
+	@SuppressWarnings( { "incomplete-switch", "unchecked" } )
 	public void update()
 	{	
 		if( state == ServerState.LOBBY )
@@ -370,7 +372,8 @@ public class TacticServer
 			return;
 		}
 		
-		float d = (System.currentTimeMillis() - sl.lastTime) / 60.f;
+		//This isn't used at the moment, but we should be using it
+		//float d = (System.currentTimeMillis() - sl.lastTime) / 60.f;
 		if( sl.lastTime - lastTick > 100 )
 		{
 			lastTick += 100;
@@ -727,8 +730,7 @@ public class TacticServer
 				{
 					try {
 						Thread.sleep( timeDiff );
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
+					} catch( InterruptedException e ) {
 						e.printStackTrace();
 					}
 				}

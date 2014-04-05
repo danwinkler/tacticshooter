@@ -1,8 +1,6 @@
 package com.danwink.tacticshooter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-
 import javax.vecmath.Point2f;
 import javax.vecmath.Point2i;
 import javax.vecmath.Vector2f;
@@ -49,7 +47,7 @@ public class KryoHelper
 		k.register( Vector2f.class );
 		
 		//LEVEL
-		for( Class c : Level.class.getDeclaredClasses() )
+		for( Class<?> c : Level.class.getDeclaredClasses() )
 		{
 			k.register( c );
 		}

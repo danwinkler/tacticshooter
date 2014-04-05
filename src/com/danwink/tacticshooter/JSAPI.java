@@ -1,10 +1,6 @@
 package com.danwink.tacticshooter;
 
 import java.io.FileNotFoundException;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import javax.script.Bindings;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
@@ -38,19 +34,8 @@ public class JSAPI
 		{
 			Bindings bindings = engine.getBindings( ScriptContext.ENGINE_SCOPE );
 		    
-			Object[] c = ts.players.keySet().toArray();
-			
 			bindings.put( "api", this );
 			
-			/*Set<Entry<Integer, Player>> playerSet = ts.players.entrySet();
-			int[] players = new int[playerSet.size()];
-		    Iterator<Entry<Integer, Player>> pi = playerSet.iterator();
-			for( int i = 0; pi.hasNext(); i++ )
-		    {
-				Entry<Integer, Player> e = pi.next();
-		    	players[i] = e.getValue().id;
-		    }
-		    */
 		    bindings.put( "players", ts.players.keySet().toArray() );
 			
 		    int[] buildings = new int[ts.l.buildings.size()];
