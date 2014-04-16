@@ -367,6 +367,10 @@ public class TacticServer
 					fogEnabled = (Boolean)m.message;
 					si.sendToAllClients( new Message( MessageType.FOGUPDATE, fogEnabled ) );
 					break;
+				case GAMETYPE:
+					gameType = (GameType)m.message;
+					si.sendToAllClients( new Message( MessageType.GAMETYPE, gameType ) );
+					break;
 				}
 			}
 			return;

@@ -20,7 +20,10 @@ import org.newdawn.slick.util.pathfinding.TileBasedMap;
 
 
 
+
+
 import com.danwink.tacticshooter.AutoTileDrawer;
+import com.danwink.tacticshooter.ComputerPlayer.PlayType;
 import com.danwink.tacticshooter.MessageType;
 import com.danwink.tacticshooter.TacticServer;
 import com.danwink.tacticshooter.gameobjects.Level.TileType;
@@ -51,6 +54,9 @@ public class Level implements TileBasedMap
 	public float[][] lightMap;
 
 	public String code;
+	public String ums;
+	
+	public SlotOption[] slotOptions;
 	
 	public Level()
 	{
@@ -498,5 +504,19 @@ public class Level implements TileBasedMap
 			}
 		}
 		return null;
+	}
+	
+	public class SlotOption
+	{
+		SlotType st;
+		PlayType bt;
+	}
+	
+	public enum SlotType
+	{
+		ANY,
+		PLAYER,
+		COMPUTER,
+		CLOSED;
 	}
 }

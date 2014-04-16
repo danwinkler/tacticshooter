@@ -36,8 +36,8 @@ public class CodePanel extends JPanel implements ActionListener
 		
 	}
 
-	public void updateCode()
+	public void updateCode( String code )
 	{
-		textArea.setText( editor.l.code != null ? editor.l.code : "" );
+		textArea.setText( code != null ? code : "" );
 	}
 }

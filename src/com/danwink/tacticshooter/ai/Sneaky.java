@@ -14,6 +14,7 @@ import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Unit;
 import com.danwink.tacticshooter.gameobjects.Unit.UnitState;
+import com.danwink.tacticshooter.gameobjects.Unit.UnitType;
 import com.danwink.tacticshooter.network.Message;
 import com.phyloa.dlib.util.DMath;
 
@@ -63,6 +64,11 @@ public class Sneaky extends ComputerPlayer
 					}
 				}
 			}
+		}
+		
+		if( player.money > 20 )
+		{
+			ci.sl.received( fc, new Message( MessageType.BUILDUNIT, UnitType.values()[DMath.randomi(0, UnitType.values().length)] ) );
 		}
 	}
 }

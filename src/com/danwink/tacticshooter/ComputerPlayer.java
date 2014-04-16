@@ -13,6 +13,7 @@ import com.danwink.tacticshooter.ai.Aggressive;
 import com.danwink.tacticshooter.ai.Fortifier;
 import com.danwink.tacticshooter.ai.Masser;
 import com.danwink.tacticshooter.ai.Moderate;
+import com.danwink.tacticshooter.ai.Passive;
 import com.danwink.tacticshooter.ai.Sneaky;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Level;
@@ -128,11 +129,6 @@ public abstract class ComputerPlayer implements Runnable
 				}
 				update( finder );
 				
-				if( player.money > 20 )
-				{
-					ci.sl.received( fc, new Message( MessageType.BUILDUNIT, UnitType.values()[DMath.randomi(0, UnitType.values().length)] ) );
-				}
-				
 				try 
 				{	
 					Thread.sleep( sleepDuration );
@@ -193,7 +189,8 @@ public abstract class ComputerPlayer implements Runnable
 		SNEAKY( Sneaky.class ),
 		MODERATE( Moderate.class ),
 		MASSER( Masser.class ),
-		FORTIFIER( Fortifier.class );
+		FORTIFIER( Fortifier.class ),
+		PASSIVE( Passive.class );
 		
 		Class<? extends ComputerPlayer> c;
 		

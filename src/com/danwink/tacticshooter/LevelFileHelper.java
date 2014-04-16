@@ -75,6 +75,12 @@ public class LevelFileHelper
 			m.code = code.getText();
 		}
 		
+		Node ums = level.selectSingleNode( "ums" );
+		if( ums != null )
+		{
+			m.ums = ums.getText();
+		}
+		
 		return m;
 	}
 	
@@ -123,6 +129,12 @@ public class LevelFileHelper
 		{
 			Element code = level.addElement( "code" );
 			code.setText( m.code );
+		}
+		
+		if( m.ums != null )
+		{
+			Element code = level.addElement( "ums" );
+			code.setText( m.ums );
 		}
 		
 		XMLWriter writer = new XMLWriter(

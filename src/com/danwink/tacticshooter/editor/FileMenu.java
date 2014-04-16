@@ -18,6 +18,8 @@ public class FileMenu extends JMenu implements ActionListener
 {
 	Editor editor;
 	
+	File f;
+	
 	public FileMenu( Editor editor )
 	{
 		super( "File" );
@@ -56,6 +58,7 @@ public class FileMenu extends JMenu implements ActionListener
 		{
 		case "new":
 			editor.showNewDialog();
+			f = null;
 			break;
 		case "open":
 		{
@@ -66,6 +69,7 @@ public class FileMenu extends JMenu implements ActionListener
 				try
 				{
 					editor.loadLevel( LevelFileHelper.loadLevel( ofc.getSelectedFile() ) );
+					f = ofc.getSelectedFile();
 				}
 				catch( DocumentException e1 )
 				{
@@ -76,21 +80,37 @@ public class FileMenu extends JMenu implements ActionListener
 		}
 		case "save":
 		{
+			if( f != null )
+			{
+				saveFile( f );
+				break;
+			}
+			//If f IS null, roll over to saveas handler
+		}
+		case "saveas":
+		{
 			JFileChooser sfc = new JFileChooser();
 			sfc.setCurrentDirectory( new File( System.getProperty("user.dir") ) );
 			int returnVal = sfc.showSaveDialog( editor.container );
 			if( returnVal == JFileChooser.APPROVE_OPTION ) {
-				try
-				{
-					LevelFileHelper.saveLevel( sfc.getSelectedFile(), editor.l );
-				}
-				catch( IOException e1 )
-				{
-					e1.printStackTrace();
-				}
+				saveFile( sfc.getSelectedFile() );
 			}
 			break;
 		}
+		}
+	}
+	
+	public void saveFile( File file )
+	{
+		try
+		{
+			editor.updateLevel();
+			LevelFileHelper.saveLevel( file, editor.l );
+			f = file;
+		}
+		catch( IOException e1 )
+		{
+			e1.printStackTrace();
 		}
 	}
 }

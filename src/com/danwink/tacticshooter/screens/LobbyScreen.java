@@ -11,7 +11,9 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
 
+
 import com.danwink.tacticshooter.ComputerPlayer;
+import com.danwink.tacticshooter.GameType;
 import com.danwink.tacticshooter.MessageType;
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.ComputerPlayer.PlayType;
@@ -44,6 +46,7 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 	DDropDown[] humanOrBot = new DDropDown[16];
 	DDropDown[] botType = new DDropDown[16];
 	DDropDown maps;
+	DDropDown gameType;
 	DTextBox chatBox;
 	DButton startGame;
 	DButton leaveGame;
@@ -82,6 +85,10 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 		
 		maps = new DDropDown( 20, 100, 500, 25 );
 		dui.add( maps );
+		
+		gameType = new DDropDown( 20, 130, 500, 25 );
+		gameType.addItems( (Object[])GameType.values() );
+		dui.add( gameType );
 		
 		leaveGame = new DButton( "Leave", 105, 700, 90, 50 );
 		dui.add( leaveGame );
@@ -161,6 +168,9 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 			case FOGUPDATE:
 				fog.checked = (Boolean)m.message;
 				break;
+			case GAMETYPE:
+				gameType.setSelected( ((GameType)m.message).ordinal() );
+				break;
 			}
 		}
 	}
@@ -212,6 +222,10 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 			if( el == maps )
 			{
 				ci.sendToServer( new Message( MessageType.LEVELUPDATE, el.getSelectedOrdinal() ) );
+			}
+			else if( el == gameType )
+			{
+				ci.sendToServer( new Message( MessageType.GAMETYPE, GameType.valueOf( el.getSelected() ) ) );
 			}
 			else
 			{

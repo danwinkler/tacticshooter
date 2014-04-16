@@ -29,6 +29,7 @@ public class Editor
 	public JPanel mapEditTab;
 	public OptionsPanel optionsPanel;
 	public CodePanel codePanel;
+	public CodePanel umsPanel;
 	
 	public BrushPanel brushPanel;
 	public BuildingPanel buildingPanel;
@@ -80,10 +81,12 @@ public class Editor
 			
 		optionsPanel = new OptionsPanel( this );
 		codePanel = new CodePanel( this );
+		umsPanel = new CodePanel( this );
 		
 		tabs.addTab( "Map", mapEditTab );
 		tabs.addTab( "Options", optionsPanel );
 		tabs.addTab( "Code", codePanel );
+		tabs.addTab( "ums", umsPanel );
 		
 		container.add( tabs );
 		
@@ -107,7 +110,8 @@ public class Editor
 	{
 		this.l = l;
 		mapPane.updateLevel();
-		codePanel.updateCode();
+		codePanel.updateCode( l.code );
+		umsPanel.updateCode( l.ums );
 		
 		setMode( EditMode.TILE );
 	}
@@ -255,5 +259,11 @@ public class Editor
 			redrawLevel();
 			container.repaint();
 		}
+	}
+
+	public void updateLevel()
+	{
+		l.code = codePanel.textArea.getText();
+		l.ums = umsPanel.textArea.getText();
 	}
 }
