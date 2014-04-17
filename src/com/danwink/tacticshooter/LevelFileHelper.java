@@ -15,10 +15,11 @@ import org.dom4j.io.XMLWriter;
 
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Level;
+import com.danwink.tacticshooter.gameobjects.Level.SlotOption;
 import com.danwink.tacticshooter.gameobjects.Team;
 import com.danwink.tacticshooter.gameobjects.Building.BuildingType;
+import com.danwink.tacticshooter.gameobjects.Level.SlotType;
 import com.danwink.tacticshooter.gameobjects.Level.TileType;
-
 
 public class LevelFileHelper
 {
@@ -66,6 +67,18 @@ public class LevelFileHelper
 			}
 			b.name = n.valueOf( "@name" );
 			m.buildings.add( b );
+		}
+		
+		//Load Slots
+		List<? extends Node> slots = doc.selectNodes( "//level/slots/slot" );
+		if( slots != null )
+		{
+			for( int i = 0; i < slots.size(); i++ )
+			{
+				Node n = slots.get( i );
+				m.slotOptions[i].st = SlotType.valueOf( n.valueOf( "@s" ) );
+				m.slotOptions[i].bt = ComputerPlayer.PlayType.valueOf( n.valueOf( "@b" ) );
+			}
 		}
 		
 		//Load Code
@@ -122,6 +135,16 @@ public class LevelFileHelper
 			building.addAttribute( "id", Integer.toString( b.id ) );
 			building.addAttribute( "radius", Float.toString( b.radius ) );
 			building.addAttribute( "name", b.name );
+		}
+		
+		//ADD slots
+		Element slots = level.addElement( "slots" );
+		for( int i = 0; i < m.slotOptions.length; i++ )
+		{
+			SlotOption so = m.slotOptions[i];
+			Element slot = slots.addElement( "slot" );
+			slot.addAttribute( "s", so.st.toString() );
+			slot.addAttribute( "b", so.bt.toString() );
 		}
 		
 		//ADD code

@@ -12,11 +12,13 @@ import org.newdawn.slick.Graphics;
 
 
 
+
 import com.danwink.tacticshooter.ComputerPlayer;
 import com.danwink.tacticshooter.GameType;
 import com.danwink.tacticshooter.MessageType;
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.ComputerPlayer.PlayType;
+import com.danwink.tacticshooter.gameobjects.Level.SlotOption;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.network.ClientInterface;
 import com.danwink.tacticshooter.network.Message;

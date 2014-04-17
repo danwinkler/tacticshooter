@@ -112,6 +112,7 @@ public class Editor
 		mapPane.updateLevel();
 		codePanel.updateCode( l.code );
 		umsPanel.updateCode( l.ums );
+		optionsPanel.updateOptions( l );
 		
 		setMode( EditMode.TILE );
 	}

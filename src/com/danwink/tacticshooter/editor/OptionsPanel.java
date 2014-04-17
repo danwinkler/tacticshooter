@@ -10,6 +10,8 @@ import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
 import com.danwink.tacticshooter.ComputerPlayer.PlayType;
+import com.danwink.tacticshooter.gameobjects.Level;
+import com.danwink.tacticshooter.gameobjects.Level.SlotType;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -18,7 +20,7 @@ public class OptionsPanel extends JPanel implements ActionListener
 {
 	Editor editor;
 	
-	JComboBox<String>[] playerType;
+	JComboBox<SlotType>[] playerType;
 	JComboBox<PlayType>[] botType;
 
 	public OptionsPanel( Editor editor )
@@ -35,11 +37,17 @@ public class OptionsPanel extends JPanel implements ActionListener
 		
 		for( int i = 0; i < 16; i++ )
 		{
-			JComboBox<String> pt = new JComboBox<String>( new String[] { "HUMAN", "BOT" } );
+			JComboBox<SlotType> pt = new JComboBox<SlotType>( SlotType.values() );
 			JComboBox<PlayType> bt = new JComboBox<PlayType>( PlayType.values() );
 			
 			playerType[i] = pt;
 			botType[i] = bt;
+			
+			pt.setActionCommand( "p-" + i );
+			bt.setActionCommand( "b-" + i );
+			
+			pt.addActionListener( this );
+			bt.addActionListener( this );
 			
 			this.add( pt );
 			this.add( bt, "wrap" );
@@ -53,6 +61,27 @@ public class OptionsPanel extends JPanel implements ActionListener
 
 	public void actionPerformed( ActionEvent e )
 	{
-		
+		String[] action = e.getActionCommand().split( "-" );
+		if( action.length == 2 )
+		{
+			int i = Integer.parseInt( action[1] );
+			if( action[0].equals( "p" ) )
+			{
+				editor.l.slotOptions[i].st = (SlotType)playerType[i].getSelectedItem();
+			}
+			else
+			{
+				editor.l.slotOptions[i].bt = (PlayType)botType[i].getSelectedItem();
+			}
+		}
+	}
+	
+	public void updateOptions( Level l )
+	{
+		for( int i = 0; i < 16; i++ )
+		{
+			playerType[i].setSelectedIndex( l.slotOptions[i].st.ordinal() );
+			botType[i].setSelectedIndex( l.slotOptions[i].bt.ordinal() );
+		}
 	}
 }

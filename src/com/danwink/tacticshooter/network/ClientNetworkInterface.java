@@ -68,6 +68,11 @@ public class ClientNetworkInterface implements ClientInterface
 	public String getServerAddr()
 	{
 		if( client == null ) return "";
-		return client.getRemoteAddressTCP().getHostName();
+		try {
+			return client.getRemoteAddressTCP().getHostName();
+		} catch( Exception ex )
+		{
+			return "";
+		}
 	}
 }

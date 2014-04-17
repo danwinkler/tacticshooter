@@ -13,10 +13,12 @@ import org.newdawn.slick.util.pathfinding.PathFinder;
 
 
 
+
 import com.danwink.tacticshooter.ComputerPlayer.PlayType;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Bullet;
 import com.danwink.tacticshooter.gameobjects.Level;
+import com.danwink.tacticshooter.gameobjects.Level.SlotOption;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.gameobjects.Team;
 import com.danwink.tacticshooter.gameobjects.Unit;
@@ -134,6 +136,12 @@ public class TacticServer
 		
 		selectedMap = (selectedMap+1) % maps.size();
 		
+		try {
+			l = LevelFileHelper.loadLevel( maps.get( selectedMap ) );
+		} catch( DocumentException e ) {
+			e.printStackTrace();
+		}
+		
 		state = ServerState.LOBBY;
 	}
 	
@@ -146,11 +154,11 @@ public class TacticServer
 		}
 		
 		js = new JSAPI( this );
-		if( l.code != null && l.code.length() == 0 )
+		if( gameType == GameType.UMS )
 		{
-			js.load( l.code );
+			js.load( l.ums );
 		}
-		else
+		else if( gameType == GameType.POINTCONTROL )
 		{
 			js.loadFile( "data/gamemodes/pointcapture.js" );
 		}
@@ -201,6 +209,50 @@ public class TacticServer
 		
 		lastTick = System.currentTimeMillis();
 		state = ServerState.PLAYING;
+	}
+	
+	public void setBot( int line, boolean isBot, boolean update )
+	{
+		Player p = slots[line];
+		
+		if( p != null )
+		{
+			if( isBot )
+			{
+				si.sendToClient( p.id, new Message( MessageType.KICK, "Your slot turned into a bot." ) );
+			}
+			else if( !isBot && p.isBot )
+			{
+				slots[line] = null;
+			}
+		}
+		
+		if( isBot )
+		{
+			p = new Player();
+			p.slot = line;
+			String[] rnames = StaticFiles.names.split( "\n" );
+			p.name = rnames[DMath.randomi( 0, rnames.length )].split( " " )[0];
+			p.isBot = isBot;
+			slots[line] = p;
+		}
+		
+		if( update )
+		{
+			si.sendToAllClients( new Message( MessageType.PLAYERUPDATE, new Object[] { line, slots[line] } ) );
+		}
+	}
+	
+	public void setPlayType( int line, PlayType pt )
+	{
+		Player p = slots[line];
+		
+		if( p != null )
+		{
+			p.playType = pt;
+		}
+		
+		si.sendToAllClients( new Message( MessageType.PLAYERUPDATE, new Object[] { line, slots[line] } ) );
 	}
 	
 	@SuppressWarnings( { "incomplete-switch", "unchecked" } )
@@ -276,31 +328,8 @@ public class TacticServer
 					Object[] oa = (Object[])m.message;
 					int line = (Integer)oa[0];
 					boolean isBot = (Boolean)oa[1];
-					Player p = slots[line];
 					
-					if( p != null )
-					{
-						if( isBot )
-						{
-							si.sendToClient( p.id, new Message( MessageType.KICK, "Your slot turned into a bot." ) );
-						}
-						else if( !isBot && p.isBot )
-						{
-							slots[line] = null;
-						}
-					}
-					
-					if( isBot )
-					{
-						p = new Player();
-						p.slot = line;
-						String[] rnames = StaticFiles.names.split( "\n" );
-						p.name = rnames[DMath.randomi( 0, rnames.length )].split( " " )[0];
-						p.isBot = isBot;
-						slots[line] = p;
-					}
-					
-					si.sendToAllClients( new Message( MessageType.PLAYERUPDATE, new Object[] { line, slots[line] } ) );
+					setBot( line, isBot, true );
 					break;
 				}
 				case SETPLAYTYPE:	
@@ -308,14 +337,7 @@ public class TacticServer
 					Object[] oa = (Object[])m.message;
 					int line = (Integer)oa[0];
 					PlayType pt = (PlayType)oa[1];
-					Player p = slots[line];
-					
-					if( p != null )
-					{
-						p.playType = pt;
-					}
-					
-					si.sendToAllClients( new Message( MessageType.PLAYERUPDATE, new Object[] { line, slots[line] } ) );
+					setPlayType( line, pt );
 					break;
 				}
 				case MESSAGE:
@@ -341,6 +363,11 @@ public class TacticServer
 				{
 					selectedMap = (Integer)m.message;
 					si.sendToAllClients( new Message( MessageType.LEVELUPDATE, new Object[] { selectedMap, maps } ) );
+					try {
+						l = LevelFileHelper.loadLevel( maps.get( selectedMap ) );
+					} catch( DocumentException e ) {
+						e.printStackTrace();
+					}
 					break;
 				}
 				case SWITCHTEAMS:
@@ -370,6 +397,23 @@ public class TacticServer
 				case GAMETYPE:
 					gameType = (GameType)m.message;
 					si.sendToAllClients( new Message( MessageType.GAMETYPE, gameType ) );
+					if( gameType == GameType.UMS )
+					{
+						for( int i = 0; i < l.slotOptions.length; i++ )
+						{
+							SlotOption so = l.slotOptions[i];
+							switch( so.st )
+							{
+							case COMPUTER:
+								setBot( i, true, false );
+								setPlayType( i, so.bt );
+								break;
+							case PLAYER:
+								setBot( i, false, true );
+								break;
+							}
+						}
+					}
 					break;
 				}
 			}

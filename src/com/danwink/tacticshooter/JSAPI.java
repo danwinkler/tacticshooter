@@ -111,6 +111,13 @@ public class JSAPI
 		return t == null ? -1 : t.id;
 	}
 	
+	public int getPlayerBySlot( int slot )
+	{
+		if( slot < 0 || slot >= ts.slots.length ) return -1;
+		Player p = ts.slots[slot];
+		return p == null ? -1 : p.id;
+	}
+	
 	//---------------------------------
 	// BUILDING
 	//---------------------------------
@@ -159,6 +166,42 @@ public class JSAPI
 		if( base != null )
 		{
 			return base.y;
+		}
+		return -1;
+	}
+	
+	public int getBuildingByName( String name )
+	{
+		for( Building bu : ts.l.buildings )
+		{
+			if( bu.name.equals( name ) )
+			{
+				return bu.id;
+			}
+		}
+		return -1;
+	}
+	
+	public int getBuildingX( int id )
+	{
+		for( Building bu : ts.l.buildings )
+		{
+			if( bu.id == id )
+			{
+				return bu.x;
+			}
+		}
+		return -1;
+	}
+	
+	public int getBuildingY( int id )
+	{
+		for( Building bu : ts.l.buildings )
+		{
+			if( bu.id == id )
+			{
+				return bu.y;
+			}
 		}
 		return -1;
 	}

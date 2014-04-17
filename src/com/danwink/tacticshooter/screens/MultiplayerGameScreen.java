@@ -730,20 +730,25 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	{
 		int destX = 0;
 		int destY = 0;
+		boolean found = false;
 		for( int i = 0; i < cs.l.buildings.size(); i++ )
 		{
 			Building b = cs.l.buildings.get( i );
-			if( b.bt == BuildingType.CENTER && b.t.id == t.id )
+			if( b.bt == BuildingType.CENTER && b.t != null && b.t.id == t.id )
 			{
 				destX = b.x;
 				destY = b.y;
+				found = true;
 				break;
 			}
 		}
 		
-		Rectangle screenBounds = getScreenBounds();
-		cs.scrollx = DMath.bound( destX-gc.getWidth()/2, screenBounds.getMinX(), screenBounds.getMaxX() );
-		cs.scrolly = DMath.bound( destY-gc.getHeight()/2, screenBounds.getMinY(), screenBounds.getMaxY() );
+		if( found )
+		{
+			Rectangle screenBounds = getScreenBounds();
+			cs.scrollx = DMath.bound( destX-gc.getWidth()/2, screenBounds.getMinX(), screenBounds.getMaxX() );
+			cs.scrolly = DMath.bound( destY-gc.getHeight()/2, screenBounds.getMinY(), screenBounds.getMaxY() );
+		}
 	}
 	
 	public static Color bloodColor = new Color( 255, 0, 0 );

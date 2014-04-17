@@ -54,6 +54,7 @@ public class KryoHelper
 		}
 		k.register( Level.TileType[].class );
 		k.register( Level.TileType[][].class );
+		k.register( Level.SlotOption[].class );
 		k.register( TacticServer.ServerState.class );
 		k.register( ComputerPlayer.PlayType.class );
 	}

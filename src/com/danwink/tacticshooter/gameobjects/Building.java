@@ -210,6 +210,10 @@ public class Building
 
 		public boolean isCapturable( Level l, Building tb )
 		{
+			if( tb.t == null )
+			{
+				return false;
+			}
 			for( Building b : l.buildings )
 			{
 				if( b.t != null && b.t.id == tb.t.id && b.bt == BuildingType.POINT )

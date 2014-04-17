@@ -56,7 +56,7 @@ public class Level implements TileBasedMap
 	public String code;
 	public String ums;
 	
-	public SlotOption[] slotOptions;
+	public SlotOption[] slotOptions = new SlotOption[16];
 	
 	public Level()
 	{
@@ -74,6 +74,10 @@ public class Level implements TileBasedMap
 			{
 				tiles[x][y] = TileType.FLOOR;
 			}
+		}
+		for( int i = 0; i < slotOptions.length; i++ )
+		{
+			slotOptions[i] = new SlotOption();
 		}
 	}
 	
@@ -506,10 +510,15 @@ public class Level implements TileBasedMap
 		return null;
 	}
 	
-	public class SlotOption
+	public static class SlotOption
 	{
-		SlotType st;
-		PlayType bt;
+		public SlotType st = SlotType.ANY;
+		public PlayType bt = PlayType.AGGRESSIVE;
+		
+		public SlotOption()
+		{
+			
+		}
 	}
 	
 	public enum SlotType
