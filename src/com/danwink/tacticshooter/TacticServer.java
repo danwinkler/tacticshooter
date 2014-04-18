@@ -14,11 +14,15 @@ import org.newdawn.slick.util.pathfinding.PathFinder;
 
 
 
+
+
+
 import com.danwink.tacticshooter.ComputerPlayer.PlayType;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Bullet;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Level.SlotOption;
+import com.danwink.tacticshooter.gameobjects.Level.SlotType;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.gameobjects.Team;
 import com.danwink.tacticshooter.gameobjects.Unit;
@@ -28,6 +32,8 @@ import com.danwink.tacticshooter.gameobjects.Unit.UnitType;
 import com.danwink.tacticshooter.network.Message;
 import com.danwink.tacticshooter.network.ServerInterface;
 import com.danwink.tacticshooter.network.ServerNetworkInterface;
+import com.danwink.tacticshooter.screens.LobbyScreen;
+import com.danwink.tacticshooter.screens.LobbyScreen.Slot;
 import com.phyloa.dlib.util.DMath;
 
 /**
@@ -68,7 +74,7 @@ public class TacticServer
 	GameType gameType = GameType.POINTCONTROL;
 	
 	//LOBBY
-	Player[] slots = new Player[16];
+	Slot[] slots = new Slot[16];
 	int selectedMap = 0;
 	boolean fogEnabled = false;
 	
@@ -78,6 +84,11 @@ public class TacticServer
 	public TacticServer( ServerInterface si )
 	{
 		this.si = si;
+		
+		for( int i = 0; i < 16; i++ )
+		{
+			slots[i] = new Slot();
+		}
 	}
 	
 	public void begin()
@@ -104,7 +115,7 @@ public class TacticServer
 			p.name = rnames[DMath.randomi( 0, rnames.length )].split( " " )[0];
 			p.playType = PlayType.values()[i%PlayType.values().length];
 			p.isBot = true;
-			slots[i] = p;
+			slots[i].p = p;
 		}
 		
 		for( int i = 12; i < 16; i++ )
@@ -115,7 +126,7 @@ public class TacticServer
 			p.name = rnames[DMath.randomi( 0, rnames.length )].split( " " )[0];
 			p.playType = PlayType.values()[i%PlayType.values().length];
 			p.isBot = true;
-			slots[i] = p;
+			slots[i].p = p;
 		}
 	}
 	
@@ -123,14 +134,14 @@ public class TacticServer
 	{
 		for( int i = 0; i < 16; i++ )
 		{
-			if( slots[i] != null && !slots[i].isBot )
+			if( slots[i].p != null && !slots[i].p.isBot )
 			{
-				slots[i] = null;
+				slots[i].p = null;
 			}
-			else if( slots[i] != null && slots[i].isBot )
+			else if( slots[i].p != null && slots[i].p.isBot )
 			{
-				slots[i].money = 0;
-				slots[i].respawn = 0;
+				slots[i].p.money = 0;
+				slots[i].p.respawn = 0;
 			}
 		}
 		
@@ -166,30 +177,30 @@ public class TacticServer
 		gs.setup( a, b );
 		for( int i = 0; i < 16; i++ )
 		{
-			if( slots[i] != null )
+			if( slots[i].p != null )
 			{
-				slots[i].team = i < 8 ? a : b;
-				if( slots[i].isBot )
+				slots[i].p.team = i < 8 ? a : b;
+				if( slots[i].p.isBot )
 				{
 					ComputerPlayer cp = null;
 					try {
-						cp = (ComputerPlayer)slots[i].playType.c.newInstance();
+						cp = (ComputerPlayer)slots[i].p.playType.c.newInstance();
 					} catch (InstantiationException e) {
 						e.printStackTrace();
 					} catch (IllegalAccessException e) {
 						e.printStackTrace();
 					}
 					cp.setup( (ServerNetworkInterface)si );
-					cp.player = slots[i];
+					cp.player = slots[i].p;
 					cp.l = l;
-					slots[i].id = cp.fc.id;
-					players.put( cp.fc.id, slots[i] );
+					slots[i].p.id = cp.fc.id;
+					players.put( cp.fc.id, slots[i].p );
 					Thread ct = new Thread( cp );
 					ct.start();
 				}
 				else
 				{
-					players.put( slots[i].id, slots[i] );
+					players.put( slots[i].p.id, slots[i].p );
 				}
 			}
 		}
@@ -199,9 +210,9 @@ public class TacticServer
 		
 		for( int i = 0; i < 16; i++ )
 		{
-			if( slots[i] != null )
+			if( slots[i].p != null )
 			{
-				si.sendToClient( slots[i].id, new Message( MessageType.PLAYERUPDATE, slots[i] ) );	
+				si.sendToClient( slots[i].p.id, new Message( MessageType.PLAYERUPDATE, slots[i].p ) );	
 			}
 		}
 		
@@ -213,7 +224,7 @@ public class TacticServer
 	
 	public void setBot( int line, boolean isBot, boolean update )
 	{
-		Player p = slots[line];
+		Player p = slots[line].p;
 		
 		if( p != null )
 		{
@@ -223,7 +234,7 @@ public class TacticServer
 			}
 			else if( !isBot && p.isBot )
 			{
-				slots[line] = null;
+				slots[line].p = null;
 			}
 		}
 		
@@ -234,7 +245,7 @@ public class TacticServer
 			String[] rnames = StaticFiles.names.split( "\n" );
 			p.name = rnames[DMath.randomi( 0, rnames.length )].split( " " )[0];
 			p.isBot = isBot;
-			slots[line] = p;
+			slots[line].p = p;
 		}
 		
 		if( update )
@@ -245,7 +256,7 @@ public class TacticServer
 	
 	public void setPlayType( int line, PlayType pt )
 	{
-		Player p = slots[line];
+		Player p = slots[line].p;
 		
 		if( p != null )
 		{
@@ -268,12 +279,12 @@ public class TacticServer
 				case DISCONNECTED:
 					for( int i = 0; i < 16; i++ )
 					{
-						if( slots[i] != null && slots[i].id == m.sender )
+						if( slots[i].p != null && slots[i].p.id == m.sender )
 						{
-							si.sendToAllClients( new Message( MessageType.MESSAGE, slots[i].name + " left the game." ) );
-							if( !slots[i].isBot )
+							si.sendToAllClients( new Message( MessageType.MESSAGE, slots[i].p.name + " left the game." ) );
+							if( !slots[i].p.isBot )
 							{
-								slots[i] = null;
+								slots[i].p = null;
 							}
 							si.sendToClient( m.sender, new Message( MessageType.PLAYERUPDATE, new Object[] { i, slots[i] } ) );
 							break;
@@ -294,9 +305,9 @@ public class TacticServer
 					boolean foundSlot = false;
 					for( int i = 0; i < 16; i++ )
 					{
-						if( slots[i] == null )
+						if( slots[i].p == null && slots[i].type.allowPlayer() )
 						{
-							slots[i] = player;
+							slots[i].p = player;
 							player.slot = i;
 							foundSlot = true;
 							break;
@@ -312,14 +323,14 @@ public class TacticServer
 					{
 						for( int i = 0; i < 16; i++ )
 						{
-							if( slots[i] != null )
+							if( slots[i].p != null )
 							{
 								si.sendToClient( m.sender, new Message( MessageType.PLAYERUPDATE, new Object[] { i, slots[i] } ) );
 							}
 						}
 						si.sendToClient( m.sender, new Message( MessageType.LEVELUPDATE, new Object[] { selectedMap, maps } ) );
 						si.sendToClient( m.sender, new Message( MessageType.FOGUPDATE, fogEnabled ) );
-						si.sendToAllClients( new Message( MessageType.PLAYERUPDATE, new Object[] { player.slot, player } ) );
+						si.sendToAllClients( new Message( MessageType.PLAYERUPDATE, new Object[] { player.slot, slots[player.slot] } ) );
 						si.sendToAllClients( new Message( MessageType.MESSAGE, player.name + " joined." ) );
 					}
 					break;
@@ -345,9 +356,9 @@ public class TacticServer
 					String text = (String)m.message;
 					for( int i = 0; i < slots.length; i++ )
 					{
-						if( slots[i] != null && slots[i].id == m.sender )
+						if( slots[i].p != null && slots[i].p.id == m.sender )
 						{
-							si.sendToAllClients( new Message( MessageType.MESSAGE, slots[i].name + ": " + text ) );
+							si.sendToAllClients( new Message( MessageType.MESSAGE, slots[i].p.name + ": " + text ) );
 							break;
 						}
 					}
@@ -373,16 +384,16 @@ public class TacticServer
 				case SWITCHTEAMS:
 				{
 					int target = (Integer)m.message;
-					if( slots[target] == null )
+					if( slots[target].type.allowPlayer() )
 					{
 						for( int i = 0; i < slots.length; i++ )
 						{
-							if( slots[i] != null && slots[i].id == m.sender )
+							if( slots[i].p != null && slots[i].p.id == m.sender )
 							{
-								slots[target] = slots[i];
-								slots[target].slot = target;
-								slots[i] = null;
-								si.sendToAllClients( new Message( MessageType.PLAYERUPDATE, new Object[] { i, null } ) );
+								slots[target].p = slots[i].p;
+								slots[target].p.slot = target;
+								slots[i].p = null;
+								si.sendToAllClients( new Message( MessageType.PLAYERUPDATE, new Object[] { i, slots[i] } ) );
 								si.sendToAllClients( new Message( MessageType.PLAYERUPDATE, new Object[] { target, slots[target] } ) );
 								break;
 							}
@@ -402,6 +413,7 @@ public class TacticServer
 						for( int i = 0; i < l.slotOptions.length; i++ )
 						{
 							SlotOption so = l.slotOptions[i];
+							slots[i].type = so.st;
 							switch( so.st )
 							{
 							case COMPUTER:
@@ -411,7 +423,18 @@ public class TacticServer
 							case PLAYER:
 								setBot( i, false, true );
 								break;
+							case CLOSED:
+								setBot( i, false, true );
+								break;
 							}
+						}
+					}
+					else
+					{
+						for( int i = 0; i < slots.length; i++ )
+						{
+							slots[i].type = SlotType.ANY;
+							si.sendToAllClients( new Message( MessageType.PLAYERUPDATE, new Object[] { i, slots[i] } ) );
 						}
 					}
 					break;
@@ -586,9 +609,9 @@ public class TacticServer
 					Player chosenPlayer = null;
 					for( int i = 0; i < slots.length; i++ )
 					{
-						if( slots[i] != null && slots[i].team == player.team && slots[i].id != player.id )
+						if( slots[i].p != null && slots[i].p.team == player.team && slots[i].p.id != player.id )
 						{
-							chosenPlayer = slots[i];
+							chosenPlayer = slots[i].p;
 							break;
 						}
 					}

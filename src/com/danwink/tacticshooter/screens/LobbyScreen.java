@@ -13,12 +13,14 @@ import org.newdawn.slick.Graphics;
 
 
 
+
 import com.danwink.tacticshooter.ComputerPlayer;
 import com.danwink.tacticshooter.GameType;
 import com.danwink.tacticshooter.MessageType;
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.ComputerPlayer.PlayType;
 import com.danwink.tacticshooter.gameobjects.Level.SlotOption;
+import com.danwink.tacticshooter.gameobjects.Level.SlotType;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.network.ClientInterface;
 import com.danwink.tacticshooter.network.Message;
@@ -54,7 +56,7 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 	DButton leaveGame;
 	DCheckBox fog;
 	
-	Player[] slots = new Player[16];
+	Slot[] slots = new Slot[16];
 	
 	ArrayList<String> messages = new ArrayList<String>();
 	
@@ -125,20 +127,28 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 			case PLAYERUPDATE:
 			{
 				Object[] oa = (Object[])m.message;
-				Player p = (Player)oa[1];
+				Slot s = (Slot)oa[1];
 				int slot = (Integer)oa[0];
-				if( p == null )
+				if( s.type == SlotType.CLOSED )
+				{
+					names[slot].setText( "CLOSED" );
+					botType[slot].setVisible( false );
+					humanOrBot[slot].setVisible( false );
+				}
+				else if( s.p == null )
 				{
 					names[slot].setText( "Open" );
+					humanOrBot[slot].setVisible( true );
 					humanOrBot[slot].setSelected( 0 );
 					botType[slot].setVisible( false );
 				}
 				else
 				{
-					names[p.slot].setText( p.name );
-					humanOrBot[p.slot].setSelected( p.isBot ? 1 : 0 );
-					botType[p.slot].setVisible( p.isBot );
-					botType[p.slot].setSelected( p.playType.ordinal() );
+					names[s.p.slot].setText( s.p.name );
+					humanOrBot[slot].setVisible( true );
+					humanOrBot[s.p.slot].setSelected( s.p.isBot ? 1 : 0 );
+					botType[s.p.slot].setVisible( s.p.isBot );
+					botType[s.p.slot].setSelected( s.p.playType.ordinal() );
 				}
 				break;
 			}
@@ -295,6 +305,23 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 			{
 				ci.sendToServer( new Message( MessageType.FOGUPDATE, fog.checked ) );
 			}
+		}
+	}
+	
+	public static class Slot
+	{
+		public SlotType type;
+		public Player p;
+		
+		public Slot()
+		{
+			type = SlotType.ANY;
+		}
+		
+		public Slot( SlotType type, Player p )
+		{
+			this.type = type;
+			this.p = p;
 		}
 	}
 }

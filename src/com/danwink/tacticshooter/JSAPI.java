@@ -94,7 +94,6 @@ public class JSAPI
 	
 	public void stop( Building b, Unit u )
 	{
-		System.out.println( "stop in java" );
 		try
 		{
 			engine.eval( "callStop( " + b.id + ", " + u.id + " );" );
@@ -159,7 +158,7 @@ public class JSAPI
 	public int getPlayerBySlot( int slot )
 	{
 		if( slot < 0 || slot >= ts.slots.length ) return -1;
-		Player p = ts.slots[slot];
+		Player p = ts.slots[slot].p;
 		return p == null ? -1 : p.id;
 	}
 	

@@ -527,5 +527,10 @@ public class Level implements TileBasedMap
 		PLAYER,
 		COMPUTER,
 		CLOSED;
+
+		public boolean allowPlayer()
+		{
+			return this == ANY || this == PLAYER;
+		}
 	}
 }
