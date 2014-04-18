@@ -165,9 +165,10 @@ public class Unit
 					Building tb = l.buildings.get( i );
 					float dx = x - tb.x;
 					float dy = y - tb.y;
-					if( (dx*dx + dy*dy) < 50*50 )
+					if( (dx*dx + dy*dy) < tb.bt.bu.getRadius()*tb.bt.bu.getRadius() )
 					{
 						stoppedAt = tb;
+						ts.js.stop( tb, this );
 						break;
 					}
 				}

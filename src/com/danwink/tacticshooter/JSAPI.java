@@ -1,6 +1,7 @@
 package com.danwink.tacticshooter;
 
 import java.io.FileNotFoundException;
+
 import javax.script.Bindings;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
@@ -8,6 +9,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import com.danwink.tacticshooter.gameobjects.Building;
+import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.gameobjects.Team;
 import com.danwink.tacticshooter.gameobjects.Unit;
@@ -26,6 +28,35 @@ public class JSAPI
     public JSAPI( TacticServer ts )
     {
     	this.ts = ts;
+    	
+    	String beginProgram = "";
+	    try
+		{
+	    	Bindings bindings = engine.getBindings( ScriptContext.ENGINE_SCOPE );
+	    	
+	    	bindStatic( bindings );
+	    	
+			beginProgram = DFile.loadText( "data/setup.js" );
+			engine.eval( beginProgram );
+		}
+		catch( FileNotFoundException | ScriptException e )
+		{
+			e.printStackTrace();
+		}
+    }
+    
+    public void bindStatic( Bindings bindings )
+    {
+    	bindings.put( "api", this );
+    	
+	 	int[] buildings = new int[ts.l.buildings.size()];
+		for( int i = 0; i < ts.l.buildings.size(); i++ )
+		{
+			buildings[i] = ts.l.buildings.get( i ).id;
+		}
+		bindings.put( "buildings", buildings );
+		
+		bindings.put( "out", System.out );
     }
     
 	public void tick( int frame )
@@ -34,17 +65,8 @@ public class JSAPI
 		{
 			Bindings bindings = engine.getBindings( ScriptContext.ENGINE_SCOPE );
 		    
-			bindings.put( "api", this );
-			
 		    bindings.put( "players", ts.players.keySet().toArray() );
-			
-		    int[] buildings = new int[ts.l.buildings.size()];
-		    for( int i = 0; i < ts.l.buildings.size(); i++ )
-		    {
-		    	buildings[i] = ts.l.buildings.get( i ).id;
-		    }
-		    bindings.put( "buildings", buildings );
-		    
+
 		    int[] units = new int[ts.units.size()];
 		    for( int i = 0; i < ts.units.size(); i++ )
 		    {
@@ -52,10 +74,33 @@ public class JSAPI
 		    }
 		    bindings.put( "units", units );
 		    
-		    bindings.put( "out", System.out );
-		    
-		    engine.eval( "tick( " + frame + " );" );
+		    engine.eval( "callTick( " + frame + " );" );
 		} catch( ScriptException e ) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void step( Building b, Unit u )
+	{
+		try
+		{
+			engine.eval( "callStep( " + b.id + ", " + u.id + " );" );
+		}
+		catch( ScriptException e )
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	public void stop( Building b, Unit u )
+	{
+		System.out.println( "stop in java" );
+		try
+		{
+			engine.eval( "callStop( " + b.id + ", " + u.id + " );" );
+		}
+		catch( ScriptException e )
+		{
 			e.printStackTrace();
 		}
 	}
@@ -222,7 +267,7 @@ public class JSAPI
 		return -1;
 	}
 	
-	public void createUnit( int player, String type, float x, float y )
+	public int createUnit( int player, String type, float x, float y )
 	{
 		Player p = ts.players.get( player );
 		
@@ -231,6 +276,19 @@ public class JSAPI
 		ts.units.add( u );
 		ts.si.sendToAllClients( new Message( MessageType.UNITUPDATE, u ) );
 		ts.gs.get( u.owner.team ).unitsCreated++;
+		return u.id;
+	}
+	
+	public void moveUnit( int u, float x, float y )
+	{
+		for( Unit unit : ts.units )
+		{
+			if( unit.id == u )
+			{
+				unit.pathTo( (int)(x/Level.tileSize), (int)(y/Level.tileSize), ts );
+				break;
+			}
+		}
 	}
 	
 	//---------------------------------

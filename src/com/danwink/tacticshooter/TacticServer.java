@@ -73,7 +73,7 @@ public class TacticServer
 	boolean fogEnabled = false;
 	
 	//SCRIPT
-	JSAPI js;
+	public JSAPI js;
 	
 	public TacticServer( ServerInterface si )
 	{
