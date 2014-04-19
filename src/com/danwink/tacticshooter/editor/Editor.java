@@ -246,7 +246,7 @@ public class Editor
 		{
 		case "None": break;
 		case "X": l.tiles[(l.width-1)-x][y] = t; break;
-		case "Y": l.tiles[y][(l.height-1)-y] = t; break;
+		case "Y": l.tiles[x][(l.height-1)-y] = t; break;
 		case "XY": l.tiles[(l.width-1)-x][(l.height-1)-y] = t; break;
 		}
 	}

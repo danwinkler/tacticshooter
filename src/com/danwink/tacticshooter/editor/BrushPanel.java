@@ -91,6 +91,8 @@ public class BrushPanel extends JPanel implements ActionListener
 	public enum Brush
 	{
 		FLOOR,
-		WALL
+		WALL,
+		GRATE,
+		DOOR
 	}
 }

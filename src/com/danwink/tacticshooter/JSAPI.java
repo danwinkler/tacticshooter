@@ -104,6 +104,22 @@ public class JSAPI
 		}
 	}
 	
+	public void kill( Unit u )
+	{
+		try
+		{
+			engine.eval( "callKill( { "
+					+ "unit: " + u.id + ","
+					+ "owner:" + u.owner.id + ","
+					+ "type: '" + u.type.toString() + "'"
+					+ "} );" );
+		}
+		catch( ScriptException e )
+		{
+			e.printStackTrace();
+		}
+	}
+	
 	public void load( String code )
 	{
 		try 
@@ -290,6 +306,18 @@ public class JSAPI
 		}
 	}
 	
+	public void killUnit( int u )
+	{
+		for( Unit unit : ts.units )
+		{
+			if( unit.id == u )
+			{
+				unit.health = 0;
+				break;
+			}
+		}
+	}
+	
 	//---------------------------------
 	// GAME
 	//---------------------------------
@@ -298,5 +326,10 @@ public class JSAPI
 	{
 		ts.endGame();
 		ts.setupLobby();
+	}
+	
+	public void sendMessage( String text )
+	{
+		ts.si.sendToAllClients( new Message( MessageType.MESSAGE, text ) );
 	}
 }

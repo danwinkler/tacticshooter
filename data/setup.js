@@ -1,4 +1,6 @@
 var tickListeners = [];
+var killListeners = [];
+
 var stepListeners = {};
 var stopListeners = {};
 
@@ -9,6 +11,16 @@ function addTickListener( f ) {
 function callTick( frame ) {
 	for( var i in tickListeners ) {
 		tickListeners[i]( frame );
+	}
+}
+
+function addKillListener( f ) {
+	killListeners.push( f );
+}
+
+function callKill( u ) {
+	for( var i in tickListeners ) {
+		killListeners[i]( u );
 	}
 }
 

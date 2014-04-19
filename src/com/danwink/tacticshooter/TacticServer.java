@@ -17,6 +17,7 @@ import org.newdawn.slick.util.pathfinding.PathFinder;
 
 
 
+
 import com.danwink.tacticshooter.ComputerPlayer.PlayType;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Bullet;
@@ -722,6 +723,7 @@ public class TacticServer
 			{
 				gs.get( u.owner.team ).unitsLost++;
 				units.remove( i );
+				js.kill( u );
 				i--;
 			}
 		}

@@ -59,6 +59,11 @@ public class LevelRenderer
 			g.pushMatrix();
 			g.translate( b.x, b.y );
 			g.drawOval( -rad, -rad, rad*2, rad*2 );
+			g.color( Color.GREEN );
+			if( b.name != null )
+			{
+				g.text( b.name, 0, 0 );
+			}
 			g.popMatrix();
 		}
 	}
