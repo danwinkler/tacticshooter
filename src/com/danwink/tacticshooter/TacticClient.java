@@ -10,6 +10,8 @@ import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
+
+import com.danwink.tacticshooter.editor.Editor;
 import com.danwink.tacticshooter.screens.BrowseOnlineLevelsScreen;
 import com.danwink.tacticshooter.screens.HomeScreen;
 import com.danwink.tacticshooter.screens.LobbyScreen;
@@ -105,35 +107,41 @@ public class TacticClient extends BasicGame
 	
 	public static void main( String[] args )
 	{
-		try
+		if( args.length > 0 && args[1].equals( "--editor" ) ) {
+			Editor.main( args );
+		}
+		else
 		{
-			//Attempt to avoid sealed exception errors on zoe's mac
-			Class.forName( "javax.vecmath.Point2i" );
-			
-			AppGameContainer app = new AppGameContainer( new TacticClient() );
-			app.setMultiSample( StaticFiles.advOptions.getI( "multisample" ) );
-			app.setDisplayMode( StaticFiles.options.getI( "windowWidth" ), StaticFiles.options.getI( "windowHeight" ), StaticFiles.options.getB( "fullscreen" ) );
-			app.setVSync( StaticFiles.options.getB( "vsync" ) );
-			app.setUpdateOnlyWhenVisible( false );
-			app.setAlwaysRender( true );
-			app.start();
-		} catch( Exception ex )
-		{
-			ex.printStackTrace();
-			
-			PrintWriter pw = null;
-			try {
-				pw = new PrintWriter( "tmp/error.log" );
-			} catch (FileNotFoundException e) {
-				System.exit( 0 );
-				e.printStackTrace();
+			try
+			{
+				//Attempt to avoid sealed exception errors on zoe's mac
+				Class.forName( "javax.vecmath.Point2i" );
+				
+				AppGameContainer app = new AppGameContainer( new TacticClient() );
+				app.setMultiSample( StaticFiles.advOptions.getI( "multisample" ) );
+				app.setDisplayMode( StaticFiles.options.getI( "windowWidth" ), StaticFiles.options.getI( "windowHeight" ), StaticFiles.options.getB( "fullscreen" ) );
+				app.setVSync( StaticFiles.options.getB( "vsync" ) );
+				app.setUpdateOnlyWhenVisible( false );
+				app.setAlwaysRender( true );
+				app.start();
+			} catch( Exception ex )
+			{
+				ex.printStackTrace();
+				
+				PrintWriter pw = null;
+				try {
+					pw = new PrintWriter( "tmp/error.log" );
+				} catch (FileNotFoundException e) {
+					System.exit( 0 );
+					e.printStackTrace();
+				}
+				ex.printStackTrace( pw );
+				
+				pw.flush();
+				pw.close();
+				
+				System.exit( 1 );
 			}
-			ex.printStackTrace( pw );
-			
-			pw.flush();
-			pw.close();
-			
-			System.exit( 1 );
 		}
 	}
 }

@@ -13,8 +13,10 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.opengl.shader.ShaderProgram;
 
 
+
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.TacticServer;
+import com.danwink.tacticshooter.editor.Editor;
 import com.danwink.tacticshooter.gameobjects.Unit.UnitType;
 import com.danwink.tacticshooter.network.ServerNetworkInterface;
 import com.danwink.tacticshooter.slick.Slick2DEventMapper;
@@ -38,6 +40,7 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 	DButton singlePlayer;
 	DButton multiPlayer;
 	DButton settings;
+	DButton editor;
 	DButton exit;
 	
 	DButton login;
@@ -47,6 +50,8 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 	String ip;
 	
 	Image title;
+	
+	boolean openEditor = false;
 	
 	public void onActivate( GameContainer e, DScreenHandler<GameContainer, Graphics> dsh )
 	{
@@ -60,6 +65,7 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 			exit = new DButton( "Exit", e.getWidth() / 2 - 200, e.getHeight()/2 + 150, 400, 100 );
 			
 			login = new DButton( "Login", 50, 50, 200, 100 );
+			editor = new DButton( "Editor", 50, 170, 200, 100 );
 			
 			dui.add( singlePlayer );
 			dui.add( multiPlayer );
@@ -67,6 +73,7 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 			dui.add( exit );
 			
 			dui.add( login );
+			dui.add( editor );
 			
 			dui.addDUIListener( this );
 		}
@@ -110,6 +117,15 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 		}
 		
 		g.drawImage( title, gc.getWidth()/2 - title.getWidth()/2, 150, new Color( 0, 0, 0, 128 ) );
+		
+		if( openEditor )
+		{
+			try {
+				gc.setForceExit( false );
+				gc.exit();
+			} catch( Exception ex ) {}
+			Editor.main( new String[] {} );
+		}
 	}
 
 	public void onExit()
@@ -167,7 +183,11 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 				StaticFiles.user = null;
 				login.setText( "Login" );
 			}
-		} 
+		}
+		else if( e == editor )
+		{
+			openEditor = true;
+		}
 	}
 
 	@Override
