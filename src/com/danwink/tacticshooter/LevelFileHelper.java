@@ -1,8 +1,6 @@
 package com.danwink.tacticshooter;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
@@ -17,18 +15,23 @@ import org.dom4j.io.XMLWriter;
 
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Level;
+import com.danwink.tacticshooter.gameobjects.Level.SlotOption;
 import com.danwink.tacticshooter.gameobjects.Team;
 import com.danwink.tacticshooter.gameobjects.Building.BuildingType;
-import com.danwink.tacticshooter.gameobjects.Level.Link;
+import com.danwink.tacticshooter.gameobjects.Level.SlotType;
 import com.danwink.tacticshooter.gameobjects.Level.TileType;
-
 
 public class LevelFileHelper
 {
 	public static Level loadLevel( String name ) throws DocumentException
 	{
+		return loadLevel( new File( "levels" + File.separator + name + ".xml" ) );
+	}
+	
+	public static Level loadLevel( File file ) throws DocumentException
+	{
 		SAXReader reader = new SAXReader();
-		Document doc = reader.read( new File( "levels" + File.separator + name + ".xml" ) );
+		Document doc = reader.read( file );
 		Node level = doc.selectSingleNode( "//level" );
 		Level m = new Level( Integer.parseInt( level.valueOf( "@width" ) ), Integer.parseInt( level.valueOf( "@height" ) ) );
 		String theme = level.valueOf( "@theme" );
@@ -42,7 +45,7 @@ public class LevelFileHelper
 			String[] vals = rows.get( y ).getText().split( "," );
 			for( int x = 0; x < m.width; x++ )
 			{
-				m.tiles[x][y] = TileType.values()[Integer.parseInt( vals[x] )];
+				m.tiles[x][y] = TileType.getTile( Integer.parseInt( vals[x] ) );
 			}
 		}
 		
@@ -57,15 +60,38 @@ public class LevelFileHelper
 			{
 				b.id = Integer.parseInt( id );
 			}
+			String radius = n.valueOf( "@radius" );
+			if( radius != null && !radius.equals( "" ) )
+			{
+				b.radius = Float.parseFloat( radius );
+			}
+			b.name = n.valueOf( "@name" );
 			m.buildings.add( b );
 		}
 		
-		//Load Links
-		List<? extends Node> links = doc.selectNodes( "//level/links/link" );
-		for( Node n : links )
+		//Load Slots
+		List<? extends Node> slots = doc.selectNodes( "//level/slots/slot" );
+		if( slots != null )
 		{
-			Link l = new Link( Integer.parseInt( n.valueOf( "@source" ) ), Integer.parseInt( n.valueOf( "@targetX" ) ), Integer.parseInt( n.valueOf( "@targetY" ) ) ) ;
-			m.links.add( l );
+			for( int i = 0; i < slots.size(); i++ )
+			{
+				Node n = slots.get( i );
+				m.slotOptions[i].st = SlotType.valueOf( n.valueOf( "@s" ) );
+				m.slotOptions[i].bt = ComputerPlayer.PlayType.valueOf( n.valueOf( "@b" ) );
+			}
+		}
+		
+		//Load Code
+		Node code = level.selectSingleNode( "code" );
+		if( code != null )
+		{
+			m.code = code.getText();
+		}
+		
+		Node ums = level.selectSingleNode( "ums" );
+		if( ums != null )
+		{
+			m.ums = ums.getText();
 		}
 		
 		return m;
@@ -73,7 +99,11 @@ public class LevelFileHelper
 	
 	public static void saveLevel( String name, Level m ) throws IOException
 	{
-		File file = new File( "levels" + File.separator + name + ".xml" );
+		saveLevel( new File( "levels" + File.separator + name + ".xml" ), m );
+	}
+	
+	public static void saveLevel( File file, Level m ) throws IOException
+	{
 		Document doc = DocumentHelper.createDocument();
 		Element level = doc.addElement( "level" );
 		level.addAttribute( "width", Integer.toString( m.width ) );
@@ -87,7 +117,7 @@ public class LevelFileHelper
 			StringBuilder rows = new StringBuilder();
 			for( int x = 0; x < m.width; x++ )
 			{
-				rows.append( m.getTile( x, y ).ordinal() + "," );
+				rows.append( m.getTile( x, y ).data + "," );
 			}
 			row.setText( rows.toString() );
 		}
@@ -103,17 +133,31 @@ public class LevelFileHelper
 			building.addAttribute( "bt", b.bt.name() );
 			building.addAttribute( "team", b.t == null ? "null" : Integer.toString( b.t.id ) );
 			building.addAttribute( "id", Integer.toString( b.id ) );
+			building.addAttribute( "radius", Float.toString( b.radius ) );
+			building.addAttribute( "name", b.name );
 		}
 		
-		//ADD links
-		Element links = level.addElement( "links" );
-		for( int i = 0; i < m.links.size(); i++ )
+		//ADD slots
+		Element slots = level.addElement( "slots" );
+		for( int i = 0; i < m.slotOptions.length; i++ )
 		{
-			Link l = m.links.get( i );
-			Element link = links.addElement( "link" );
-			link.addAttribute( "source", Integer.toString( l.source ) );
-			link.addAttribute( "targetX", Integer.toString( l.targetX ) );
-			link.addAttribute( "targetY", Integer.toString( l.targetY ) );
+			SlotOption so = m.slotOptions[i];
+			Element slot = slots.addElement( "slot" );
+			slot.addAttribute( "s", so.st.toString() );
+			slot.addAttribute( "b", so.bt.toString() );
+		}
+		
+		//ADD code
+		if( m.code != null )
+		{
+			Element code = level.addElement( "code" );
+			code.setText( m.code );
+		}
+		
+		if( m.ums != null )
+		{
+			Element code = level.addElement( "ums" );
+			code.setText( m.ums );
 		}
 		
 		XMLWriter writer = new XMLWriter(

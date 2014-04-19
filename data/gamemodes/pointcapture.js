@@ -1,4 +1,4 @@
-function tick( frame ) {
+function pointCaptureTick( frame ) {
 	
 	if( frame % 10 == 0 ) {
 		
@@ -57,3 +57,4 @@ function tick( frame ) {
 	}
 	
 }
+addTickListener( pointCaptureTick );

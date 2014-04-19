@@ -26,6 +26,10 @@ public class Building
 	
 	public int updateCountdown = 0;
 	
+	public float radius;
+
+	public String name;
+	
 	public Building()
 	{
 		
@@ -39,6 +43,8 @@ public class Building
 		this.y = y;
 		if( t != null )
 			hold = HOLDMAX;
+	
+		radius = bt.bu.getRadius();
 	}
 
 	public void render( Graphics g )
@@ -204,6 +210,10 @@ public class Building
 
 		public boolean isCapturable( Level l, Building tb )
 		{
+			if( tb.t == null )
+			{
+				return false;
+			}
 			for( Building b : l.buildings )
 			{
 				if( b.t != null && b.t.id == tb.t.id && b.bt == BuildingType.POINT )
@@ -260,7 +270,6 @@ public class Building
 				}
 			}
 			isSteppedOn = stepCheck;
-			ts.l.signal( b, isSteppedOn, ts );
 		}
 
 		public boolean isCapturable( Level l, Building tb )

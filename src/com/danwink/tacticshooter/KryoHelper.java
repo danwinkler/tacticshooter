@@ -1,11 +1,11 @@
 package com.danwink.tacticshooter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import javax.vecmath.Point2f;
 import javax.vecmath.Point2i;
 import javax.vecmath.Vector2f;
+
 
 
 import com.danwink.tacticshooter.gameobjects.Building;
@@ -14,9 +14,9 @@ import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.gameobjects.Team;
 import com.danwink.tacticshooter.gameobjects.Unit;
-import com.danwink.tacticshooter.gameobjects.Level.Link;
 import com.danwink.tacticshooter.gameobjects.Unit.UnitType;
 import com.danwink.tacticshooter.network.Message;
+import com.danwink.tacticshooter.screens.LobbyScreen;
 import com.esotericsoftware.kryo.Kryo;
 
 public class KryoHelper 
@@ -48,15 +48,18 @@ public class KryoHelper
 		k.register( float[].class );
 		k.register( float[][].class );
 		k.register( Vector2f.class );
+		k.register( GameType.class );
 		
 		//LEVEL
-		for( Class c : Level.class.getDeclaredClasses() )
+		for( Class<?> c : Level.class.getDeclaredClasses() )
 		{
 			k.register( c );
 		}
 		k.register( Level.TileType[].class );
 		k.register( Level.TileType[][].class );
+		k.register( Level.SlotOption[].class );
 		k.register( TacticServer.ServerState.class );
 		k.register( ComputerPlayer.PlayType.class );
+		k.register( LobbyScreen.Slot.class );
 	}
 }

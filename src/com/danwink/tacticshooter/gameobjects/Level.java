@@ -2,6 +2,7 @@ package com.danwink.tacticshooter.gameobjects;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.vecmath.Point2f;
 import javax.vecmath.Point2i;
@@ -17,7 +18,12 @@ import org.newdawn.slick.util.pathfinding.PathFindingContext;
 import org.newdawn.slick.util.pathfinding.TileBasedMap;
 
 
+
+
+
+
 import com.danwink.tacticshooter.AutoTileDrawer;
+import com.danwink.tacticshooter.ComputerPlayer.PlayType;
 import com.danwink.tacticshooter.MessageType;
 import com.danwink.tacticshooter.TacticServer;
 import com.danwink.tacticshooter.gameobjects.Level.TileType;
@@ -31,7 +37,6 @@ public class Level implements TileBasedMap
 	public static int tileSize = 20;
 	
 	public ArrayList<Building> buildings = new ArrayList<Building>();
-	public ArrayList<Link> links = new ArrayList<Link>();
 	
 	public TileType[][] tiles;
 	
@@ -47,6 +52,11 @@ public class Level implements TileBasedMap
 	public Image grate;
 	
 	public float[][] lightMap;
+
+	public String code;
+	public String ums;
+	
+	public SlotOption[] slotOptions = new SlotOption[16];
 	
 	public Level()
 	{
@@ -65,23 +75,9 @@ public class Level implements TileBasedMap
 				tiles[x][y] = TileType.FLOOR;
 			}
 		}
-	}
-	
-	public void renderLinks( Graphics g )
-	{
-		g.setColor( Color.green );
-		for( int i = 0; i < links.size(); i++ )
+		for( int i = 0; i < slotOptions.length; i++ )
 		{
-			Link l = links.get( i );
-			for( int j = 0; j < buildings.size(); j++ )
-			{
-				Building b = buildings.get( j );
-				if( b.id == l.source )
-				{
-					g.drawLine( b.x, b.y, l.targetX*tileSize + tileSize/2, l.targetY*tileSize + tileSize/2 );
-					break;
-				}
-			}
+			slotOptions[i] = new SlotOption();
 		}
 	}
 	
@@ -118,26 +114,6 @@ public class Level implements TileBasedMap
 	{
 		switch( tiles[x][y] )
 		{
-		case LIGHT:
-			//g.setColor( Color.yellow );
-			//g.fillOval(  x*tileSize, y*tileSize, tileSize, tileSize );
-			break;
-		case PASSOPEN:
-			g.setColor( Color.gray );
-			g.drawRect( x*tileSize + tileSize/4, y*tileSize + tileSize/4, tileSize/2, tileSize/2 );
-			break;
-		case PASSCLOSED:
-			g.setColor( Color.gray );
-			g.fillRect( x*tileSize + tileSize/4, y*tileSize + tileSize/4, tileSize/2, tileSize/2 );
-			break;
-		case GATEOPEN:
-			g.setColor( Color.gray );
-			g.drawRect( x*tileSize + tileSize/4, y*tileSize + tileSize/4, tileSize/2, tileSize/2 );
-			break;
-		case GATECLOSED:
-			g.setColor( Color.gray );
-			g.fillRect( x*tileSize + tileSize/4, y*tileSize + tileSize/4, tileSize/2, tileSize/2 );
-			break;
 		case DOOR:
 			drawAutoTile( g, x, y, TileType.FLOOR, floor );
 			drawAutoTile( g, x, y, TileType.WALL, wall );
@@ -149,103 +125,6 @@ public class Level implements TileBasedMap
 		case WALL:
 			g.drawImage( floor, x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize, floor.getWidth()/3, 0, floor.getWidth()/3 * 2, floor.getHeight()/4 );
 			drawAutoTile( g, x, y, tiles[x][y], wall );
-			/*
-			g.setColor( Color.gray );
-			g.fillRect( x*tileSize, y*tileSize, tileSize, tileSize ); 
-			g.setColor( Color.black );
-			if( !getTile( x-1, y ).isWall )
-			{
-				g.drawLine( x*tileSize, y*tileSize, x*tileSize, y*tileSize+tileSize );
-			}
-			if( !getTile( x+1, y ).isWall )
-			{
-				g.drawLine( x*tileSize+tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize );
-			}
-			if( !getTile( x, y-1 ).isWall )
-			{
-				g.drawLine( x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize );
-			}
-			if( !getTile( x, y+1 ).isWall )
-			{
-				g.drawLine( x*tileSize, y*tileSize+tileSize, x*tileSize+tileSize, y*tileSize+tileSize );
-			}
-			
-			if( (x+y) % 4 == 0 )
-			{
-				g.setColor( Color.darkGray );
-				g.drawLine( x*tileSize, y*tileSize+tileSize, x*tileSize+tileSize, y*tileSize );
-			}
-			
-			if( (x-y) % 6 == 0 )
-			{
-				g.setColor( Color.darkGray );
-				g.drawLine( x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize );
-			}
-			*/
-			break;
-		case TRIANGLENE:
-			g.setColor( Color.gray );
-			Polygon nep = new Polygon();
-			nep.addPoint( x*tileSize, y*tileSize );
-			nep.addPoint( x*tileSize+tileSize, y*tileSize );
-			nep.addPoint( x*tileSize+tileSize, y*tileSize+tileSize );
-			g.fill( nep );
-			g.setColor( Color.black );
-			g.drawLine( x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize );
-			
-			if( (x+y) % 4 == 0 )
-			{
-				g.setColor( Color.darkGray );
-				g.drawLine( x*tileSize+tileSize*.5f, y*tileSize+tileSize*.5f, x*tileSize+tileSize, y*tileSize );
-			}
-			break;
-		case TRIANGLENW:
-			g.setColor( Color.gray );
-			Polygon nwp = new Polygon();
-			nwp.addPoint( x*tileSize, y*tileSize );
-			nwp.addPoint( x*tileSize, y*tileSize+tileSize );
-			nwp.addPoint( x*tileSize+tileSize, y*tileSize );
-			g.fill( nwp );
-			g.setColor( Color.black );
-			g.drawLine( x*tileSize, y*tileSize+tileSize, x*tileSize+tileSize, y*tileSize );
-			
-			if( (x-y) % 6 == 0 )
-			{
-				g.setColor( Color.darkGray );
-				g.drawLine( x*tileSize, y*tileSize, x*tileSize+tileSize*.5f, y*tileSize+tileSize*.5f );
-			}
-			break;
-		case TRIANGLESE:
-			g.setColor( Color.gray );
-			Polygon sep = new Polygon();
-			sep.addPoint( x*tileSize+tileSize, y*tileSize+tileSize );
-			sep.addPoint( x*tileSize, y*tileSize+tileSize );
-			sep.addPoint( x*tileSize+tileSize, y*tileSize );
-			g.fill( sep );
-			g.setColor( Color.black );
-			g.drawLine( x*tileSize, y*tileSize+tileSize, x*tileSize+tileSize, y*tileSize );
-			
-			if( (x-y) % 6 == 0 )
-			{
-				g.setColor( Color.darkGray );
-				g.drawLine( x*tileSize+tileSize, y*tileSize+tileSize, x*tileSize+tileSize*.5f, y*tileSize+tileSize*.5f );
-			}				
-			break;
-		case TRIANGLESW:
-			g.setColor( Color.gray );
-			Polygon swp = new Polygon();
-			swp.addPoint( x*tileSize, y*tileSize );
-			swp.addPoint( x*tileSize, y*tileSize+tileSize );
-			swp.addPoint( x*tileSize+tileSize, y*tileSize+tileSize );
-			g.fill( swp );
-			g.setColor( Color.black );
-			g.drawLine( x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize );
-			
-			if( (x+y) % 4 == 0 )
-			{
-				g.setColor( Color.darkGray );
-				g.drawLine( x*tileSize+tileSize*.5f, y*tileSize+tileSize*.5f, x*tileSize, y*tileSize+tileSize );
-			}
 			break;
 		}
 	}
@@ -506,37 +385,31 @@ public class Level implements TileBasedMap
 	
 	public enum TileType
 	{
-		FLOOR( true, true ),
-		WALL( new WallInfo() ),
-		LIGHT( true, true ),
-		TRIANGLENW( true, true ),
-		TRIANGLESW( true, true ),
-		TRIANGLENE( true, true ),
-		TRIANGLESE( true, true ),
-		PASSOPEN( new PassInfo() ),
-		PASSCLOSED( new GateInfo() ),
-		GATEOPEN( new PassInfo() ),
-		GATECLOSED( new GateInfo() ),
-		DOOR( new DoorInfo() ),
-		GRATE( new GrateInfo() );
+		FLOOR( true, true, 0 ),
+		WALL( new WallInfo(), 1 ),
+		DOOR( new DoorInfo(), 11 ),
+		GRATE( new GrateInfo(), 12 );
 		
 		TileInfo ti;
+		public int data;
 		
 		TileType()
 		{
 			
 		}
 		
-		TileType( boolean passable, boolean shootable )
+		TileType( boolean passable, boolean shootable, int data )
 		{
 			ti = new TileInfo( passable, shootable );
 			ti.t = this;
+			this.data = data;
 		}
 		
-		TileType( TileInfo ti )
+		TileType( TileInfo ti, int data )
 		{
 			this.ti = ti;
 			ti.t = this;
+			this.data = data;
 		}
 		
 		public boolean isPassable()
@@ -552,6 +425,19 @@ public class Level implements TileBasedMap
 		public boolean connectsTo( TileType tt )
 		{
 			return ti.connectsTo( tt );
+		}
+		
+		public static HashMap<Integer, TileType> map = new HashMap<Integer, TileType>();
+		static {
+			for( TileType t : values() )
+			{
+				map.put( t.data, t );
+			}
+		}
+		
+		public static TileType getTile( int data )
+		{
+			return map.get( data );
 		}
 	}
 	
@@ -599,50 +485,6 @@ public class Level implements TileBasedMap
 		}
 	}
 	
-	public static class PassInfo extends TileInfo
-	{
-		public PassInfo()
-		{
-			super( true, true );
-		}
-		
-		public boolean connectsTo( TileType t )
-		{
-			return t == TileType.FLOOR;
-		}
-	}
-	
-	public static class GateInfo extends TileInfo
-	{
-		public GateInfo()
-		{
-			super( false, false );
-		}
-		
-		public boolean connectsTo( TileType t )
-		{
-			return t == TileType.FLOOR;
-		}
-	}
-	
-	public static class Link
-	{
-		public int source;
-		public int targetX, targetY;
-		
-		public Link()
-		{
-			
-		}
-		
-		public Link( int source, int targetX, int targetY )
-		{
-			this.source = source;
-			this.targetX = targetX;
-			this.targetY = targetY;
-		}
-	}
-	
 	public static class WallInfo extends TileInfo
 	{
 		public WallInfo()
@@ -656,67 +498,39 @@ public class Level implements TileBasedMap
 		}
 	}
 
-	public void signal( Building b, boolean signal, TacticServer ts )
+	public Building getBuilding( int x, int y )
 	{
-		for( int i = 0; i < links.size(); i++ )
+		for( Building b : buildings )
 		{
-			Link l = links.get( i );
-			if( l.source == b.id )
+			if( x*tileSize+tileSize/2 == b.x && y*tileSize+tileSize/2 == b.y )
 			{
-				TileType target = getTile( l.targetX, l.targetY );
-				TileType set = null;
-				switch( target )
-				{
-				case PASSOPEN:
-					if( signal )
-					{
-						set = TileType.PASSCLOSED;
-					}
-					break;
-				case PASSCLOSED:
-					if( !signal )
-					{
-						set = TileType.PASSOPEN;
-					}
-					break;
-				case GATEOPEN:
-					if( !signal )
-					{
-						set = TileType.GATECLOSED;
-					}
-					break;
-				case GATECLOSED:
-					if( signal )
-					{
-						set = TileType.GATEOPEN;
-					}
-					break;
-				}
-				if( set != null && tiles[l.targetX][l.targetY] != set )
-				{
-					tiles[l.targetX][l.targetY] = set;
-					ts.si.sendToAllClients( new Message( MessageType.TILEUPDATE, new Object[] { l.targetX, l.targetY, set } ) );
-					if( !set.isPassable() )
-					{
-						for( int j = 0; j < ts.units.size(); j++ )
-						{
-							Unit u = ts.units.get( j );
-							for( int k = 0; k < u.path.size(); k++ )
-							{
-								Point2i p = u.path.get( k );
-								if( p.x == l.targetX && p.y == l.targetY )
-								{
-									u.path.clear();
-									u.state = UnitState.STOPPED;
-									u.pathTo( u.destx, u.desty, ts );
-									ts.si.sendToAllClients( new Message( MessageType.UNITUPDATE, u ) );
-									break;
-								}
-							}
-						}
-					}
-				}
+				return b;
 			}
+		}
+		return null;
+	}
+	
+	public static class SlotOption
+	{
+		public SlotType st = SlotType.ANY;
+		public PlayType bt = PlayType.AGGRESSIVE;
+		
+		public SlotOption()
+		{
+			
+		}
+	}
+	
+	public enum SlotType
+	{
+		ANY,
+		PLAYER,
+		COMPUTER,
+		CLOSED;
+
+		public boolean allowPlayer()
+		{
+			return this == ANY || this == PLAYER;
 		}
 	}
 }

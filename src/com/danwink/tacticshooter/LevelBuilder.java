@@ -129,8 +129,8 @@ public class LevelBuilder
 		fillBox( l, 1, 1, 5, 5, TileType.FLOOR );
 		fillBox( l, l.width-6, l.height-6, 5, 5, TileType.FLOOR );
 		
-		l.buildings.add( new Building( 3 * l.tileSize, 3 * l.tileSize, BuildingType.CENTER, a ) );
-		l.buildings.add( new Building( (l.width-3) * l.tileSize, (l.height-3) * l.tileSize, BuildingType.CENTER, b ) );
+		l.buildings.add( new Building( 3 * Level.tileSize, 3 * Level.tileSize, BuildingType.CENTER, a ) );
+		l.buildings.add( new Building( (l.width-3) * Level.tileSize, (l.height-3) * Level.tileSize, BuildingType.CENTER, b ) );
 		
 		int roomcount = 5;
 		
@@ -142,7 +142,7 @@ public class LevelBuilder
 			boxes[i][0] = DMath.randomi( 10, (l.width - boxes[i][2]) ); //x
 			boxes[i][1] = DMath.randomi( 10, (l.height - boxes[i][3]) ); //y
 			
-			l.buildings.add( new Building( (boxes[i][0]+boxes[i][2]/2) * l.tileSize, (boxes[i][1]+boxes[i][3]/2) * l.tileSize, BuildingType.POINT, null ) );
+			l.buildings.add( new Building( (boxes[i][0]+boxes[i][2]/2) * Level.tileSize, (boxes[i][1]+boxes[i][3]/2) * Level.tileSize, BuildingType.POINT, null ) );
 		}
 		for( int i = roomcount; i < roomcount*2; i++ )
 		{
@@ -151,7 +151,7 @@ public class LevelBuilder
 			boxes[i][0] = l.width - boxes[i-roomcount][0]; //x
 			boxes[i][1] = l.height - boxes[i-roomcount][1]; //y
 			
-			l.buildings.add( new Building( (boxes[i][0]+boxes[i][2]/2) * l.tileSize, (boxes[i][1]+boxes[i][3]/2) * l.tileSize, BuildingType.POINT, null ) );
+			l.buildings.add( new Building( (boxes[i][0]+boxes[i][2]/2) * Level.tileSize, (boxes[i][1]+boxes[i][3]/2) * Level.tileSize, BuildingType.POINT, null ) );
 		}
 		
 		for( int i = 0; i < boxes.length; i++ )

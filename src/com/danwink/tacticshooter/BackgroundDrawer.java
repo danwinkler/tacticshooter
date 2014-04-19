@@ -2,7 +2,6 @@ package com.danwink.tacticshooter;
 
 import java.io.File;
 
-import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
@@ -46,8 +45,8 @@ public class BackgroundDrawer
 				floor = new Image( "img" + File.separator + theme.getS( "floor" ) );
 			} catch( SlickException e1 )
 			{
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				System.err.println( "Could not load image files for theme" );
+				System.exit(1);
 			}
 		}
 		g.pushTransform();

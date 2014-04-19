@@ -13,7 +13,9 @@ import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Unit;
 import com.danwink.tacticshooter.gameobjects.Unit.UnitState;
+import com.danwink.tacticshooter.gameobjects.Unit.UnitType;
 import com.danwink.tacticshooter.network.Message;
+import com.phyloa.dlib.util.DMath;
 
 public class Aggressive extends ComputerPlayer 
 {
@@ -35,6 +37,11 @@ public class Aggressive extends ComputerPlayer
 					ci.sl.received( fc, new Message( MessageType.SETATTACKPOINT, new Object[]{ new Point2i( closeb.x/Level.tileSize, closeb.y/Level.tileSize ), selected } ) );
 				}
 			}
+		}
+		
+		if( player.money > 20 )
+		{
+			ci.sl.received( fc, new Message( MessageType.BUILDUNIT, UnitType.values()[DMath.randomi(0, UnitType.values().length)] ) );
 		}
 	}
 }

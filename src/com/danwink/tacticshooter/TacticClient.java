@@ -12,10 +12,6 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
 import com.danwink.tacticshooter.screens.BrowseOnlineLevelsScreen;
 import com.danwink.tacticshooter.screens.HomeScreen;
-import com.danwink.tacticshooter.screens.LevelEditor;
-import com.danwink.tacticshooter.screens.LevelEditorLoadMap;
-import com.danwink.tacticshooter.screens.LevelEditorNewMapSetup;
-import com.danwink.tacticshooter.screens.LevelEditorSetup;
 import com.danwink.tacticshooter.screens.LobbyScreen;
 import com.danwink.tacticshooter.screens.LoginScreen;
 import com.danwink.tacticshooter.screens.MessageScreen;
@@ -52,10 +48,6 @@ public class TacticClient extends BasicGame
 		dsh.register( "message", new MessageScreen() );
 		dsh.register( "postgame", new PostGameScreen() );
 		
-		dsh.register( "editorsetup", new LevelEditorSetup() );
-		dsh.register( "newmap", new LevelEditorNewMapSetup() );
-		dsh.register( "loadmap", new LevelEditorLoadMap() );
-		dsh.register( "editor", new LevelEditor() );
 		dsh.register( "levelbrowser", new BrowseOnlineLevelsScreen() );
 		
 		dsh.register( "settings", new SettingsScreen() );
@@ -90,7 +82,8 @@ public class TacticClient extends BasicGame
 	{
 		dsh.update( gc, delta );
 		
-		if( !(dsh.get() instanceof MultiplayerGameScreen) && !(dsh.get() instanceof LevelEditor) )
+		//Render background if not in a game
+		if( !(dsh.get() instanceof MultiplayerGameScreen) )
 		{
 			StaticFiles.bgd.update( delta );
 		}
@@ -101,7 +94,8 @@ public class TacticClient extends BasicGame
 		g.setFont( f );
 		g.setAntiAlias( StaticFiles.advOptions.getB( "antialias" ) );
 		
-		if( !(dsh.get() instanceof MultiplayerGameScreen) && !(dsh.get() instanceof LevelEditor) )
+		//Render background if not in a game
+		if( !(dsh.get() instanceof MultiplayerGameScreen) )
 		{
 			StaticFiles.bgd.render( gc, g );
 		}

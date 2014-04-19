@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.vecmath.Point2f;
+
 import org.newdawn.slick.util.pathfinding.AStarPathFinder;
 import org.newdawn.slick.util.pathfinding.Path;
 import org.newdawn.slick.util.pathfinding.PathFinder;
@@ -12,17 +13,16 @@ import com.danwink.tacticshooter.ai.Aggressive;
 import com.danwink.tacticshooter.ai.Fortifier;
 import com.danwink.tacticshooter.ai.Masser;
 import com.danwink.tacticshooter.ai.Moderate;
+import com.danwink.tacticshooter.ai.Passive;
 import com.danwink.tacticshooter.ai.Sneaky;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.gameobjects.Unit;
 import com.danwink.tacticshooter.gameobjects.Level.TileType;
-import com.danwink.tacticshooter.gameobjects.Unit.UnitType;
 import com.danwink.tacticshooter.network.FakeConnection;
 import com.danwink.tacticshooter.network.Message;
 import com.danwink.tacticshooter.network.ServerNetworkInterface;
-import com.phyloa.dlib.util.DMath;
 
 public abstract class ComputerPlayer implements Runnable 
 {
@@ -54,6 +54,7 @@ public abstract class ComputerPlayer implements Runnable
 	
 	public abstract void update( PathFinder finder );
 	
+	@SuppressWarnings( "incomplete-switch" )
 	public void run() 
 	{
 		while( playing )
@@ -126,11 +127,6 @@ public abstract class ComputerPlayer implements Runnable
 				}
 				update( finder );
 				
-				if( player.money > 20 )
-				{
-					ci.sl.received( fc, new Message( MessageType.BUILDUNIT, UnitType.values()[DMath.randomi(0, UnitType.values().length)] ) );
-				}
-				
 				try 
 				{	
 					Thread.sleep( sleepDuration );
@@ -191,7 +187,8 @@ public abstract class ComputerPlayer implements Runnable
 		SNEAKY( Sneaky.class ),
 		MODERATE( Moderate.class ),
 		MASSER( Masser.class ),
-		FORTIFIER( Fortifier.class );
+		FORTIFIER( Fortifier.class ),
+		PASSIVE( Passive.class );
 		
 		Class<? extends ComputerPlayer> c;
 		
