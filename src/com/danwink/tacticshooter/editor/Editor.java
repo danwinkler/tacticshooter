@@ -213,9 +213,14 @@ public class Editor
 			case WALL:
 				setTile( x, y, TileType.WALL );
 				break;
+			case DOOR:
+				setTile( x, y, TileType.DOOR );
+				break;
+			case GRATE:
+				setTile( x, y, TileType.GRATE );
+				break;
 			default:
 				break;
-			
 			}
 			break;
 		case BUILDING:

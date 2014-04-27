@@ -30,17 +30,29 @@ public class BrushPanel extends JPanel implements ActionListener
 		ButtonGroup brushes = new ButtonGroup();
 		JToggleButton floor = new JToggleButton( new ImageIcon( editor.mapPane.lr.floor.getSubimage( 32, 64, 32, 32 ) ) );
 		JToggleButton wall = new JToggleButton( new ImageIcon( editor.mapPane.lr.wall.getSubimage( 0, 0, 32, 32 ) ) );
+		JToggleButton door = new JToggleButton( "DOOR" );
+		JToggleButton grate = new JToggleButton( "GRATE" );
 		
 		floor.setActionCommand( "floor" );
 		wall.setActionCommand( "wall" );
+		door.setActionCommand( "door" );
+		grate.setActionCommand( "grate" );
 		
 		floor.addActionListener( this );
 		wall.addActionListener( this );
+		door.addActionListener( this );
+		grate.addActionListener( this );
+		
 		
 		brushes.add( floor );
 		brushes.add( wall );
+		brushes.add( door );
+		brushes.add( grate );
+		
 		this.add( floor, "wrap" );
 		this.add( wall, "wrap" );
+		this.add( door, "wrap" );
+		this.add( grate, "wrap" );
 		
 		floor.setSelected( true );
 		
@@ -82,6 +94,8 @@ public class BrushPanel extends JPanel implements ActionListener
 		{
 		case "floor": brush = Brush.FLOOR; break;
 		case "wall": brush = Brush.WALL; break;
+		case "door": brush = Brush.DOOR; break;
+		case "grate": brush = Brush.GRATE; break;
 		default:
 			mirrorMode = e.getActionCommand();
 			break;

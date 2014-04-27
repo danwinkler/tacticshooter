@@ -19,7 +19,7 @@ function addKillListener( f ) {
 }
 
 function callKill( u ) {
-	for( var i in tickListeners ) {
+	for( var i in killListeners ) {
 		killListeners[i]( u );
 	}
 }

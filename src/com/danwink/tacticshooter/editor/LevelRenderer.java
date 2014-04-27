@@ -5,6 +5,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+import org.newdawn.slick.Image;
+
 import com.danwink.tacticshooter.editor.AutoTileDrawer;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Level;
@@ -19,6 +21,7 @@ public class LevelRenderer
 	
 	BufferedImage floor;
 	BufferedImage wall;
+	BufferedImage grate;
 	
 	public LevelRenderer( Level l )
 	{
@@ -26,8 +29,9 @@ public class LevelRenderer
 		
 		try
 		{
-			floor = DFile.loadImage(  "img" + File.separator + new DOptions( "themes" + File.separator + l.theme ).getS( "floor" ) );
-			wall  = DFile.loadImage(  "img" + File.separator + new DOptions( "themes" + File.separator + l.theme ).getS( "wall" ) );
+			floor = DFile.loadImage( "img" + File.separator + new DOptions( "themes" + File.separator + l.theme ).getS( "floor" ) );
+			wall  = DFile.loadImage( "img" + File.separator + new DOptions( "themes" + File.separator + l.theme ).getS( "wall" ) );
+			grate = DFile.loadImage( "img" + File.separator + new DOptions( "themes" + File.separator + l.theme ).getS( "grate" ) );
 		}
 		catch( IOException e )
 		{
@@ -41,13 +45,23 @@ public class LevelRenderer
 		{
 			for( int x = 0; x < l.width; x++ )
 			{
-				if( l.tiles[x][y] != TileType.WALL )
+				if( l.tiles[x][y] == TileType.FLOOR )
 				{
 					drawAutoTile( g, x, y, TileType.FLOOR, floor );
 				}
 				else if( l.tiles[x][y] == TileType.WALL )
 				{
 					drawAutoTile( g, x, y, TileType.WALL, wall );
+				}
+				else if( l.tiles[x][y] == TileType.DOOR )
+				{
+					//drawAutoTile( g, x, y, TileType.FLOOR, floor );
+					drawAutoTile( g, x, y, TileType.WALL, wall );
+				}
+				else if( l.tiles[x][y] == TileType.GRATE )
+				{
+					drawAutoTile( g, x, y, TileType.FLOOR, floor );
+					drawAutoTile( g, x, y, TileType.GRATE, grate );
 				}
 			}
 		}
