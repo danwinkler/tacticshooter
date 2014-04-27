@@ -51,8 +51,6 @@ public class Level implements TileBasedMap
 	public Image wall;
 	public Image grate;
 	
-	public float[][] lightMap;
-
 	public String code;
 	public String ums;
 	
@@ -532,5 +530,27 @@ public class Level implements TileBasedMap
 		{
 			return this == ANY || this == PLAYER;
 		}
+	}
+
+	public void resize( int width, int height )
+	{
+		TileType[][] newTiles = new TileType[width][height];
+		for( int y = 0; y < height; y++ )
+		{
+			for( int x = 0; x < width; x++ )
+			{
+				if( x < this.width && y < this.height )
+				{
+					newTiles[x][y] = tiles[x][y];
+				}
+				else
+				{
+					newTiles[x][y] = TileType.FLOOR;
+				}
+			}
+		}
+		this.width = width;
+		this.height = height;
+		this.tiles = newTiles;
 	}
 }

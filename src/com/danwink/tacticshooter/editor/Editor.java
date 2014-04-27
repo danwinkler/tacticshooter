@@ -40,6 +40,7 @@ public class Editor
 	public JScrollPane scrollPane;
 	
 	NewDialog newDialog;
+	ResizeDialog resizeDialog;
 	BuildingDialog buildingDialog;
 	
 	Level l;
@@ -65,6 +66,7 @@ public class Editor
 		container.setJMenuBar( menubar );
 		
 		menubar.add( new FileMenu( this ) );
+		menubar.add( new EditMenu( this ) );
 		
 		tabs = new JTabbedPane();
 		
@@ -277,5 +279,10 @@ public class Editor
 	{
 		l.code = codePanel.textArea.getText();
 		l.ums = umsPanel.textArea.getText();
+	}
+
+	public void showResizeDialog()
+	{
+		resizeDialog = new ResizeDialog( this );
 	}
 }
