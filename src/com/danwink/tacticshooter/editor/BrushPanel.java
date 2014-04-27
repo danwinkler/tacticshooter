@@ -60,7 +60,7 @@ public class BrushPanel extends JPanel implements ActionListener
 		
 		this.add( new JLabel( "Mirror Mode", JLabel.CENTER ), "growx, wrap" );
 		
-		groupHelper( "None", "X", "Y", "XY", "/", "\\", "4" );
+		groupHelper( "None", "X", "Y", "XY", "4" );
 	}
 	
 	private void groupHelper( String... a )

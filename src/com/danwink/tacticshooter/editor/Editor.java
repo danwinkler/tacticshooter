@@ -202,6 +202,7 @@ public class Editor
 
 	public void place( int x, int y )
 	{
+		if( x < 0 || x >= l.width || y < 0 || y >= l.height ) return;
 		switch( modePanel.mode )
 		{
 		case TILE:
@@ -253,6 +254,11 @@ public class Editor
 		case "X": l.tiles[(l.width-1)-x][y] = t; break;
 		case "Y": l.tiles[x][(l.height-1)-y] = t; break;
 		case "XY": l.tiles[(l.width-1)-x][(l.height-1)-y] = t; break;
+		case "4": 
+			l.tiles[(l.width-1)-x][y] = t;
+			l.tiles[x][(l.height-1)-y] = t;
+			l.tiles[(l.width-1)-x][(l.height-1)-y] = t; 
+			break;
 		}
 	}
 
