@@ -3,10 +3,14 @@ package com.danwink.tacticshooter.network;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.ListIterator;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 import com.danwink.tacticshooter.KryoHelper;
 import com.danwink.tacticshooter.MessageType;
+import com.danwink.tacticshooter.gameobjects.Unit;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
@@ -14,24 +18,24 @@ import com.esotericsoftware.kryonet.Server;
 public class ServerNetworkInterface implements ServerInterface 
 {
 	public static final boolean DEBUG = false;
-	static int[] messageCount;
-	
-	static {
-		if( DEBUG )
-		{
-			messageCount = new int[MessageType.values().length];
-		}
-	}
+	public static final int WRITE_BUFFER = 5000000;
+	public static final int OBJECT_BUFFER = 32000; 
 	
 	Server server;
-	LinkedList<Message> messages = new LinkedList<Message>();
+	ConcurrentLinkedDeque<Message> messages = new  ConcurrentLinkedDeque<Message>();
+	ConcurrentLinkedDeque<Object[]> messagesToSend = new  ConcurrentLinkedDeque<Object[]>();
 	HashMap<Integer, Connection> connections = new HashMap<Integer, Connection>();
 	ArrayList<Connection> connectionsArr = new ArrayList<Connection>();
 	public ServerListener sl;
+	MessageSender ms;
+	Thread mst;
+	boolean stopped;
+	
+	
 	
 	public ServerNetworkInterface()
 	{
-		server = new Server( 5000000, 32000 );
+		server = new Server( WRITE_BUFFER, OBJECT_BUFFER );
 		KryoHelper.register( server.getKryo() );
 		server.start();
 		try {
@@ -41,20 +45,19 @@ public class ServerNetworkInterface implements ServerInterface
 		}
 		sl = new ServerListener();
 		server.addListener( sl );
+		ms = new MessageSender();
+		mst = new Thread( ms );
+		mst.start();
 	}
 	
 	public void sendToClient( int id, Message m )
 	{
-		synchronized( messages )
+		synchronized( connections )
 		{
 			Connection c = connections.get( id );
 			if( c != null )
 			{
-				c.sendTCP( m );
-				if( DEBUG )
-				{
-					messageCount[m.messageType.ordinal()]++;
-				}
+				messagesToSend.push( new Object[] { id, m } );
 			}
 		}
 	}
@@ -66,22 +69,16 @@ public class ServerNetworkInterface implements ServerInterface
 			for( int i = 0; i < connectionsArr.size(); i++ )
 			{
 				if( connectionsArr.get( i ) == null ) break;
-				connectionsArr.get( i ).sendTCP( m );
-				if( DEBUG )
-				{
-					messageCount[m.messageType.ordinal()]++;
-				}
+				sendToClient( connectionsArr.get( i ).getID(), m );
 			}
 		}
 	}
 
 	public Message getNextServerMessage()
-	{
-		synchronized( messages )
-		{
-			return messages.pop();
-		}
+	{	
+		return messages.pop();
 	}
+	
 
 	public boolean hasServerMessages() 
 	{
@@ -99,64 +96,41 @@ public class ServerNetworkInterface implements ServerInterface
 			}
 			if( o instanceof Message )
 			{
-				synchronized( messages )
-				{
-					Message m = (Message)o;
-					m.sender = c.getID();
-					messages.push( m );
-				}
+				Message m = (Message)o;
+				m.sender = c.getID();
+				messages.push( m );
 			}
 		}
 		
 		public void connected( Connection c )
 		{
-			synchronized( messages )
+			synchronized( connectionsArr )
 			{
-				synchronized( connectionsArr )
+				Message m = new Message();
+				m.message = c.getID();
+				m.sender = c.getID();
+				m.messageType = MessageType.CONNECTED;
+				messages.push( m );
+				if( connections.get( c.getID() ) == null )
 				{
-					Message m = new Message();
-					m.message = c.getID();
-					m.sender = c.getID();
-					m.messageType = MessageType.CONNECTED;
-					messages.push( m );
-					if( connections.get( c.getID() ) == null )
-					{
-						connections.put( c.getID(), c );
-						connectionsArr.add( c );
-					}
+					connections.put( c.getID(), c );
+					connectionsArr.add( c );
 				}
 			}
 		}
 		
 		public void disconnected( Connection c )
 		{
-			synchronized( messages )
+			synchronized( connectionsArr )
 			{
-				synchronized( connectionsArr )
-				{
-					Message m = new Message();
-					m.message = c.getID();
-					m.sender = c.getID();
-					m.messageType = MessageType.DISCONNECTED;
-					messages.push( m );
-					connections.remove( c.getID() );
-					connectionsArr.remove( c );
-				}
+				Message m = new Message();
+				m.message = c.getID();
+				m.sender = c.getID();
+				m.messageType = MessageType.DISCONNECTED;
+				messages.push( m );
+				connections.remove( c.getID() );
+				connectionsArr.remove( c );
 			}
-		}
-	}
-	
-	public void printDebug()
-	{
-		if( DEBUG )
-		{
-			System.out.println( "MESSAGETYPE BREAKDOWN" );
-			for( MessageType t : MessageType.values() )
-			{
-				System.out.println( t.name() + " " + messageCount[t.ordinal()] );
-			}
-			System.out.println( "-------------------------" );
-			System.out.println( "" );
 		}
 	}
 
@@ -164,5 +138,65 @@ public class ServerNetworkInterface implements ServerInterface
 	public void stop()
 	{
 		server.close();
+		stopped = true;
+	}
+	
+	public class MessageSender implements Runnable
+	{
+		public void run()
+		{
+			while( !stopped )
+			{
+				Iterator<Object[]> i = messagesToSend.iterator();
+				while( i.hasNext() )
+				{
+					Object[] o = i.next();
+					Integer id = (Integer)o[0];
+					Message m = (Message)o[1];
+					synchronized( connections )
+					{
+						Connection c = connections.get( id );
+						if( c == null )
+						{
+							i.remove();
+							continue;
+						}
+						int bytes = 0;
+						
+						try 
+						{
+							bytes = c.getTcpWriteBufferSize();
+						}
+						catch( NullPointerException e ){}
+						
+						if( bytes < WRITE_BUFFER - OBJECT_BUFFER ) 
+						{
+							c.sendTCP( m );
+							i.remove();
+						}
+						else
+						{
+							if( m.messageType == MessageType.UNITUPDATE )
+							{
+								Unit u = (Unit)m.message;
+								if( u.alive )
+								{
+									i.remove();
+								}
+							}
+						}
+					}
+				}
+				
+				try
+				{
+					Thread.sleep( 10 );
+				}
+				catch( InterruptedException e )
+				{
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 }

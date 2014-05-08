@@ -2,6 +2,7 @@ package com.danwink.tacticshooter.editor;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
@@ -28,6 +29,9 @@ public class ModePanel extends JPanel implements ActionListener
 		ButtonGroup brushes = new ButtonGroup();
 		JToggleButton tile = new JToggleButton( "Tile" );
 		JToggleButton building = new JToggleButton( "Building" );
+		
+		tile.setMnemonic( KeyEvent.VK_T );
+		building.setMnemonic( KeyEvent.VK_B );
 		
 		tile.setActionCommand( EditMode.TILE.name() );
 		building.setActionCommand( EditMode.BUILDING.name() );

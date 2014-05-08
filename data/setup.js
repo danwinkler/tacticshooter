@@ -55,3 +55,7 @@ function callStop( building, unit ) {
 		}
 	}
 }
+
+function setupDefaultButtons( building, unit ) {
+	
+}

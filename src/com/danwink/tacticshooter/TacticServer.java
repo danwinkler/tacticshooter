@@ -488,7 +488,6 @@ public class TacticServer
 				gs.get( b ).unitCount.add( bunits );
 				gs.totalPoints = l.buildings.size();
 				
-				((ServerNetworkInterface)si).printDebug();
 				Player[] playerArr = new Player[players.entrySet().size()];
 				int pi = 0;
 				for( Entry<Integer, Player> e : players.entrySet() )
