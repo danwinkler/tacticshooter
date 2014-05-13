@@ -31,8 +31,6 @@ public class ServerNetworkInterface implements ServerInterface
 	Thread mst;
 	boolean stopped;
 	
-	
-	
 	public ServerNetworkInterface()
 	{
 		server = new Server( WRITE_BUFFER, OBJECT_BUFFER );

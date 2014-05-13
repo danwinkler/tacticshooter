@@ -39,10 +39,12 @@ import com.phyloa.dlib.util.DMath;
  */
 public class TacticServer 
 {
+	public static final int UNITS_PER_TILE = 2;
 	public ServerInterface si;
 	
 	public ArrayList<Unit> units = new ArrayList<Unit>();
 	public ArrayList<Bullet> bullets = new ArrayList<Bullet>();
+	public Unit[][] unitGrid;
 	
 	public HashMap<Integer, Player> players = new HashMap<Integer, Player>();
 	public Level l;
@@ -158,6 +160,8 @@ public class TacticServer
 		} catch( DocumentException e ) {
 			e.printStackTrace();
 		}
+		
+		unitGrid = new Unit[l.width*UNITS_PER_TILE][l.height*UNITS_PER_TILE];
 		
 		js = new JSAPI( this );
 		if( gameType == GameType.UMS )
@@ -590,6 +594,7 @@ public class TacticServer
 						units.add( u );
 						si.sendToAllClients( new Message( MessageType.UNITUPDATE, u ) );
 						gs.get( u.owner.team ).unitsCreated++;
+						u.pathTo( l.getTileX( u.x ), l.getTileY(u.y), this );
 					}
 				}
 				si.sendToClient( m.sender, new Message( MessageType.PLAYERUPDATE, player ) );
@@ -717,6 +722,10 @@ public class TacticServer
 				gs.get( u.owner.team ).unitsLost++;
 				units.remove( i );
 				js.kill( u );
+				if( u.occupyX > -1 )
+				{
+					unitGrid[u.occupyX][u.occupyY] = null;
+				}
 				i--;
 			}
 		}

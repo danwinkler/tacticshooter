@@ -76,6 +76,9 @@ public class Unit
 	
 	public Building stoppedAt;
 	
+	public int occupyX = -1;
+	public int occupyY = -1;
+	
 	//CLIENT ONLY
 	public boolean selected = false;
 	public int timeSinceUpdate = 0;
@@ -121,6 +124,12 @@ public class Unit
 		switch( state )
 		{
 		case MOVING:
+			if( occupyX != -1 )
+			{
+				ts.unitGrid[occupyX][occupyY] = null;
+				occupyX = -1;
+				occupyY = -1;
+			}
 			stoppedAt = null;
 			if( owner == null && onStep >= path.size() )
 			{
@@ -159,18 +168,36 @@ public class Unit
 			}
 			else
 			{
-				state = UnitState.STOPPED;
-				for( int i = 0; i < l.buildings.size(); i++ )
+				Point2i closestSpot = findClosestRestSpot( ts );
+				float txd = closestSpot.x - tilex*TacticServer.UNITS_PER_TILE;
+				float tyd = closestSpot.y - tiley*TacticServer.UNITS_PER_TILE;
+				if( (txd >= 0 && txd < TacticServer.UNITS_PER_TILE) & (tyd >= 0 && tyd < TacticServer.UNITS_PER_TILE) )
 				{
-					Building tb = l.buildings.get( i );
-					float dx = x - tb.x;
-					float dy = y - tb.y;
-					if( (dx*dx + dy*dy) < tb.bt.bu.getRadius()*tb.bt.bu.getRadius() )
+					//Found a good spot
+					float tilePart = l.tileSize/(float)TacticServer.UNITS_PER_TILE;
+					x = tilex*l.tileSize + tilePart*.5f + tilePart * txd;
+					y = tiley*l.tileSize + tilePart*.5f + tilePart * tyd;
+					ts.unitGrid[closestSpot.x][closestSpot.y] = this;
+					occupyX = closestSpot.x;
+					occupyY = closestSpot.y;
+					state = UnitState.STOPPED;
+					for( int i = 0; i < l.buildings.size(); i++ )
 					{
-						stoppedAt = tb;
-						ts.js.stop( tb, this );
-						break;
+						Building tb = l.buildings.get( i );
+						float dx = x - tb.x;
+						float dy = y - tb.y;
+						if( (dx*dx + dy*dy) < tb.bt.bu.getRadius()*tb.bt.bu.getRadius() )
+						{
+							stoppedAt = tb;
+							ts.js.stop( tb, this );
+							break;
+						}
 					}
+				}
+				else
+				{
+					//Need to path to other spot
+					pathTo( closestSpot.x/TacticServer.UNITS_PER_TILE, closestSpot.y/TacticServer.UNITS_PER_TILE, ts );
 				}
 			}
 			break;
@@ -453,10 +480,51 @@ public class Unit
 			{
 				path.add( new Point2i( tp.getX( i ), tp.getY( i ) ) );
 			}
-			destx = tx;
-			desty = ty;
-			onStep = 0;
-			state = UnitState.MOVING;
+		}
+		destx = tx;
+		desty = ty;
+		onStep = 0;
+		state = UnitState.MOVING;
+	}
+	
+	//Note: doesnt actually find best spot, rather does a random walk until finds
+	public Point2i findClosestRestSpot( TacticServer ts )
+	{
+		int tilex = ts.l.getTileX( x );
+		int tiley = ts.l.getTileY( y );
+		while( true )
+		{
+			for( int xx = tilex*TacticServer.UNITS_PER_TILE; xx < (tilex+1)*(TacticServer.UNITS_PER_TILE); xx++ )
+			{
+				for( int yy = tiley*TacticServer.UNITS_PER_TILE; yy < (tiley+1)*(TacticServer.UNITS_PER_TILE); yy++ )
+				{
+					if( ts.unitGrid[xx][yy] == null )
+					{
+						return new Point2i( xx, yy );
+					}
+				}
+			}
+			
+			float dir = DMath.randomf() > .5f ? -1 : 1;
+			float rot = DMath.randomf();
+			
+			int ntx = tilex;
+			int nty = tiley;
+			
+			if( rot > .5f ) 
+			{
+				ntx += dir;
+			}
+			else
+			{
+				nty += dir;
+			}
+			
+			if( ts.l.tiles[ntx][nty].isPassable() )
+			{
+				tilex = ntx;
+				tiley = nty;
+			}
 		}
 	}
 	
@@ -476,9 +544,9 @@ public class Unit
 			{
 				path.add( new Point2i( tp.getX( i ), tp.getY( i ) ) );
 			}
-			destx = tx;
-			desty = ty;
 		}
+		destx = tx;
+		desty = ty;
 	}
 	
 	public void sync( Unit u )
