@@ -41,7 +41,6 @@ public class Unit
 			heavyColor = new SpriteSheet( new Image( "img" + File.separator + new DOptions( "themes" + File.separator + l.theme ).getS( "heavycolor" ) ), 32, 32 );
 		} catch( SlickException e )
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
