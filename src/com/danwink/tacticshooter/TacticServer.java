@@ -551,6 +551,7 @@ public class TacticServer
 					if( unit.owner.id == m.sender && selected.contains( unit.id ) )
 					{
 						unit.pathToContinue( p.x, p.y, this );
+						si.sendToClient( m.sender, new Message( MessageType.UNITUPDATE, unit ) );
 					}
 				}
 				si.sendToClient( m.sender, new Message( MessageType.MOVESUCCESS, null ) );
