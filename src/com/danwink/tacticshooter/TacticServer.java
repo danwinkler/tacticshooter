@@ -27,7 +27,6 @@ import com.danwink.tacticshooter.network.Message;
 import com.danwink.tacticshooter.network.ServerInterface;
 import com.danwink.tacticshooter.network.ServerNetworkInterface;
 
-import com.danwink.tacticshooter.screens.LobbyScreen;
 import com.danwink.tacticshooter.screens.LobbyScreen.Slot;
 import com.phyloa.dlib.util.DMath;
 

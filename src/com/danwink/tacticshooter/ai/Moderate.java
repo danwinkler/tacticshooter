@@ -9,7 +9,6 @@ import org.newdawn.slick.util.pathfinding.PathFinder;
 
 import com.danwink.tacticshooter.ComputerPlayer;
 import com.danwink.tacticshooter.MessageType;
-import com.danwink.tacticshooter.ComputerPlayer.Filter;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Unit;

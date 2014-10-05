@@ -1,7 +1,6 @@
 package com.danwink.tacticshooter.gameobjects;
 
 import com.danwink.tacticshooter.ComputerPlayer;
-import com.danwink.tacticshooter.ComputerPlayer.PlayType;
 
 public class Player
 {

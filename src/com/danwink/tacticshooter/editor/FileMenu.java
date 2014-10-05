@@ -14,6 +14,7 @@ import org.dom4j.DocumentException;
 
 import com.danwink.tacticshooter.LevelFileHelper;
 
+@SuppressWarnings( "serial" )
 public class FileMenu extends JMenu implements ActionListener
 {
 	Editor editor;

@@ -151,8 +151,8 @@ public class Unit
 					}
 				}
 				
-				float nx = s.x*l.tileSize + l.tileSize/2;
-				float ny = s.y*l.tileSize + l.tileSize/2;
+				float nx = s.x*Level.tileSize + Level.tileSize/2;
+				float ny = s.y*Level.tileSize + Level.tileSize/2;
 				
 				float dpx = nx-x;
 				float dpy = ny-y;
@@ -173,9 +173,9 @@ public class Unit
 				if( (txd >= 0 && txd < TacticServer.UNITS_PER_TILE) & (tyd >= 0 && tyd < TacticServer.UNITS_PER_TILE) )
 				{
 					//Found a good spot
-					float tilePart = l.tileSize/(float)TacticServer.UNITS_PER_TILE;
-					x = tilex*l.tileSize + tilePart*.5f + tilePart * txd;
-					y = tiley*l.tileSize + tilePart*.5f + tilePart * tyd;
+					float tilePart = Level.tileSize/(float)TacticServer.UNITS_PER_TILE;
+					x = tilex*Level.tileSize + tilePart*.5f + tilePart * txd;
+					y = tiley*Level.tileSize + tilePart*.5f + tilePart * tyd;
 					ts.unitGrid[closestSpot.x][closestSpot.y] = this;
 					occupyX = closestSpot.x;
 					occupyY = closestSpot.y;
@@ -207,6 +207,10 @@ public class Unit
 			{
 				state = UnitState.STOPPED;
 			}
+			break;
+		case STOPPED:
+			break;
+		default:
 			break;
 		}
 		
@@ -374,17 +378,17 @@ public class Unit
 			int xmax = Math.min( lx+10, l.width-1 );
 			int ymax = Math.min( ly+10, l.height-1 );
 			
-			float maxView = 10*l.tileSize;
+			float maxView = 10*Level.tileSize;
 			float maxView2 = maxView * maxView;
 			
 			for( int xx = xmin; xx <= xmax; xx++ )
 			{
 				for( int yy = ymin; yy < ymax; yy++ )
 				{
-					v.set( xx*l.tileSize - x + (l.tileSize*.5f), yy*l.tileSize - y + (l.tileSize*.5f) );
+					v.set( xx*Level.tileSize - x + (Level.tileSize*.5f), yy*Level.tileSize - y + (Level.tileSize*.5f) );
 					if( v.lengthSquared() < maxView2 && !l.hitwall( loc, v, result ) )
 					{
-						fog.fillOval( xx*l.tileSize-(l.tileSize*.5f), yy*l.tileSize-(l.tileSize*.5f), l.tileSize*2, l.tileSize*2 );
+						fog.fillOval( xx*Level.tileSize-(Level.tileSize*.5f), yy*Level.tileSize-(Level.tileSize*.5f), Level.tileSize*2, Level.tileSize*2 );
 					}
 				}
 			}
@@ -534,7 +538,6 @@ public class Unit
 			pathTo( tx, ty, ts );
 			return;
 		}
-		Level l = ts.l;
 		Point2i lastPoint = path.get( path.size()-1 );
 		Path tp = ts.finder.findPath( null, lastPoint.x, lastPoint.y, tx, ty );
 		if( tp != null )
@@ -591,7 +594,6 @@ public class Unit
 
 	public void hit( Bullet bullet, TacticServer ts )
 	{
-		Level l = ts.l;
 		health -= bullet.damage;
 		if( alive && health <= 0 )
 		{

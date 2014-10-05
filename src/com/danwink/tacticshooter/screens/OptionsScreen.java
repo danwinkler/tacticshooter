@@ -13,7 +13,6 @@ import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.slick.Slick2DEventMapper;
 import com.danwink.tacticshooter.slick.Slick2DRenderer;
 import com.phyloa.dlib.dui.DButton;
-import com.phyloa.dlib.dui.DCheckBox;
 import com.phyloa.dlib.dui.DScrollPane;
 import com.phyloa.dlib.dui.DSlider;
 import com.phyloa.dlib.dui.DText;

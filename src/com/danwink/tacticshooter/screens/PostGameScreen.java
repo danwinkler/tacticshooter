@@ -19,7 +19,6 @@ import com.phyloa.dlib.dui.DUIEvent;
 import com.phyloa.dlib.dui.DUIListener;
 import com.phyloa.dlib.game.DScreen;
 import com.phyloa.dlib.game.DScreenHandler;
-import com.phyloa.dlib.util.DMath;
 import com.phyloa.dlib.util.DUtil;
 
 public class PostGameScreen extends DScreen<GameContainer, Graphics> implements DUIListener

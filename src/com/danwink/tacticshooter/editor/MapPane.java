@@ -12,8 +12,10 @@ import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 
 import com.danwink.tacticshooter.editor.ModePanel.EditMode;
+import com.danwink.tacticshooter.gameobjects.Level;
 import com.phyloa.dlib.renderer.Graphics2DIRenderer;
 
+@SuppressWarnings( "serial" )
 public class MapPane extends JPanel implements MouseListener, MouseMotionListener, KeyListener
 {
 	Graphics2DIRenderer r;
@@ -33,12 +35,12 @@ public class MapPane extends JPanel implements MouseListener, MouseMotionListene
 	
 	public void updateLevel()
 	{
-		r = new Graphics2DIRenderer( editor.l.width * editor.l.tileSize, editor.l.height * editor.l.tileSize );
+		r = new Graphics2DIRenderer( editor.l.width * Level.tileSize, editor.l.height * Level.tileSize );
 		lr = new LevelRenderer( editor.l );
 		redrawLevel();
 		
-		setSize( editor.l.width * editor.l.tileSize, editor.l.height * editor.l.tileSize );
-		setPreferredSize( new Dimension( editor.l.width * editor.l.tileSize, editor.l.height * editor.l.tileSize ) );
+		setSize( editor.l.width * Level.tileSize, editor.l.height * Level.tileSize );
+		setPreferredSize( new Dimension( editor.l.width * Level.tileSize, editor.l.height * Level.tileSize ) );
 		image = (BufferedImage)r.getImage();
 	}
 	

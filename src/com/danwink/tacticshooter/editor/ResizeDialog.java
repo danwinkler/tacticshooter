@@ -4,17 +4,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 import net.miginfocom.swing.MigLayout;
-
-import com.danwink.tacticshooter.gameobjects.Building;
-import com.danwink.tacticshooter.gameobjects.Team;
-import com.danwink.tacticshooter.gameobjects.Building.BuildingType;
 
 public class ResizeDialog implements ActionListener
 {

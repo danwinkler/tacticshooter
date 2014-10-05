@@ -22,7 +22,8 @@ public class OptionsPanel extends JPanel implements ActionListener
 	
 	JComboBox<SlotType>[] playerType;
 	JComboBox<PlayType>[] botType;
-
+	
+	@SuppressWarnings( "unchecked" )
 	public OptionsPanel( Editor editor )
 	{
 		super();

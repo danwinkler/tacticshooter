@@ -5,8 +5,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-import org.newdawn.slick.Image;
-
 import com.danwink.tacticshooter.editor.AutoTileDrawer;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Level;
@@ -85,9 +83,9 @@ public class LevelRenderer
 	public void drawAutoTile( Graphics2DIRenderer g, int x, int y, TileType autoTile, BufferedImage tileImage )
 	{
 		g.pushMatrix();
-		g.translate( x*l.tileSize, y*l.tileSize );
+		g.translate( x*Level.tileSize, y*Level.tileSize );
 		//g.scale( tileSize/32f, tileSize/32f );
-		AutoTileDrawer.draw( g.g, tileImage, l.tileSize, 0, 	
+		AutoTileDrawer.draw( g.g, tileImage, Level.tileSize, 0, 	
 													l.getTile( x-1, y-1 ).connectsTo( autoTile ), 
 													l.getTile( x, y-1 ).connectsTo( autoTile ), 
 													l.getTile( x+1, y-1 ).connectsTo( autoTile ), 

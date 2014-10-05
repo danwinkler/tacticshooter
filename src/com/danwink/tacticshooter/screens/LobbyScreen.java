@@ -1,7 +1,6 @@
 package com.danwink.tacticshooter.screens;
 
 import java.awt.event.KeyEvent;
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -14,12 +13,12 @@ import org.newdawn.slick.Graphics;
 
 
 
+
 import com.danwink.tacticshooter.ComputerPlayer;
 import com.danwink.tacticshooter.GameType;
 import com.danwink.tacticshooter.MessageType;
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.ComputerPlayer.PlayType;
-import com.danwink.tacticshooter.gameobjects.Level.SlotOption;
 import com.danwink.tacticshooter.gameobjects.Level.SlotType;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.network.ClientInterface;
@@ -37,7 +36,6 @@ import com.phyloa.dlib.dui.DUIEvent;
 import com.phyloa.dlib.dui.DUIListener;
 import com.phyloa.dlib.game.DScreen;
 import com.phyloa.dlib.game.DScreenHandler;
-import com.phyloa.dlib.util.DMath;
 
 public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUIListener
 {
@@ -167,6 +165,7 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 			case LEVELUPDATE:
 			{
 				Object[] oa = (Object[])m.message;
+				@SuppressWarnings( "unchecked" )
 				ArrayList<String> mapList = (ArrayList<String>)oa[1];
 				int selectedMap = (Integer)oa[0];
 				maps.clearItems();

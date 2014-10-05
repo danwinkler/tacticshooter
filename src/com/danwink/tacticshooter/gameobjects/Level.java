@@ -5,30 +5,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.vecmath.Point2f;
-import javax.vecmath.Point2i;
 import javax.vecmath.Vector2f;
 
-import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.geom.Polygon;
 import org.newdawn.slick.util.pathfinding.Mover;
 import org.newdawn.slick.util.pathfinding.PathFindingContext;
 import org.newdawn.slick.util.pathfinding.TileBasedMap;
 
-
-
-
-
-
 import com.danwink.tacticshooter.AutoTileDrawer;
 import com.danwink.tacticshooter.ComputerPlayer.PlayType;
-import com.danwink.tacticshooter.MessageType;
-import com.danwink.tacticshooter.TacticServer;
-import com.danwink.tacticshooter.gameobjects.Level.TileType;
-import com.danwink.tacticshooter.gameobjects.Unit.UnitState;
-import com.danwink.tacticshooter.network.Message;
 import com.phyloa.dlib.util.DMath;
 import com.phyloa.dlib.util.DOptions;
 
@@ -123,6 +110,10 @@ public class Level implements TileBasedMap
 		case WALL:
 			g.drawImage( floor, x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize, floor.getWidth()/3, 0, floor.getWidth()/3 * 2, floor.getHeight()/4 );
 			drawAutoTile( g, x, y, tiles[x][y], wall );
+			break;
+		case FLOOR:
+			break;
+		default:
 			break;
 		}
 	}
@@ -263,13 +254,13 @@ public class Level implements TileBasedMap
 		{
 			stepX = 1;
 			outX = l.width;
-			cbx = (cx + 1) * l.tileSize;
+			cbx = (cx + 1) * Level.tileSize;
 		}
 		else
 		{
 			stepX = -1;
 			outX = -1;
-			cbx = cx * l.tileSize;
+			cbx = cx * Level.tileSize;
 		}
 		if( direction.y > 0 )
 		{

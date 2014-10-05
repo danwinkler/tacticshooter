@@ -7,12 +7,10 @@ import java.awt.event.KeyEvent;
 import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
 import javax.swing.JToggleButton;
-import javax.swing.SwingConstants;
-
 import net.miginfocom.swing.MigLayout;
 
+@SuppressWarnings( "serial" )
 public class ModePanel extends JPanel implements ActionListener
 {
 	Editor editor;

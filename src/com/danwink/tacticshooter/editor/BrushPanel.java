@@ -2,7 +2,6 @@ package com.danwink.tacticshooter.editor;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -14,6 +13,7 @@ import javax.swing.SwingConstants;
 
 import net.miginfocom.swing.MigLayout;
 
+@SuppressWarnings( "serial" )
 public class BrushPanel extends JPanel implements ActionListener
 {
 	Editor editor;

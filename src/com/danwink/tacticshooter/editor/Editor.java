@@ -155,6 +155,7 @@ public class Editor
 	
 	public static void main( String[] args )
 	{
+		@SuppressWarnings( "unused" )
 		Editor e = new Editor();
 	}
 
@@ -185,7 +186,7 @@ public class Editor
 		case BUILDING:
 			for( Building b : l.buildings )
 			{
-				if( b.x == x*l.tileSize + l.tileSize/2 && b.y == y*l.tileSize + l.tileSize/2 )
+				if( b.x == x*Level.tileSize + Level.tileSize/2 && b.y == y*Level.tileSize + Level.tileSize/2 )
 				{
 					buildingDialog = new BuildingDialog( this, b );
 					break;
@@ -230,7 +231,7 @@ public class Editor
 				Building b = l.getBuilding( x, y );
 				if( b == null )
 				{
-					l.buildings.add( new Building( x*l.tileSize + l.tileSize/2, y*l.tileSize + l.tileSize/2, buildingPanel.type, null ) );
+					l.buildings.add( new Building( x*Level.tileSize + Level.tileSize/2, y*Level.tileSize + Level.tileSize/2, buildingPanel.type, null ) );
 				}
 				else
 				{

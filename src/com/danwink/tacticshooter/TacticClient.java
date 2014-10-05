@@ -12,7 +12,6 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
 
 import com.danwink.tacticshooter.editor.Editor;
-import com.danwink.tacticshooter.screens.BrowseOnlineLevelsScreen;
 import com.danwink.tacticshooter.screens.HomeScreen;
 import com.danwink.tacticshooter.screens.LobbyScreen;
 import com.danwink.tacticshooter.screens.LoginScreen;
@@ -49,8 +48,6 @@ public class TacticClient extends BasicGame
 		
 		dsh.register( "message", new MessageScreen() );
 		dsh.register( "postgame", new PostGameScreen() );
-		
-		dsh.register( "levelbrowser", new BrowseOnlineLevelsScreen() );
 		
 		dsh.register( "settings", new SettingsScreen() );
 		dsh.register( "options", new OptionsScreen( "options.txt", "settings" ) );

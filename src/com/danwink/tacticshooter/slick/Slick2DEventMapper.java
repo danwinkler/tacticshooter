@@ -1,10 +1,7 @@
 package com.danwink.tacticshooter.slick;
 
-import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
-
 import org.newdawn.slick.Input;
 import org.newdawn.slick.InputListener;
 
@@ -13,7 +10,6 @@ import com.phyloa.dlib.dui.DKeyEvent;
 import com.phyloa.dlib.dui.DKeyListener;
 import com.phyloa.dlib.dui.DMouseEvent;
 import com.phyloa.dlib.dui.DMouseListener;
-import com.phyloa.dlib.util.DMath;
 
 public class Slick2DEventMapper implements DEventMapper, InputListener
 {

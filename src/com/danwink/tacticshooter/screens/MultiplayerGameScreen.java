@@ -19,6 +19,7 @@ import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.opengl.shader.ShaderProgram;
 
 
+
 import com.danwink.tacticshooter.AutoTileDrawer;
 import com.danwink.tacticshooter.ClientState;
 import com.danwink.tacticshooter.ExplodeParticle;
@@ -115,6 +116,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	
 	ArrayList<Vector3f> pings = new ArrayList<Vector3f>();
 	
+	@SuppressWarnings( "unchecked" )
 	ArrayList<Integer>[] battleGroups = new ArrayList[10];
 	
 	Unit control;
@@ -574,7 +576,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				{
 					if( !cs.l.tiles[x][y].isShootable() )
 					{
-						fogG.fillRect( x*cs.l.tileSize, y*cs.l.tileSize, cs.l.tileSize, cs.l.tileSize );
+						fogG.fillRect( x*Level.tileSize, y*Level.tileSize, Level.tileSize, Level.tileSize );
 					}
 				}
 			}
@@ -865,7 +867,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 					{
 						float dx = x2 - u.x;
 						float dy = y2 - u.y;
-						if( u.owner.id == this.cs.player.id && dx*dx + dy*dy < u.radius * u.radius )
+						if( u.owner.id == this.cs.player.id && dx*dx + dy*dy < Unit.radius * Unit.radius )
 						{
 							u.selected = true;
 							cs.selected.add( u.id );

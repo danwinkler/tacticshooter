@@ -8,16 +8,10 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
-import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.opengl.shader.ShaderProgram;
-
-
-
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.TacticServer;
 import com.danwink.tacticshooter.editor.Editor;
-import com.danwink.tacticshooter.gameobjects.Unit.UnitType;
 import com.danwink.tacticshooter.network.ServerNetworkInterface;
 import com.danwink.tacticshooter.slick.Slick2DEventMapper;
 import com.danwink.tacticshooter.slick.Slick2DRenderer;
@@ -28,9 +22,6 @@ import com.phyloa.dlib.dui.DUIEvent;
 import com.phyloa.dlib.dui.DUIListener;
 import com.phyloa.dlib.game.DScreen;
 import com.phyloa.dlib.game.DScreenHandler;
-import com.phyloa.dlib.util.DMath;
-import com.phyloa.dlib.util.DOptions;
-import com.phyloa.dlib.util.ImprovedNoise;
 
 public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIListener
 {

@@ -22,7 +22,7 @@ public class BuildingDialog implements ActionListener
 	JTextField name;
 	JComboBox<BuildingType> type;
 	JTextField radius;
-	JComboBox team;
+	JComboBox<String> team;
 	
 	JButton confirm;
 	JButton cancel;
@@ -45,7 +45,7 @@ public class BuildingDialog implements ActionListener
 		type = new JComboBox<BuildingType>( BuildingType.values() );
 		type.setSelectedIndex( b.bt.ordinal() );
 		radius = new JTextField( String.valueOf( b.radius ) );
-		team = new JComboBox( new String[] { "null", "A", "B" } );
+		team = new JComboBox<String>( new String[] { "null", "A", "B" } );
 		team.setSelectedIndex( b.t == null ? 0 : b.t.id == Team.a.id ? 1 : 2 );
 		
 		confirm = new JButton( "Confirm" );

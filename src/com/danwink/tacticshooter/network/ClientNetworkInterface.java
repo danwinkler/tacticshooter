@@ -1,7 +1,6 @@
 package com.danwink.tacticshooter.network;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.util.LinkedList;
 
 import com.danwink.tacticshooter.KryoHelper;

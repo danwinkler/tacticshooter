@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import javax.vecmath.Point2f;
 import javax.vecmath.Point2i;
 
-import org.newdawn.slick.util.pathfinding.Path;
 import org.newdawn.slick.util.pathfinding.PathFinder;
 
 import com.danwink.tacticshooter.ComputerPlayer;

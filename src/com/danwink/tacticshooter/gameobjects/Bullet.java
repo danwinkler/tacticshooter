@@ -1,10 +1,8 @@
 package com.danwink.tacticshooter.gameobjects;
 
 import javax.vecmath.Point2f;
-import javax.vecmath.Point2i;
 import javax.vecmath.Vector2f;
 
-import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
@@ -113,7 +111,7 @@ public class Bullet
 			return;
 		}
 		
-		if( loc.x > l.width * l.tileSize || loc.x < 0 || loc.y > l.height * l.tileSize || loc.y < 0 )
+		if( loc.x > l.width * Level.tileSize || loc.x < 0 || loc.y > l.height * Level.tileSize || loc.y < 0 )
 		{
 			alive = false;
 		}
@@ -156,7 +154,7 @@ public class Bullet
 			}
 		}
 		
-		if( loc.x > l.width * l.tileSize || loc.x < 0 || loc.y > l.height * l.tileSize || loc.y < 0 )
+		if( loc.x > l.width * Level.tileSize || loc.x < 0 || loc.y > l.height * Level.tileSize || loc.y < 0 )
 		{
 			alive = false;
 			for( int i = 0; i < 10; i++ )
