@@ -111,9 +111,7 @@ public class TacticClient extends BasicGame
 		{
 			try
 			{
-				//Attempt to avoid sealed exception errors on zoe's mac
-				Class.forName( "javax.vecmath.Point2i" );
-				
+				//Attempt to avoid sealed exception errors on zoe's mac	
 				AppGameContainer app = new AppGameContainer( new TacticClient() );
 				app.setMultiSample( StaticFiles.advOptions.getI( "multisample" ) );
 				app.setDisplayMode( StaticFiles.options.getI( "windowWidth" ), StaticFiles.options.getI( "windowHeight" ), StaticFiles.options.getB( "fullscreen" ) );

@@ -4,8 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import javax.vecmath.Point2f;
-import javax.vecmath.Vector2f;
+import jp.objectclub.vecmath.Point2f;
+import jp.objectclub.vecmath.Vector2f;
 
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;

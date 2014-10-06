@@ -1,7 +1,7 @@
 package com.danwink.tacticshooter.gameobjects;
 
-import javax.vecmath.Point2f;
-import javax.vecmath.Vector2f;
+import jp.objectclub.vecmath.Point2f;
+import jp.objectclub.vecmath.Vector2f;
 
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;

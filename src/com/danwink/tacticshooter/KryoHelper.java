@@ -2,12 +2,10 @@ package com.danwink.tacticshooter;
 
 import java.util.ArrayList;
 
-import javax.vecmath.Point2f;
-import javax.vecmath.Point2i;
-import javax.vecmath.Vector2f;
+import jp.objectclub.vecmath.Point2f;
+import jp.objectclub.vecmath.Vector2f;
 
-
-
+import com.phyloa.dlib.math.Point2i;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Bullet;
 import com.danwink.tacticshooter.gameobjects.Level;

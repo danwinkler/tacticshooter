@@ -3,8 +3,8 @@ package com.danwink.tacticshooter.screens;
 import java.io.File;
 import java.util.ArrayList;
 
-import javax.vecmath.Point2i;
-import javax.vecmath.Vector3f;
+import com.phyloa.dlib.math.Point2i;
+import jp.objectclub.vecmath.Vector3f;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;

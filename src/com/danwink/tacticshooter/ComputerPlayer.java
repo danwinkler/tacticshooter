@@ -3,7 +3,7 @@ package com.danwink.tacticshooter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import javax.vecmath.Point2f;
+import jp.objectclub.vecmath.Point2f;
 
 import org.newdawn.slick.util.pathfinding.AStarPathFinder;
 import org.newdawn.slick.util.pathfinding.Path;

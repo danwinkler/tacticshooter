@@ -4,9 +4,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
 
-import javax.vecmath.Point2f;
-import javax.vecmath.Point2i;
-import javax.vecmath.Vector2f;
+import jp.objectclub.vecmath.Point2f;
+import com.phyloa.dlib.math.Point2i;
+import jp.objectclub.vecmath.Vector2f;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;

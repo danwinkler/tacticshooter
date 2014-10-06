@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import javax.vecmath.Point2i;
+import com.phyloa.dlib.math.Point2i;
 
 import org.dom4j.DocumentException;
 import org.newdawn.slick.util.pathfinding.AStarPathFinder;

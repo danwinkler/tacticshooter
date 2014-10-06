@@ -2,8 +2,8 @@ package com.danwink.tacticshooter.ai;
 
 import java.util.ArrayList;
 
-import javax.vecmath.Point2f;
-import javax.vecmath.Point2i;
+import jp.objectclub.vecmath.Point2f;
+import com.phyloa.dlib.math.Point2i;
 
 import org.newdawn.slick.util.pathfinding.PathFinder;
 

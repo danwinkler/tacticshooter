@@ -6,7 +6,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.HashMap;
 
-import javax.vecmath.Vector2f;
+import jp.objectclub.vecmath.Vector2f;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
