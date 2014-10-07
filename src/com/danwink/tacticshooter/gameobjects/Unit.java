@@ -59,6 +59,7 @@ public class Unit
 	public UnitState state = UnitState.STOPPED;
 	public UnitState lastState = state;
 	public float turnToAngle;
+	public boolean turnOnStop = false;
 	
 	public Player owner;
 	
@@ -180,6 +181,11 @@ public class Unit
 					occupyX = closestSpot.x;
 					occupyY = closestSpot.y;
 					state = UnitState.STOPPED;
+					if( turnOnStop )
+					{
+						state = UnitState.TURNTO;
+						turnOnStop = false;
+					}
 					for( int i = 0; i < l.buildings.size(); i++ )
 					{
 						Building tb = l.buildings.get( i );
@@ -476,9 +482,9 @@ public class Unit
 	{
 		Level l = ts.l;
 		Path tp = ts.finder.findPath( null, l.getTileX( x ), l.getTileY( y ), tx, ty );
+		path.clear();
 		if( tp != null )
 		{
-			path.clear();
 			for( int i = 0; i < tp.getLength(); i++ )
 			{
 				path.add( new Point2i( tp.getX( i ), tp.getY( i ) ) );

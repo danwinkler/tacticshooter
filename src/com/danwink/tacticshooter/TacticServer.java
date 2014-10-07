@@ -565,8 +565,18 @@ public class TacticServer
 				{
 					if( unit.owner.id == m.sender && selected.contains( unit.id ) )
 					{
-						unit.state = UnitState.TURNTO;
 						unit.turnToAngle = (float) Math.atan2( p.y - unit.y, p.x - unit.x );
+						if( unit.state == Unit.UnitState.MOVING )
+						{
+							unit.turnOnStop = true;
+							unit.pathTo( l.getTileX( unit.x ), l.getTileY( unit.y ), this );
+							si.sendToClient( m.sender, new Message( MessageType.UNITUPDATE, unit ) );
+							System.out.println( unit.x );
+						}
+						else
+						{
+							unit.state = UnitState.TURNTO;
+						}
 					}
 				}
 				break;
