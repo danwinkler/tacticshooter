@@ -11,6 +11,7 @@ import org.newdawn.slick.util.pathfinding.PathFinder;
 
 import com.danwink.tacticshooter.ai.Aggressive;
 import com.danwink.tacticshooter.ai.Fortifier;
+import com.danwink.tacticshooter.ai.Good2;
 import com.danwink.tacticshooter.ai.Masser;
 import com.danwink.tacticshooter.ai.Moderate;
 import com.danwink.tacticshooter.ai.Passive;
@@ -188,7 +189,8 @@ public abstract class ComputerPlayer implements Runnable
 		MODERATE( Moderate.class ),
 		MASSER( Masser.class ),
 		FORTIFIER( Fortifier.class ),
-		PASSIVE( Passive.class );
+		PASSIVE( Passive.class ),
+		GOOD2( Good2.class );
 		
 		Class<? extends ComputerPlayer> c;
 		

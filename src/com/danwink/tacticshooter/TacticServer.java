@@ -103,24 +103,25 @@ public class TacticServer
 		t.start();
 		lastTick = System.currentTimeMillis();
 		
-		for( int i = 4; i < 8; i++ )
+		
+		for( int i = 7; i < 8; i++ )
 		{
 			Player p = new Player();
 			p.slot = i;
 			String[] rnames = StaticFiles.names.split( "\n" );
 			p.name = rnames[DMath.randomi( 0, rnames.length )].split( " " )[0];
-			p.playType = PlayType.values()[i%PlayType.values().length];
+			p.playType = PlayType.GOOD2;
 			p.isBot = true;
 			slots[i].p = p;
 		}
 		
-		for( int i = 12; i < 16; i++ )
+		for( int i = 15; i < 16; i++ )
 		{
 			Player p = new Player();
 			p.slot = i;
 			String[] rnames = StaticFiles.names.split( "\n" );
 			p.name = rnames[DMath.randomi( 0, rnames.length )].split( " " )[0];
-			p.playType = PlayType.values()[i%PlayType.values().length];
+			p.playType = PlayType.GOOD2;
 			p.isBot = true;
 			slots[i].p = p;
 		}

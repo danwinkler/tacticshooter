@@ -121,7 +121,7 @@ public class Fortifier extends ComputerPlayer
 						if( d2 < closeDist )
 						{
 							closeDist = d2;
-							closeb = b;
+							closeb = bu;
 						}
 					}
 				}

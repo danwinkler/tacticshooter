@@ -288,6 +288,19 @@ public class JSAPI
 		
 		Unit u = new Unit( x, y, p );
 		u.setType( UnitType.valueOf( type ) );
+		
+		for( int i = 0; i < ts.l.buildings.size(); i++ )
+		{
+			Building tb = ts.l.buildings.get( i );
+			float dx = u.x - tb.x;
+			float dy = u.y - tb.y;
+			if( (dx*dx + dy*dy) < tb.bt.bu.getRadius()*tb.bt.bu.getRadius() )
+			{
+				u.stoppedAt = tb;
+				break;
+			}
+		}
+		
 		ts.units.add( u );
 		ts.si.sendToAllClients( new Message( MessageType.UNITUPDATE, u ) );
 		ts.gs.get( u.owner.team ).unitsCreated++;
