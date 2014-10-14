@@ -334,10 +334,12 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			boolean scrollleft = cs.scrollx > screenBounds.getMinX() && (input.isKeyDown( Input.KEY_LEFT ) || input.isKeyDown( Input.KEY_A ) || (gc.isFullscreen() && input.getMouseX() < 10));
 			boolean scrollright = cs.scrollx+gc.getWidth() < screenBounds.getMaxX() && (input.isKeyDown( Input.KEY_RIGHT ) || input.isKeyDown( Input.KEY_D ) || (gc.isFullscreen() && input.getMouseX() > gc.getWidth()-10));
 			
-			if( scrollup ) cs.scrolly-=scrollSpeed*d;
-			if( scrolldown ) cs.scrolly+=scrollSpeed*d;
-			if( scrollleft ) cs.scrollx-=scrollSpeed*d;
-			if( scrollright ) cs.scrollx+=scrollSpeed*d;
+			float scrollMultiplier = input.isKeyDown( Input.KEY_LSHIFT ) ? 2 : 1;
+			
+			if( scrollup ) cs.scrolly-=scrollSpeed*d*scrollMultiplier;
+			if( scrolldown ) cs.scrolly+=scrollSpeed*d*scrollMultiplier;
+			if( scrollleft ) cs.scrollx-=scrollSpeed*d*scrollMultiplier;
+			if( scrollright ) cs.scrollx+=scrollSpeed*d*scrollMultiplier;
 		}
 		
 		for( int i = 0; i < cs.units.size(); i++ )
