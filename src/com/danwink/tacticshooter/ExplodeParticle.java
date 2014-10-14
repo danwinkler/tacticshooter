@@ -28,7 +28,7 @@ public class ExplodeParticle extends Particle<Graphics>
 	
 	public void render( Graphics r )
 	{
-		r.setColor( c );
+		//r.setColor( c );
 		r.drawImage( im, pos.x-size, pos.y-size, pos.x+size, pos.y+size, 0, 0, 64, 64, c );
 	}
 }

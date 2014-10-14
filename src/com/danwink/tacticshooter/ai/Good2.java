@@ -50,8 +50,8 @@ public class Good2 extends ComputerPlayer
 		//Point ownership
 		//The idea is that open points should be the priority, and then try to take enemy points.
 		//Placing units on owned points doesn't really make a big difference
-		weightBuildingOwnerNotTaken = 20;
-		weightBuildingOwnerEnemy = 3;
+		weightBuildingOwnerNotTaken = 50;
+		weightBuildingOwnerEnemy = 10;
 		weightBuildingOwnerTeam = 1;
 		
 		//Units on point
@@ -62,7 +62,7 @@ public class Good2 extends ComputerPlayer
 		weightBuildingEachEnemyOnOwnedPoint = .5f;
 		
 		//Distance from point owned by team
-		weightBuildingDistanceFromTeamPoint = -.1f;
+		weightBuildingDistanceFromTeamPoint = -.2f;
 		
 		//Point owned by team but not fully taken
 		weightBuildingInversePointOwnershipAmount = .01f;
@@ -72,7 +72,7 @@ public class Good2 extends ComputerPlayer
 		
 		//Distance from closest enemy point
 		//Further away you are, more likely to be chosen
-		weightUnitDistanceFromEnemyPoint = .5f;
+		weightUnitDistanceFromEnemyPoint = 10f;
 		
 		//If unit is not stopped, much less likely to be chosen
 		weightUnitIsNotStopped = -10;
