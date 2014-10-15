@@ -126,7 +126,16 @@ public abstract class ComputerPlayer implements Runnable
 					finder = new AStarPathFinder( l, 500, StaticFiles.options.getB( "diagonalMove" ) );
 					hasSetup = true;
 				}
-				update( finder );
+				
+				//If the AI code has a bug, don't stop the whole AI
+				try 
+				{
+					update( finder );
+				}
+				catch( Exception e )
+				{
+					e.printStackTrace();
+				}
 				
 				try 
 				{	

@@ -51,7 +51,7 @@ public class Good2 extends ComputerPlayer
 		//The idea is that open points should be the priority, and then try to take enemy points.
 		//Placing units on owned points doesn't really make a big difference
 		weightBuildingOwnerNotTaken = 50;
-		weightBuildingOwnerEnemy = 10;
+		weightBuildingOwnerEnemy = 20;
 		weightBuildingOwnerTeam = 1;
 		
 		//Units on point
@@ -59,13 +59,13 @@ public class Good2 extends ComputerPlayer
 		weightBuildingEachEnemy = -.5f;
 		weightBuildingEachFriend = -.25f;
 		//Enemies on own point means you want to attack
-		weightBuildingEachEnemyOnOwnedPoint = .5f;
+		weightBuildingEachEnemyOnOwnedPoint = 4f;
 		
 		//Distance from point owned by team
 		weightBuildingDistanceFromTeamPoint = -.2f;
 		
 		//Point owned by team but not fully taken
-		weightBuildingInversePointOwnershipAmount = .01f;
+		weightBuildingInversePointOwnershipAmount = .02f;
 		
 		//UNIT SELECTION WEIGHTS
 		weightUnitAtBase = 10;
@@ -75,7 +75,7 @@ public class Good2 extends ComputerPlayer
 		weightUnitDistanceFromEnemyPoint = 10f;
 		
 		//If unit is not stopped, much less likely to be chosen
-		weightUnitIsNotStopped = -10;
+		weightUnitIsNotStopped = -1000;
 		
 		//If unit is stopped on enemy building, much less likely to be chosen
 		weightUnitIsStoppedOnEnemy = -15;
@@ -106,6 +106,12 @@ public class Good2 extends ComputerPlayer
 			
 			//Skip if the building isn't capturable
 			if( !b.isCapturable( l ) ) { continue; }
+			
+			//If is capturable, and is the final point, all in
+			if( b.bt == BuildingType.CENTER )
+			{
+				score += 1000000;
+			}
 			
 			//Add weights based on point ownership
 			if( b.t == null ) { score += weightBuildingOwnerNotTaken; }
