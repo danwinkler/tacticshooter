@@ -27,6 +27,7 @@ public class Good2 extends ComputerPlayer
 	public static float weightBuildingEachEnemyOnOwnedPoint;
 	public static float weightBuildingDistanceFromTeamPoint;
 	public static float weightBuildingInversePointOwnershipAmount;
+	public static float weightBuildingIsCenter;
 	
 	public static float weightUnitAtBase;
 	public static float weightUnitDistanceFromEnemyPoint;
@@ -59,13 +60,16 @@ public class Good2 extends ComputerPlayer
 		weightBuildingEachEnemy = -.5f;
 		weightBuildingEachFriend = -.25f;
 		//Enemies on own point means you want to attack
-		weightBuildingEachEnemyOnOwnedPoint = 4f;
+		weightBuildingEachEnemyOnOwnedPoint = 5f;
 		
 		//Distance from point owned by team
-		weightBuildingDistanceFromTeamPoint = -.2f;
+		weightBuildingDistanceFromTeamPoint = -.1f;
 		
 		//Point owned by team but not fully taken
 		weightBuildingInversePointOwnershipAmount = .02f;
+		
+		//Point is CENTER and capturable
+		weightBuildingIsCenter = 49;
 		
 		//UNIT SELECTION WEIGHTS
 		weightUnitAtBase = 10;
@@ -107,10 +111,10 @@ public class Good2 extends ComputerPlayer
 			//Skip if the building isn't capturable
 			if( !b.isCapturable( l ) ) { continue; }
 			
-			//If is capturable, and is the final point, all in
+			//If is capturable, and is CENTER
 			if( b.bt == BuildingType.CENTER )
 			{
-				score += 1000000;
+				score += weightBuildingIsCenter;
 			}
 			
 			//Add weights based on point ownership
@@ -127,6 +131,7 @@ public class Good2 extends ComputerPlayer
 			{
 				if( u.stoppedAt != null && u.stoppedAt.id == b.id )
 				{
+					//If unit team is our team
 					if( u.owner.team.id == player.team.id )
 					{
 						score += weightBuildingEachFriend;
@@ -134,6 +139,7 @@ public class Good2 extends ComputerPlayer
 					else
 					{
 						score += weightBuildingEachEnemy;
+						//If building team is our team
 						if( b.t != null && b.t.id == player.team.id ) 
 						{
 							score += weightBuildingEachEnemyOnOwnedPoint;
