@@ -28,6 +28,7 @@ public class Good2 extends ComputerPlayer
 	public static float weightBuildingDistanceFromTeamPoint;
 	public static float weightBuildingInversePointOwnershipAmount;
 	public static float weightBuildingIsCenter;
+	public static float weightBuildingRandomness;
 	
 	public static float weightUnitAtBase;
 	public static float weightUnitDistanceFromEnemyPoint;
@@ -35,6 +36,7 @@ public class Good2 extends ComputerPlayer
 	public static float weightUnitIsStoppedOnEnemy;
 	public static float weightUnitDistanceFromTarget;
 	public static float weightUnitTargetMultiplier;
+	public static float weightUnitRandomness;
 	
 	public static float unitScoreThreshold;
 	
@@ -71,6 +73,9 @@ public class Good2 extends ComputerPlayer
 		//Point is CENTER and capturable
 		weightBuildingIsCenter = 49;
 		
+		//Randomness
+		weightBuildingRandomness = 5;
+		
 		//UNIT SELECTION WEIGHTS
 		weightUnitAtBase = 10;
 		
@@ -90,11 +95,21 @@ public class Good2 extends ComputerPlayer
 		//If target got a high score, translate that to more units being chosen
 		weightUnitTargetMultiplier = .1f;
 		
+		//Randomness
+		weightUnitRandomness = 5;
+		
 		unitScoreThreshold = 5;
 	}
 	
 	public void update( PathFinder finder ) 
 	{
+		//BUY UNITS
+		//TODO: figure out better way to choose what kind of unit to buy, and when to buy it
+		if( player.money > 20 )
+		{
+			ci.sl.received( fc, new Message( MessageType.BUILDUNIT, UnitType.values()[DMath.randomi(0, UnitType.values().length)] ) );
+		}
+		
 		setValues();
 		//Stages of AI
 		// 1. POINT SEARCH - find the best building for the next action
@@ -166,12 +181,20 @@ public class Good2 extends ComputerPlayer
 				}
 			}
 			score += closestTeamBuildingDistance * weightBuildingDistanceFromTeamPoint;
-		
+			
+			//Add randomness
+			score += DMath.randomf( -weightBuildingRandomness, weightBuildingRandomness );
+			
 			if( score > targetBuildingScore )
 			{
 				targetBuilding = b;
 				targetBuildingScore = score;
 			}
+		}
+		
+		if( targetBuilding == null )
+		{
+			return;
 		}
 		
 		// UNIT SELECTION
@@ -234,6 +257,9 @@ public class Good2 extends ComputerPlayer
 				score += 100000;
 			}
 			
+			//Add randomness
+			score += DMath.randomf( -weightUnitRandomness, weightUnitRandomness );
+			
 			if( score > unitScoreThreshold ) 
 			{
 				selectedUnits.add( u );
@@ -246,12 +272,6 @@ public class Good2 extends ComputerPlayer
 			unitIdsToMove.add( u.id );
 		}
 		ci.sl.received( fc, new Message( MessageType.SETATTACKPOINT, new Object[]{ new Point2i( targetBuilding.x/Level.tileSize, targetBuilding.y/Level.tileSize ), unitIdsToMove } ) );
-		
-		//TODO: figure out better way to choose what kind of unit to buy, and when to buy it
-		if( player.money > 20 )
-		{
-			ci.sl.received( fc, new Message( MessageType.BUILDUNIT, UnitType.values()[DMath.randomi(0, UnitType.values().length)] ) );
-		}
 	}
 }
 

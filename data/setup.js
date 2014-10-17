@@ -3,6 +3,7 @@ var killListeners = [];
 
 var stepListeners = {};
 var stopListeners = {};
+var buttonListeners = {};
 
 function addTickListener( f ) {
 	tickListeners.push( f );
@@ -56,6 +57,47 @@ function callStop( building, unit ) {
 	}
 }
 
-function setupDefaultButtons( building, unit ) {
-	
+function callButton( id, player ) {
+	if( id in buttonListeners ) {
+		buttonListeners[id]( player );
+	}
+}
+
+function setupDefaultButtons() {
+	var unitTypes = [
+		'LIGHT',
+		'HEAVY',
+		'SHOTGUN',
+		'SCOUT',
+		'SNIPER',
+		'SABOTEUR'
+	];
+	var prices = {
+		'LIGHT': 10,
+		'HEAVY': 20,
+		'SHOTGUN': 15,
+		'SCOUT': 3,
+		'SNIPER': 15,
+		'SABOTEUR': 20
+	};
+	for( var i = 0; i < unitTypes.length; i++ ) {
+		var unit = unitTypes[i];
+		addButton( "BUILD " + unit + "\n" + prices[unit], i*2, 0, 2, 1,
+			//This callback trickery is because javascript is a cunt
+			function( unit ) {
+				function callback( player ) {
+					if( api.getPlayerMoney( player ) >= prices[unit] ) {
+						api.createUnit( player, unit, api.getBaseX( player ), api.getBaseY( player ) );
+						api.addPlayerMoney( player, -prices[unit] );
+					}
+				}
+				return callback;
+			}( unit )
+		);
+	}
+}
+
+function addButton( text, x, y, width, height, callback ) {
+	var id = api.addButton( text, x, y, width, height );
+	buttonListeners[id] = callback;
 }

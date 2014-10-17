@@ -711,6 +711,12 @@ public class TacticServer
 					u.health = 0;
 					si.sendToClient( m.sender, new Message( MessageType.UNITUPDATE, u ) );
 				}
+				break;
+			}
+			case BUTTONPRESS:
+			{
+				js.buttonPressed( (String)m.message, m.sender );
+				break;
 			}
 			}
 		}

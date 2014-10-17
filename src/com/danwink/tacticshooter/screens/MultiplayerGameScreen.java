@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import com.phyloa.dlib.math.Point2i;
+
 import jp.objectclub.vecmath.Vector3f;
 
 import org.newdawn.slick.Color;
@@ -17,6 +18,7 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.Sound;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.opengl.shader.ShaderProgram;
+
 
 
 
@@ -134,13 +136,15 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		if( dui == null )
 		{
 			dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
+			
+			/*
 			buildScoutUnit = new DButton( "Build Scout\n" + UnitType.SCOUT.price, 0, gc.getHeight()-75, 150, 75 );
 			buildLightUnit = new DButton( "Build Light\n" + UnitType.LIGHT.price, 150, gc.getHeight()-75, 150, 75 );
 			buildHeavyUnit = new DButton( "Build Heavy\n" + UnitType.HEAVY.price, 300, gc.getHeight()-75, 150, 75 );
 			buildShotgunUnit = new DButton( "Build Shotgun\n" + UnitType.SHOTGUN.price, 450, gc.getHeight()-75, 150, 75 );
 			buildSniperUnit = new DButton( "Build Sniper\n" + UnitType.SNIPER.price, 600, gc.getHeight()-75, 150, 75 );
 			buildSaboteurUnit = new DButton( "Build Saboteur\n" + UnitType.SABOTEUR.price, 750, gc.getHeight()-75, 150, 75 );
-			
+			*/
 			
 			escapeMenu = new DPanel( gc.getWidth() / 2 - 100, gc.getHeight()/2 - 100, 200, 300 );
 			quit = new DButton( "Quit Game", 0, 0, 200, 100 );
@@ -158,7 +162,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			chatPanel.add( chatBox );
 			
 			chatPanel.setVisible( false );
-			
+			/*
 			dui.add( buildScoutUnit );
 			dui.add( buildLightUnit );
 			dui.add( buildHeavyUnit );
@@ -167,6 +171,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			dui.add( buildSaboteurUnit );
 			dui.add( escapeMenu );
 			dui.add( chatPanel );
+			*/
 			
 			dui.addDUIListener( this );
 		}
@@ -284,6 +289,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				} while( mess.length() > 0 );
 				break;
 			case TILEUPDATE:
+			{
 				Object[] arr = (Object[])m.message;
 				int tx = (Integer)arr[0];
 				int ty = (Integer)arr[1];
@@ -291,6 +297,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				cs.l.tiles[tx][ty] = change;
 				mapChanged = true;
 				break;
+			}
 			case PINGMAP:
 				Point2i pingLoc = (Point2i)m.message;
 				pings.add( new Vector3f( pingLoc.x, pingLoc.y, 100 ) );
@@ -315,7 +322,21 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 					unit.sy = uu.y;
 				}
 				break;
-			}	
+			}
+			case CREATEBUTTON:
+			{
+				Object[] arr = (Object[])m.message;
+				String id = (String)arr[0];
+				String text = (String)arr[1];
+				int width = (int)arr[4]*75;
+				int height = (int)arr[5]*75;
+				int x = (int)arr[2]*75;
+				int y = gc.getHeight()-((int)arr[3]*75) - height;
+				DButton button = new DButton( text, x, y, width, height );
+				button.name = id;
+				dui.add( button );
+				break;
+			}
 			}
 		}
 		
@@ -1135,30 +1156,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			{
 				ci.sendToServer( new Message( MessageType.SWITCHTEAMS, cs.player.team ) );
 			}
-			else if( e == buildScoutUnit )
-			{
-				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.SCOUT ) );
-			} 
-			else if( e == buildLightUnit )
-			{
-				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.LIGHT ) );
-			} 
-			else if( e == buildHeavyUnit )
-			{
-				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.HEAVY ) );
-			} 
-			else if( e == buildShotgunUnit )
-			{
-				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.SHOTGUN ) );
-			} 
-			else if( e == buildSniperUnit )
-			{
-				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.SNIPER ) );
-			}
-			else if( e == buildSaboteurUnit )
-			{
-				ci.sendToServer( new Message( MessageType.BUILDUNIT, UnitType.SABOTEUR ) );
-			}
 			else if( e == quit )
 			{
 				running = false;
@@ -1167,6 +1164,9 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			} else if( e == returnToGame )
 			{
 				escapeMenu.setVisible( false );
+			} else if( e.name.startsWith( "userbutton" ) )
+			{
+				ci.sendToServer( new Message( MessageType.BUTTONPRESS, e.name ) );
 			}
 		}
 	}

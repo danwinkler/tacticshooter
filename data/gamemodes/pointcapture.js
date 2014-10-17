@@ -1,7 +1,8 @@
+setupDefaultButtons();
+
 function pointCaptureTick( frame ) {
-	
 	if( frame % 10 == 0 ) {
-		
+
 		//Give player unit if they have no unit
 		for( var i in players ) {
 			var p = players[i];
@@ -13,16 +14,16 @@ function pointCaptureTick( frame ) {
 					break;
 				}
 			}
-			
+
 			if( !hasUnit ) {
 				api.createUnit( p, "LIGHT", api.getBaseX( p ), api.getBaseY( p ) );
 			}
 		}
-		
+
 	}
 
 	if( frame % 100 == 0 ) {
-		
+
 		//Give players money based on points owned
 		for( var pi in players ) {
 			var p = players[pi];
@@ -35,7 +36,7 @@ function pointCaptureTick( frame ) {
 			}
 			api.addPlayerMoney( p, bc );
 		}
-		
+
 		//Check to see if game should be over
 		var winTeam = -1;
 		var won = true;
@@ -49,12 +50,12 @@ function pointCaptureTick( frame ) {
 				break;
 			}
 		}
-		
+
 		if( won ) {
 			api.endGame();
 		}
-		
+
 	}
-	
+
 }
 addTickListener( pointCaptureTick );

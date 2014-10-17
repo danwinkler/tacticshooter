@@ -1,6 +1,7 @@
 package com.danwink.tacticshooter;
 
 import java.io.FileNotFoundException;
+import java.util.Random;
 
 import javax.script.Bindings;
 import javax.script.ScriptContext;
@@ -142,6 +143,29 @@ public class JSAPI
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	public void buttonPressed( String id, int player )
+	{
+		try
+		{
+			engine.eval( "callButton( '" + id + "', " + player + " );" );
+		}
+		catch( ScriptException e )
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	//---------------------------------
+	// UI
+	//---------------------------------
+	
+	public String addButton( String text, int x, int y, int width, int height )
+	{
+		String id = "userbutton" + Integer.toString( new Random().nextInt() );
+		ts.si.sendToAllClients( new Message( MessageType.CREATEBUTTON, new Object[] { id, text, x, y, width, height } ) );
+		return id;
 	}
 	
 	//---------------------------------
@@ -302,6 +326,7 @@ public class JSAPI
 		}
 		
 		ts.units.add( u );
+		u.pathTo((int)(x/Level.tileSize), (int)(y/Level.tileSize), ts );
 		ts.si.sendToAllClients( new Message( MessageType.UNITUPDATE, u ) );
 		ts.gs.get( u.owner.team ).unitsCreated++;
 		return u.id;
