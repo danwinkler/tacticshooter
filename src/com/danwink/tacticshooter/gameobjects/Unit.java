@@ -163,6 +163,14 @@ public class Unit
 				
 				float dx = (float)(Math.cos( heading ) * type.speed);
 				float dy = (float)(Math.sin( heading ) * type.speed);
+				
+				//Slow down when almost on point
+				if( path.size() - onStep <= 1 ) 
+				{
+					dx *= .5f;
+					dy *= .5f;
+				}
+				
 				if( l.getTile( x+dx, y ).isPassable() ) x += dx;
 				if( l.getTile( x, y+dy ).isPassable() ) y += dy;
 			}
