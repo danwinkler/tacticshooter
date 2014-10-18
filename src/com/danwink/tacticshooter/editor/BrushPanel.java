@@ -20,6 +20,7 @@ public class BrushPanel extends JPanel implements ActionListener
 	
 	Brush brush = Brush.FLOOR;
 	String mirrorMode = "None";
+	DrawType drawType = DrawType.PENCIL;
 	
 	public BrushPanel( Editor editor )
 	{
@@ -44,7 +45,6 @@ public class BrushPanel extends JPanel implements ActionListener
 		door.addActionListener( this );
 		grate.addActionListener( this );
 		
-		
 		brushes.add( floor );
 		brushes.add( wall );
 		brushes.add( door );
@@ -62,6 +62,10 @@ public class BrushPanel extends JPanel implements ActionListener
 		this.add( new JLabel( "Mirror Mode", JLabel.CENTER ), "growx, wrap" );
 		
 		groupHelper( "None", "X", "Y", "XY", "4" );
+		
+		this.add(  new JSeparator( SwingConstants.HORIZONTAL ), "growx, wrap" );
+		
+		groupHelper( "PENCIL", "FILL" );
 	}
 	
 	private void groupHelper( String... a )
@@ -97,6 +101,8 @@ public class BrushPanel extends JPanel implements ActionListener
 		case "wall": brush = Brush.WALL; break;
 		case "door": brush = Brush.DOOR; break;
 		case "grate": brush = Brush.GRATE; break;
+		case "PENCIL": drawType = DrawType.PENCIL; break;
+		case "FILL": drawType = DrawType.FILL; break;
 		default:
 			mirrorMode = e.getActionCommand();
 			break;
@@ -109,5 +115,11 @@ public class BrushPanel extends JPanel implements ActionListener
 		WALL,
 		GRATE,
 		DOOR
+	}
+	
+	public enum DrawType
+	{
+		PENCIL,
+		FILL
 	}
 }

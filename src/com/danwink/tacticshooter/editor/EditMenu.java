@@ -22,6 +22,13 @@ public class EditMenu extends JMenu implements ActionListener
 		resizeMenu.addActionListener( this );
 		this.add( resizeMenu );
 		
+		JMenuItem undoMenu = new JMenuItem( "Undo" );
+		undoMenu.setAccelerator( KeyStroke.getKeyStroke( java.awt.event.KeyEvent.VK_Z, java.awt.Event.CTRL_MASK ) );
+		undoMenu.setActionCommand( "undo" );
+		undoMenu.addActionListener( this );
+		this.add( undoMenu );
+		
+		
 		this.editor = editor;
 	}
 
@@ -31,6 +38,9 @@ public class EditMenu extends JMenu implements ActionListener
 		{
 		case "resize":
 			editor.showResizeDialog();
+			break;
+		case "undo":
+			editor.undo();
 			break;
 		}
 	}

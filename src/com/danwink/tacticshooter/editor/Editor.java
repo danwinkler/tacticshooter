@@ -2,6 +2,7 @@ package com.danwink.tacticshooter.editor;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.util.LinkedList;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
@@ -45,6 +46,8 @@ public class Editor
 	
 	Level l;
 	Building selected;
+	
+	LinkedList<TileType[][]> undoStack = new LinkedList<TileType[][]>();
 	
 	public Editor()
 	{
@@ -115,6 +118,7 @@ public class Editor
 		codePanel.updateCode( l.code );
 		umsPanel.updateCode( l.ums );
 		optionsPanel.updateOptions( l );
+		undoStack.clear();
 		
 		setMode( EditMode.TILE );
 	}
@@ -248,21 +252,61 @@ public class Editor
 		container.repaint();
 	}
 
+	public static TileType[][] copy( TileType[][] arr )
+	{
+		TileType[][] copy = new TileType[arr[0].length][arr.length];
+		for( int y = 0; y < arr.length; y++ )
+			for( int x = 0; x < arr[y].length; x++ )
+				copy[x][y] = arr[x][y];
+		return copy;
+	}
+	
 	public void setTile( int x, int y, TileType t )
 	{
-		l.tiles[x][y] = t;
+		undoStack.push( copy( l.tiles ) );
+		
+		internalSetTile( x, y, t );
 		switch( brushPanel.mirrorMode )
 		{
 		case "None": break;
-		case "X": l.tiles[(l.width-1)-x][y] = t; break;
-		case "Y": l.tiles[x][(l.height-1)-y] = t; break;
-		case "XY": l.tiles[(l.width-1)-x][(l.height-1)-y] = t; break;
+		case "X": internalSetTile( (l.width-1)-x, y, t ); break;
+		case "Y": internalSetTile( x, (l.height-1)-y, t ); break;
+		case "XY": internalSetTile( (l.width-1)-x, (l.height-1)-y, t ); break;
 		case "4": 
-			l.tiles[(l.width-1)-x][y] = t;
-			l.tiles[x][(l.height-1)-y] = t;
-			l.tiles[(l.width-1)-x][(l.height-1)-y] = t; 
+			internalSetTile( (l.width-1)-x, y, t);
+			internalSetTile( x, (l.height-1)-y, t );
+			internalSetTile( (l.width-1)-x, (l.height-1)-y, t ); 
 			break;
 		}
+	}
+	
+	public void internalSetTile( int x, int y, TileType t )
+	{
+		if( l.tiles[x][y] == t ) return;
+		switch( brushPanel.drawType )
+		{
+		case FILL:
+			System.out.println( x + ", " + y );
+			TileType old = l.tiles[x][y];
+			l.tiles[x][y] = t;
+			if( x > 0 && l.tiles[x-1][y] == old ) internalSetTile( x-1, y, t );
+			if( x < l.width-1 && l.tiles[x+1][y] == old ) internalSetTile( x+1, y, t );
+			if( y > 0 && l.tiles[x][y-1] == old ) internalSetTile( x, y-1, t );
+			if( y < l.height-1 && l.tiles[x][y+1] == old ) internalSetTile( x, y+1, t );
+			break;
+		case PENCIL:
+			l.tiles[x][y] = t;
+			break;
+		default:
+			break;
+		}
+	}
+	
+	public void undo()
+	{
+		l.tiles = undoStack.removeLast();
+		redrawLevel();
+		container.repaint();
 	}
 
 	public void delete()
