@@ -7,6 +7,7 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
 import com.danwink.tacticshooter.ClientState;
+import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.TacticServer;
 import com.danwink.tacticshooter.screens.MultiplayerGameScreen;
 import com.phyloa.dlib.util.DMath;
@@ -147,7 +148,7 @@ public class Bullet
 				{
 					alive = false;
 					
-					ts.hit1.play( DMath.randomf( .9f, 1.1f ), ts.getSoundMag( gc, loc.x, loc.y ) * .3f );
+					StaticFiles.getSound( "hit1" ).play( DMath.randomf( .9f, 1.1f ), ts.getSoundMag( gc, loc.x, loc.y ) * .3f );
 					cs.drawBlood( loc.x, loc.y );
 					break;
 				}

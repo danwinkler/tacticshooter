@@ -188,13 +188,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		
 		try
 		{
-			cs.bullet1 = new Sound( "sound" + File.separator + "bullet1.wav" );
-			cs.bullet2 = new Sound( "sound" + File.separator + "bullet2.wav" );
-			cs.ping1 = new Sound( "sound" + File.separator + "ping1.wav" );
-			cs.death1 = new Sound( "sound" + File.separator + "death1.wav" );
-			cs.death2 = new Sound( "sound" + File.separator + "death2.wav" );
-			cs.hit1 = new Sound( "sound" + File.separator + "hit1.wav" );
-			cs.explode1 = new Sound( "sound" + File.separator + "explode1.wav" );
+			
 			
 			craterTexture = new Image( "img" + File.separator + "crater1.png" );
 			smoke1 = new Image( "img" + File.separator + "smoke1.png" );
@@ -225,7 +219,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				{
 					cs.unitMap.put( u.id, u );
 					cs.units.add( u );
-					cs.ping1.play( 1.f, cs.getSoundMag( gc, u.x, u.y ) );
+					StaticFiles.getSound( "ping1" ).play( 1.f, cs.getSoundMag( gc, u.x, u.y ) );
 					tu = u;
 				}
 				tu.sync( u );
@@ -248,7 +242,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			case BULLETUPDATE:
 				Bullet b = (Bullet)m.message;
 				cs.bullets.add( b );
-				(Math.random() > .5 ? cs.bullet1 : cs.bullet2).play( 1.f, cs.getSoundMag( gc, b.loc.x, b.loc.y ) * .2f );
+				(Math.random() > .5 ? StaticFiles.getSound( "bullet1" ) : StaticFiles.getSound( "bullet2" ) ).play( 1.f, cs.getSoundMag( gc, b.loc.x, b.loc.y ) * .2f );
 				break;
 			case MOVESUCCESS:
 				this.waitingForMoveConfirmation = false;
@@ -301,7 +295,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			case PINGMAP:
 				Point2i pingLoc = (Point2i)m.message;
 				pings.add( new Vector3f( pingLoc.x, pingLoc.y, 100 ) );
-				cs.ping1.play( 2.f, 1.f );
+				StaticFiles.getSound( "ping1" ).play( 2.f, 1.f );
 				break;
 			case GAMEOVER:
 				dsh.message( "postgame", m.message );
@@ -384,7 +378,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				}
 				if( u.type == UnitType.SABOTEUR )
 				{
-					cs.explode1.play();
+					StaticFiles.getSound( "explode1" ).play();
 					btg.drawImage( craterTexture, u.x - 16, u.y - 16, u.x + 16, u.y + 16, 0, 0, 32, 32 );
 					btg.flush();
 					
@@ -408,7 +402,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				}
 				else
 				{
-					(Math.random() > .5 ? cs.death1 : cs.death2).play( 1.f, cs.getSoundMag( gc, u.x, u.y ) );
+					(Math.random() > .5 ? StaticFiles.getSound( "death1" ) : StaticFiles.getSound( "death2" ) ).play( 1.f, cs.getSoundMag( gc, u.x, u.y ) );
 				}
 				i--;
 				continue;

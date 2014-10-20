@@ -286,7 +286,6 @@ public class Editor
 		switch( brushPanel.drawType )
 		{
 		case FILL:
-			System.out.println( x + ", " + y );
 			TileType old = l.tiles[x][y];
 			l.tiles[x][y] = t;
 			if( x > 0 && l.tiles[x-1][y] == old ) internalSetTile( x-1, y, t );

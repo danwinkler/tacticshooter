@@ -36,10 +36,12 @@ public class StaticFiles
 	
 	public static UserInfo user;
 
-	static boolean ready = false;
+	public static boolean ready = false;
 	
 	private static boolean started = false;
 	public static String names;
+	
+	public static String status = "";
 	
 	static
 	{
@@ -60,10 +62,18 @@ public class StaticFiles
 				public void run()
 				{
 					started = true;
-					loadMusic( "menu", "sound" + File.separator + "Deliberate Thought.ogg" );
-					loadMusic( "play1", "sound" + File.separator + "Decisions.ogg" );
-					loadMusic( "play2", "sound" + File.separator + "Finding the Balance.ogg" );
-					loadMusic( "play3", "sound" + File.separator + "Rising.ogg" );
+					loadMusic( "menu", "Deliberate Thought.ogg" );
+					loadMusic( "play1", "Decisions.ogg" );
+					loadMusic( "play2", "Finding the Balance.ogg" );
+					loadMusic( "play3", "Rising.ogg" );
+					
+					loadSound( "bullet1", "bullet1.wav" );
+					loadSound( "bullet2", "bullet2.wav" );
+					loadSound( "ping1", "ping1.wav" );
+					loadSound( "death1", "death1.wav" );
+					loadSound( "death2", "death2.wav" );
+					loadSound( "hit1", "hit1.wav" );
+					loadSound( "explode1", "explode1.wav" );
 					ready = true;
 				} 
 			}).start();
@@ -74,7 +84,8 @@ public class StaticFiles
 	{
 		try
 		{
-			music.put( name, new Music( file ) );
+			music.put( name, new Music( "data" + File.separator + "sound" + File.separator + file ) );
+			status = "Loading " + file;
 		} catch( SlickException e )
 		{
 			
@@ -85,7 +96,8 @@ public class StaticFiles
 	{
 		try
 		{
-			sound.put( name, new Sound( file ) );
+			sound.put( name, new Sound( "data" + File.separator + "sound" + File.separator + file ) );
+			status = "Loading " + file;
 		} catch( SlickException e )
 		{
 			

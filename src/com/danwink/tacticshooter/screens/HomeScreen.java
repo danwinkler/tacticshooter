@@ -69,9 +69,6 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 			dui.addDUIListener( this );
 		}
 		
-		StaticFiles.loadAllMusic();
-		StaticFiles.loopWhenReady( "menu" );
-		
 		dui.setEnabled( true );
 		
 		if( StaticFiles.user == null )

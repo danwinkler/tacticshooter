@@ -18,6 +18,7 @@ import com.danwink.tacticshooter.screens.LoginScreen;
 import com.danwink.tacticshooter.screens.MessageScreen;
 import com.danwink.tacticshooter.screens.MultiplayerGameScreen;
 import com.danwink.tacticshooter.screens.MultiplayerSetupScreen;
+import com.danwink.tacticshooter.screens.OpenLoadScreen;
 import com.danwink.tacticshooter.screens.OptionsScreen;
 import com.danwink.tacticshooter.screens.PostGameScreen;
 import com.danwink.tacticshooter.screens.ServerConnectScreen;
@@ -38,6 +39,8 @@ public class TacticClient extends BasicGame
 
 	public void init( GameContainer gc ) throws SlickException
 	{
+		dsh.register( "openload", new OpenLoadScreen() );
+		
 		dsh.register( "home", new HomeScreen() );
 		dsh.register( "login", new LoginScreen() );
 		
@@ -53,7 +56,7 @@ public class TacticClient extends BasicGame
 		dsh.register( "options", new OptionsScreen( "options.txt", "settings" ) );
 		dsh.register( "advoptions", new OptionsScreen( "data" + File.separator + "advoptions.txt", "settings" ) );
 		
-		dsh.activate( "home", gc );
+		dsh.activate( "openload", gc );
 		
 		new Thread( new Runnable() {
 			public void run()

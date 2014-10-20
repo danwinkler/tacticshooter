@@ -1,6 +1,6 @@
 fullscreen false
 vsync true
-slider.sound 0.94736844
-slider.music 0.94736844
 windowHeight 800
+slider.sound 0.94736844
 windowWidth 1280
+slider.music 0.94736844
