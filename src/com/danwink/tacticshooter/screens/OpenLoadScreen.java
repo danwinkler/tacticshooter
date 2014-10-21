@@ -4,21 +4,9 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
-import com.danwink.tacticshooter.GameStats;
 import com.danwink.tacticshooter.StaticFiles;
-import com.danwink.tacticshooter.GameStats.TeamStats;
-import com.danwink.tacticshooter.slick.Slick2DEventMapper;
-import com.danwink.tacticshooter.slick.Slick2DRenderer;
-import com.phyloa.dlib.dui.DButton;
-import com.phyloa.dlib.dui.DLinePlot;
-import com.phyloa.dlib.dui.DText;
-import com.phyloa.dlib.dui.DUI;
-import com.phyloa.dlib.dui.DUIElement;
-import com.phyloa.dlib.dui.DUIEvent;
-import com.phyloa.dlib.dui.DUIListener;
 import com.phyloa.dlib.game.DScreen;
 import com.phyloa.dlib.game.DScreenHandler;
-import com.phyloa.dlib.util.DUtil;
 
 public class OpenLoadScreen extends DScreen<GameContainer, Graphics>
 {

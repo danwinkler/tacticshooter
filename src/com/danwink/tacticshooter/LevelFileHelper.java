@@ -36,7 +36,7 @@ public class LevelFileHelper
 		Level m = new Level( Integer.parseInt( level.valueOf( "@width" ) ), Integer.parseInt( level.valueOf( "@height" ) ) );
 		String theme = level.valueOf( "@theme" );
 		if( theme.length() > 0 )
-			m.theme = theme;
+			m.themeName = theme;
 		
 		Node map = level.selectSingleNode( "map" );
 		List<? extends Node> rows = map.selectNodes( "row" );

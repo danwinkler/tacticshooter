@@ -16,6 +16,7 @@ import org.newdawn.slick.util.pathfinding.TileBasedMap;
 
 import com.danwink.tacticshooter.AutoTileDrawer;
 import com.danwink.tacticshooter.ComputerPlayer.PlayType;
+import com.danwink.tacticshooter.Theme;
 import com.phyloa.dlib.util.DMath;
 import com.phyloa.dlib.util.DOptions;
 
@@ -32,11 +33,9 @@ public class Level implements TileBasedMap
 	
 	public boolean randomFinding = true;
 	
-	public String theme = "desertrpg.txt";
+	public String themeName = "desertrpg";
 	
-	public Image floor;
-	public Image wall;
-	public Image grate;
+	public Theme theme;
 	
 	public String code;
 	public String ums;
@@ -74,7 +73,7 @@ public class Level implements TileBasedMap
 			{
 				if( tiles[x][y] != TileType.WALL )
 				{
-					drawAutoTile( g, x, y, TileType.FLOOR, floor );
+					drawAutoTile( g, x, y, TileType.FLOOR, theme.floor );
 				}
 			}
 		}
@@ -100,16 +99,16 @@ public class Level implements TileBasedMap
 		switch( tiles[x][y] )
 		{
 		case DOOR:
-			drawAutoTile( g, x, y, TileType.FLOOR, floor );
-			drawAutoTile( g, x, y, TileType.WALL, wall );
+			drawAutoTile( g, x, y, TileType.FLOOR, theme.floor );
+			drawAutoTile( g, x, y, TileType.WALL, theme.wall );
 			break;
 		case GRATE:
-			drawAutoTile( g, x, y, TileType.FLOOR, floor );
-			drawAutoTile( g, x, y, TileType.GRATE, grate );
+			drawAutoTile( g, x, y, TileType.FLOOR, theme.floor );
+			drawAutoTile( g, x, y, TileType.GRATE, theme.grate );
 			break;
 		case WALL:
-			g.drawImage( floor, x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize, floor.getWidth()/3, 0, floor.getWidth()/3 * 2, floor.getHeight()/4 );
-			drawAutoTile( g, x, y, tiles[x][y], wall );
+			g.drawImage( theme.floor, x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize, theme.floor.getWidth()/3, 0, theme.floor.getWidth()/3 * 2, theme.floor.getHeight()/4 );
+			drawAutoTile( g, x, y, tiles[x][y], theme.wall );
 			break;
 		case FLOOR:
 			break;
@@ -122,9 +121,7 @@ public class Level implements TileBasedMap
 	{
 		try
 		{
-			wall = new Image( "img" + File.separator + new DOptions( "themes" + File.separator + theme ).getS( "wall" ) );
-			floor = new Image( "img" + File.separator + new DOptions( "themes" + File.separator + theme ).getS( "floor" ) );
-			grate = new Image( "img" + File.separator + new DOptions( "themes" + File.separator + theme ).getS( "grate" ) );
+			theme = Theme.getTheme( themeName );
 		} catch( SlickException e )
 		{
 			e.printStackTrace();

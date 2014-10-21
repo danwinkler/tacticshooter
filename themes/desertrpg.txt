@@ -1,7 +1,0 @@
-wall desertrpgwall.png
-floor desertrpgfloor.png
-grate grate.png
-light man2.png
-lightcolor man2color.png
-heavy man3.png
-heavycolor man3color.png

@@ -82,7 +82,7 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 		
 		try
 		{
-			title = new Image( "img" + File.separator + "title.png" );
+			title = new Image( "data" + File.separator + "img" + File.separator + "title.png" );
 		} catch( SlickException e1 )
 		{
 			// TODO Auto-generated catch block

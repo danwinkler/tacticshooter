@@ -35,14 +35,19 @@ public class Unit
 	{
 		try
 		{
-			light = new SpriteSheet( new Image( "img" + File.separator + new DOptions( "themes" + File.separator + l.theme ).getS( "light" ) ), 16, 16 );
-			lightColor = new SpriteSheet( new Image( "img" + File.separator + new DOptions( "themes" + File.separator + l.theme ).getS( "lightcolor" ) ), 16, 16 );
-			heavy = new SpriteSheet( new Image( "img" + File.separator + new DOptions( "themes" + File.separator + l.theme ).getS( "heavy" ) ), 32, 32 );
-			heavyColor = new SpriteSheet( new Image( "img" + File.separator + new DOptions( "themes" + File.separator + l.theme ).getS( "heavycolor" ) ), 32, 32 );
+			light = new SpriteSheet( loadHelper( "light" ), 16, 16 );
+			lightColor = new SpriteSheet( loadHelper( "light_color" ), 16, 16 );
+			heavy = new SpriteSheet( loadHelper( "heavy" ), 32, 32 );
+			heavyColor = new SpriteSheet( loadHelper( "heavy_color" ), 32, 32 );
 		} catch( SlickException e )
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	private static Image loadHelper( String s ) throws SlickException
+	{
+		return new Image( "data" + File.separator + "img" + File.separator + s + ".png" );
 	}
 	
 	public int id = new Random().nextInt();

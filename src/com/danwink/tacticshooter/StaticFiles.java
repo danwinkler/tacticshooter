@@ -15,6 +15,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
 import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.Sound;
@@ -27,7 +28,7 @@ import com.phyloa.dlib.util.DOptions;
 public class StaticFiles
 {
 	static HashMap<String, Music> music = new HashMap<String, Music>(); 
-	static HashMap<String, Sound> sound = new HashMap<String, Sound>(); 
+	static HashMap<String, Sound> sound = new HashMap<String, Sound>();
 	
 	public static DOptions options = new DOptions( "options.txt" );
 	public static DOptions advOptions = new DOptions( "data" + File.separator + "advoptions.txt" );
@@ -102,6 +103,11 @@ public class StaticFiles
 		{
 			
 		}
+	}
+	
+	static void loadImage( String name, String file )
+	{
+		
 	}
 	
 	public static void loopMusic( String name )

@@ -1,31 +1,28 @@
 package com.danwink.tacticshooter;
 
 import java.io.File;
-
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
 import com.phyloa.dlib.util.DMath;
-import com.phyloa.dlib.util.DOptions;
 import com.phyloa.dlib.util.ImprovedNoise;
 
 public class BackgroundDrawer
 {
-	Image wall;
-	Image floor;
+	Theme theme;
 	
 	float scrollx;
 	float scrolly;
 	ImprovedNoise n;
 	
-	DOptions theme;
+	File themePath;
 	
 	public BackgroundDrawer()
 	{
 		File[] files = new File( "themes" ).listFiles();
-		theme = new DOptions( files[DMath.randomi( 0, files.length )].getPath() );
+		themePath = files[DMath.randomi( 0, files.length )];
 		n = new ImprovedNoise( System.currentTimeMillis() );
 	}
 	
@@ -37,18 +34,18 @@ public class BackgroundDrawer
 	
 	public void render( GameContainer gc, Graphics g )
 	{
-		if( wall == null )
+		if( theme == null )
 		{
 			try
 			{
-				wall = new Image( "img" + File.separator + theme.getS( "wall" ) );
-				floor = new Image( "img" + File.separator + theme.getS( "floor" ) );
-			} catch( SlickException e1 )
+				theme = Theme.getTheme( themePath.getName() );
+			}
+			catch( SlickException e )
 			{
-				System.err.println( "Could not load image files for theme" );
-				System.exit(1);
+				e.printStackTrace();
 			}
 		}
+		
 		g.pushTransform();
 		g.setAntiAlias( true );
 		g.translate( -scrollx, -scrolly );
@@ -65,9 +62,9 @@ public class BackgroundDrawer
 				g.pushTransform();
 				g.translate( x*tileSize, y*tileSize );
 				Image here = getTile( x, y );
-				if( here == wall )
+				if( here == theme.wall )
 				{
-					g.drawImage( floor, 0, 0, tileSize, tileSize, floor.getWidth()/3, 0, floor.getWidth()/3 * 2, floor.getHeight()/4 );
+					g.drawImage( theme.floor, 0, 0, tileSize, tileSize, theme.floor.getWidth()/3, 0, theme.floor.getWidth()/3 * 2, theme.floor.getHeight()/4 );
 				}
 				AutoTileDrawer.draw( g, here, tileSize, 0, 
 						getTile( x-1, y-1 ) == here, 
@@ -87,6 +84,6 @@ public class BackgroundDrawer
 	
 	public Image getTile( int x, int y )
 	{
-		return n.noise( x*.1, y*.1, 0 ) > .2f ? wall : floor;
+		return n.noise( x*.1, y*.1, 0 ) > .2f ? theme.wall : theme.floor;
 	}
 }

@@ -22,12 +22,14 @@ import org.newdawn.slick.opengl.shader.ShaderProgram;
 
 
 
+
 import com.danwink.tacticshooter.AutoTileDrawer;
 import com.danwink.tacticshooter.ClientState;
 import com.danwink.tacticshooter.ExplodeParticle;
 import com.danwink.tacticshooter.MessageType;
 import com.danwink.tacticshooter.MusicQueuer;
 import com.danwink.tacticshooter.StaticFiles;
+import com.danwink.tacticshooter.Theme;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Bullet;
 import com.danwink.tacticshooter.gameobjects.Level;
@@ -97,16 +99,17 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	
 	boolean running = false;
 	
-	Image wallTexture;
-	Image bloodTexture;
 	Graphics btg;
-	
+
+	Image wallTexture;
+	Image floorTexture;
 	Image backgroundTexture;
-	Image craterTexture;
-	Image smoke1;
+	
+	Image smoke;
+	Image bloodTexture;
+	Image fog;	
 	
 	boolean fogEnabled;
-	Image fog;	
 	
 	ArrayList<String> messages = new ArrayList<String>();
 	
@@ -137,15 +140,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		{
 			dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
 			
-			/*
-			buildScoutUnit = new DButton( "Build Scout\n" + UnitType.SCOUT.price, 0, gc.getHeight()-75, 150, 75 );
-			buildLightUnit = new DButton( "Build Light\n" + UnitType.LIGHT.price, 150, gc.getHeight()-75, 150, 75 );
-			buildHeavyUnit = new DButton( "Build Heavy\n" + UnitType.HEAVY.price, 300, gc.getHeight()-75, 150, 75 );
-			buildShotgunUnit = new DButton( "Build Shotgun\n" + UnitType.SHOTGUN.price, 450, gc.getHeight()-75, 150, 75 );
-			buildSniperUnit = new DButton( "Build Sniper\n" + UnitType.SNIPER.price, 600, gc.getHeight()-75, 150, 75 );
-			buildSaboteurUnit = new DButton( "Build Saboteur\n" + UnitType.SABOTEUR.price, 750, gc.getHeight()-75, 150, 75 );
-			*/
-			
 			escapeMenu = new DPanel( gc.getWidth() / 2 - 100, gc.getHeight()/2 - 100, 200, 300 );
 			quit = new DButton( "Quit Game", 0, 0, 200, 100 );
 			escapeMenu.add( quit );
@@ -162,16 +156,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			chatPanel.add( chatBox );
 			
 			chatPanel.setVisible( false );
-			/*
-			dui.add( buildScoutUnit );
-			dui.add( buildLightUnit );
-			dui.add( buildHeavyUnit );
-			dui.add( buildShotgunUnit );
-			dui.add( buildSniperUnit );
-			dui.add( buildSaboteurUnit );
-			dui.add( escapeMenu );
-			dui.add( chatPanel );
-			*/
 			
 			dui.addDUIListener( this );
 		}
@@ -188,10 +172,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		
 		try
 		{
-			
-			
-			craterTexture = new Image( "img" + File.separator + "crater1.png" );
-			smoke1 = new Image( "img" + File.separator + "smoke1.png" );
+			smoke = new Image( "data" + File.separator + "img" + File.separator + "smoke.png" );
 		} 
 		catch( SlickException e )
 		{
@@ -225,18 +206,16 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				tu.sync( u );
 				break;
 			case LEVELUPDATE:
+				cs.l = (Level)m.message;
+				cs.l.loadTextures();
+				Unit.loadTextures( cs.l );
 				if( cs.l == null && cs.player != null )
 				{
-					cs.l = (Level)m.message;
 					scrollToTeamBase( cs.player.team );
-					cs.l.loadTextures();
-					Unit.loadTextures( cs.l );
 				}
 				else
 				{
-					cs.l = (Level)m.message;
-					cs.l.loadTextures();
-					Unit.loadTextures( cs.l );
+					
 				}
 				break;
 			case BULLETUPDATE:
@@ -379,7 +358,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				if( u.type == UnitType.SABOTEUR )
 				{
 					StaticFiles.getSound( "explode1" ).play();
-					btg.drawImage( craterTexture, u.x - 16, u.y - 16, u.x + 16, u.y + 16, 0, 0, 32, 32 );
+					btg.drawImage( cs.l.theme.crater, u.x - 16, u.y - 16, u.x + 16, u.y + 16, 0, 0, 32, 32 );
 					btg.flush();
 					
 					for( int j = 0; j < 7; j++ )
@@ -394,7 +373,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 							ExplodeParticle p = new ExplodeParticle( u.x, u.y, DMath.cosf( heading ) * 25 * mag * magmax, DMath.sinf( heading ) * 25 * mag * magmax, 30 );
 							p.c = new Color( r, g, b );
 							p.friction = .075f;
-							p.im = smoke1;
+							p.im = smoke;
 							p.size = (1.f-mag) * magmax * 20;
 							ps.add( p );
 						}
@@ -497,7 +476,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 					{	
 						bgg.pushTransform();
 						bgg.translate( x, y );
-						AutoTileDrawer.draw( bgg, cs.l.wall, Level.tileSize, 0, true, true, true, true, true, true, true, true );
+						AutoTileDrawer.draw( bgg, cs.l.theme.wall, Level.tileSize, 0, true, true, true, true, true, true, true, true );
 						bgg.popTransform();
 					}
 				}
@@ -776,7 +755,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		x += DMath.randomf( -8, 8 );
 		y += DMath.randomf( -8, 8 );
 		//btg.fillOval( x-2, y-2, 4, 4 );
-		btg.drawImage( smoke1, x-4, y-4, x+4, y+4, 0, 0, 64, 64, bloodColor );
+		btg.drawImage( smoke, x-4, y-4, x+4, y+4, 0, 0, 64, 64, bloodColor );
 		btg.flush();
 	}
 	
