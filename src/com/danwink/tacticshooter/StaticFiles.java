@@ -85,8 +85,8 @@ public class StaticFiles
 	{
 		try
 		{
-			music.put( name, new Music( "data" + File.separator + "sound" + File.separator + file ) );
 			status = "Loading " + file;
+			music.put( name, new Music( "data" + File.separator + "sound" + File.separator + file ) );
 		} catch( SlickException e )
 		{
 			
@@ -97,8 +97,8 @@ public class StaticFiles
 	{
 		try
 		{
-			sound.put( name, new Sound( "data" + File.separator + "sound" + File.separator + file ) );
 			status = "Loading " + file;
+			sound.put( name, new Sound( "data" + File.separator + "sound" + File.separator + file ) );
 		} catch( SlickException e )
 		{
 			
