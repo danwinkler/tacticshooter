@@ -80,7 +80,7 @@ public class PostGameScreen extends DScreen<GameContainer, Graphics> implements 
 		dui.setEnabled( true );
 	}
 	
-	public void update( GameContainer gc, int delta )
+	public void update( GameContainer gc, float delta )
 	{
 		dui.update();
 	}
@@ -120,4 +120,6 @@ public class PostGameScreen extends DScreen<GameContainer, Graphics> implements 
 	{
 		stats = (GameStats)o;
 	} 
+	
+	public void onResize( int width, int height ) {}
 }

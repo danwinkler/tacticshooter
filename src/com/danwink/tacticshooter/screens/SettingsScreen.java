@@ -47,7 +47,7 @@ public class SettingsScreen extends DScreen<GameContainer, Graphics> implements 
 		dui.setEnabled( true );
 	}
 	
-	public void update( GameContainer gc, int delta )
+	public void update( GameContainer gc, float delta )
 	{
 		dui.update();
 	}
@@ -97,4 +97,6 @@ public class SettingsScreen extends DScreen<GameContainer, Graphics> implements 
 			} 
 		}
 	}
+	
+	public void onResize( int width, int height ) {}
 }

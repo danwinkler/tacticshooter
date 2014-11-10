@@ -76,7 +76,7 @@ public class LoginScreen extends DScreen<GameContainer, Graphics> implements DUI
 		r = new Slick2DRenderer();
 	}
 	
-	public void update( GameContainer gc, int delta )
+	public void update( GameContainer gc, float delta )
 	{
 		dui.update();
 	}
@@ -98,6 +98,8 @@ public class LoginScreen extends DScreen<GameContainer, Graphics> implements DUI
 	{
 		
 	}
+	
+	public void onResize( int width, int height ) {}
 	
 	public void event( DUIEvent event )
 	{

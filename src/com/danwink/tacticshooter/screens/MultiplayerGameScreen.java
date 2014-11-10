@@ -182,11 +182,12 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		running = true;
 	}
 	
-	public void update( GameContainer gc, int delta )
+	public void update( GameContainer gc, float d )
 	{
 		if( !running ) return;
 		
-		float d = delta / 60.f;
+		//This is so fucked. I did all the tuning with the wrong timestep scale. So now we do this shit.
+		d = (d*1000f)/60f;
 		
 		while( ci.hasClientMessages() )
 		{
@@ -1119,6 +1120,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	{
 		this.ci = (ClientInterface)o;
 	}
+	
+	public void onResize( int width, int height ) {}
 	
 	public void event( DUIEvent event )
 	{

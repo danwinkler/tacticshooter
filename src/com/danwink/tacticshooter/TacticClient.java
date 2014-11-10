@@ -82,7 +82,7 @@ public class TacticClient extends BasicGame
 	
 	public void update( GameContainer gc, int delta ) throws SlickException
 	{
-		dsh.update( gc, delta );
+		dsh.update( gc, delta/1000.f );
 		
 		//Render background if not in a game
 		if( !(dsh.get() instanceof MultiplayerGameScreen) )

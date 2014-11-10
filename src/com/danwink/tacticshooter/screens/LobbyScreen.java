@@ -113,7 +113,7 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 		ci.sendToServer( new Message( MessageType.CLIENTJOIN, StaticFiles.getUsername() ) );
 	}
 	
-	public void update( GameContainer gc, int delta )
+	public void update( GameContainer gc, float delta )
 	{
 		dui.update();
 		
@@ -224,6 +224,8 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 			ci = (ClientInterface)o;
 		}
 	}
+	
+	public void onResize( int width, int height ) {}
 
 	public void event( DUIEvent event )
 	{

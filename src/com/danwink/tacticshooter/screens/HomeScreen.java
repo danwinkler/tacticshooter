@@ -90,7 +90,7 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 		}
 	}
 	
-	public void update( GameContainer gc, int delta )
+	public void update( GameContainer gc, float delta )
 	{
 		dui.update();
 	}
@@ -185,5 +185,7 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 		{
 			login.setText( "Logout" );
 		}
-	} 
+	}
+
+	public void onResize( int width, int height ) {} 
 }

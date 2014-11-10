@@ -49,10 +49,8 @@ public class DScreenSlideTransition implements DScreenTransition<GameContainer, 
 		y = DMath.lerp( v, startY, goalY );
 	}
 
-	public void update( GameContainer gc, int delta )
+	public void update( GameContainer gc, float d)
 	{
-		float d = delta/1000.f;
-		
 		float v = slideIn ? expOut( time, 0, 1, duration ) : expIn( time, 0, 1, duration );
 		
 		x = DMath.lerp( v, startX, goalX );

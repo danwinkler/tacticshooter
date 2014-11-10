@@ -89,7 +89,7 @@ public class OptionsScreen extends DScreen<GameContainer, Graphics> implements D
 		dui.setEnabled( true );
 	}
 	
-	public void update( GameContainer gc, int delta )
+	public void update( GameContainer gc, float delta )
 	{
 		dui.update();
 	}
@@ -110,6 +110,8 @@ public class OptionsScreen extends DScreen<GameContainer, Graphics> implements D
 	{
 		
 	}
+	
+	public void onResize( int width, int height ) {}
 
 	public void event( DUIEvent event )
 	{

@@ -16,7 +16,7 @@ public class OpenLoadScreen extends DScreen<GameContainer, Graphics>
 		StaticFiles.loopWhenReady( "menu" );
 	}
 	
-	public void update( GameContainer gc, int delta )
+	public void update( GameContainer gc, float delta )
 	{
 		if( StaticFiles.ready )
 		{
@@ -43,5 +43,7 @@ public class OpenLoadScreen extends DScreen<GameContainer, Graphics>
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public void onResize( int width, int height ) {}
 }
 

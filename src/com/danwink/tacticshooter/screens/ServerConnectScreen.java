@@ -29,7 +29,7 @@ public class ServerConnectScreen extends DScreen<GameContainer, Graphics>
 		ci.sendToServer( new Message( MessageType.CONNECTED, null ) );
 	}
 	
-	public void update( GameContainer gc, int delta )
+	public void update( GameContainer gc, float delta )
 	{
 		while( ci.hasClientMessages() )
 		{
@@ -69,5 +69,6 @@ public class ServerConnectScreen extends DScreen<GameContainer, Graphics>
 			address = (String)o;
 		}
 	}
-
+	
+	public void onResize( int width, int height ) {}
 }

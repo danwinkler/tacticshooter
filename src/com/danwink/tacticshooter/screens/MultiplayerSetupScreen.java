@@ -52,7 +52,7 @@ public class MultiplayerSetupScreen extends DScreen<GameContainer, Graphics> imp
 		}
 	}
 	
-	public void update( GameContainer gc, int delta )
+	public void update( GameContainer gc, float delta )
 	{
 		dui.update();
 	}
@@ -97,4 +97,6 @@ public class MultiplayerSetupScreen extends DScreen<GameContainer, Graphics> imp
 		// TODO Auto-generated method stub
 		
 	} 
+	
+	public void onResize( int width, int height ) {}
 }
