@@ -216,7 +216,8 @@ public class Building
 			}
 			for( Building b : l.buildings )
 			{
-				if( b.t != null && b.t.id == tb.t.id && b.bt == BuildingType.POINT )
+				if( b.t == null ) return false;
+				if( b.t.id == tb.t.id && b.bt == BuildingType.POINT )
 				{
 					return false;
 				}
