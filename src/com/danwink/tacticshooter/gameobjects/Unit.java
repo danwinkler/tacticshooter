@@ -30,6 +30,7 @@ public class Unit
 	public static SpriteSheet heavy;
 	public static SpriteSheet heavyColor;
 	public static Color playerColor = new Color( 128, 128, 255 );
+	public static Random random = new Random();
 	
 	public static void loadTextures( Level l )
 	{
@@ -50,7 +51,7 @@ public class Unit
 		return new Image( "data" + File.separator + "img" + File.separator + s + ".png" );
 	}
 	
-	public int id = new Random().nextInt();
+	public int id = random.nextInt();
 	
 	public float sx, sy, sheading;
 	

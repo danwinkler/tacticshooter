@@ -19,26 +19,26 @@ import com.phyloa.dlib.util.DMath;
 
 public class Good2 extends ComputerPlayer 
 {
-	public static float weightBuildingOwnerNotTaken;
-	public static float weightBuildingOwnerEnemy;
-	public static float weightBuildingOwnerTeam;
-	public static float weightBuildingEachEnemy;
-	public static float weightBuildingEachFriend;
-	public static float weightBuildingEachEnemyOnOwnedPoint;
-	public static float weightBuildingDistanceFromTeamPoint;
-	public static float weightBuildingInversePointOwnershipAmount;
-	public static float weightBuildingIsCenter;
-	public static float weightBuildingRandomness;
+	public float weightBuildingOwnerNotTaken;
+	public float weightBuildingOwnerEnemy;
+	public float weightBuildingOwnerTeam;
+	public float weightBuildingEachEnemy;
+	public float weightBuildingEachFriend;
+	public float weightBuildingEachEnemyOnOwnedPoint;
+	public float weightBuildingDistanceFromTeamPoint;
+	public float weightBuildingInversePointOwnershipAmount;
+	public float weightBuildingIsCenter;
+	public float weightBuildingRandomness;
 	
-	public static float weightUnitAtBase;
-	public static float weightUnitDistanceFromEnemyPoint;
-	public static float weightUnitIsNotStopped;
-	public static float weightUnitIsStoppedOnEnemy;
-	public static float weightUnitDistanceFromTarget;
-	public static float weightUnitTargetMultiplier;
-	public static float weightUnitRandomness;
+	public float weightUnitAtBase;
+	public float weightUnitDistanceFromEnemyPoint;
+	public float weightUnitIsNotStopped;
+	public float weightUnitIsStoppedOnEnemy;
+	public float weightUnitDistanceFromTarget;
+	public float weightUnitTargetMultiplier;
+	public float weightUnitRandomness;
 	
-	public static float unitScoreThreshold;
+	public float unitScoreThreshold;
 	
 	public Good2()
 	{
@@ -137,7 +137,7 @@ public class Good2 extends ComputerPlayer
 			else if( b.t.id == player.team.id ) 
 			{ 
 				score += weightBuildingOwnerTeam;
-				score += (b.HOLDMAX - b.hold) * weightBuildingInversePointOwnershipAmount;
+				score += (Building.HOLDMAX - b.hold) * weightBuildingInversePointOwnershipAmount;
 			}
 			else { score += weightBuildingOwnerEnemy; }
 			

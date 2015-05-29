@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 
+import org.lwjgl.openal.OpenALException;
 import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
@@ -107,14 +108,14 @@ public class TacticClient extends BasicGame
 	
 	public static void main( String[] args )
 	{
-		if( args.length > 0 && args[1].equals( "--editor" ) ) {
+		if( args.length > 0 && args[1].equals( "--editor" ) ) 
+		{
 			Editor.main( args );
 		}
 		else
 		{
 			try
 			{
-				//Attempt to avoid sealed exception errors on zoe's mac	
 				AppGameContainer app = new AppGameContainer( new TacticClient() );
 				app.setMultiSample( StaticFiles.advOptions.getI( "multisample" ) );
 				app.setDisplayMode( StaticFiles.options.getI( "windowWidth" ), StaticFiles.options.getI( "windowHeight" ), StaticFiles.options.getB( "fullscreen" ) );
@@ -122,7 +123,18 @@ public class TacticClient extends BasicGame
 				app.setUpdateOnlyWhenVisible( false );
 				app.setAlwaysRender( true );
 				app.start();
-			} catch( Exception ex )
+			} 
+			catch( OpenALException ex ) 
+			{
+				//These seem to happen fairly often on macs, not quite sure what to do about it.
+				ex.printStackTrace();
+			}
+			catch( SlickException e )
+			{
+				e.printStackTrace();
+			}
+			/*
+			catch( Exception ex )
 			{
 				ex.printStackTrace();
 				
@@ -140,6 +152,7 @@ public class TacticClient extends BasicGame
 				
 				System.exit( 1 );
 			}
+			*/ 
 		}
 	}
 }

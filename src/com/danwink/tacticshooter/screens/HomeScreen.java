@@ -111,7 +111,9 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 			try {
 				gc.setForceExit( false );
 				gc.exit();
-			} catch( Exception ex ) {}
+			} catch( Exception ex ) {
+				ex.printStackTrace();
+			}
 			Editor.main( new String[] {} );
 		}
 	}

@@ -182,6 +182,8 @@ public class TacticServer
 				if( slots[i].p.isBot )
 				{
 					ComputerPlayer cp = null;
+					
+					//TODO: handle errors correctly :/
 					try {
 						cp = (ComputerPlayer)slots[i].p.playType.c.newInstance();
 					} catch (InstantiationException e) {

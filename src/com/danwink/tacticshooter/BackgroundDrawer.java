@@ -22,6 +22,7 @@ public class BackgroundDrawer
 	public BackgroundDrawer()
 	{
 		File[] files = new File( "themes" ).listFiles();
+		//TODO: Throw Error if no files in folder
 		themePath = files[DMath.randomi( 0, files.length )];
 		n = new ImprovedNoise( System.currentTimeMillis() );
 	}

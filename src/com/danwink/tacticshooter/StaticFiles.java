@@ -127,15 +127,18 @@ public class StaticFiles
 		new Thread( new Runnable() {
 			public void run()
 			{
-				Music m;
-				while( true )
+				while( !ready )
 				{
-					if( (m = getMusic( name )) != null )
-					{
-						if( !m.playing() )
-							m.loop();
-						break;
+					try {
+						Thread.sleep( 100 );
+					} catch (InterruptedException e) {
+						e.printStackTrace();
 					}
+				}
+				Music m = music.get( name );
+				if( !m.playing() ) 
+				{
+					m.loop();
 				}
 			} 
 		}).start();

@@ -15,13 +15,8 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.InputListener;
 import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.Sound;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.opengl.shader.ShaderProgram;
-
-
-
-
 
 import com.danwink.tacticshooter.AutoTileDrawer;
 import com.danwink.tacticshooter.ClientState;
@@ -29,7 +24,6 @@ import com.danwink.tacticshooter.ExplodeParticle;
 import com.danwink.tacticshooter.MessageType;
 import com.danwink.tacticshooter.MusicQueuer;
 import com.danwink.tacticshooter.StaticFiles;
-import com.danwink.tacticshooter.Theme;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Bullet;
 import com.danwink.tacticshooter.gameobjects.Level;
@@ -87,7 +81,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	
 	Input input;
 	
-	DScreenHandler<GameContainer, Graphics> dsh;
+	//DScreenHandler<GameContainer, Graphics> dsh;
 	
 	Slick2DRenderer renderer = new Slick2DRenderer();
 	
@@ -210,7 +204,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				cs.l = (Level)m.message;
 				cs.l.loadTextures();
 				Unit.loadTextures( cs.l );
-				if( cs.l == null && cs.player != null )
+				if( cs.player != null )
 				{
 					scrollToTeamBase( cs.player.team );
 				}
@@ -349,7 +343,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			if( !u.alive )
 			{
 				cs.units.remove( i );
-				cs.unitMap.remove( u );
+				cs.unitMap.remove( u.id );
 				cs.selected.remove( (Object)u.id );
 				u.renderDead( btg );
 				for( int j = 0; j < 10; j++ )
@@ -1131,16 +1125,18 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			if( e == switchTeams )
 			{
 				ci.sendToServer( new Message( MessageType.SWITCHTEAMS, cs.player.team ) );
-			}
+			} 
 			else if( e == quit )
 			{
 				running = false;
 				escapeMenu.setVisible( false );
 				dsh.activate( "home", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
-			} else if( e == returnToGame )
+			} 
+			else if( e == returnToGame )
 			{
 				escapeMenu.setVisible( false );
-			} else if( e.name.startsWith( "userbutton" ) )
+			} 
+			else if( e.name.startsWith( "userbutton" ) )
 			{
 				ci.sendToServer( new Message( MessageType.BUTTONPRESS, e.name ) );
 			}

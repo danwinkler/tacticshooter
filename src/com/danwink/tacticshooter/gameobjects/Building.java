@@ -13,6 +13,8 @@ public class Building
 {
 	public static final int UPDATE_TIME = 5;
 	
+	public static final Random random = new Random();
+	
 	public Team t;
 	public BuildingType bt;
 	public int x;
@@ -22,7 +24,7 @@ public class Building
 	
 	public int hold = 0;
 	
-	public int id = new Random().nextInt();
+	public int id = random.nextInt();
 	
 	public int updateCountdown = 0;
 	

@@ -30,9 +30,15 @@ public class Team
 		
 	}
 	
-	public boolean equals( Team t )
+	public boolean equals( Object o )
 	{
-		return this.id == t.id;
+		if( !(o instanceof Team) ) return false;
+		return this.id == ((Team)o).id;
+	}
+	
+	public int hashCode() 
+	{
+		return this.id;
 	}
 
 	public Color getColor() 

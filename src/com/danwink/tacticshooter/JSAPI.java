@@ -25,6 +25,8 @@ public class JSAPI
     ScriptEngine engine = mgr.getEngineByName("JavaScript");
 	
     public TacticServer ts;
+    
+    public Random random = new Random();
 	
     public JSAPI( TacticServer ts )
     {
@@ -163,7 +165,7 @@ public class JSAPI
 	
 	public String addButton( String text, int x, int y, int width, int height )
 	{
-		String id = "userbutton" + Integer.toString( new Random().nextInt() );
+		String id = "userbutton" + Integer.toString( random.nextInt() );
 		ts.si.sendToAllClients( new Message( MessageType.CREATEBUTTON, new Object[] { id, text, x, y, width, height } ) );
 		return id;
 	}

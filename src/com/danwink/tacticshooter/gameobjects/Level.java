@@ -360,7 +360,9 @@ public class Level implements TileBasedMap
 	@Override
 	public boolean blocked( PathFindingContext arg0, int x, int y )
 	{
-		return !getTile( x, y ).isPassable();
+		TileType t = getTile( x, y );
+		if( t == null ) return true;
+		return !t.isPassable();
 	}
 
 	@Override
