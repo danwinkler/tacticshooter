@@ -21,6 +21,7 @@ import org.newdawn.slick.opengl.shader.ShaderProgram;
 import com.danwink.tacticshooter.AutoTileDrawer;
 import com.danwink.tacticshooter.ClientState;
 import com.danwink.tacticshooter.ExplodeParticle;
+import com.danwink.tacticshooter.GameRenderer;
 import com.danwink.tacticshooter.MessageType;
 import com.danwink.tacticshooter.MusicQueuer;
 import com.danwink.tacticshooter.StaticFiles;
@@ -118,7 +119,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	@SuppressWarnings( "unchecked" )
 	ArrayList<Integer>[] battleGroups = new ArrayList[10];
 	
-	Unit control;
+	GameRenderer gameRenderer;
 	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
@@ -172,6 +173,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		{
 			e.printStackTrace();
 		}
+		
+		gameRenderer = new GameRenderer();
 		
 		running = true;
 	}
@@ -512,7 +515,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			}
 		}
 		
-		g.drawImage( backgroundTexture, -Level.tileSize-(cs.scrollx - ((int)(cs.scrollx/Level.tileSize))*Level.tileSize), -Level.tileSize-(cs.scrolly - ((int)(cs.scrolly/Level.tileSize)*Level.tileSize)) );
+		gameRenderer.render( g, cs, gc );
+		//g.drawImage( backgroundTexture, -Level.tileSize-(cs.scrollx - ((int)(cs.scrollx/Level.tileSize))*Level.tileSize), -Level.tileSize-(cs.scrolly - ((int)(cs.scrolly/Level.tileSize)*Level.tileSize)) );
 		
 		g.setColor( Color.black );
 		
@@ -761,165 +765,145 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 
 	public void mousePressed( int button, int x, int y )
 	{
-		if( control == null )
-		{
-			if( x > gc.getWidth()-200 && y > gc.getHeight()-200 && !selecting )
-			{	
-				boolean xLarger = cs.l.width > cs.l.height;
-				float xOffset = xLarger ? 0 : 100 - 100 *  cs.l.width/(float)cs.l.height;
-				float yOffset = !xLarger ? 0 : 100 - 100 * (float)cs.l.height/cs.l.width;
-				float scale = 200.f / ((xLarger?cs.l.width:cs.l.height)*Level.tileSize);
-				float minimapX = (x - (gc.getWidth()-200+xOffset));
-				float minimapY = (y - (gc.getHeight()-200+yOffset));
-				float mapX = minimapX / scale;
-				float mapY = minimapY / scale;
-				
-				if( input.isKeyDown( Input.KEY_LCONTROL ) )
-				{
-					ci.sendToServer( new Message( MessageType.MESSAGE, "/ping " + (input.getMouseX()-(gc.getWidth()-200)) + " " + (input.getMouseY()-(gc.getHeight()-200)) ) );
-				}
-				else
-				{
-					if( button == Input.MOUSE_LEFT_BUTTON )
-					{					
-						Rectangle screenBounds = getScreenBounds();
-						cs.scrollx = DMath.bound( mapX - gc.getWidth()/2, screenBounds.getMinX(), screenBounds.getMaxX() );
-						cs.scrolly = DMath.bound( mapY - gc.getHeight()/2, screenBounds.getMinY(), screenBounds.getMaxY() );
-					}
-					else if( button == Input.MOUSE_RIGHT_BUTTON )
-					{
-						int tx = cs.l.getTileX( ((x - (gc.getWidth()-200.f)) / 200.f) * cs.l.width*Level.tileSize );
-						int ty = cs.l.getTileY( ((y - (gc.getHeight()-200.f)) / 200.f) * cs.l.height*Level.tileSize );
-						ci.sendToServer( new Message( input.isKeyDown( Input.KEY_LCONTROL ) ? MessageType.SETATTACKPOINTCONTINUE : MessageType.SETATTACKPOINT, new Object[]{ new Point2i( tx, ty ), cs.selected } ) );
-						this.waitingForMoveConfirmation = true;
-					}
-				}
-			}	
+		if( x > gc.getWidth()-200 && y > gc.getHeight()-200 && !selecting )
+		{	
+			boolean xLarger = cs.l.width > cs.l.height;
+			float xOffset = xLarger ? 0 : 100 - 100 *  cs.l.width/(float)cs.l.height;
+			float yOffset = !xLarger ? 0 : 100 - 100 * (float)cs.l.height/cs.l.width;
+			float scale = 200.f / ((xLarger?cs.l.width:cs.l.height)*Level.tileSize);
+			float minimapX = (x - (gc.getWidth()-200+xOffset));
+			float minimapY = (y - (gc.getHeight()-200+yOffset));
+			float mapX = minimapX / scale;
+			float mapY = minimapY / scale;
+			
+			if( input.isKeyDown( Input.KEY_LCONTROL ) )
+			{
+				ci.sendToServer( new Message( MessageType.MESSAGE, "/ping " + (input.getMouseX()-(gc.getWidth()-200)) + " " + (input.getMouseY()-(gc.getHeight()-200)) ) );
+			}
 			else
 			{
 				if( button == Input.MOUSE_LEFT_BUTTON )
-				{
-					sx = x + cs.scrollx;
-					sy = y + cs.scrolly;
-					sx2 = sx;
-					sy2 = sy;
-					selecting = true;
-				} 
+				{					
+					Rectangle screenBounds = getScreenBounds();
+					cs.scrollx = DMath.bound( mapX - gc.getWidth()/2, screenBounds.getMinX(), screenBounds.getMaxX() );
+					cs.scrolly = DMath.bound( mapY - gc.getHeight()/2, screenBounds.getMinY(), screenBounds.getMaxY() );
+				}
 				else if( button == Input.MOUSE_RIGHT_BUTTON )
 				{
-					int tx = (int)((x+cs.scrollx) / Level.tileSize);
-					int ty = (int)((y+cs.scrolly) / Level.tileSize);
-					if( input.isKeyDown( Input.KEY_LCONTROL ) )
-					{
-						ci.sendToServer( new Message( MessageType.SETATTACKPOINTCONTINUE, new Object[]{ new Point2i( tx, ty ), cs.selected } ) );
-					}
-					else if( input.isKeyDown( Input.KEY_LSHIFT ) )
-					{
-						ci.sendToServer( new Message( MessageType.LOOKTOWARD, new Object[]{ new Point2i( tx * Level.tileSize, ty * Level.tileSize ), cs.selected } ) );
-					}
-					else
-					{
-						ci.sendToServer( new Message( MessageType.SETATTACKPOINT, new Object[]{ new Point2i( tx, ty ), cs.selected } ) );
-					}
-					
+					int tx = cs.l.getTileX( ((x - (gc.getWidth()-200.f)) / 200.f) * cs.l.width*Level.tileSize );
+					int ty = cs.l.getTileY( ((y - (gc.getHeight()-200.f)) / 200.f) * cs.l.height*Level.tileSize );
+					ci.sendToServer( new Message( input.isKeyDown( Input.KEY_LCONTROL ) ? MessageType.SETATTACKPOINTCONTINUE : MessageType.SETATTACKPOINT, new Object[]{ new Point2i( tx, ty ), cs.selected } ) );
 					this.waitingForMoveConfirmation = true;
 				}
+			}
+		}	
+		else
+		{
+			if( button == Input.MOUSE_LEFT_BUTTON )
+			{
+				sx = x + cs.scrollx;
+				sy = y + cs.scrolly;
+				sx2 = sx;
+				sy2 = sy;
+				selecting = true;
+			} 
+			else if( button == Input.MOUSE_RIGHT_BUTTON )
+			{
+				int tx = (int)((x+cs.scrollx) / Level.tileSize);
+				int ty = (int)((y+cs.scrolly) / Level.tileSize);
+				if( input.isKeyDown( Input.KEY_LCONTROL ) )
+				{
+					ci.sendToServer( new Message( MessageType.SETATTACKPOINTCONTINUE, new Object[]{ new Point2i( tx, ty ), cs.selected } ) );
+				}
+				else if( input.isKeyDown( Input.KEY_LSHIFT ) )
+				{
+					ci.sendToServer( new Message( MessageType.LOOKTOWARD, new Object[]{ new Point2i( tx * Level.tileSize, ty * Level.tileSize ), cs.selected } ) );
+				}
+				else
+				{
+					ci.sendToServer( new Message( MessageType.SETATTACKPOINT, new Object[]{ new Point2i( tx, ty ), cs.selected } ) );
+				}
+				
+				this.waitingForMoveConfirmation = true;
 			}
 		}
 	}
 
 	public void mouseReleased( int button, int x, int y )
 	{
-		if( control == null )
+		if( button == Input.MOUSE_LEFT_BUTTON && selecting )
 		{
-			if( button == Input.MOUSE_LEFT_BUTTON && selecting )
+			cs.selected.clear();
+			
+			float x1 = Math.min( sx, x+cs.scrollx );
+			float y1 = Math.min( sy, y+cs.scrolly );
+			float x2 = Math.max( sx, x+cs.scrollx );
+			float y2 = Math.max( sy, y+cs.scrolly );
+			
+			if( x2 - x1 > 2 || y2 - y1 > 2 )
 			{
-				cs.selected.clear();
-				
-				float x1 = Math.min( sx, x+cs.scrollx );
-				float y1 = Math.min( sy, y+cs.scrolly );
-				float x2 = Math.max( sx, x+cs.scrollx );
-				float y2 = Math.max( sy, y+cs.scrolly );
-				
-				if( x2 - x1 > 2 || y2 - y1 > 2 )
+				for( Unit u : cs.units )
 				{
-					for( Unit u : cs.units )
+					u.selected = u.owner.id == this.cs.player.id && u.x > x1 && u.x < x2 && u.y > y1 && u.y < y2;
+					if( u.selected )
 					{
-						u.selected = u.owner.id == this.cs.player.id && u.x > x1 && u.x < x2 && u.y > y1 && u.y < y2;
-						if( u.selected )
-						{
-							cs.selected.add( u.id );
-						}
+						cs.selected.add( u.id );
 					}
 				}
-				else
-				{
-					for( Unit u : cs.units )
-					{
-						float dx = x2 - u.x;
-						float dy = y2 - u.y;
-						if( u.owner.id == this.cs.player.id && dx*dx + dy*dy < Unit.radius * Unit.radius )
-						{
-							u.selected = true;
-							cs.selected.add( u.id );
-							break;
-						}
-						else
-						{
-							u.selected = false;
-						}
-						
-						//Disabling this code for now. Taking control of a unit is kind of a dumb idea
-						/*
-						if( input.isKeyDown( Input.KEY_LCONTROL ) )
-						{
-							control = u;
-							u.selected = false;
-							cs.selected.clear();
-							ci.sendToServer( new Message( MessageType.TAKECONTROL, u.id ) );
-						}
-						*/
-					}
-				}
-				selecting = false;
 			}
+			else
+			{
+				for( Unit u : cs.units )
+				{
+					float dx = x2 - u.x;
+					float dy = y2 - u.y;
+					if( u.owner.id == this.cs.player.id && dx*dx + dy*dy < Unit.radius * Unit.radius )
+					{
+						u.selected = true;
+						cs.selected.add( u.id );
+						break;
+					}
+					else
+					{
+						u.selected = false;
+					}
+				}
+			}
+			selecting = false;
 		}
 	}
 
 	public void mouseDragged( int oldx, int oldy, int newx, int newy )
 	{
-		if( control == null )
-		{
-			if( newx > gc.getWidth()-200 && newy > gc.getHeight()-200 && !selecting )
-			{	
-				if( input.isMouseButtonDown( Input.MOUSE_LEFT_BUTTON ) && !input.isKeyDown( Input.KEY_LCONTROL ) )
-				{
-					boolean xLarger = cs.l.width > cs.l.height;
-					float xOffset = xLarger ? 0 : 100 - 100 *  cs.l.width/(float)cs.l.height;
-					float yOffset = !xLarger ? 0 : 100 - 100 * (float)cs.l.height/cs.l.width;
-					float scale = 200.f / ((xLarger?cs.l.width:cs.l.height)*Level.tileSize);
-					float minimapX = (newx - (gc.getWidth()-200+xOffset));
-					float minimapY = (newy - (gc.getHeight()-200+yOffset));
-					float mapX = minimapX / scale;
-					float mapY = minimapY / scale;
-					
-					Rectangle screenBounds = getScreenBounds();
-					cs.scrollx = DMath.bound( mapX - gc.getWidth()/2, screenBounds.getMinX(), screenBounds.getMaxX() );
-					cs.scrolly = DMath.bound( mapY - gc.getHeight()/2, screenBounds.getMinY(), screenBounds.getMaxY() );
-				}
-			}	
-			else
+		if( newx > gc.getWidth()-200 && newy > gc.getHeight()-200 && !selecting )
+		{	
+			if( input.isMouseButtonDown( Input.MOUSE_LEFT_BUTTON ) && !input.isKeyDown( Input.KEY_LCONTROL ) )
 			{
-				if( input.isMouseButtonDown( Input.MOUSE_LEFT_BUTTON ) )
-				{
-					sx2 = newx+cs.scrollx;
-					sy2 = newy+cs.scrolly;
-				}
-				else if( input.isMouseButtonDown( Input.MOUSE_MIDDLE_BUTTON ) )
-				{
-					cs.scrollx += oldx - newx;
-					cs.scrolly += oldy - newy;
-				}
+				boolean xLarger = cs.l.width > cs.l.height;
+				float xOffset = xLarger ? 0 : 100 - 100 *  cs.l.width/(float)cs.l.height;
+				float yOffset = !xLarger ? 0 : 100 - 100 * (float)cs.l.height/cs.l.width;
+				float scale = 200.f / ((xLarger?cs.l.width:cs.l.height)*Level.tileSize);
+				float minimapX = (newx - (gc.getWidth()-200+xOffset));
+				float minimapY = (newy - (gc.getHeight()-200+yOffset));
+				float mapX = minimapX / scale;
+				float mapY = minimapY / scale;
+				
+				Rectangle screenBounds = getScreenBounds();
+				cs.scrollx = DMath.bound( mapX - gc.getWidth()/2, screenBounds.getMinX(), screenBounds.getMaxX() );
+				cs.scrolly = DMath.bound( mapY - gc.getHeight()/2, screenBounds.getMinY(), screenBounds.getMaxY() );
+			}
+		}	
+		else
+		{
+			if( input.isMouseButtonDown( Input.MOUSE_LEFT_BUTTON ) )
+			{
+				sx2 = newx+cs.scrollx;
+				sy2 = newy+cs.scrolly;
+			}
+			else if( input.isMouseButtonDown( Input.MOUSE_MIDDLE_BUTTON ) )
+			{
+				cs.scrollx += oldx - newx;
+				cs.scrolly += oldy - newy;
 			}
 		}
 	}

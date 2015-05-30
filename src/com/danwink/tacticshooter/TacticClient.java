@@ -128,31 +128,12 @@ public class TacticClient extends BasicGame
 			{
 				//These seem to happen fairly often on macs, not quite sure what to do about it.
 				ex.printStackTrace();
+				System.exit( 1 );
 			}
 			catch( SlickException e )
 			{
 				e.printStackTrace();
 			}
-			/*
-			catch( Exception ex )
-			{
-				ex.printStackTrace();
-				
-				PrintWriter pw = null;
-				try {
-					pw = new PrintWriter( "tmp/error.log" );
-				} catch (FileNotFoundException e) {
-					System.exit( 0 );
-					e.printStackTrace();
-				}
-				ex.printStackTrace( pw );
-				
-				pw.flush();
-				pw.close();
-				
-				System.exit( 1 );
-			}
-			*/ 
 		}
 	}
 }
