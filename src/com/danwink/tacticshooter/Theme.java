@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.SpriteSheet;
 
 public class Theme
 {
@@ -16,6 +17,13 @@ public class Theme
 	public Image grate;
 	public Image wall;
 	public Image floor;
+	public Image smoke;
+	
+	public SpriteSheet light;
+	public SpriteSheet lightColor;
+	public SpriteSheet heavy;
+	public SpriteSheet heavyColor;
+	
 	
 	private Theme( String name ) throws SlickException
 	{
@@ -25,11 +33,21 @@ public class Theme
 		grate = load( "grate" );
 		wall = load( "wall" );
 		floor = load( "floor" );
+		
+		light = loadSS( "light", 16 );
+		lightColor = loadSS( "light_color", 16 );
+		heavy = loadSS( "heavy", 32 );
+		heavyColor = loadSS( "heavy_color", 32 );
 	}
 	
 	private Image load( String s ) throws SlickException
 	{
 		return new Image( "themes" + File.separator + name + File.separator + s + ".png" );
+	}
+	
+	private SpriteSheet loadSS( String s, int size ) throws SlickException
+	{
+		return new SpriteSheet( load( s ), size, size );
 	}
 	
 	public static Theme getTheme( String name ) throws SlickException

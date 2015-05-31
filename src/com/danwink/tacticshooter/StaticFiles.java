@@ -49,7 +49,8 @@ public class StaticFiles
 		try
 		{
 			names = DFile.loadText( "data" + File.separator + "dist.male.first.txt" );
-		} catch( FileNotFoundException e )
+		} 
+		catch( FileNotFoundException e )
 		{
 			System.err.println( "Make sure the names file is located at: data" + File.separator + "dist.male.first.txt" );
 		}

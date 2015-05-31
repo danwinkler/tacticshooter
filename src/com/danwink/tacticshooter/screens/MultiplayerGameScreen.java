@@ -21,7 +21,6 @@ import org.newdawn.slick.opengl.shader.ShaderProgram;
 import com.danwink.tacticshooter.AutoTileDrawer;
 import com.danwink.tacticshooter.ClientState;
 import com.danwink.tacticshooter.ExplodeParticle;
-import com.danwink.tacticshooter.GameRenderer;
 import com.danwink.tacticshooter.MessageType;
 import com.danwink.tacticshooter.MusicQueuer;
 import com.danwink.tacticshooter.StaticFiles;
@@ -36,6 +35,7 @@ import com.danwink.tacticshooter.gameobjects.Level.TileType;
 import com.danwink.tacticshooter.gameobjects.Unit.UnitType;
 import com.danwink.tacticshooter.network.ClientInterface;
 import com.danwink.tacticshooter.network.Message;
+import com.danwink.tacticshooter.renderer.GameRenderer;
 import com.danwink.tacticshooter.slick.Slick2DEventMapper;
 import com.danwink.tacticshooter.slick.Slick2DRenderer;
 import com.phyloa.dlib.dui.DButton;
@@ -100,7 +100,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	Image floorTexture;
 	Image backgroundTexture;
 	
-	Image smoke;
 	Image bloodTexture;
 	Image fog;	
 	
@@ -165,15 +164,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		music.play();
 		music.addListener( new MusicQueuer( DMath.randomi( 0, 2 ), "play1", "play2", "play3" ) );
 		
-		try
-		{
-			smoke = new Image( "data" + File.separator + "img" + File.separator + "smoke.png" );
-		} 
-		catch( SlickException e )
-		{
-			e.printStackTrace();
-		}
-		
 		gameRenderer = new GameRenderer();
 		
 		running = true;
@@ -206,7 +196,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			case LEVELUPDATE:
 				cs.l = (Level)m.message;
 				cs.l.loadTextures();
-				Unit.loadTextures( cs.l );
 				if( cs.player != null )
 				{
 					scrollToTeamBase( cs.player.team );
@@ -348,34 +337,10 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				cs.units.remove( i );
 				cs.unitMap.remove( u.id );
 				cs.selected.remove( (Object)u.id );
-				u.renderDead( btg );
-				for( int j = 0; j < 10; j++ )
-				{
-					drawBlood( u.x, u.y );
-				}
+				gameRenderer.killUnit( u );
 				if( u.type == UnitType.SABOTEUR )
 				{
 					StaticFiles.getSound( "explode1" ).play();
-					btg.drawImage( cs.l.theme.crater, u.x - 16, u.y - 16, u.x + 16, u.y + 16, 0, 0, 32, 32 );
-					btg.flush();
-					
-					for( int j = 0; j < 7; j++ )
-					{
-						float magmax = DMath.randomf( .4f, 1 );
-						float heading = DMath.randomf( 0, DMath.PI2F );
-						for( float mag = .1f; mag < 1; mag += .1f )
-						{
-							float r = DMath.lerp( mag, .5f, 1f );
-							float g = DMath.lerp( mag, .5f, .25f );
-							float b = DMath.lerp( mag, .5f, 0f );
-							ExplodeParticle p = new ExplodeParticle( u.x, u.y, DMath.cosf( heading ) * 25 * mag * magmax, DMath.sinf( heading ) * 25 * mag * magmax, 30 );
-							p.c = new Color( r, g, b );
-							p.friction = .075f;
-							p.im = smoke;
-							p.size = (1.f-mag) * magmax * 20;
-							ps.add( p );
-						}
-					}
 				}
 				else
 				{
@@ -460,25 +425,10 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				cs.l.render( wtg );
 				wtg.flush();
 				
-				backgroundTexture = new Image( gc.getWidth() + Level.tileSize*2, gc.getHeight() + Level.tileSize*2 );
-				
 				if( fogEnabled )
 				{
 					fog = new Image( cs.l.width * Level.tileSize, cs.l.height * Level.tileSize );
 				}
-				
-				Graphics bgg = backgroundTexture.getGraphics();
-				for( int y = 0; y < gc.getHeight() + Level.tileSize*2; y += Level.tileSize )
-				{
-					for( int x = 0; x < gc.getWidth() + Level.tileSize*2; x += Level.tileSize )
-					{	
-						bgg.pushTransform();
-						bgg.translate( x, y );
-						AutoTileDrawer.draw( bgg, cs.l.theme.wall, Level.tileSize, 0, true, true, true, true, true, true, true, true );
-						bgg.popTransform();
-					}
-				}
-				
 			} catch( SlickException e )
 			{
 				e.printStackTrace();
@@ -516,12 +466,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		}
 		
 		gameRenderer.render( g, cs, gc );
-		//g.drawImage( backgroundTexture, -Level.tileSize-(cs.scrollx - ((int)(cs.scrollx/Level.tileSize))*Level.tileSize), -Level.tileSize-(cs.scrolly - ((int)(cs.scrolly/Level.tileSize)*Level.tileSize)) );
 		
 		g.setColor( Color.black );
-		
-		g.pushTransform();
-		g.translate( -cs.scrollx, -cs.scrolly );
 		
 		g.drawImage( bloodTexture, 0, 0 );
 		cs.l.renderBuildings( g );
@@ -536,12 +482,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 					fogG.fillOval( b.x - b.bt.bu.getRadius(), b.y - b.bt.bu.getRadius(), b.bt.bu.getRadius()*2, b.bt.bu.getRadius()*2 );
 				}
 			}
-		}
-		
-		for( int i = 0; i < cs.units.size(); i++ )
-		{
-			Unit u = cs.units.get( i );
-			u.renderBody( g, cs.player );
 		}
 		
 		g.drawImage( wallTexture, 0, 0 );
@@ -591,6 +531,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			g.drawRect( x1, y1, x2-x1, y2-y1 );
 		}
 		
+		//TODO: delete when all renderers are completed
 		g.popTransform();
 		
 		g.setColor( new Color( 0, 0, 0, 128 ) );
@@ -748,16 +689,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		}
 	}
 	
-	public static Color bloodColor = new Color( 255, 0, 0 );
-	public void drawBlood( float x, float y )
-	{
-		x += DMath.randomf( -8, 8 );
-		y += DMath.randomf( -8, 8 );
-		//btg.fillOval( x-2, y-2, 4, 4 );
-		btg.drawImage( smoke, x-4, y-4, x+4, y+4, 0, 0, 64, 64, bloodColor );
-		btg.flush();
-	}
-	
 	public Rectangle getScreenBounds()
 	{
 		return new Rectangle( -gc.getWidth()/2, -gc.getHeight()/2, cs.l.width*Level.tileSize + gc.getWidth(), cs.l.height*Level.tileSize + gc.getHeight() );
@@ -911,35 +842,30 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	@Override
 	public void mouseClicked( int arg0, int arg1, int arg2, int arg3 )
 	{
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void mouseMoved( int arg0, int arg1, int arg2, int arg3 )
 	{
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void mouseWheelMoved( int arg0 )
 	{
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void inputEnded()
 	{
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void inputStarted()
 	{
-		// TODO Auto-generated method stub
 		
 	}
 
@@ -951,7 +877,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	@Override
 	public void setInput( Input arg0 )
 	{
-		// TODO Auto-generated method stub
 		
 	}
 
@@ -1019,77 +944,66 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	@Override
 	public void keyReleased( int arg0, char arg1 )
 	{
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void controllerButtonPressed( int arg0, int arg1 )
 	{
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void controllerButtonReleased( int arg0, int arg1 )
 	{
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void controllerDownPressed( int arg0 )
 	{
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void controllerDownReleased( int arg0 )
 	{
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void controllerLeftPressed( int arg0 )
 	{
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void controllerLeftReleased( int arg0 )
 	{
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void controllerRightPressed( int arg0 )
 	{
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void controllerRightReleased( int arg0 )
 	{
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void controllerUpPressed( int arg0 )
 	{
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void controllerUpReleased( int arg0 )
 	{
-		// TODO Auto-generated method stub
 		
 	}
 
@@ -1125,5 +1039,10 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				ci.sendToServer( new Message( MessageType.BUTTONPRESS, e.name ) );
 			}
 		}
+	}
+
+	public void drawBlood( float x, float y )
+	{
+		gameRenderer.drawBlood( x, y );
 	}
 }

@@ -25,26 +25,7 @@ public class Unit
 	public static int radius = 10;
 	public static final int UPDATE_TIME = 7;
 	public static final float frameTime = 5;
-	public static SpriteSheet light;
-	public static SpriteSheet lightColor;
-	public static SpriteSheet heavy;
-	public static SpriteSheet heavyColor;
-	public static Color playerColor = new Color( 128, 128, 255 );
 	public static Random random = new Random();
-	
-	public static void loadTextures( Level l )
-	{
-		try
-		{
-			light = new SpriteSheet( loadHelper( "light" ), 16, 16 );
-			lightColor = new SpriteSheet( loadHelper( "light_color" ), 16, 16 );
-			heavy = new SpriteSheet( loadHelper( "heavy" ), 32, 32 );
-			heavyColor = new SpriteSheet( loadHelper( "heavy_color" ), 32, 32 );
-		} catch( SlickException e )
-		{
-			e.printStackTrace();
-		}
-	}
 	
 	private static Image loadHelper( String s ) throws SlickException
 	{
@@ -89,7 +70,7 @@ public class Unit
 	public boolean selected = false;
 	public int timeSinceUpdate = 0;
 	
-	int frame = 0;
+	public int frame = 0;
 	float timeSinceLastFrame = 0;
 	
 	public Unit()
@@ -412,83 +393,6 @@ public class Unit
 					}
 				}
 			}
-		}
-	}
-
-	public void renderBody( Graphics g, Player p )
-	{
-		g.pushTransform();
-		g.translate( x, y );
-		g.rotate( 0, 0, heading / DMath.PI2F * 360 );
-		drawBody( g, owner.id == p.id );
-		g.popTransform();
-	}
-	
-	public void renderDead( Graphics g )
-	{
-		g.pushTransform();
-		g.translate( x, y );
-		g.rotate( 0, 0, heading / DMath.PI2F * 360 );
-		drawBody( g, false );
-		g.popTransform();
-	}
-	
-	public void drawBody( Graphics g, boolean player )
-	{
-		Color color = player ? playerColor : this.owner.team.getColor();
-		
-		switch( type )
-		{
-		case LIGHT:
-			g.pushTransform();
-			g.rotate( 0, 0, 90 );
-			//g.scale( 1.0f, 1.0f );
-			g.drawImage( light.getSprite( frame, 0 ), -8, -8 );
-			g.drawImage( lightColor.getSprite( frame, 0 ), -8, -8, color );
-			g.popTransform();
-			break;
-		case SCOUT:
-		case SHOTGUN:
-		case SABOTEUR:
-			if( player )
-			{
-				g.setColor( Color.white );
-				g.fillOval( -7, -7, 14, 14 );
-				g.setColor( Color.black );
-				g.drawOval( -7, -7, 14, 14 );
-			}
-			
-			g.setColor( color );
-			g.fillOval( -5, -5, 10, 10 );
-			g.setColor( Color.black );
-			g.drawOval( -5, -5, 10, 10 );
-			g.drawLine( 0, 0, 5, 0 );
-			
-			break;
-		case SNIPER:
-			if( player )
-			{
-				g.setColor( Color.white );
-				g.fillOval( -7, -6, 14, 12 );
-				g.setColor( Color.black );
-				g.drawOval( -7, -6, 14, 12 );
-			}
-			
-			g.setColor( color );
-			g.fillOval( -5, -4, 10, 8 );
-			g.setColor( Color.black );
-			g.drawOval( -5, -4, 10, 8 );
-			g.drawLine( 0, 0, 5, 0 );
-			break;
-		case HEAVY:
-			g.pushTransform();
-			g.rotate( 0, 0, 90 );
-			//g.scale( 1.0f, 1.0f );
-			g.drawImage( heavy.getSprite( frame, 0 ), -16, -16 );
-			g.drawImage( heavyColor.getSprite( frame, 0 ), -16, -16, color );
-			g.popTransform();
-			break;
-			
 		}
 	}
 	
