@@ -1,8 +1,11 @@
 package com.danwink.tacticshooter.screens;
 
+import java.util.ArrayList;
+
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
+
 
 
 
@@ -65,6 +68,19 @@ public class PostGameScreen extends DScreen<GameContainer, Graphics> implements 
 		
 		dui.add( new DText( "Points:", e.getWidth()/2 - 500, e.getHeight()/2 - 100 ) );
 		dui.add( new DText( "Units:", e.getWidth()/2 - 500, e.getHeight()/2 + 100 ) );
+		
+		//Test and see if extraneous data got added on to end :/
+		ArrayList<Integer> lastPointA = stats.teamStats[0].pointCount;
+		ArrayList<Integer> lastPointB = stats.teamStats[1].pointCount;
+		if( lastPointA.get( lastPointA.size()-1 ) + lastPointB.get( lastPointB.size()-1) == 0 )
+		{
+			for( TeamStats ts : stats.teamStats )
+			{
+				ts.pointCount.remove( ts.pointCount.size()-1 );
+				ts.unitCount.remove( ts.unitCount.size()-1 );
+			}
+		}
+		
 		DLinePlot pointPlot = new DLinePlot( gc.getWidth()/2 - 400, gc.getHeight()/2 - 150, 800, 100 );
 		for( TeamStats ts : stats.teamStats )
 		{

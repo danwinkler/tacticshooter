@@ -151,6 +151,9 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			
 			chatPanel.setVisible( false );
 			
+			dui.add( chatPanel );
+			dui.add( escapeMenu );
+			
 			dui.addDUIListener( this );
 		}
 		dui.setEnabled( true );
