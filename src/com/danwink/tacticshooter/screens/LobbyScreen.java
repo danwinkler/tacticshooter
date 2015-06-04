@@ -173,7 +173,7 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 			case STARTGAME:
 				dsh.message( "multiplayergame", ci );
 				dsh.activate( "multiplayergame", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
-				break;
+				return; //YES, RETURN! We don't want lobby to handle any more of the messages from the server
 			case LEVELUPDATE:
 			{
 				Object[] oa = (Object[])m.message;

@@ -28,7 +28,7 @@ public class ClientNetworkInterface implements ClientInterface
 				{
 					synchronized( messages )
 					{
-						messages.push( (Message)o );
+						messages.addLast( (Message)o );
 					}
 				}
 			}
@@ -49,7 +49,7 @@ public class ClientNetworkInterface implements ClientInterface
 	{
 		synchronized( messages )
 		{
-			return messages.pop();
+			return messages.removeFirst();
 		}
 	}
 

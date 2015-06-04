@@ -5,6 +5,7 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
 
+
 import com.danwink.tacticshooter.GameStats;
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.GameStats.TeamStats;
@@ -17,6 +18,7 @@ import com.phyloa.dlib.dui.DUI;
 import com.phyloa.dlib.dui.DUIElement;
 import com.phyloa.dlib.dui.DUIEvent;
 import com.phyloa.dlib.dui.DUIListener;
+import com.phyloa.dlib.dui.DUITheme;
 import com.phyloa.dlib.game.DScreen;
 import com.phyloa.dlib.game.DScreenHandler;
 import com.phyloa.dlib.util.DUtil;
@@ -34,6 +36,10 @@ public class PostGameScreen extends DScreen<GameContainer, Graphics> implements 
 	public void onActivate( GameContainer e, DScreenHandler<GameContainer, Graphics> dsh )
 	{
 		dui = new DUI( new Slick2DEventMapper( e.getInput() ) );
+		
+		dui.setTheme( new DUITheme( DUITheme.defaultTheme ) {{
+			borderColor = new java.awt.Color( 64, 170, 255 );
+		}});
 		
 		dui.add( new DText( "Post Game Stats", e.getWidth()/2 - 300, 30, true ) );
 		

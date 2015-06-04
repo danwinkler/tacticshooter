@@ -51,18 +51,21 @@ public class NeuralAI extends ComputerPlayer
 		 * distance to closest friendly point (on point doesn't count)
 		 * number of friendly units on point
 		 * number of enemy units on point
-		 * distance to closest enemy point (on point doesn't count)
+		 * number of friendly units moving to point
+		 * distance to closest non-friendly point (on point doesn't count)
 		 * number of friendly units on point
 		 * number of enemy units on point
+		 * number of friendly units moving to point
 		 * distance to friendly point closest to enemy center
 		 * number of friendly units on point
 		 * number of enemy units on point
+		 * number of friendly units moving to point
 		 * 
 		 * 
 		 * Outputs
 		 * don't move
 		 * go to closest friendly point (on point doesn't count)
-		 * go to closest enemy point (on point doesn't count)
+		 * go to closest non-friendly point (on point doesn't count)
 		 * go to friendly point closest to enemy center
 		 */
 		

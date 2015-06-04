@@ -53,7 +53,7 @@ public class ServerNetworkInterface implements ServerInterface
 			Connection c = connections.get( id );
 			if( c != null )
 			{
-				messagesToSend.push( new Object[] { id, m } );
+				messagesToSend.addLast( new Object[] { id, m } );
 			}
 		}
 	}
@@ -72,7 +72,7 @@ public class ServerNetworkInterface implements ServerInterface
 
 	public Message getNextServerMessage()
 	{	
-		return messages.pop();
+		return messages.removeFirst();
 	}
 	
 
@@ -94,7 +94,7 @@ public class ServerNetworkInterface implements ServerInterface
 			{
 				Message m = (Message)o;
 				m.sender = c.getID();
-				messages.push( m );
+				messages.addLast( m );
 			}
 		}
 		

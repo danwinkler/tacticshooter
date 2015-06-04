@@ -285,6 +285,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			}
 			case CREATEBUTTON:
 			{
+				assert( cs.player != null );
 				if( cs.player.spectator ) break;
 				Object[] arr = (Object[])m.message;
 				String id = (String)arr[0];
