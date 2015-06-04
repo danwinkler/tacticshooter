@@ -522,6 +522,8 @@ public class TacticServer
 					Player p = e.getValue();
 					playerArr[pi++] = p;
 				}
+				
+				if( playerArr.length == 0 ) return;
 				si.sendToAllClients( new Message( MessageType.PLAYERLIST, playerArr ) );
 			}
 			
