@@ -188,6 +188,9 @@ public class JSAPI
 	public void addPlayerMoney( int id, int money )
 	{
 		ts.players.get( id ).money += money;
+		if( money > 0 ) {
+			ts.gs.teamStats[ts.players.get( id ).team.id].moneyEarned += money;
+		}
 		ts.updatePlayer( id );
 	}
 	
