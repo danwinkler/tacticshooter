@@ -109,8 +109,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	
 	ShaderProgram shader;
 	
-	public ParticleSystem<Graphics> ps = new ParticleSystem<Graphics>();
-	
 	boolean mapChanged = true;
 	
 	ArrayList<Vector3f> pings = new ArrayList<Vector3f>();
@@ -215,7 +213,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				break;
 			case PLAYERUPDATE:
 				Player newPlayer = (Player)m.message;
-				if( (cs.player == null || newPlayer.team.id != cs.player.team.id) && cs.l != null )
+				if( (cs.player == null || newPlayer.team.id != cs.player.team.id) && cs.l != null && !newPlayer.spectator )
 				{
 					scrollToTeamBase( newPlayer.team );
 				}
@@ -285,6 +283,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			}
 			case CREATEBUTTON:
 			{
+				if( cs.player.spectator ) break;
 				Object[] arr = (Object[])m.message;
 				String id = (String)arr[0];
 				String text = (String)arr[1];
@@ -399,7 +398,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			}
 		}
 		
-		ps.update( d );
+		gameRenderer.update( d );
 	}
 
 	public void render( GameContainer gc, Graphics g )
@@ -437,89 +436,11 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		
 		if( mapChanged )
 		{
-			try
-			{	
-				Graphics wtg = wallTexture.getGraphics();
-				wtg.clear();
-				cs.l.render( wtg );
-				wtg.flush();
-			} catch( SlickException e )
-			{
-				e.printStackTrace();
-			}
+			gameRenderer.updateWalls( cs );
 			mapChanged = false;
 		}
 		
-		Graphics fogG = null;
-		if( fogEnabled )
-		{
-			try
-			{
-				fogG = fog.getGraphics();
-				fogG.setColor( Color.black );
-				fogG.fillRect( 0, 0, fog.getWidth(), fog.getHeight() );
-			}
-			catch( SlickException e )
-			{
-				e.printStackTrace();
-			}
-		}
-		
-		gameRenderer.render( g, cs, gc );
-		
-		g.setColor( Color.black );
-		
-		g.drawImage( bloodTexture, 0, 0 );
-		cs.l.renderBuildings( g );
-		
-		if( fogEnabled ) {
-			for( int i = 0; i < cs.l.buildings.size(); i++ )
-			{
-				Building b = cs.l.buildings.get( i );
-				if( b.t != null && b.t.id == this.cs.player.team.id )
-				{
-					fogG.setColor( Color.white );
-					fogG.fillOval( b.x - b.bt.bu.getRadius(), b.y - b.bt.bu.getRadius(), b.bt.bu.getRadius()*2, b.bt.bu.getRadius()*2 );
-				}
-			}
-		}
-		
-		g.drawImage( wallTexture, 0, 0 );
-		
-		g.setColor( Color.black );
-		
-		for( int i = 0; i < cs.bullets.size(); i++ )
-		{
-			Bullet b = cs.bullets.get( i );
-			b.render( g );
-		}
-		
-		for( int i = 0; i < cs.units.size(); i++ )
-		{
-			Unit u = cs.units.get( i );
-			u.render( g, cs.player, input.getMouseX() + cs.scrollx, input.getMouseY() + cs.scrolly, cs.l, fogG );
-		}
-		
-		g.setColor( Color.darkGray );
-		ps.render( g );
-		
-		if( fogEnabled )
-		{
-			for( int y = 0; y < cs.l.height; y++ )
-			{
-				for( int x = 0; x < cs.l.width; x++ )
-				{
-					if( !cs.l.tiles[x][y].isShootable() )
-					{
-						fogG.fillRect( x*Level.tileSize, y*Level.tileSize, Level.tileSize, Level.tileSize );
-					}
-				}
-			}
-		
-			g.setDrawMode( Graphics.MODE_COLOR_MULTIPLY );
-			g.drawImage( fog, 0, 0 );
-			g.setDrawMode( Graphics.MODE_NORMAL );
-		}
+		gameRenderer.render( g, cs, gc, fogEnabled );
 		
 		if( selecting )
 		{
@@ -1044,5 +965,10 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	public void drawBlood( float x, float y )
 	{
 		gameRenderer.drawBlood( x, y );
+	}
+
+	public void bulletImpact( Bullet bullet )
+	{
+		gameRenderer.bulletImpact( bullet );
 	}
 }

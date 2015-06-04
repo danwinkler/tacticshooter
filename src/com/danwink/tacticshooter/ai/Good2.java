@@ -87,7 +87,7 @@ public class Good2 extends ComputerPlayer
 		weightUnitIsNotStopped = -1000;
 		
 		//If unit is stopped on enemy building, much less likely to be chosen
-		weightUnitIsStoppedOnEnemy = -15;
+		weightUnitIsStoppedOnEnemy = -150;
 		
 		//If unit is close to target, more likely to be chosen
 		weightUnitDistanceFromTarget = -.1f;
@@ -236,7 +236,7 @@ public class Good2 extends ComputerPlayer
 			}
 			
 			//Unit on enemy point
-			if( u.stoppedAt != null && u.stoppedAt.t.id != player.team.id )
+			if( u.stoppedAt != null && u.stoppedAt.t != null && u.stoppedAt.t.id != player.team.id )
 			{
 				score += weightUnitIsStoppedOnEnemy;
 			}

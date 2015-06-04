@@ -98,7 +98,7 @@ public class Editor
 		container.pack();
 		container.setVisible( true );
 		
-		newLevel( 20, 20 );
+		//newLevel( 20, 20 );
 	}
 	
 	public void showNewDialog()

@@ -13,7 +13,6 @@ import com.danwink.tacticshooter.ClientState;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Unit;
 import com.danwink.tacticshooter.gameobjects.Unit.UnitType;
-import com.danwink.tacticshooter.renderer.GameRenderer.UnitBodyRenderer;
 import com.phyloa.dlib.util.DMath;
 
 public class BloodExplosionRenderer
@@ -30,7 +29,6 @@ public class BloodExplosionRenderer
 	Image texture;
 	Graphics tg;
 	
-	private ConcurrentLinkedDeque<Unit> unitsToKill = new ConcurrentLinkedDeque<>();
 	private ConcurrentLinkedDeque<Point2f> bloodToDraw = new ConcurrentLinkedDeque<>();
 	
 	public void render( Graphics g, ClientState cs, UnitBodyRenderer ubr ) 
@@ -45,11 +43,6 @@ public class BloodExplosionRenderer
 			{
 				return;
 			}
-		}
-		
-		while( !unitsToKill.isEmpty() )
-		{
-			internalKillUnit( unitsToKill.removeLast(), cs, ubr );
 		}
 		
 		while( !bloodToDraw.isEmpty() )
@@ -74,12 +67,7 @@ public class BloodExplosionRenderer
 		}
 	}
 	
-	public void killUnit( Unit u )
-	{
-		unitsToKill.addFirst( u );
-	}
-	
-	private void internalKillUnit( Unit u, ClientState cs, UnitBodyRenderer ubr  )
+	public void killUnit( Unit u, ClientState cs, UnitBodyRenderer ubr )
 	{
 		ubr.drawDeadUnit( tg, u, cs );
 		
@@ -92,11 +80,6 @@ public class BloodExplosionRenderer
 		{
 			tg.drawImage( cs.l.theme.crater, u.x - 16, u.y - 16, u.x + 16, u.y + 16, 0, 0, 32, 32 );
 			tg.flush();
-			
-			//TODO: this is bad. BloodExplosionRenderer shouldn't have anything to do with the particle system
-			//GameRenderer should track the units that need to die, and then tell BloodExplosionRenderer to draw on it's ground texture,
-			//And ParticleSystemRenderer to create a particle explosion
-			this.gameRenderer.createExplosion( u.x, u.y );
 		}
 	}
 	

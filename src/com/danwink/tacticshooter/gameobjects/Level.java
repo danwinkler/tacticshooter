@@ -44,11 +44,12 @@ public class Level implements TileBasedMap
 	
 	public Level()
 	{
-		
+
 	}
 	
 	public Level( int width, int height )
 	{
+		this();
 		this.width = width;
 		this.height = height;
 		tiles = new TileType[width][height];

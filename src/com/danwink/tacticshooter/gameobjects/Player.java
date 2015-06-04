@@ -14,6 +14,7 @@ public class Player
 	public ComputerPlayer.PlayType playType = ComputerPlayer.PlayType.AGGRESSIVE;
 	public String name;
 	public int slot;
+	public boolean spectator;
 	
 	public Player()
 	{

@@ -47,6 +47,7 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 	DButton[] names = new DButton[16];
 	DDropDown[] humanOrBot = new DDropDown[16];
 	DDropDown[] botType = new DDropDown[16];
+	DDropDown[] spectator = new DDropDown[16];
 	DDropDown maps;
 	DDropDown gameType;
 	DTextBox chatBox;
@@ -75,7 +76,7 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 			humanOrBot[i].addItems( "HUMAN", "BOT" );
 			dui.add( humanOrBot[i] );
 			
-			botType[i] = new DDropDown( 310, baseHeight + i * 30, 200, 25 );
+			botType[i] = new DDropDown( 310, baseHeight + i * 30, 100, 25 );
 			botType[i].name = "bt " + i;
 			botType[i].setVisible( false );
 			for( ComputerPlayer.PlayType pt : ComputerPlayer.PlayType.values() )
@@ -83,6 +84,13 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 				botType[i].addItems( pt.name() );
 			}
 			dui.add( botType[i] );
+			
+			spectator[i] = new DDropDown( 420, baseHeight + i * 30, 90, 25 );
+			spectator[i].name = "sp " + i;
+			spectator[i].setVisible( false );
+			spectator[i].addItems( "Player", "Spec" );
+		
+			dui.add( spectator[i] );
 		}
 		
 		maps = new DDropDown( 20, 100, 500, 25 );
@@ -132,6 +140,7 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 					names[slot].setText( "CLOSED" );
 					botType[slot].setVisible( false );
 					humanOrBot[slot].setVisible( false );
+					spectator[slot].setVisible( false );
 				}
 				else if( s.p == null )
 				{
@@ -139,6 +148,7 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 					humanOrBot[slot].setVisible( true );
 					humanOrBot[slot].setSelected( 0 );
 					botType[slot].setVisible( false );
+					spectator[slot].setVisible( false );
 				}
 				else
 				{
@@ -147,6 +157,8 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 					humanOrBot[s.p.slot].setSelected( s.p.isBot ? 1 : 0 );
 					botType[s.p.slot].setVisible( s.p.isBot );
 					botType[s.p.slot].setSelected( s.p.playType.ordinal() );
+					spectator[slot].setVisible( true );
+					spectator[slot].setSelected( s.p.spectator ? 1 : 0 );
 				}
 				break;
 			}
@@ -255,6 +267,10 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 					{
 						PlayType pt = PlayType.values()[el.getSelectedOrdinal()];
 						ci.sendToServer( new Message( MessageType.SETPLAYTYPE, new Object[] { line, pt } ) );
+					}
+					else if( name[0].equals( "sp" ) )
+					{
+						ci.sendToServer( new Message( MessageType.SETSPECTATOR, new Object[] { line, (el.getSelectedOrdinal() == 1) } ) );
 					}
 				}
 			}

@@ -33,6 +33,7 @@ public class Theme
 		grate = load( "grate" );
 		wall = load( "wall" );
 		floor = load( "floor" );
+		smoke = load( "smoke" );
 		
 		light = loadSS( "light", 16 );
 		lightColor = loadSS( "light_color", 16 );

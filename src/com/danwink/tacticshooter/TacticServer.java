@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import com.phyloa.dlib.math.Point2i;
 
@@ -26,7 +27,6 @@ import com.danwink.tacticshooter.gameobjects.Unit.UnitType;
 import com.danwink.tacticshooter.network.Message;
 import com.danwink.tacticshooter.network.ServerInterface;
 import com.danwink.tacticshooter.network.ServerNetworkInterface;
-
 import com.danwink.tacticshooter.screens.LobbyScreen.Slot;
 import com.phyloa.dlib.util.DMath;
 
@@ -162,21 +162,11 @@ public class TacticServer
 		}
 		
 		unitGrid = new Unit[l.width*UNITS_PER_TILE][l.height*UNITS_PER_TILE];
-		
-		js = new JSAPI( this );
-		if( gameType == GameType.UMS )
-		{
-			js.load( l.ums );
-		}
-		else if( gameType == GameType.POINTCONTROL )
-		{
-			js.loadFile( "data/gamemodes/pointcapture.js" );
-		}
 			
 		gs.setup( a, b );
 		for( int i = 0; i < 16; i++ )
 		{
-			if( slots[i].p != null )
+			if( slots[i].p != null && !slots[i].p.spectator )
 			{
 				slots[i].p.team = i < 8 ? a : b;
 				if( slots[i].p.isBot )
@@ -215,6 +205,16 @@ public class TacticServer
 			{
 				si.sendToClient( slots[i].p.id, new Message( MessageType.PLAYERUPDATE, slots[i].p ) );	
 			}
+		}
+		
+		js = new JSAPI( this );
+		if( gameType == GameType.UMS )
+		{
+			js.load( l.ums );
+		}
+		else if( gameType == GameType.POINTCONTROL )
+		{
+			js.loadFile( "data/gamemodes/pointcapture.js" );
 		}
 		
 		finder = new AStarPathFinder( l, 500, StaticFiles.advOptions.getB( "diagonalMove" )  );
@@ -262,6 +262,18 @@ public class TacticServer
 		if( p != null )
 		{
 			p.playType = pt;
+		}
+		
+		si.sendToAllClients( new Message( MessageType.PLAYERUPDATE, new Object[] { line, slots[line] } ) );
+	}
+	
+	public void setSpectator( int line, boolean spectator )
+	{
+		Player p = slots[line].p;
+		
+		if( p != null )
+		{
+			p.spectator = spectator;
 		}
 		
 		si.sendToAllClients( new Message( MessageType.PLAYERUPDATE, new Object[] { line, slots[line] } ) );
@@ -350,6 +362,15 @@ public class TacticServer
 					int line = (Integer)oa[0];
 					PlayType pt = (PlayType)oa[1];
 					setPlayType( line, pt );
+					break;
+				}
+				case SETSPECTATOR:
+				{
+					Object[] oa = (Object[])m.message;
+					int line = (Integer)oa[0];
+					boolean spectator = (Boolean)oa[1];
+					
+					setSpectator( line, spectator );
 					break;
 				}
 				case MESSAGE:

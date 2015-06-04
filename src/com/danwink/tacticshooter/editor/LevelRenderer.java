@@ -27,14 +27,19 @@ public class LevelRenderer
 		
 		try
 		{
-			floor = DFile.loadImage( "img" + File.separator + new DOptions( "themes" + File.separator + l.theme ).getS( "floor" ) );
-			wall  = DFile.loadImage( "img" + File.separator + new DOptions( "themes" + File.separator + l.theme ).getS( "wall" ) );
-			grate = DFile.loadImage( "img" + File.separator + new DOptions( "themes" + File.separator + l.theme ).getS( "grate" ) );
+			floor = loadImage( l.themeName, "floor" );
+			wall  = loadImage( l.themeName, "wall" );
+			grate = loadImage( l.themeName, "grate" );
 		}
 		catch( IOException e )
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	public BufferedImage loadImage( String theme, String name ) throws IOException
+	{
+		return DFile.loadImage( "themes" + File.separator + theme + File.separator + name + ".png" );
 	}
 	
 	public void render( Graphics2DIRenderer g, Building selected )
@@ -85,16 +90,17 @@ public class LevelRenderer
 		g.pushMatrix();
 		g.translate( x*Level.tileSize, y*Level.tileSize );
 		//g.scale( tileSize/32f, tileSize/32f );
-		AutoTileDrawer.draw( g.g, tileImage, Level.tileSize, 0, 	
-													l.getTile( x-1, y-1 ).connectsTo( autoTile ), 
-													l.getTile( x, y-1 ).connectsTo( autoTile ), 
-													l.getTile( x+1, y-1 ).connectsTo( autoTile ), 
-													l.getTile( x-1, y ).connectsTo( autoTile ), 
-													l.getTile( x+1, y ).connectsTo( autoTile ), 
-													l.getTile( x-1, y+1 ).connectsTo( autoTile ), 
-													l.getTile( x, y+1 ).connectsTo( autoTile ), 
-													l.getTile( x+1, y+1 ).connectsTo( autoTile ) 
-		);
+		boolean nw = l.getTile( x-1, y-1 ).connectsTo( autoTile );
+		boolean n = l.getTile( x, y-1 ).connectsTo( autoTile );
+		boolean ne = l.getTile( x+1, y-1 ).connectsTo( autoTile );
+		boolean w = l.getTile( x-1, y ).connectsTo( autoTile );
+		boolean e = l.getTile( x+1, y ).connectsTo( autoTile );
+		boolean sw = l.getTile( x-1, y+1 ).connectsTo( autoTile );
+		boolean s = l.getTile( x, y+1 ).connectsTo( autoTile );
+		boolean se = l.getTile( x+1, y+1 ).connectsTo( autoTile );
+		
+		AutoTileDrawer.draw( g.g, tileImage, Level.tileSize, 0, nw, n, ne, w, e, sw, s, se );
+		
 		g.popMatrix();
 	}
 }

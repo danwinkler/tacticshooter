@@ -10,6 +10,7 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.Node;
+import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 
@@ -160,8 +161,10 @@ public class LevelFileHelper
 			code.setText( m.ums );
 		}
 		
+		OutputFormat format = OutputFormat.createPrettyPrint();
 		XMLWriter writer = new XMLWriter(
-	            new FileWriter( file )
+	            new FileWriter( file ),
+	            format
 	        );
 	    writer.write( doc );
 	    writer.close();
