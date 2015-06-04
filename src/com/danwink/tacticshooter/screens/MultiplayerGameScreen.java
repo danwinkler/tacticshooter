@@ -118,6 +118,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	
 	GameRenderer gameRenderer;
 	
+	long lastClick;
+	
 	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
 	{
 		this.dsh = dsh;
@@ -682,9 +684,13 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	}
 
 	public void mouseReleased( int button, int x, int y )
-	{
+	{	
 		if( button == Input.MOUSE_LEFT_BUTTON && selecting )
 		{
+			for( int i = 0; i < cs.selected.size(); i++ )
+			{
+				cs.unitMap.get( cs.selected.get( i ) ).selected = false;
+			}
 			cs.selected.clear();
 			
 			float x1 = Math.min( sx, x+cs.scrollx );
@@ -705,6 +711,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			}
 			else
 			{
+				UnitType matchType = null;
 				for( Unit u : cs.units )
 				{
 					float dx = x2 - u.x;
@@ -713,6 +720,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 					{
 						u.selected = true;
 						cs.selected.add( u.id );
+						matchType = u.type;
 						break;
 					}
 					else
@@ -720,9 +728,28 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 						u.selected = false;
 					}
 				}
+				if( cs.selected.size() == 1 && System.currentTimeMillis() - lastClick < 500 ) 
+				{
+					for( Unit u : cs.units )
+					{
+						if( 
+							u.type == matchType 
+							&& u.x > cs.scrollx 
+							&& u.y > cs.scrolly 
+							&& u.x < cs.scrollx + gc.getWidth() 
+							&& u.y < cs.scrolly + gc.getHeight()
+							&& !cs.selected.contains( u.id )
+						) 
+						{
+							u.selected = true;
+							cs.selected.add( u.id );
+						}
+					}
+				}
 			}
 			selecting = false;
 		}
+		lastClick = System.currentTimeMillis();
 	}
 
 	public void mouseDragged( int oldx, int oldy, int newx, int newy )
