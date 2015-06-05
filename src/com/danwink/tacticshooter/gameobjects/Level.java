@@ -147,11 +147,11 @@ public class Level implements TileBasedMap
 		g.popTransform();
 	}
 	
-	public void renderBuildings( Graphics g )
+	public void renderBuildings( Graphics g, boolean endGame  )
 	{
 		for( Building b : buildings )
 		{
-			b.render( g );
+			b.render( g, endGame );
 		}
 	}
 	

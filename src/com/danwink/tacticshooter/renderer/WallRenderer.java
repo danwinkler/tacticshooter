@@ -9,7 +9,7 @@ import com.danwink.tacticshooter.gameobjects.Level;
 
 public class WallRenderer
 {
-	Image texture;
+	public Image texture;
 	
 	public void render( Graphics g, ClientState cs ) 
 	{

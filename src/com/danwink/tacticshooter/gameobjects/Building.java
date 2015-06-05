@@ -49,11 +49,11 @@ public class Building
 		radius = bt.bu.getRadius();
 	}
 
-	public void render( Graphics g )
+	public void render( Graphics g, boolean endGame  )
 	{
 		g.pushTransform();
 		g.translate( x, y );
-		if( t != null )
+		if( t != null && !endGame )
 		{
 			Color teamColor = t.getColor();
 			g.setColor( new Color( teamColor.r, teamColor.g, teamColor.b, .3f ) );

@@ -26,7 +26,7 @@ public class BloodExplosionRenderer
 
 	public Color bloodColor = new Color( 255, 0, 0 );
 	
-	Image texture;
+	public Image texture;
 	Graphics tg;
 	
 	private ConcurrentLinkedDeque<Point2f> bloodToDraw = new ConcurrentLinkedDeque<>();

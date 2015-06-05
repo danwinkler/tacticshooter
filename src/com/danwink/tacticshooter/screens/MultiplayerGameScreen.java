@@ -103,6 +103,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	Image bloodTexture;
 	Image fog;	
 	
+	Image endMap;
+	
 	boolean fogEnabled;
 	
 	ArrayList<String> messages = new ArrayList<String>();
@@ -268,6 +270,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				break;
 			case GAMEOVER:
 				dsh.message( "postgame", m.message );
+				dsh.message( "postgame", endMap );
 				dsh.activate( "postgame", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
 				return;
 			case FOGUPDATE:
@@ -414,29 +417,44 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		if( cs.l == null )
 		{
 			return;
-		} else if( bloodTexture == null )
+		}
+		
+		//TODO: faster way to know when game is over, but server hasn't yet send GAMEOVER command?
+		if( endMap == null )
 		{
-			try
+			//Render endMap if game is over
+			//Find out if game is over
+			int teamA = -1;
+			boolean gameOver = false;
+			for( int i = 0; i < cs.l.buildings.size(); i++ )
 			{
-				bloodTexture = new Image( cs.l.width * Level.tileSize, cs.l.height * Level.tileSize );
-				btg = bloodTexture.getGraphics();
-				cs.l.renderFloor( btg );
-				btg.flush();
-				btg.setColor( new Color( 255, 0, 0, 200 ) );
-				wallTexture = new Image( cs.l.width * Level.tileSize, cs.l.height * Level.tileSize );
-				
-				Graphics wtg = wallTexture.getGraphics();
-				wtg.clearAlphaMap();
-				cs.l.render( wtg );
-				wtg.flush();
-				
-				if( fogEnabled )
-				{
-					fog = new Image( cs.l.width * Level.tileSize, cs.l.height * Level.tileSize );
+				Building b = cs.l.buildings.get( i );
+				if( b.t != null ) {
+					if( teamA != -1 && b.t.id != teamA )
+					{
+						gameOver = true;
+						break;
+					}
+					else
+					{
+						teamA = b.t.id;
+					}
 				}
-			} catch( SlickException e )
+			}
+			if( gameOver )
 			{
-				e.printStackTrace();
+				try
+				{
+					endMap = new Image( cs.l.width * Level.tileSize, cs.l.height * Level.tileSize );
+					Graphics emg = endMap.getGraphics();
+					emg.setAntiAlias( true );
+					gameRenderer.renderEndGameMap( emg, cs );		
+				}
+				catch( SlickException e )
+				{
+					e.printStackTrace();
+				}
+				
 			}
 		}
 		
@@ -498,7 +516,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		}
 		g.translate( xOffset, yOffset );
 		g.scale( scale, scale );
-		cs.l.renderBuildings( g );
+		cs.l.renderBuildings( g, false );
 		for( int i = 0; i < cs.units.size(); i++ )
 		{
 			Unit u = cs.units.get( i );
@@ -507,9 +525,9 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		
 		if( fogEnabled )
 		{
-			g.setDrawMode( Graphics.MODE_COLOR_MULTIPLY );
-			g.drawImage( fog, 0, 0 );
-			g.setDrawMode( Graphics.MODE_NORMAL );
+			//g.setDrawMode( Graphics.MODE_COLOR_MULTIPLY );
+			//g.drawImage( fog, 0, 0 );
+			//g.setDrawMode( Graphics.MODE_NORMAL );
 		}
 		
 		g.popTransform();
@@ -587,6 +605,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		bloodTexture = null;
 		wallTexture = null;
 		mapChanged = true;
+		endMap = null;
 		dui.setEnabled( false );
 		messages.clear();
 	}

@@ -43,16 +43,16 @@ public class GameRenderer
 	 * 11. Fog of War (Generated each frame)
 	 */
 	
-	OutsideFloorRenderer outsideFloor;
-	FloorRenderer floor;
-	BloodExplosionRenderer bloodExplosion;
-	WallRenderer wall;
-	BuildingRenderer building;
-	UnitBodyRenderer unitBody;
-	BulletRenderer bullet;
-	ParticleSystemRenderer particle;
-	UnitInfoRenderer unitInfo;
-	FogRenderer fog;
+	public OutsideFloorRenderer outsideFloor;
+	public FloorRenderer floor;
+	public BloodExplosionRenderer bloodExplosion;
+	public WallRenderer wall;
+	public BuildingRenderer building;
+	public UnitBodyRenderer unitBody;
+	public BulletRenderer bullet;
+	public ParticleSystemRenderer particle;
+	public UnitInfoRenderer unitInfo;
+	public FogRenderer fog;
 	
 	ConcurrentLinkedDeque<Unit> unitsToKill = new ConcurrentLinkedDeque<>();
 	
@@ -97,7 +97,7 @@ public class GameRenderer
 		
 		floor.render( g, cs );
 		bloodExplosion.render( g, cs, unitBody );
-		building.render( g, cs );
+		building.render( g, cs, false );
 		unitBody.render( g, cs );
 		wall.render( g, cs );
 		bullet.render( g, cs );
@@ -108,6 +108,14 @@ public class GameRenderer
 			
 		//TODO: uncomment when all renderers are completed
 		//g.popTransform();
+	}
+	
+	public void renderEndGameMap( Graphics g, ClientState cs )
+	{
+		floor.render( g, cs );
+		bloodExplosion.render( g, cs, unitBody );
+		building.render( g, cs, true );
+		wall.render( g, cs );
 	}
 	
 	public void killUnit( Unit u )

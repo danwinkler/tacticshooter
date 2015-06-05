@@ -1,5 +1,8 @@
 package com.danwink.tacticshooter.screens;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.newdawn.slick.Color;
@@ -8,6 +11,10 @@ import org.newdawn.slick.Graphics;
 
 
 
+
+import org.newdawn.slick.Image;
+import org.newdawn.slick.SlickException;
+import org.newdawn.slick.imageout.ImageOut;
 
 import com.danwink.tacticshooter.GameStats;
 import com.danwink.tacticshooter.StaticFiles;
@@ -31,10 +38,12 @@ public class PostGameScreen extends DScreen<GameContainer, Graphics> implements 
 	DUI dui;
 	DButton okay;
 	DButton rejoin;
+	DButton saveImage;
 	
 	Slick2DRenderer r = new Slick2DRenderer();
 	
 	GameStats stats;
+	Image endMap;
 	
 	public void onActivate( GameContainer e, DScreenHandler<GameContainer, Graphics> dsh )
 	{
@@ -58,13 +67,15 @@ public class PostGameScreen extends DScreen<GameContainer, Graphics> implements 
 			x += 400;
 		}
 		
-		okay = new DButton( "Okay", e.getWidth() / 2 - 200, e.getHeight() - 200, 200, 100 );
-		rejoin = new DButton( "Rejoin", e.getWidth() / 2, e.getHeight() - 200, 200, 100 );
+		okay = new DButton( "Okay", e.getWidth() / 2 - 300, e.getHeight() - 200, 200, 100 );
+		rejoin = new DButton( "Rejoin", e.getWidth() / 2 - 100, e.getHeight() - 200, 200, 100 );
+		saveImage = new DButton( "Save Image of End Map", e.getWidth()/2 + 100, e.getHeight() - 200, 200, 100 );
 		
 		StaticFiles.getMusic( "menu" ).loop();
 		
 		dui.add( okay );
 		dui.add( rejoin );
+		dui.add( saveImage );
 		
 		dui.add( new DText( "Points:", e.getWidth()/2 - 500, e.getHeight()/2 - 100 ) );
 		dui.add( new DText( "Units:", e.getWidth()/2 - 500, e.getHeight()/2 + 100 ) );
@@ -100,12 +111,15 @@ public class PostGameScreen extends DScreen<GameContainer, Graphics> implements 
 		dui.addDUIListener( this );
 		
 		dui.setEnabled( true );
+		rd = false;
 	}
 	
 	public void update( GameContainer gc, float delta )
 	{
 		dui.update();
 	}
+	
+	boolean rd = false;
 
 	public void render( GameContainer gc, Graphics g )
 	{
@@ -113,6 +127,23 @@ public class PostGameScreen extends DScreen<GameContainer, Graphics> implements 
 		g.fillRect( 0, 0, gc.getWidth(), gc.getHeight() );
 		
 		dui.render( r.renderTo( g ) );
+		
+		//SO yeah I have to render here in order to get the blood to show up :/
+		if( !rd )
+		{
+			try
+			{
+				Graphics emg = endMap.getGraphics();
+				MultiplayerGameScreen mgs = ((MultiplayerGameScreen)dsh.get( "multiplayergame" ));
+				endMap.getGraphics().drawImage( mgs.gameRenderer.bloodExplosion.texture, 0, 0 );
+				endMap.getGraphics().drawImage( mgs.gameRenderer.wall.texture, 0, 0 );
+			}
+			catch( SlickException e )
+			{
+				e.printStackTrace();
+			}
+			rd = true;
+		}
 	}
 
 	public void onExit()
@@ -133,14 +164,41 @@ public class PostGameScreen extends DScreen<GameContainer, Graphics> implements 
 			{
 				dsh.message( "connect", ((MultiplayerSetupScreen)dsh.get( "multiplayersetup" )).address.getText().trim() );
 				dsh.activate( "connect", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
+			} else if( e == saveImage )
+			{
+				if( endMap == null ) return;
+				saveImage.setText( "Image Saved!" );
+				try
+				{
+					//We have to create the FileOutputStream ourselves, as the ImageOut utility will never close it!
+					FileOutputStream fos = new FileOutputStream( "screenshots/" + System.currentTimeMillis() + ".png" );
+					ImageOut.write( endMap.getFlippedCopy( false, false ), "png", fos );
+					fos.close();
+					endMap.destroy();
+					endMap = null;
+				}
+				catch( SlickException | IOException e1 )
+				{
+					e1.printStackTrace();
+				}
 			}
 		}
+		
+		
 	}
 
 	@Override
 	public void message( Object o )
 	{
-		stats = (GameStats)o;
+		if( o instanceof GameStats )
+		{
+			stats = (GameStats)o;
+		}
+		else if( o instanceof Image )
+		{
+			endMap = (Image)o;
+		}
+		
 	} 
 	
 	public void onResize( int width, int height ) {}
