@@ -732,12 +732,14 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 						u.selected = false;
 					}
 				}
-				if( cs.selected.size() == 1 && System.currentTimeMillis() - lastClick < 500 ) 
+				long timeDiff = System.currentTimeMillis() - lastClick;
+				if( cs.selected.size() == 1 && timeDiff > 100 && timeDiff < 500 ) 
 				{
 					for( Unit u : cs.units )
 					{
 						if( 
-							u.type == matchType 
+							u.type == matchType
+							&& u.owner.id == this.cs.player.id
 							&& u.x > cs.scrollx 
 							&& u.y > cs.scrolly 
 							&& u.x < cs.scrollx + gc.getWidth() 
@@ -753,7 +755,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			}
 			selecting = false;
 		}
-		lastClick = System.currentTimeMillis();
+		if( cs.selected.size() > 0 ) lastClick = System.currentTimeMillis();
 	}
 
 	public void mouseDragged( int oldx, int oldy, int newx, int newy )

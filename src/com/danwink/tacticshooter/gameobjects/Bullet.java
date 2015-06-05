@@ -32,6 +32,8 @@ public class Bullet
 	
 	Point2f p = new Point2f();
 	
+	int age = 0;
+	
 	public Bullet()
 	{
 		
@@ -88,6 +90,7 @@ public class Bullet
 				if( Math.random() * 2.0f < Math.abs( dir.y ) / Math.abs( dir.x ) )
 				{
 					b = new Bullet( hitPoint.x-(dir.x*.01f), hitPoint.y, -dir.x, dir.y );
+					b.age = this.age + 1;
 				}
 			}
 			else if( Math.abs( hitPoint.y - Math.round( hitPoint.y ) ) < .001f )
@@ -96,10 +99,11 @@ public class Bullet
 				if( Math.random() * 2.0f < Math.abs( dir.x ) / Math.abs( dir.y ) )
 				{
 					b = new Bullet( hitPoint.x, hitPoint.y-(dir.y*.01f), dir.x, -dir.y );
+					b.age = this.age + 1;
 				}
 			}
 			
-			if( b != null )
+			if( b != null && b.age < 5 )
 			{
 				b.owner = this.owner;
 				b.shooter = this.shooter;
