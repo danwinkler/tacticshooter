@@ -276,7 +276,7 @@ public class Unit
 			else 
 			{
 				timeSinceLastFrame -= frameTime/type.speed;
-				frame = (frame+1) % 4;
+				frame = (frame+1) % 8;
 			}
 		}
 		if( state == UnitState.STOPPED )

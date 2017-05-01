@@ -76,6 +76,10 @@ public class Level implements TileBasedMap
 				{
 					drawAutoTile( g, x, y, TileType.FLOOR, theme.floor );
 				}
+				else
+				{
+					g.drawImage( theme.floor, x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize, theme.floor.getWidth()/3, 0, theme.floor.getWidth()/3 * 2, theme.floor.getHeight()/4 );
+				}
 			}
 		}
 	}
@@ -108,7 +112,7 @@ public class Level implements TileBasedMap
 			drawAutoTile( g, x, y, TileType.GRATE, theme.grate );
 			break;
 		case WALL:
-			g.drawImage( theme.floor, x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize, theme.floor.getWidth()/3, 0, theme.floor.getWidth()/3 * 2, theme.floor.getHeight()/4 );
+			//g.drawImage( theme.floor, x*tileSize, y*tileSize, x*tileSize+tileSize, y*tileSize+tileSize, theme.floor.getWidth()/3, 0, theme.floor.getWidth()/3 * 2, theme.floor.getHeight()/4 );
 			drawAutoTile( g, x, y, tiles[x][y], theme.wall );
 			break;
 		case FLOOR:

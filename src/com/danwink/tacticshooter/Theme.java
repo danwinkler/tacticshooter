@@ -23,7 +23,8 @@ public class Theme
 	public SpriteSheet lightColor;
 	public SpriteSheet heavy;
 	public SpriteSheet heavyColor;
-	
+	public SpriteSheet dir4;
+	public SpriteSheet dir8;
 	
 	private Theme( String name ) throws SlickException
 	{
@@ -39,6 +40,9 @@ public class Theme
 		lightColor = loadSS( "light_color", 16 );
 		heavy = loadSS( "heavy", 32 );
 		heavyColor = loadSS( "heavy_color", 32 );
+		
+		dir4 = loadSS( "4dirtest", 16 );
+		dir8 = loadSS( "8dirtest", 48 );
 	}
 	
 	private Image load( String s ) throws SlickException

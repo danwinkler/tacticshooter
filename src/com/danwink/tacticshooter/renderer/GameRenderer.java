@@ -1,5 +1,7 @@
 package com.danwink.tacticshooter.renderer;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import jp.objectclub.vecmath.Point2f;
@@ -77,6 +79,11 @@ public class GameRenderer
 	
 	public void render( Graphics g, ClientState cs, GameContainer gc, boolean fogEnabled )
 	{
+		//Sort units by y
+		Collections.sort( cs.units, ( Unit a, Unit b ) -> {
+			return ((int)a.y - (int)b.y);
+		});
+		
 		//Prerendering to secondary textures
 		while( !unitsToKill.isEmpty() )
 		{
@@ -93,13 +100,13 @@ public class GameRenderer
 		outsideFloor.render( g, cs, gc );
 		
 		g.pushTransform();
-		g.translate( -cs.scrollx, -cs.scrolly );
+		g.translate( -(int)cs.scrollx, -(int)cs.scrolly );
 		
 		floor.render( g, cs );
 		bloodExplosion.render( g, cs, unitBody );
 		building.render( g, cs, false );
-		unitBody.render( g, cs );
 		wall.render( g, cs );
+		unitBody.render( g, cs );
 		bullet.render( g, cs );
 		particle.render( g );
 		unitInfo.render( g, cs, gc.getInput() );
@@ -182,6 +189,8 @@ public class GameRenderer
 			switch( u.type )
 			{
 			case SCOUT:
+				healthBarDist = -14;
+				break;
 			case SHOTGUN:
 			case LIGHT:
 			case SNIPER:
@@ -193,11 +202,13 @@ public class GameRenderer
 				break;
 			}
 			
-			g.setColor( Color.black );
-			g.fillRect( -9, healthBarDist, (18.f * u.health/u.type.health), 4 );
-			
-			g.setColor( new Color( DMath.bound( 1.f - u.health/u.type.health, 0, 1 ), DMath.bound(u.health/u.type.health, 0, 1 ), 0 ) );
-			g.fillRect( -8, healthBarDist+1, (16.f * u.health/u.type.health), 2 );
+			if( u.selected ) {
+				g.setColor( Color.black );
+				g.fillRect( -9, healthBarDist, (18.f * u.health/u.type.health), 4 );
+				
+				g.setColor( new Color( DMath.bound( 1.f - u.health/u.type.health, 0, 1 ), DMath.bound(u.health/u.type.health, 0, 1 ), 0 ) );
+				g.fillRect( -8, healthBarDist+1, (16.f * u.health/u.type.health), 2 );
+			}
 			
 			float dmx = u.x - mx;
 			float dmy = u.y - my;
