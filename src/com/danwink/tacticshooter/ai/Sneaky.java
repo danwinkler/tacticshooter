@@ -32,7 +32,7 @@ public class Sneaky extends ComputerPlayer
 			if( u.owner.id == player.id && (u.state == UnitState.STOPPED) )
 			{
 				//Find closest enemy building
-				Building closeb = findBuildingClosest( new Point2f( u.x, u.y ), new Filter<Building>( u, finder ) {
+				Building closeb = findBuildingClosest( new Point2f( u.x, u.y ), new OldFilter<Building>( u, finder ) {
 					public boolean valid( Building b ) {
 						return (b.t == null || b.t.id != player.team.id) && b.isCapturable( l, (Unit)o[0], (PathFinder)o[1] );
 					}

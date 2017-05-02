@@ -12,6 +12,7 @@ import org.newdawn.slick.util.pathfinding.PathFinder;
 import com.danwink.tacticshooter.ai.Aggressive;
 import com.danwink.tacticshooter.ai.Fortifier;
 import com.danwink.tacticshooter.ai.Good2;
+import com.danwink.tacticshooter.ai.Good3;
 import com.danwink.tacticshooter.ai.Masser;
 import com.danwink.tacticshooter.ai.Moderate;
 import com.danwink.tacticshooter.ai.Passive;
@@ -24,6 +25,7 @@ import com.danwink.tacticshooter.gameobjects.Level.TileType;
 import com.danwink.tacticshooter.network.FakeConnection;
 import com.danwink.tacticshooter.network.Message;
 import com.danwink.tacticshooter.network.ServerNetworkInterface;
+import com.phyloa.dlib.math.Point2i;
 
 public abstract class ComputerPlayer implements Runnable 
 {
@@ -149,7 +151,7 @@ public abstract class ComputerPlayer implements Runnable
 		}
 	}
 	
-	public Building findBuildingClosest( Point2f p, Filter<Building> f )
+	public Building findBuildingClosest( Point2f p, OldFilter<Building> f )
 	{
 		Building closeb = null;
 		float closed2 = Float.MAX_VALUE;
@@ -164,6 +166,27 @@ public abstract class ComputerPlayer implements Runnable
 				{
 					closeb = b;
 					closed2 = d2;
+				}
+			}
+		}
+		return closeb;
+	}
+	
+	public Building findBuildingShortestPath( Point2f p, PathFinder finder, OldFilter<Building> f )
+	{
+		Building closeb = null;
+		float closeDist = Float.MAX_VALUE;
+		for( Building b : l.buildings )
+		{
+			if( f.valid( b ) )
+			{
+				Path path = finder.findPath( null, l.getTileX( b.x ), l.getTileY( b.y ), l.getTileX( p.x ), l.getTileY( p.y ) );
+				if( path == null ) continue;
+				float d2 = path.getLength();
+				if( d2 < closeDist )
+				{
+					closeDist = d2;
+					closeb = b;
 				}
 			}
 		}
@@ -191,15 +214,25 @@ public abstract class ComputerPlayer implements Runnable
 		return closeb;
 	}
 	
+	public void moveUnit( Unit u, Point2i p )
+	{
+		ArrayList<Integer> selected = new ArrayList<Integer>();
+		selected.add( u.id );
+		ci.sl.received( fc, new Message( MessageType.SETATTACKPOINT, new Object[]{ p, selected } ) );
+	}
+	
 	public enum PlayType
 	{
 		AGGRESSIVE( Aggressive.class ),
+		/*
 		SNEAKY( Sneaky.class ),
 		MODERATE( Moderate.class ),
 		MASSER( Masser.class ),
 		FORTIFIER( Fortifier.class ),
 		PASSIVE( Passive.class ),
-		GOOD2( Good2.class );
+		*/
+		GOOD2( Good2.class ),
+		GOOD3( Good3.class );
 		
 		Class<? extends ComputerPlayer> c;
 		
@@ -209,16 +242,21 @@ public abstract class ComputerPlayer implements Runnable
 		}
 	}
 	
-	public abstract class Filter<E>
+	public interface Filter<E>
+	{
+		public boolean valid( E e );
+	}
+	
+	public abstract class OldFilter<E>
 	{
 		public Object[] o;
 		
-		public Filter()
+		public OldFilter()
 		{
 			
 		}
 		
-		public Filter( Object... o )
+		public OldFilter( Object... o )
 		{
 			this.o = o;
 		}

@@ -56,7 +56,7 @@ public class Masser extends ComputerPlayer
 		if( target == null ) return;
 		
 		//Find closest friendly building to target
-		closeb = findBuildingShortestPath( new Point2f( target.x, target.y ), finder, new Filter<Building>() {
+		closeb = findBuildingShortestPath( new Point2f( target.x, target.y ), finder, new OldFilter<Building>() {
 			public boolean valid( Building b ) {
 				return b.t != null && b.t.id == Masser.this.player.team.id && b.hold == Building.HOLDMAX;
 			}

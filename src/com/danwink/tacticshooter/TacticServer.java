@@ -110,7 +110,7 @@ public class TacticServer
 			p.slot = i;
 			String[] rnames = StaticFiles.names.split( "\n" );
 			p.name = rnames[DMath.randomi( 0, rnames.length )].split( " " )[0];
-			p.playType = PlayType.GOOD2;
+			p.playType = PlayType.GOOD3;
 			p.isBot = true;
 			slots[i].p = p;
 		}
@@ -121,7 +121,7 @@ public class TacticServer
 			p.slot = i;
 			String[] rnames = StaticFiles.names.split( "\n" );
 			p.name = rnames[DMath.randomi( 0, rnames.length )].split( " " )[0];
-			p.playType = PlayType.GOOD2;
+			p.playType = PlayType.GOOD3;
 			p.isBot = true;
 			slots[i].p = p;
 		}

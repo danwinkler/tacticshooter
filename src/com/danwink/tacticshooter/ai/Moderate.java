@@ -25,7 +25,7 @@ public class Moderate extends ComputerPlayer
 		{
 			if( u.owner.id == player.id && (u.state == UnitState.STOPPED || Math.random() < .1f) )
 			{
-				Building closeb = findBuildingClosest( new Point2f( u.x, u.y ), new Filter<Building>( u, finder ) {
+				Building closeb = findBuildingClosest( new Point2f( u.x, u.y ), new OldFilter<Building>( u, finder ) {
 					public boolean valid( Building b ) {
 						return b.isCapturable( l, (Unit)o[0], (PathFinder)o[1] ) && (b.t == null || (b.t.id != player.team.id) || (b.t.id == player.team.id && b.hold < Building.HOLDMAX));
 					}
