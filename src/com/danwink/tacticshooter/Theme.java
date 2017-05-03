@@ -41,8 +41,8 @@ public class Theme
 		heavy = loadSS( "heavy", 32 );
 		heavyColor = loadSS( "heavy_color", 32 );
 		
-		dir4 = loadSS( "4dirtest", 16 );
-		dir8 = loadSS( "8dirtest", 48 );
+		//dir4 = loadSS( "4dirtest", 16 );
+		//dir8 = loadSS( "8dirtest", 48 );
 	}
 	
 	private Image load( String s ) throws SlickException

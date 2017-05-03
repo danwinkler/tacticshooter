@@ -176,11 +176,13 @@ public class Unit
 					occupyX = closestSpot.x;
 					occupyY = closestSpot.y;
 					state = UnitState.STOPPED;
+					
 					if( turnOnStop )
 					{
 						state = UnitState.TURNTO;
 						turnOnStop = false;
 					}
+					
 					for( int i = 0; i < l.buildings.size(); i++ )
 					{
 						Building tb = l.buildings.get( i );
@@ -491,6 +493,7 @@ public class Unit
 		this.state = u.state;
 		this.onStep = u.onStep;
 		this.owner = u.owner;
+		this.stoppedAt = u.stoppedAt;
 		timeSinceUpdate = 0;
 	}
 	

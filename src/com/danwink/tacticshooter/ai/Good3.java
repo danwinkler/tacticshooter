@@ -149,7 +149,7 @@ public class Good3 extends ComputerPlayer
 			if( army.location.distance( new Point2f( homeBase.x, homeBase.y ) ) < homeBase.radius*1.5f && bestBorderZone.b.id != homeBase.id )
 			{
 				//If more than n units (5?)
-				if( army.units.size() > 5 )
+				if( army.units.size() > 2 )
 				{
 					//For each zone on border, give a score based on the relative strength vs the closest enemy zone
 					
@@ -215,8 +215,7 @@ public class Good3 extends ComputerPlayer
 				}
 				
 				//Look at closest enemy zone
-					//Decide if you can attack, then attack if so
-				
+				//Decide if you can attack, then attack if so
 				for( Neighbor n : currentZone.neighbors )
 				{
 					if( n.z.b.t.id == player.team.id ) continue;
@@ -252,6 +251,7 @@ public class Good3 extends ComputerPlayer
 				
 				if( ourSize > theirSize * 2.5f )
 				{
+					ci.sl.received( fc, new Message( MessageType.MESSAGE, "Full Attack" ) );
 					for( Building b: l.buildings )
 					{
 						if( b.t.id != player.team.id && b.isCapturable( l ) )
@@ -267,26 +267,28 @@ public class Good3 extends ComputerPlayer
 	
 	public Zone findBestBorderZone()
 	{
-		//TODO: a zone that borders more of our own zones should get a higher score
-		
 		Zone best = null;
 		int score = -1000;
 		for( Zone z : la.zones )
 		{
 			if( z.b.t.id != player.team.id ) continue;
 			
-			int numUnits = 5; //Each point gets a base amount so even if its unoccupied its worth creating a front against
+			int zScore = 5; //Each point gets a base amount so even if its unoccupied its worth creating a front against
 			boolean isBorder = false;
 			for( Neighbor n : z.neighbors )
 			{
 				if( n.z.b.t.id != player.team.id )
 				{
-					numUnits += numUnitsAtBuilding( n.z.b );
+					zScore += numUnitsAtBuilding( n.z.b );
 					isBorder = true;
+				}
+				else
+				{
+					zScore += 5; // a zone that borders more of our own zones should get a higher score
 				}
 			}
 			
-			int zScore = numUnits - numUnitsAtBuilding( z.b );
+			zScore -= numUnitsAtBuilding( z.b );
 			
 			if( !isBorder )
 			{
