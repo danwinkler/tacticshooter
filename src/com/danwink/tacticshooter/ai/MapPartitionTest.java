@@ -49,7 +49,7 @@ public class MapPartitionTest extends BasicGame
 		try
 		{
 			t = Theme.getTheme( "desertrpg" );
-			l = LevelFileHelper.loadLevel( levels[0] );
+			l = LevelFileHelper.loadLevel( levels[5] );
 			l.theme = t;
 			
 			la = new LevelAnalysis();

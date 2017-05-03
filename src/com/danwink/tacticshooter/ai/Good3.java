@@ -224,7 +224,7 @@ public class Good3 extends ComputerPlayer
 					
 					int nZoneStrength = numUnitsAtBuilding( n.z.b );
 					
-					if( nZoneStrength < army.units.size() * 2f )
+					if( nZoneStrength < army.units.size() * .75f )
 					{
 						army.move(  n.z.b.x, n.z.b.y );
 						break armyBreak;

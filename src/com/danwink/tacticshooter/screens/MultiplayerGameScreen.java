@@ -477,10 +477,12 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		}
 		
 		//DEBUG INFO
-		///if( true )
-		//{
-		//	((HomeScreen)dsh.get( "home" )).server.comps.get( 0 ).render( g );
-		//}
+		/*
+		if( true )
+		{
+			((HomeScreen)dsh.get( "home" )).server.comps.get( 1 ).render( g );
+		}
+		*/
 		
 		//TODO: delete when all renderers are completed
 		g.popTransform();

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.util.pathfinding.Path;
+import org.newdawn.slick.util.pathfinding.Path.Step;
 import org.newdawn.slick.util.pathfinding.PathFinder;
 
 import com.danwink.tacticshooter.ai.LevelAnalysis.Zone;
@@ -93,6 +95,7 @@ public class LevelAnalysis
 	public void build( Level l, PathFinder finder )
 	{
 		this.l = l;
+		l.randomFinding = false;
 		width = l.width;
 		height = l.height;
 		
@@ -156,13 +159,38 @@ public class LevelAnalysis
 			}
 		}
 		
+		//Calculate zone distances
+		//Prune neighbors whose paths force us to go through another zone's building (so we dont feed)
 		for( Zone z : zones )
 		{
-			for( Neighbor n : z.neighbors )
+			for( int i = 0; i < z.neighbors.size(); i++ )
 			{
-				n.distance = finder.findPath( null, l.getTileX( z.b.x ), l.getTileY( z.b.y ), l.getTileX( n.z.b.x ), l.getTileY( n.z.b.y ) ).getLength();
+				Neighbor n = z.neighbors.get( i );
+				Path p = finder.findPath( null, l.getTileX( z.b.x ), l.getTileY( z.b.y ), l.getTileX( n.z.b.x ), l.getTileY( n.z.b.y ) );
+				n.distance = p.getLength();
+				
+				for( int j = 0; j < p.getLength(); j++ )
+				{
+					Step s = p.getStep( j );
+					TileAnalysis ta = tiles[s.getX()][s.getY()];
+					if( ta.zone != z && ta.zone != n.z )
+					{
+						float dx = ta.zone.b.x - (s.getX()*Level.tileSize);
+						float dy = ta.zone.b.y - (s.getY()*Level.tileSize);
+						float distance = (float)Math.sqrt( (dx*dx) + (dy*dy) );
+						
+						if( distance < (5*Level.tileSize) )
+						{
+							z.neighbors.remove( i );
+							i--;
+							break;
+						}
+					}
+				}
 			}
 		}
+		
+		l.randomFinding = true;
 	}
 	
 	class TileAnalysis
