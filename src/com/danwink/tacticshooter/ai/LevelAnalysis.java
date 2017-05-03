@@ -7,11 +7,14 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.util.pathfinding.PathFinder;
 
+import com.danwink.tacticshooter.ai.LevelAnalysis.Zone;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Team;
 import com.danwink.tacticshooter.gameobjects.Building.BuildingType;
 import com.phyloa.dlib.util.DMath;
+
+import jp.objectclub.vecmath.Point2f;
 
 public class LevelAnalysis
 {
@@ -220,10 +223,22 @@ public class LevelAnalysis
 				}
 				if( ta.side != null )
 				{
-					g.setColor( new Color( ta.side.getColor().r, ta.side.getColor().g, ta.side.getColor().b, .2f ) );
-					g.fillRect( x * Level.tileSize, y * Level.tileSize, Level.tileSize, Level.tileSize );
+					//g.setColor( new Color( ta.side.getColor().r, ta.side.getColor().g, ta.side.getColor().b, .1f ) );
+					//g.fillRect( x * Level.tileSize, y * Level.tileSize, Level.tileSize, Level.tileSize );
+					//g.setColor( Color.black );
+					//g.drawString( Integer.toString( ta.side.id ), x * Level.tileSize + 5, y * Level.tileSize );
 				}
 			}
 		}
+	}
+
+	public Zone getZone( Point2f location )
+	{
+		return tiles[l.getTileX( location.x )][l.getTileY( location.y )].zone;
+	}
+	
+	public Team getSide( Point2f location )
+	{
+		return tiles[l.getTileX( location.x )][l.getTileY( location.y )].side;
 	}
 }

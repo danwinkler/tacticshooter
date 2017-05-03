@@ -69,6 +69,8 @@ public class TacticServer
 	
 	GameType gameType = GameType.POINTCONTROL;
 	
+	public ArrayList<ComputerPlayer> comps = new ArrayList<ComputerPlayer>();
+	
 	//LOBBY
 	Slot[] slots = new Slot[16];
 	int selectedMap = 0;
@@ -164,6 +166,7 @@ public class TacticServer
 		unitGrid = new Unit[l.width*UNITS_PER_TILE][l.height*UNITS_PER_TILE];
 			
 		gs.setup( a, b );
+		comps.clear();
 		for( int i = 0; i < 16; i++ )
 		{
 			if( slots[i].p != null && !slots[i].p.spectator )
@@ -184,6 +187,7 @@ public class TacticServer
 					cp.setup( (ServerNetworkInterface)si );
 					cp.player = slots[i].p;
 					cp.l = l;
+					comps.add( cp );
 					slots[i].p.id = cp.fc.id;
 					players.put( cp.fc.id, slots[i].p );
 					Thread ct = new Thread( cp );

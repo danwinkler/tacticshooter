@@ -71,6 +71,15 @@ public class Building
 		g.popTransform();
 	}
 	
+	public void sync( Building b )
+	{
+		this.t = b.t;
+		this.bt = b.bt;
+		this.x = b.x;
+		this.y = b.y;
+		this.hold = b.hold;
+	}
+	
 	public boolean update( TacticServer ts )
 	{
 		boolean updateClient = false;

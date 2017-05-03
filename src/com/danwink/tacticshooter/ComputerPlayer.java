@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import jp.objectclub.vecmath.Point2f;
 
+import org.newdawn.slick.Graphics;
 import org.newdawn.slick.util.pathfinding.AStarPathFinder;
 import org.newdawn.slick.util.pathfinding.Path;
 import org.newdawn.slick.util.pathfinding.PathFinder;
@@ -57,6 +58,11 @@ public abstract class ComputerPlayer implements Runnable
 	
 	public abstract void update( PathFinder finder );
 	
+	public void render( Graphics g )
+	{
+		
+	}
+	
 	@SuppressWarnings( "incomplete-switch" )
 	public void run() 
 	{
@@ -99,7 +105,8 @@ public abstract class ComputerPlayer implements Runnable
 							Building b = l.buildings.get( i );
 							if( b.id == building.id )
 							{
-								l.buildings.set( i, building );
+								b.sync( building );
+								break;
 							}
 						}
 					}
@@ -219,6 +226,19 @@ public abstract class ComputerPlayer implements Runnable
 		ArrayList<Integer> selected = new ArrayList<Integer>();
 		selected.add( u.id );
 		ci.sl.received( fc, new Message( MessageType.SETATTACKPOINT, new Object[]{ p, selected } ) );
+	}
+	
+	public int numUnitsAtBuilding( Building b )
+	{
+		int num = 0;
+		for( Unit u: units )
+		{
+			if( u.stoppedAt != null && u.stoppedAt.id == b.id )
+			{
+				num++;
+			}
+		}
+		return num;
 	}
 	
 	public enum PlayType

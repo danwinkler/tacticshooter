@@ -476,6 +476,12 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			g.drawRect( x1, y1, x2-x1, y2-y1 );
 		}
 		
+		//DEBUG INFO
+		///if( true )
+		//{
+		//	((HomeScreen)dsh.get( "home" )).server.comps.get( 0 ).render( g );
+		//}
+		
 		//TODO: delete when all renderers are completed
 		g.popTransform();
 		
