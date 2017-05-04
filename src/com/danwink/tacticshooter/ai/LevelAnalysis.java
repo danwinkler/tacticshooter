@@ -92,23 +92,8 @@ public class LevelAnalysis
 		}
 	}
 	
-	public void build( Level l, PathFinder finder )
+	public void createInitialZones()
 	{
-		this.l = l;
-		l.randomFinding = false;
-		width = l.width;
-		height = l.height;
-		
-		tiles = new TileAnalysis[width][height];
-		for( int x = 0; x < width; x++ )
-		{
-			for( int y = 0; y < height; y++ )
-			{
-				tiles[x][y] = new TileAnalysis();
-			}
-		}
-		
-		//Set initial zones
 		for( Building b : l.buildings )
 		{
 			if( b.bt == BuildingType.CENTER ) 
@@ -133,34 +118,10 @@ public class LevelAnalysis
 				zones.add( z );
 			}
 		}
-		
-		//Flood fill
-		try
-		{
-			fillField( "zone" );
-			fillField( "side" );
-		}
-		catch( IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e )
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		
-		//for each zone, calculate adjacent zones, and distances to each zone
-		for( int x = 0; x < width; x++ )
-		{
-			for( int y = 0; y < height; y++ )
-			{
-				setAdjacent( x, y, x-1, y );
-				setAdjacent( x, y, x+1, y );
-				setAdjacent( x, y, x, y-1 );
-				setAdjacent( x, y, x, y+1 );
-			}
-		}
-		
-		//Calculate zone distances
-		//Prune neighbors whose paths force us to go through another zone's building (so we dont feed)
+	}
+	
+	public void pruneNeighbors( PathFinder finder )
+	{
 		for( Zone z : zones )
 		{
 			for( int i = 0; i < z.neighbors.size(); i++ )
@@ -189,6 +150,55 @@ public class LevelAnalysis
 				}
 			}
 		}
+	}
+	
+	public void build( Level l, PathFinder finder )
+	{
+		this.l = l;
+		l.randomFinding = false;
+		width = l.width;
+		height = l.height;
+		
+		tiles = new TileAnalysis[width][height];
+		for( int x = 0; x < width; x++ )
+		{
+			for( int y = 0; y < height; y++ )
+			{
+				tiles[x][y] = new TileAnalysis();
+			}
+		}
+		
+		//Set initial zones
+		createInitialZones();
+		
+		//Flood fill
+		try
+		{
+			fillField( "zone" );
+			fillField( "side" );
+		}
+		catch( IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e )
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		//for each zone, calculate adjacent zones, and distances to each zone
+		for( int x = 0; x < width; x++ )
+		{
+			for( int y = 0; y < height; y++ )
+			{
+				setAdjacent( x, y, x-1, y );
+				setAdjacent( x, y, x+1, y );
+				setAdjacent( x, y, x, y-1 );
+				setAdjacent( x, y, x, y+1 );
+			}
+		}
+		
+		//Calculate zone distances
+		//Prune neighbors whose paths force us to go through another zone's building (so we dont feed)
+		pruneNeighbors( finder );
 		
 		l.randomFinding = true;
 	}
