@@ -1,0 +1,134 @@
+package com.danwink.tacticshooter;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+
+import javax.script.ScriptEngineManager;
+
+import org.lwjgl.openal.OpenALException;
+import org.newdawn.slick.AngelCodeFont;
+import org.newdawn.slick.AppGameContainer;
+import org.newdawn.slick.BasicGame;
+import org.newdawn.slick.GameContainer;
+import org.newdawn.slick.Graphics;
+import org.newdawn.slick.SlickException;
+
+import com.danwink.tacticshooter.editor.Editor;
+import com.danwink.tacticshooter.screens.HomeScreen;
+import com.danwink.tacticshooter.screens.LobbyScreen;
+import com.danwink.tacticshooter.screens.LoginScreen;
+import com.danwink.tacticshooter.screens.MessageScreen;
+import com.danwink.tacticshooter.screens.MultiplayerGameScreen;
+import com.danwink.tacticshooter.screens.MultiplayerSetupScreen;
+import com.danwink.tacticshooter.screens.OpenLoadScreen;
+import com.danwink.tacticshooter.screens.OptionsScreen;
+import com.danwink.tacticshooter.screens.PostGameScreen;
+import com.danwink.tacticshooter.screens.ServerConnectScreen;
+import com.danwink.tacticshooter.screens.SettingsScreen;
+import com.phyloa.dlib.game.DScreenHandler;
+import com.phyloa.dlib.util.DFile;
+
+public class TacticClient extends BasicGame {
+	DScreenHandler<GameContainer, Graphics> dsh = new DScreenHandler<GameContainer, Graphics>();
+
+	org.newdawn.slick.Font f;
+
+	public TacticClient() {
+		super("Tactic Shooter Client");
+	}
+
+	public void init(GameContainer gc) throws SlickException {
+		dsh.register("openload", new OpenLoadScreen());
+
+		dsh.register("home", new HomeScreen());
+		dsh.register("login", new LoginScreen());
+
+		dsh.register("multiplayersetup", new MultiplayerSetupScreen());
+		dsh.register("multiplayergame", new MultiplayerGameScreen());
+		dsh.register("connect", new ServerConnectScreen());
+		dsh.register("lobby", new LobbyScreen());
+
+		dsh.register("message", new MessageScreen());
+		dsh.register("postgame", new PostGameScreen());
+
+		dsh.register("settings", new SettingsScreen());
+		dsh.register("options", new OptionsScreen("options.txt", "settings"));
+		dsh.register("advoptions", new OptionsScreen("data" + File.separator + "advoptions.txt", "settings"));
+
+		dsh.activate("openload", gc);
+
+		new Thread(new Runnable() {
+			public void run() {
+				try {
+					String[] loginFile = (String[]) DFile.loadObject("data" + File.separator + "l.tmp");
+					StaticFiles.login(loginFile[0], loginFile[1]);
+					dsh.message("home", null);
+				} catch (Exception ex) {
+
+				}
+			}
+		}).start();
+
+		f = new AngelCodeFont("data" + File.separator + "pixelfont1_16px.fnt",
+				"data" + File.separator + "pixelfont1_16px_0.png");
+
+		gc.setMusicVolume(StaticFiles.options.getF("slider.music"));
+		gc.setSoundVolume(StaticFiles.options.getF("slider.sound"));
+	}
+
+	public void update(GameContainer gc, int delta) throws SlickException {
+		dsh.update(gc, delta / 1000.f);
+
+		// Render background if not in a game
+		if (!(dsh.get() instanceof MultiplayerGameScreen)) {
+			StaticFiles.bgd.update(delta);
+		}
+	}
+
+	public void render(GameContainer gc, Graphics g) throws SlickException {
+		g.setFont(f);
+		g.setAntiAlias(StaticFiles.advOptions.getB("antialias"));
+
+		// Render background if not in a game
+		if (!(dsh.get() instanceof MultiplayerGameScreen)) {
+			StaticFiles.bgd.render(gc, g);
+		}
+
+		dsh.render(gc, g);
+	}
+
+	public static void main(String[] args) {
+		SharedLibraryLoader.load();
+
+		ScriptEngineManager sem = new ScriptEngineManager();
+		var factories = sem.getEngineFactories();
+		for (var factory : factories)
+			System.out.println(factory.getEngineName() + " " + factory.getEngineVersion() + " " + factory.getNames());
+		if (factories.isEmpty())
+			System.out.println("No Script Engines found");
+
+		if (args.length > 0 && args[1].equals("--editor")) {
+			Editor.main(args);
+		} else {
+			try {
+				AppGameContainer app = new AppGameContainer(new TacticClient());
+				app.setMultiSample(StaticFiles.advOptions.getI("multisample"));
+				app.setDisplayMode(StaticFiles.options.getI("windowWidth"), StaticFiles.options.getI("windowHeight"),
+						StaticFiles.options.getB("fullscreen"));
+				app.setVSync(StaticFiles.options.getB("vsync"));
+				app.setUpdateOnlyWhenVisible(false);
+				app.setAlwaysRender(true);
+				app.setResizable(false); // UI expects that window size never changes :(
+				app.start();
+			} catch (OpenALException ex) {
+				// These seem to happen fairly often on macs, not quite sure what to do about
+				// it.
+				ex.printStackTrace();
+				System.exit(1);
+			} catch (SlickException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+}
