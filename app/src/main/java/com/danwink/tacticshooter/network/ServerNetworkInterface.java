@@ -31,7 +31,6 @@ public class ServerNetworkInterface implements ServerInterface {
 	boolean stopped;
 
 	public ServerNetworkInterface() {
-		System.out.println("!!!!!!!!!!!!!!!!!STARTING SERVER");
 		server = new Server(WRITE_BUFFER, OBJECT_BUFFER);
 		KryoHelper.register(server.getKryo());
 		server.start();

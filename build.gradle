@@ -1,0 +1,38 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'org.mini2Dx', name: 'parcl', version: '1.8.0'
+    }
+}
+
+project(":app") {
+    apply plugin: "java"
+    apply plugin: "application"
+    apply plugin: 'org.mini2Dx.parcl'
+    mainClassName = "com.danwink.tacticshooter.TacticClient"
+    // project.getConvention().getPlugin(ApplicationPluginConvention.class).setMainClassName(
+    //     "com.danwink.tacticshooter.TacticClient"
+    // )
+    parcl {
+        exe {
+            exeName = "tacticshooter"
+            withJre(System.getProperty("user.dir") + "\\jre\\minijre")
+        }
+
+        app {
+            appName = "Tacticshooter"
+            // icon = "relative/path/to/icon.icns"
+            applicationCategory = "None"
+            displayName = 'My Application'
+            identifier = 'com.danwink.tacticshooter'
+            copyright = 'Copyright 2022 Daniel Winkler'
+        }
+
+        linux {
+            binName = "tacticshooter"
+        }
+    }
+}

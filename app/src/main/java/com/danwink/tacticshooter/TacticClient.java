@@ -1,8 +1,6 @@
 package com.danwink.tacticshooter;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 
 import javax.script.ScriptEngineManager;
 
@@ -17,7 +15,6 @@ import org.newdawn.slick.SlickException;
 import com.danwink.tacticshooter.editor.Editor;
 import com.danwink.tacticshooter.screens.HomeScreen;
 import com.danwink.tacticshooter.screens.LobbyScreen;
-import com.danwink.tacticshooter.screens.LoginScreen;
 import com.danwink.tacticshooter.screens.MessageScreen;
 import com.danwink.tacticshooter.screens.MultiplayerGameScreen;
 import com.danwink.tacticshooter.screens.MultiplayerSetupScreen;
@@ -42,7 +39,6 @@ public class TacticClient extends BasicGame {
 		dsh.register("openload", new OpenLoadScreen());
 
 		dsh.register("home", new HomeScreen());
-		dsh.register("login", new LoginScreen());
 
 		dsh.register("multiplayersetup", new MultiplayerSetupScreen());
 		dsh.register("multiplayergame", new MultiplayerGameScreen());
@@ -57,18 +53,6 @@ public class TacticClient extends BasicGame {
 		dsh.register("advoptions", new OptionsScreen("data" + File.separator + "advoptions.txt", "settings"));
 
 		dsh.activate("openload", gc);
-
-		new Thread(new Runnable() {
-			public void run() {
-				try {
-					String[] loginFile = (String[]) DFile.loadObject("data" + File.separator + "l.tmp");
-					StaticFiles.login(loginFile[0], loginFile[1]);
-					dsh.message("home", null);
-				} catch (Exception ex) {
-
-				}
-			}
-		}).start();
 
 		f = new AngelCodeFont("data" + File.separator + "pixelfont1_16px.fnt",
 				"data" + File.separator + "pixelfont1_16px_0.png");
@@ -100,13 +84,6 @@ public class TacticClient extends BasicGame {
 
 	public static void main(String[] args) {
 		SharedLibraryLoader.load();
-
-		ScriptEngineManager sem = new ScriptEngineManager();
-		var factories = sem.getEngineFactories();
-		for (var factory : factories)
-			System.out.println(factory.getEngineName() + " " + factory.getEngineVersion() + " " + factory.getNames());
-		if (factories.isEmpty())
-			System.out.println("No Script Engines found");
 
 		if (args.length > 0 && args[1].equals("--editor")) {
 			Editor.main(args);

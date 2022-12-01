@@ -9,6 +9,7 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
+    id 'edu.sc.seis.launch4j' version '2.5.4'
 }
 
 repositories {
@@ -50,4 +51,9 @@ application {
 tasks.named('test') {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+}
+
+launch4j {
+  mainClassName = 'com.danwink.tacticshooter.TacticClient'
+  // icon = "${projectDir}/icons/myApp.ico"
 }
