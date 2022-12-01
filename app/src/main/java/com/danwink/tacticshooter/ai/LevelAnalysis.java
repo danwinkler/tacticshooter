@@ -67,7 +67,7 @@ public class LevelAnalysis {
 			}
 
 			if (i % 10 == 0) {
-				System.out.println(i);
+				// System.out.println(i);
 			}
 		}
 	}

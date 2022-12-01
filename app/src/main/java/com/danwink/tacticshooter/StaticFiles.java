@@ -54,6 +54,7 @@ public class StaticFiles {
 				public void run() {
 					started = true;
 					loadMusic("menu", "Deliberate Thought.ogg");
+					ready = true; // We can go to menu when menu music is done
 					loadMusic("play1", "Decisions.ogg");
 					loadMusic("play2", "Finding the Balance.ogg");
 					loadMusic("play3", "Rising.ogg");
@@ -65,7 +66,6 @@ public class StaticFiles {
 					loadSound("death2", "death2.wav");
 					loadSound("hit1", "hit1.wav");
 					loadSound("explode1", "explode1.wav");
-					ready = true;
 				}
 			}).start();
 		}

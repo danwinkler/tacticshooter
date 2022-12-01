@@ -7,30 +7,26 @@ import org.newdawn.slick.util.pathfinding.PathFinder;
 import com.danwink.tacticshooter.ComputerPlayer;
 import com.phyloa.dlib.util.DMath;
 
-public class NeuralAI extends ComputerPlayer
-{
-	
+public class NeuralAI extends ComputerPlayer {
 	Net purchase;
 	Net move;
-	
-	public NeuralAI()
-	{
+
+	public NeuralAI() {
 		super();
-		purchase = new Net( 11 );
-		purchase.addLayer( 100 );
-		purchase.addLayer( 100 );
-		purchase.addLayer( 6 );
+		purchase = new Net(11);
+		purchase.addLayer(100);
+		purchase.addLayer(100);
+		purchase.addLayer(6);
 		purchase.finalize();
-		
-		move = new Net( 12 );
-		move.addLayer( 100 );
-		move.addLayer( 100 );
-		move.addLayer( 4 );
+
+		move = new Net(12);
+		move.addLayer(100);
+		move.addLayer(100);
+		move.addLayer(4);
 		move.finalize();
 	}
-	
-	public void update( PathFinder finder )
-	{
+
+	public void update(PathFinder finder) {
 		/*
 		 * Neural Nets:
 		 * 
@@ -40,7 +36,7 @@ public class NeuralAI extends ComputerPlayer
 		 * 5 inputs of number of enemy units (each type)
 		 * Money
 		 * Outputs:
-		 * 6 (each type + no buy) 
+		 * 6 (each type + no buy)
 		 * Highest output is chosen
 		 * 
 		 * 2. Per Unit Movement
@@ -68,101 +64,77 @@ public class NeuralAI extends ComputerPlayer
 		 * go to closest non-friendly point (on point doesn't count)
 		 * go to friendly point closest to enemy center
 		 */
-		
-		
-		
-		
+
 	}
-	
-	public class Net
-	{
+
+	public class Net {
 		ArrayList<Layer> layers = new ArrayList<Layer>();
 		int inputs;
-		
-		public Net( int inputs )
-		{
+
+		public Net(int inputs) {
 			this.inputs = inputs;
 		}
-		
-		public void finalize()
-		{
-			for( int i = 0; i < layers.size(); i++ ) 
-			{
-				if( i == 0 ) 
-				{
-					layers.get( i ).finalize( inputs );
-				}
-				else
-				{
-					layers.get( i ).finalize( layers.get( i-1 ).size() );
+
+		public void finalize() {
+			for (int i = 0; i < layers.size(); i++) {
+				if (i == 0) {
+					layers.get(i).finalize(inputs);
+				} else {
+					layers.get(i).finalize(layers.get(i - 1).size());
 				}
 			}
 		}
-		
-		public void seed()
-		{
-			layers.forEach( l->seed() );
+
+		public void seed() {
+			layers.forEach(l -> seed());
 		}
-		
-		public void addLayer( int size )
-		{
-			layers.add( new Layer( size ) );
+
+		public void addLayer(int size) {
+			layers.add(new Layer(size));
 		}
 	}
-	
-	public class Layer
-	{
+
+	public class Layer {
 		Neuron[] neurons;
-		
-		public Layer( int size )
-		{
+
+		public Layer(int size) {
 			neurons = new Neuron[size];
 		}
-		
-		public int size()
-		{
+
+		public int size() {
 			return neurons.length;
 		}
-		
-		public void finalize( int inputSize )
-		{
-			for( Neuron n : neurons )
-			{
-				n.finalize( inputSize );
+
+		public void finalize(int inputSize) {
+			for (Neuron n : neurons) {
+				n.finalize(inputSize);
 			}
 		}
-		
-		public void seed()
-		{
-			for( Neuron n : neurons )
-			{
+
+		public void seed() {
+			for (Neuron n : neurons) {
 				n.seed();
 			}
 		}
 	}
-	
-	public class Neuron
-	{
+
+	public class Neuron {
 		float[] inputWeights;
 		float bias;
-		
-		public Neuron()
-		{
-			
+
+		public Neuron() {
+
 		}
-		
-		public void finalize( int inputSize )
-		{
+
+		public void finalize(int inputSize) {
 			inputWeights = new float[inputSize];
 		}
-		
-		public void seed()
-		{
-			for( int i = 0; i < inputWeights.length; i++ )
-			{
-				inputWeights[i] = DMath.randomf( -1, 1 );
+
+		public void seed() {
+			for (int i = 0; i < inputWeights.length; i++) {
+				inputWeights[i] = DMath.randomf(-1, 1);
 			}
-			bias = DMath.randomf( -1, 1 );
+			bias = DMath.randomf(-1, 1);
 		}
 	}
 }

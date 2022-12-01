@@ -15,8 +15,12 @@ import com.danwink.tacticshooter.gameobjects.Unit;
 import com.danwink.tacticshooter.gameobjects.Unit.UnitType;
 import com.phyloa.dlib.util.DMath;
 
-public class BloodExplosionRenderer {
-	BloodExplosionRenderer(GameRenderer gameRenderer) {
+/**
+ * Draws blood and craters to a initially transparent texture to be rendered
+ * above the floor
+ */
+public class BloodLayerRenderer {
+	BloodLayerRenderer(GameRenderer gameRenderer) {
 	}
 
 	public Color bloodColor = new Color(255, 0, 0);

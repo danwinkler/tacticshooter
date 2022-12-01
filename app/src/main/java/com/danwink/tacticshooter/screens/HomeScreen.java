@@ -2,7 +2,14 @@ package com.danwink.tacticshooter.screens;
 
 import java.io.File;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.List;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
@@ -36,7 +43,7 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 
 	Slick2DRenderer r = new Slick2DRenderer();
 
-	String ip;
+	List<String> ips;
 
 	Image title;
 
@@ -79,9 +86,13 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 
 	public void render(GameContainer gc, Graphics g) {
 		dui.render(r.renderTo(g));
-		if (ip != null) {
+		if (ips != null) {
 			g.setColor(Color.white);
-			g.drawString("Server Address: " + ip, 200, 15);
+			g.drawString("Server Address: ", 200, 15);
+			for (int i = 0; i < ips.size(); i++) {
+				g.drawString(ips.get(i), 340, 15 + i * 25);
+			}
+
 		}
 
 		// Title
@@ -123,16 +134,12 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 					singlePlayer.setText("Stop Local Server");
 					server = new TacticServer(new ServerNetworkInterface());
 					server.begin();
-					try {
-						InetAddress thisIp = InetAddress.getLocalHost();
-						ip = thisIp.getHostAddress();
-					} catch (UnknownHostException e1) {
-					}
+					ips = getINetAddresses();
 				} else {
 					singlePlayer.setText("Start Local Server");
 					server.sl.running = false;
 					server = null;
-					ip = null;
+					ips = null;
 				}
 			} else if (e == multiPlayer) {
 				dsh.activate("multiplayersetup", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
@@ -143,6 +150,28 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 			} else if (e == editor) {
 				openEditor = true;
 			}
+	}
+
+	public List<String> getINetAddresses() {
+		try {
+			var stream = StreamSupport
+					.stream(Spliterators.spliteratorUnknownSize(NetworkInterface.getNetworkInterfaces().asIterator(),
+							Spliterator.ORDERED), false);
+			return stream.filter(ifc -> {
+				try {
+					return ifc.isUp();
+				} catch (SocketException e) {
+					e.printStackTrace();
+					return false;
+				}
+			}).flatMap(ifc -> ifc.getInterfaceAddresses().stream())
+					.filter(addr -> addr.getAddress().isSiteLocalAddress())
+					.map(addr -> addr.getAddress().getHostAddress())
+					.collect(Collectors.toList());
+		} catch (SocketException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	@Override

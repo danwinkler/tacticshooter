@@ -44,7 +44,7 @@ public class GameRenderer {
 
 	public OutsideFloorRenderer outsideFloor;
 	public FloorRenderer floor;
-	public BloodExplosionRenderer bloodExplosion;
+	public BloodLayerRenderer bloodExplosion;
 	public WallRenderer wall;
 	public BuildingRenderer building;
 	public UnitBodyRenderer unitBody;
@@ -58,7 +58,7 @@ public class GameRenderer {
 	public GameRenderer() {
 		outsideFloor = new OutsideFloorRenderer();
 		floor = new FloorRenderer();
-		bloodExplosion = new BloodExplosionRenderer(this);
+		bloodExplosion = new BloodLayerRenderer(this);
 		building = new BuildingRenderer();
 		unitBody = new UnitBodyRenderer();
 		wall = new WallRenderer();

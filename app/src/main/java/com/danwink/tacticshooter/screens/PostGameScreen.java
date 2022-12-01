@@ -8,6 +8,7 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
+import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.imageout.ImageOut;
 
@@ -39,8 +40,16 @@ public class PostGameScreen extends DScreen<GameContainer, Graphics> implements 
 	GameStats stats;
 	Image endMap;
 
-	public void onActivate(GameContainer e, DScreenHandler<GameContainer, Graphics> dsh) {
-		dui = new DUI(new Slick2DEventMapper(e.getInput()));
+	boolean rd = false;
+
+	public void onActivate(GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh) {
+		StaticFiles.getMusic("menu").loop();
+		rebuildUI(gc);
+		rd = false;
+	}
+
+	public void rebuildUI(GameContainer gc) {
+		dui = new DUI(new Slick2DEventMapper(gc.getInput()));
 
 		dui.setTheme(new DUITheme(DUITheme.defaultTheme) {
 			{
@@ -48,9 +57,9 @@ public class PostGameScreen extends DScreen<GameContainer, Graphics> implements 
 			}
 		});
 
-		dui.add(new DText("Post Game Stats", e.getWidth() / 2 - 300, 30, true));
+		dui.add(new DText("Post Game Stats", gc.getWidth() / 2 - 300, 30, true));
 
-		int x = e.getWidth() / 2 - 400;
+		int x = gc.getWidth() / 2 - 400;
 		for (TeamStats ts : stats.teamStats) {
 			dui.add(new DText("Team: " + ts.t.id, x, 100));
 			dui.add(new DText("Bullets Shot: " + ts.bulletsShot, x, 130));
@@ -58,21 +67,41 @@ public class PostGameScreen extends DScreen<GameContainer, Graphics> implements 
 			dui.add(new DText("Points Taken: " + ts.pointsTaken, x, 190));
 			dui.add(new DText("Units Created: " + ts.unitsCreated, x, 220));
 			dui.add(new DText("Units Lost: " + ts.unitsLost, x, 250));
-			x += 400;
+			x += 250;
 		}
 
-		okay = new DButton("Okay", e.getWidth() / 2 - 300, e.getHeight() - 200, 200, 100);
-		rejoin = new DButton("Rejoin", e.getWidth() / 2 - 100, e.getHeight() - 200, 200, 100);
-		saveImage = new DButton("Save Image of End Map", e.getWidth() / 2 + 100, e.getHeight() - 200, 200, 100);
+		// Top stats
+		var topStatsXPos = gc.getWidth() / 2 + 50;
+		var mostKills = stats.getMostKills();
+		dui.add(new DText("Most Kills: " + mostKills.playerName + " with " + mostKills.kills + " kills",
+				topStatsXPos, 130));
 
-		StaticFiles.getMusic("menu").loop();
+		var mostUnitsCreated = stats.getMostUnitsCreated();
+		dui.add(new DText("Most Units Created: " + mostUnitsCreated.playerName + " with "
+				+ mostUnitsCreated.unitsCreated + " units created", topStatsXPos, 160));
+
+		var mostUnitsLost = stats.getMostUnitsLost();
+		dui.add(new DText("Most Units Lost: " + mostUnitsLost.playerName + " with "
+				+ mostUnitsLost.unitsLost + " units lost", topStatsXPos, 190));
+
+		var leastUnitsLost = stats.getLeastUnitsLost();
+		dui.add(new DText("Least Units Lost: " + leastUnitsLost.playerName + " with "
+				+ leastUnitsLost.unitsLost + " units lost", topStatsXPos, 220));
+
+		var mostBulletShot = stats.getMostBulletsShot();
+		dui.add(new DText("Most Bullets Shot: " + mostBulletShot.playerName + " with "
+				+ mostBulletShot.bulletsShot + " bullets shot", topStatsXPos, 250));
+
+		okay = new DButton("Okay", gc.getWidth() / 2 - 300, gc.getHeight() - 200, 200, 100);
+		rejoin = new DButton("Rejoin", gc.getWidth() / 2 - 100, gc.getHeight() - 200, 200, 100);
+		saveImage = new DButton("Save Image of End Map", gc.getWidth() / 2 + 100, gc.getHeight() - 200, 200, 100);
 
 		dui.add(okay);
 		dui.add(rejoin);
 		dui.add(saveImage);
 
-		dui.add(new DText("Points:", e.getWidth() / 2 - 500, e.getHeight() / 2 - 100));
-		dui.add(new DText("Units:", e.getWidth() / 2 - 500, e.getHeight() / 2 + 100));
+		dui.add(new DText("Points:", gc.getWidth() / 2 - 500, gc.getHeight() / 2 - 100));
+		dui.add(new DText("Units:", gc.getWidth() / 2 - 500, gc.getHeight() / 2 + 100));
 
 		// Test and see if extraneous data got added on to end :/
 		ArrayList<Integer> lastPointA = stats.teamStats[0].pointCount;
@@ -101,17 +130,18 @@ public class PostGameScreen extends DScreen<GameContainer, Graphics> implements 
 		dui.addDUIListener(this);
 
 		dui.setEnabled(true);
-		rd = false;
 	}
 
 	public void update(GameContainer gc, float delta) {
 		dui.update();
+
+		if (gc.getInput().isKeyPressed(Input.KEY_R)) {
+			rebuildUI(gc);
+		}
 	}
 
-	boolean rd = false;
-
 	public void render(GameContainer gc, Graphics g) {
-		g.setColor(new Color(0, 0, 0, 100));
+		g.setColor(new Color(0, 0, 0, 200));
 		g.fillRect(0, 0, gc.getWidth(), gc.getHeight());
 
 		dui.render(r.renderTo(g));

@@ -515,7 +515,6 @@ public class TacticServer {
 								unit.turnOnStop = true;
 								unit.pathTo(l.getTileX(unit.x), l.getTileY(unit.y), this);
 								si.sendToClient(m.sender, new Message(MessageType.UNITUPDATE, unit));
-								System.out.println(unit.x);
 							} else {
 								unit.state = UnitState.TURNTO;
 							}
@@ -541,6 +540,7 @@ public class TacticServer {
 							units.add(u);
 							si.sendToAllClients(new Message(MessageType.UNITUPDATE, u));
 							gs.get(u.owner.team).unitsCreated++;
+							gs.getPlayerStats(player).unitsCreated++;
 							u.pathTo(l.getTileX(u.x), l.getTileY(u.y), this);
 						}
 					}
@@ -645,6 +645,11 @@ public class TacticServer {
 
 			if (!u.alive) {
 				gs.get(u.owner.team).unitsLost++;
+				gs.getPlayerStats(u.owner).unitsLost++;
+				// Saboteurs can kill themselves, so there won't be a killer
+				if (u.killer != null) {
+					gs.getPlayerStats(u.killer).kills++;
+				}
 				units.remove(i);
 				js.kill(u);
 				if (u.occupyX > -1) {
@@ -681,12 +686,14 @@ public class TacticServer {
 		b.shooter = u;
 		b.damage = u.type.damage;
 		gs.get(b.owner.team).bulletsShot++;
+		gs.getPlayerStats(b.owner).bulletsShot++;
 		bullets.add(b);
 		si.sendToAllClients(new Message(MessageType.BULLETUPDATE, b));
 	}
 
 	public void addBullet(Bullet b) {
 		gs.get(b.owner.team).bulletsShot++;
+		gs.getPlayerStats(b.owner).bulletsShot++;
 		bullets.add(b);
 		si.sendToAllClients(new Message(MessageType.BULLETUPDATE, b));
 	}

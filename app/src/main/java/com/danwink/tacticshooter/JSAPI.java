@@ -270,6 +270,7 @@ public class JSAPI {
 		u.pathTo((int) (x / Level.tileSize), (int) (y / Level.tileSize), ts);
 		ts.si.sendToAllClients(new Message(MessageType.UNITUPDATE, u));
 		ts.gs.get(u.owner.team).unitsCreated++;
+		ts.gs.getPlayerStats(p).unitsCreated++;
 		return u.id;
 	}
 
