@@ -34,12 +34,27 @@ public class LevelRenderer {
 		return DFile.loadImage("themes" + File.separator + theme + File.separator + name + ".png");
 	}
 
-	public void render(Graphics2DIRenderer g, Building selected) {
+	public void renderFloor(Graphics2DIRenderer g) {
 		for (int y = 0; y < l.height; y++) {
 			for (int x = 0; x < l.width; x++) {
-				if (l.tiles[x][y] == TileType.FLOOR) {
+				if (l.tiles[x][y] != TileType.WALL) {
 					drawAutoTile(g, x, y, TileType.FLOOR, floor);
-				} else if (l.tiles[x][y] == TileType.WALL) {
+				} else {
+					g.drawImage(floor, x * Level.tileSize, y * Level.tileSize, x * Level.tileSize + Level.tileSize,
+							y * Level.tileSize + Level.tileSize, floor.getWidth() / 3, 0, floor.getWidth() / 3 * 2,
+							floor.getHeight() / 4);
+				}
+			}
+		}
+	}
+
+	public void render(Graphics2DIRenderer g, Building selected) {
+		// Draw Floor across the whole map
+		renderFloor(g);
+
+		for (int y = 0; y < l.height; y++) {
+			for (int x = 0; x < l.width; x++) {
+				if (l.tiles[x][y] == TileType.WALL) {
 					drawAutoTile(g, x, y, TileType.WALL, wall);
 				} else if (l.tiles[x][y] == TileType.DOOR) {
 					// drawAutoTile( g, x, y, TileType.FLOOR, floor );
