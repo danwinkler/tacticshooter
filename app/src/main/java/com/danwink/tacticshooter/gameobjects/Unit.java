@@ -29,9 +29,9 @@ public class Unit {
 	public float y;
 	public float heading;
 	public float health = 100;
+	public UnitDef type;
 	public boolean alive = true;
 
-	public UnitType type = UnitType.LIGHT;
 	public UnitState state = UnitState.STOPPED;
 	public UnitState lastState = state;
 	public float turnToAngle;
@@ -283,15 +283,16 @@ public class Unit {
 		}
 
 		int healthBarDist = 0;
-		switch (type) {
-			case SCOUT:
-			case SHOTGUN:
-			case LIGHT:
-			case SNIPER:
-			case SABOTEUR:
+		// TODO: define these in the gamemode file
+		switch (type.name) {
+			case "SCOUT":
+			case "SHOTGUN":
+			case "LIGHT":
+			case "SNIPER":
+			case "SABOTEUR":
 				healthBarDist = -11;
 				break;
-			case HEAVY:
+			case "HEAVY":
 				healthBarDist = -14;
 				break;
 		}
@@ -450,13 +451,13 @@ public class Unit {
 			alive = false;
 			killer = bullet.owner;
 			bullet.owner.money += 2;
-			if (type == UnitType.SABOTEUR) {
+			if (type.explodesOnDeath) {
 				explode(ts);
 			}
 		}
 
 		if (alive) {
-			if (type == UnitType.SABOTEUR) {
+			if (type.explodesOnDeath) {
 				for (Unit u : ts.units) {
 					if (u.owner.team.id != owner.team.id) {
 						float dx = u.x - x;
@@ -489,7 +490,7 @@ public class Unit {
 		}
 	}
 
-	public void setType(UnitType type) {
+	public void setType(UnitDef type) {
 		this.type = type;
 		this.health = type.health;
 	}
@@ -500,14 +501,37 @@ public class Unit {
 		STOPPED;
 	}
 
-	public enum UnitType {
-		LIGHT(3, 10, .05f, 10, 100, 1, 10),
-		HEAVY(1.5f, 3, .1f, 20, 200, 1, 10),
-		SHOTGUN(3.0f, 30, .3f, 15, 150, 6, 10),
-		SCOUT(6f, 30, .1f, 3, 30, 1, 10),
-		SNIPER(2.5f, 100, 0, 15, 90, 1, 100),
-		SABOTEUR(4f, 10000, 0, 20, 150, 0, 0);
+	// public enum UnitType {
+	// LIGHT(3, 10, .05f, 10, 100, 1, 10),
+	// HEAVY(1.5f, 3, .1f, 20, 200, 1, 10),
+	// SHOTGUN(3.0f, 30, .3f, 15, 150, 6, 10),
+	// SCOUT(6f, 30, .1f, 3, 30, 1, 10),
+	// SNIPER(2.5f, 100, 0, 15, 90, 1, 100),
+	// SABOTEUR(4f, 10000, 0, 20, 150, 0, 0);
 
+	// public float speed;
+	// public int timeBetweenBullets;
+	// public float bulletSpread;
+	// public int price;
+	// public float health;
+	// public int bulletsAtOnce;
+	// public int damage;
+
+	// UnitType(float speed, int timeBetweenBullets, float bulletSpread, int price,
+	// float health, int bulletsAtOnce,
+	// int damage) {
+	// this.speed = speed;
+	// this.timeBetweenBullets = timeBetweenBullets;
+	// this.bulletSpread = bulletSpread;
+	// this.price = price;
+	// this.health = health;
+	// this.bulletsAtOnce = bulletsAtOnce;
+	// this.damage = damage;
+	// }
+	// }
+
+	public static class UnitDef {
+		public String name;
 		public float speed;
 		public int timeBetweenBullets;
 		public float bulletSpread;
@@ -515,17 +539,7 @@ public class Unit {
 		public float health;
 		public int bulletsAtOnce;
 		public int damage;
-
-		UnitType(float speed, int timeBetweenBullets, float bulletSpread, int price, float health, int bulletsAtOnce,
-				int damage) {
-			this.speed = speed;
-			this.timeBetweenBullets = timeBetweenBullets;
-			this.bulletSpread = bulletSpread;
-			this.price = price;
-			this.health = health;
-			this.bulletsAtOnce = bulletsAtOnce;
-			this.damage = damage;
-		}
+		public boolean explodesOnDeath;
 	}
 
 	public void renderMinimap(Graphics g, Player player) {

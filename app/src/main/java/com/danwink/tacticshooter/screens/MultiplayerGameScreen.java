@@ -25,7 +25,7 @@ import com.danwink.tacticshooter.gameobjects.Level.TileType;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.gameobjects.Team;
 import com.danwink.tacticshooter.gameobjects.Unit;
-import com.danwink.tacticshooter.gameobjects.Unit.UnitType;
+import com.danwink.tacticshooter.gameobjects.Unit.UnitDef;
 import com.danwink.tacticshooter.network.ClientInterface;
 import com.danwink.tacticshooter.network.Message;
 import com.danwink.tacticshooter.renderer.GameRenderer;
@@ -333,7 +333,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 				cs.unitMap.remove(u.id);
 				cs.selected.remove((Object) u.id);
 				gameRenderer.killUnit(u);
-				if (u.type == UnitType.SABOTEUR) {
+				if (u.type.explodesOnDeath) {
 					StaticFiles.getSound("explode1").play();
 				} else {
 					(Math.random() > .5 ? StaticFiles.getSound("death1") : StaticFiles.getSound("death2")).play(1.f,
@@ -663,7 +663,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 					}
 				}
 			} else {
-				UnitType matchType = null;
+				UnitDef matchType = null;
 				for (Unit u : cs.units) {
 					float dx = x2 - u.x;
 					float dy = y2 - u.y;
@@ -676,10 +676,12 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 						u.selected = false;
 					}
 				}
+
+				// Double click select same type units
 				long timeDiff = System.currentTimeMillis() - lastClick;
-				if (cs.selected.size() == 1 && timeDiff > 100 && timeDiff < 500) {
+				if (matchType != null && cs.selected.size() == 1 && timeDiff > 100 && timeDiff < 500) {
 					for (Unit u : cs.units) {
-						if (u.type == matchType
+						if (u.type.name.equals(matchType.name)
 								&& u.owner.id == this.cs.player.id
 								&& u.x > cs.scrollx
 								&& u.y > cs.scrolly

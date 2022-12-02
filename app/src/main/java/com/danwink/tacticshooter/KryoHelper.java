@@ -13,7 +13,7 @@ import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.gameobjects.Team;
 import com.danwink.tacticshooter.gameobjects.Unit;
-import com.danwink.tacticshooter.gameobjects.Unit.UnitType;
+import com.danwink.tacticshooter.gameobjects.Unit.UnitDef;
 import com.danwink.tacticshooter.network.Message;
 import com.danwink.tacticshooter.screens.LobbyScreen;
 import com.esotericsoftware.kryo.Kryo;
@@ -36,7 +36,8 @@ public class KryoHelper {
 		k.register(Player.class);
 		k.register(Building.class);
 		k.register(Building.BuildingType.class);
-		k.register(UnitType.class);
+		k.register(UnitDef.class);
+		k.register(UnitDef[].class);
 		k.register(Player[].class);
 		k.register(Point2f.class);
 		k.register(GameStats.class);

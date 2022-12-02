@@ -19,7 +19,6 @@ import com.danwink.tacticshooter.gameobjects.Bullet;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Unit;
 import com.danwink.tacticshooter.gameobjects.Unit.UnitState;
-import com.danwink.tacticshooter.gameobjects.Unit.UnitType;
 import com.phyloa.dlib.math.Point2i;
 import com.phyloa.dlib.util.DMath;
 
@@ -85,7 +84,7 @@ public class GameRenderer {
 			Unit u = unitsToKill.removeLast();
 			bloodExplosion.killUnit(u, cs, unitBody);
 
-			if (u.type == UnitType.SABOTEUR) {
+			if (u.type.explodesOnDeath) {
 				createExplosion(u.x, u.y, cs);
 			}
 		}
@@ -170,17 +169,16 @@ public class GameRenderer {
 			}
 
 			int healthBarDist = 0;
-			switch (u.type) {
-				case SCOUT:
-					healthBarDist = -14;
-					break;
-				case SHOTGUN:
-				case LIGHT:
-				case SNIPER:
-				case SABOTEUR:
+			// TODO: define these in the gamemode file
+			switch (u.type.name) {
+				case "SCOUT":
+				case "SHOTGUN":
+				case "LIGHT":
+				case "SNIPER":
+				case "SABOTEUR":
 					healthBarDist = -11;
 					break;
-				case HEAVY:
+				case "HEAVY":
 					healthBarDist = -14;
 					break;
 			}

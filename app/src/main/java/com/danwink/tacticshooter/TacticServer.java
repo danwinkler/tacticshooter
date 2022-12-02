@@ -19,8 +19,8 @@ import com.danwink.tacticshooter.gameobjects.Level.SlotType;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.gameobjects.Team;
 import com.danwink.tacticshooter.gameobjects.Unit;
+import com.danwink.tacticshooter.gameobjects.Unit.UnitDef;
 import com.danwink.tacticshooter.gameobjects.Unit.UnitState;
-import com.danwink.tacticshooter.gameobjects.Unit.UnitType;
 import com.danwink.tacticshooter.network.Message;
 import com.danwink.tacticshooter.network.ServerInterface;
 import com.danwink.tacticshooter.network.ServerNetworkInterface;
@@ -193,6 +193,8 @@ public class TacticServer {
 		} else if (gameType == GameType.POINTCONTROL) {
 			js.loadFile("data/gamemodes/pointcapture.js");
 		}
+
+		si.sendToAllClients(new Message(MessageType.UNITDEFS, js.getUnitDefsArray()));
 
 		finder = new AStarPathFinder(l, 500, StaticFiles.advOptions.getB("diagonalMove"));
 
@@ -524,7 +526,8 @@ public class TacticServer {
 				}
 				case BUILDUNIT: {
 					Player player = players.get(m.sender);
-					UnitType type = (UnitType) m.message;
+					String typeName = (String) m.message;
+					UnitDef type = js.unitDefs.get(typeName);
 					if (player.money >= type.price) {
 						player.money -= type.price;
 						Building base = null;

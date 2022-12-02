@@ -14,6 +14,7 @@ import com.danwink.tacticshooter.ai.Good3;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Level.TileType;
+import com.danwink.tacticshooter.gameobjects.Unit.UnitDef;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.gameobjects.Unit;
 import com.danwink.tacticshooter.network.FakeConnection;
@@ -32,6 +33,7 @@ public abstract class ComputerPlayer implements Runnable {
 	public HashMap<Integer, Unit> unitMap = new HashMap<Integer, Unit>();
 	public ArrayList<Unit> units = new ArrayList<Unit>();
 	public FakeConnection fc;
+	public HashMap<String, UnitDef> unitDefs = new HashMap<>();
 
 	boolean playing = true;
 
@@ -82,6 +84,12 @@ public abstract class ComputerPlayer implements Runnable {
 					case PLAYERUPDATE:
 						this.player = (Player) m.message;
 						break;
+					case UNITDEFS:
+						UnitDef[] defs = (UnitDef[]) m.message;
+						for (UnitDef def : defs) {
+							unitDefs.put(def.name, def);
+						}
+						break;
 					case BUILDINGUPDATE:
 						if (l != null) {
 							Building building = (Building) m.message;
@@ -111,7 +119,7 @@ public abstract class ComputerPlayer implements Runnable {
 				}
 			}
 
-			if (player != null && l != null) {
+			if (player != null && l != null && !unitDefs.isEmpty()) {
 				if (!hasSetup) {
 					finder = new AStarPathFinder(l, 500, StaticFiles.options.getB("diagonalMove"));
 					hasSetup = true;
@@ -123,12 +131,14 @@ public abstract class ComputerPlayer implements Runnable {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
+			}
 
-				try {
-					Thread.sleep(sleepDuration);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+			// NOTE: this is very important, if we don't sleep here the fakeconnection won't
+			// work right
+			try {
+				Thread.sleep(sleepDuration);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		}
 	}
