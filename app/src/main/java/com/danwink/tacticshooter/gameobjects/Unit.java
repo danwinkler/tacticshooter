@@ -231,6 +231,7 @@ public class Unit {
 			} else {
 				timeSinceLastFrame -= frameTime / type.speed;
 				frame = (frame + 1) % 8;
+				tc.mgs.gameRenderer.footprint.unitFrameUpdate(this);
 			}
 		}
 		if (state == UnitState.STOPPED) {

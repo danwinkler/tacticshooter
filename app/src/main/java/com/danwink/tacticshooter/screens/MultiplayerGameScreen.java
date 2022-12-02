@@ -49,7 +49,7 @@ import jp.objectclub.vecmath.Vector3f;
 
 public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> implements InputListener, DUIListener {
 	ClientInterface ci;
-	public ClientState cs = new ClientState();
+	public ClientState cs = new ClientState(this);
 
 	boolean waitingForMoveConfirmation = false;
 
@@ -74,7 +74,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 
 	DUI dui;
 
-	Input input;
+	public Input input;
 
 	// DScreenHandler<GameContainer, Graphics> dsh;
 
@@ -112,7 +112,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	@SuppressWarnings("unchecked")
 	ArrayList<Integer>[] battleGroups = new ArrayList[10];
 
-	GameRenderer gameRenderer;
+	public GameRenderer gameRenderer;
 
 	long lastClick;
 
@@ -434,6 +434,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 
 		gameRenderer.render(g, cs, gc, fogEnabled);
 
+		g.pushTransform();
+		g.translate(-cs.scrollx, -cs.scrolly);
 		if (selecting) {
 			g.setColor(Color.blue);
 			float x1 = Math.min(sx, sx2);
@@ -442,16 +444,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			float y2 = Math.max(sy, sy2);
 			g.drawRect(x1, y1, x2 - x1, y2 - y1);
 		}
-
-		// DEBUG INFO
-		/*
-		 * if( true )
-		 * {
-		 * ((HomeScreen)dsh.get( "home" )).server.comps.get( 1 ).render( g );
-		 * }
-		 */
-
-		// TODO: delete when all renderers are completed
 		g.popTransform();
 
 		g.setColor(new Color(0, 0, 0, 128));

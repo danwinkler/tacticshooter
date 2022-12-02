@@ -9,6 +9,7 @@ import com.danwink.tacticshooter.gameobjects.Bullet;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.gameobjects.Unit;
+import com.danwink.tacticshooter.screens.MultiplayerGameScreen;
 
 public class ClientState {
 	public HashMap<Integer, Unit> unitMap = new HashMap<Integer, Unit>();
@@ -27,6 +28,11 @@ public class ClientState {
 
 	public float soundFadeDist = 1000;
 	public Player[] players;
+	public MultiplayerGameScreen mgs;
+
+	public ClientState(MultiplayerGameScreen mgs) {
+		this.mgs = mgs;
+	}
 
 	public void resetState() {
 		unitMap.clear();

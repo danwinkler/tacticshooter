@@ -52,6 +52,7 @@ public class GameRenderer {
 	public ParticleSystemRenderer particle;
 	public UnitInfoRenderer unitInfo;
 	public FogRenderer fog;
+	public FootprintLayerRenderer footprint;
 
 	ConcurrentLinkedDeque<Unit> unitsToKill = new ConcurrentLinkedDeque<>();
 
@@ -66,6 +67,7 @@ public class GameRenderer {
 		particle = new ParticleSystemRenderer();
 		unitInfo = new UnitInfoRenderer();
 		fog = new FogRenderer();
+		footprint = new FootprintLayerRenderer();
 	}
 
 	public void update(float d) {
@@ -95,6 +97,7 @@ public class GameRenderer {
 		g.translate(-(int) cs.scrollx, -(int) cs.scrolly);
 
 		floor.render(g, cs);
+		footprint.render(g, cs);
 		bloodExplosion.render(g, cs, unitBody);
 		building.render(g, cs, false);
 		wall.render(g, cs);
@@ -105,8 +108,7 @@ public class GameRenderer {
 		if (fogEnabled)
 			fog.render(g, cs);
 
-		// TODO: uncomment when all renderers are completed
-		// g.popTransform();
+		g.popTransform();
 	}
 
 	public void renderEndGameMap(Graphics g, ClientState cs) {
