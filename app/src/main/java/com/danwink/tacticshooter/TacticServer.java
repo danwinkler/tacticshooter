@@ -19,8 +19,8 @@ import com.danwink.tacticshooter.gameobjects.Level.SlotType;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.gameobjects.Team;
 import com.danwink.tacticshooter.gameobjects.Unit;
+import com.danwink.tacticshooter.gameobjects.Unit.UnitDef;
 import com.danwink.tacticshooter.gameobjects.Unit.UnitState;
-import com.danwink.tacticshooter.gameobjects.Unit.UnitType;
 import com.danwink.tacticshooter.network.Message;
 import com.danwink.tacticshooter.network.ServerInterface;
 import com.danwink.tacticshooter.network.ServerNetworkInterface;
@@ -64,7 +64,7 @@ public class TacticServer {
 
 	ServerState state = ServerState.LOBBY;
 
-	GameType gameType = GameType.POINTCONTROL;
+	String gameType = "pointcapture";
 
 	public ArrayList<ComputerPlayer> comps = new ArrayList<ComputerPlayer>();
 
@@ -188,11 +188,13 @@ public class TacticServer {
 		}
 
 		js = new JSAPI(this);
-		if (gameType == GameType.UMS) {
+		if (gameType.equals("UMS")) {
 			js.load(l.ums);
-		} else if (gameType == GameType.POINTCONTROL) {
-			js.loadFile("data/gamemodes/pointcapture.js");
+		} else {
+			js.loadFile("data/gamemodes/" + gameType + ".js");
 		}
+
+		si.sendToAllClients(new Message(MessageType.UNITDEFS, js.getUnitDefsArray()));
 
 		finder = new AStarPathFinder(l, 500, StaticFiles.advOptions.getB("diagonalMove"));
 
@@ -375,9 +377,9 @@ public class TacticServer {
 						si.sendToAllClients(new Message(MessageType.FOGUPDATE, fogEnabled));
 						break;
 					case GAMETYPE:
-						gameType = (GameType) m.message;
+						gameType = (String) m.message;
 						si.sendToAllClients(new Message(MessageType.GAMETYPE, gameType));
-						if (gameType == GameType.UMS) {
+						if (gameType.equals("UMS")) {
 							for (int i = 0; i < l.slotOptions.length; i++) {
 								SlotOption so = l.slotOptions[i];
 								slots[i].type = so.st;
@@ -524,7 +526,8 @@ public class TacticServer {
 				}
 				case BUILDUNIT: {
 					Player player = players.get(m.sender);
-					UnitType type = (UnitType) m.message;
+					String typeName = (String) m.message;
+					UnitDef type = js.unitDefs.get(typeName);
 					if (player.money >= type.price) {
 						player.money -= type.price;
 						Building base = null;

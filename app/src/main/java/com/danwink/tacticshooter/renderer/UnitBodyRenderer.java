@@ -76,17 +76,17 @@ public class UnitBodyRenderer {
 	public void drawBody(Graphics g, Unit u, boolean player, ClientState cs) {
 		Color color = player ? playerColor : u.owner.team.getColor();
 
-		switch (u.type) {
-			case LIGHT:
+		switch (u.type.name) {
+			case "LIGHT":
 				drawSpriteBody(g, u, cs.l.theme.light, cs.l.theme.lightColor, color, 8);
 				break;
-			case SCOUT:
+			case "SCOUT":
 				// draw4DirSpriteBody( g, u, cs.l.theme.dir4, null, color, 8 );
 				// break;
-			case SHOTGUN:
+			case "SHOTGUN":
 				// draw8DirSpriteBody( g, u, cs.l.theme.dir8, null, color, 24 );
 				// break;
-			case SABOTEUR:
+			case "SABOTEUR":
 				if (player) {
 					g.setColor(Color.white);
 					g.fillOval(-7, -7, 14, 14);
@@ -104,7 +104,7 @@ public class UnitBodyRenderer {
 				g.popTransform();
 
 				break;
-			case SNIPER:
+			case "SNIPER":
 				if (player) {
 					g.setColor(Color.white);
 					g.fillOval(-7, -6, 14, 12);
@@ -121,7 +121,7 @@ public class UnitBodyRenderer {
 				g.drawLine(0, 0, 5, 0);
 				g.popTransform();
 				break;
-			case HEAVY:
+			case "HEAVY":
 				drawSpriteBody(g, u, cs.l.theme.heavy, cs.l.theme.heavyColor, color, 16);
 				break;
 		}

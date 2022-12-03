@@ -1,6 +1,8 @@
 package com.danwink.tacticshooter;
 
 import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import javax.script.Bindings;
@@ -15,7 +17,7 @@ import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.gameobjects.Team;
 import com.danwink.tacticshooter.gameobjects.Unit;
-import com.danwink.tacticshooter.gameobjects.Unit.UnitType;
+import com.danwink.tacticshooter.gameobjects.Unit.UnitDef;
 import com.danwink.tacticshooter.network.Message;
 import com.phyloa.dlib.util.DFile;
 
@@ -27,6 +29,8 @@ public class JSAPI {
 	public TacticServer ts;
 
 	public Random random = new Random();
+
+	public Map<String, UnitDef> unitDefs = new HashMap<>();
 
 	public JSAPI(TacticServer ts) {
 		this.ts = ts;
@@ -95,7 +99,6 @@ public class JSAPI {
 			engine.eval("callKill( { "
 					+ "unit: " + u.id + ","
 					+ "owner:" + u.owner.id + ","
-					+ "type: '" + u.type.toString() + "'"
 					+ "} );");
 		} catch (ScriptException e) {
 			e.printStackTrace();
@@ -250,11 +253,26 @@ public class JSAPI {
 		return -1;
 	}
 
+	public void createUnitDef(String name, float speed, int timeBetweenBullets, float bulletSpread, int price,
+			float health, int bulletsAtOnce, int damage, boolean explodesOnDeath) {
+		UnitDef ud = new UnitDef();
+		ud.name = name;
+		ud.speed = speed;
+		ud.timeBetweenBullets = timeBetweenBullets;
+		ud.bulletSpread = bulletSpread;
+		ud.price = price;
+		ud.health = health;
+		ud.bulletsAtOnce = bulletsAtOnce;
+		ud.damage = damage;
+		ud.explodesOnDeath = explodesOnDeath;
+		unitDefs.put(name, ud);
+	}
+
 	public int createUnit(int player, String type, float x, float y) {
 		Player p = ts.players.get(player);
 
 		Unit u = new Unit(x, y, p);
-		u.setType(UnitType.valueOf(type));
+		u.setType(unitDefs.get(type));
 
 		for (int i = 0; i < ts.l.buildings.size(); i++) {
 			Building tb = ts.l.buildings.get(i);
@@ -303,5 +321,9 @@ public class JSAPI {
 
 	public void sendMessage(String text) {
 		ts.si.sendToAllClients(new Message(MessageType.MESSAGE, text));
+	}
+
+	public UnitDef[] getUnitDefsArray() {
+		return unitDefs.values().toArray(new UnitDef[0]);
 	}
 }

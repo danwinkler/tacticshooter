@@ -12,7 +12,6 @@ import org.newdawn.slick.SlickException;
 import com.danwink.tacticshooter.ClientState;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Unit;
-import com.danwink.tacticshooter.gameobjects.Unit.UnitType;
 import com.phyloa.dlib.util.DMath;
 
 /**
@@ -63,7 +62,7 @@ public class BloodLayerRenderer {
 			internalDrawBlood(u.x, u.y, cs);
 		}
 
-		if (u.type == UnitType.SABOTEUR) {
+		if (u.type.explodesOnDeath) {
 			tg.drawImage(cs.l.theme.crater, u.x - 16, u.y - 16, u.x + 16, u.y + 16, 0, 0, 32, 32);
 			tg.flush();
 		}
