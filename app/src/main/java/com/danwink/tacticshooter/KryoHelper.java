@@ -49,7 +49,6 @@ public class KryoHelper {
 		k.register(float[].class);
 		k.register(float[][].class);
 		k.register(Vector2f.class);
-		k.register(GameType.class);
 
 		// LEVEL
 		for (Class<?> c : Level.class.getDeclaredClasses()) {

@@ -3,7 +3,9 @@ package com.danwink.tacticshooter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.stream.Stream;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -39,6 +41,8 @@ public class StaticFiles {
 	public static String names;
 
 	public static String status = "";
+
+	public static File gameModeDir = new File("data" + File.separator + "gamemodes");
 
 	static {
 		try {
@@ -145,5 +149,17 @@ public class StaticFiles {
 
 	public static String getUsername() {
 		return options.getS("playerName");
+	}
+
+	public static String[] getGameTypes() {
+		return Stream.concat(Arrays.stream(gameModeDir.listFiles()).filter(f -> f.isFile()).map(f -> {
+			// Remove suffix
+			String name = f.getName();
+			int i = name.lastIndexOf('.');
+			if (i > 0) {
+				name = name.substring(0, i);
+			}
+			return name;
+		}), Stream.of("UMS")).toArray(String[]::new);
 	}
 }

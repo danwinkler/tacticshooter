@@ -64,7 +64,7 @@ public class TacticServer {
 
 	ServerState state = ServerState.LOBBY;
 
-	GameType gameType = GameType.POINTCONTROL;
+	String gameType = "pointcapture";
 
 	public ArrayList<ComputerPlayer> comps = new ArrayList<ComputerPlayer>();
 
@@ -188,10 +188,10 @@ public class TacticServer {
 		}
 
 		js = new JSAPI(this);
-		if (gameType == GameType.UMS) {
+		if (gameType.equals("UMS")) {
 			js.load(l.ums);
-		} else if (gameType == GameType.POINTCONTROL) {
-			js.loadFile("data/gamemodes/pointcapture.js");
+		} else {
+			js.loadFile("data/gamemodes/" + gameType + ".js");
 		}
 
 		si.sendToAllClients(new Message(MessageType.UNITDEFS, js.getUnitDefsArray()));
@@ -377,9 +377,9 @@ public class TacticServer {
 						si.sendToAllClients(new Message(MessageType.FOGUPDATE, fogEnabled));
 						break;
 					case GAMETYPE:
-						gameType = (GameType) m.message;
+						gameType = (String) m.message;
 						si.sendToAllClients(new Message(MessageType.GAMETYPE, gameType));
-						if (gameType == GameType.UMS) {
+						if (gameType.equals("UMS")) {
 							for (int i = 0; i < l.slotOptions.length; i++) {
 								SlotOption so = l.slotOptions[i];
 								slots[i].type = so.st;

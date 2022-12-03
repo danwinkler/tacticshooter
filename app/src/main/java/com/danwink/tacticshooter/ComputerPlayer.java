@@ -11,6 +11,7 @@ import org.newdawn.slick.util.pathfinding.PathFinder;
 import com.danwink.tacticshooter.ai.Aggressive;
 import com.danwink.tacticshooter.ai.Good2;
 import com.danwink.tacticshooter.ai.Good3;
+import com.danwink.tacticshooter.ai.Passive;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Level.TileType;
@@ -214,13 +215,7 @@ public abstract class ComputerPlayer implements Runnable {
 
 	public enum PlayType {
 		AGGRESSIVE(Aggressive.class),
-		/*
-		 * SNEAKY( Sneaky.class ),
-		 * MODERATE( Moderate.class ),
-		 * MASSER( Masser.class ),
-		 * FORTIFIER( Fortifier.class ),
-		 * PASSIVE( Passive.class ),
-		 */
+		PASSIVE(Passive.class),
 		GOOD2(Good2.class),
 		GOOD3(Good3.class);
 
