@@ -57,9 +57,9 @@ function callStop(building, unit) {
 	}
 }
 
-function callButton(id, player) {
+function callButton(id, player, shiftPressed) {
 	if (id in buttonListeners) {
-		buttonListeners[id](player);
+		buttonListeners[id](player, shiftPressed);
 	}
 }
 
@@ -73,22 +73,29 @@ var defaultUnitTypes = {
 };
 
 function setupDefaultButtons() {
-	var i = 0;
-	for (var unitTypeName in defaultUnitTypes) {
-		var unit = defaultUnitTypes[unitTypeName];
-		addButton("BUILD " + unit.name + "\n" + unit.price, i * 2, 0, 2, 1,
+	function makeButton(unit, x, y) {
+		addButton(unit.name + "\n" + unit.price, x, y,
 			function (unit) {
-				function callback(player) {
-					if (api.getPlayerMoney(player) >= unit.price) {
-						api.createUnit(player, unit.name, api.getBaseX(player), api.getBaseY(player));
-						api.addPlayerMoney(player, -unit.price);
+				function callback(player, shiftPressed) {
+					var nTimes = shiftPressed ? 5 : 1;
+					for (var i = 0; i < nTimes; i++) {
+						if (api.getPlayerMoney(player) >= unit.price) {
+							api.createUnit(player, unit.name, api.getBaseX(player), api.getBaseY(player));
+							api.addPlayerMoney(player, -unit.price);
+						}
 					}
 				}
 				return callback;
 			}(unit)
 		);
-		i++;
 	}
+
+	makeButton(defaultUnitTypes.LIGHT, 0, 0);
+	makeButton(defaultUnitTypes.SCOUT, 1, 0);
+	makeButton(defaultUnitTypes.HEAVY, 0, 1);
+	makeButton(defaultUnitTypes.SHOTGUN, 1, 1);
+	makeButton(defaultUnitTypes.SNIPER, 0, 2);
+	makeButton(defaultUnitTypes.SABOTEUR, 1, 2);
 }
 
 function setupDefaultUnits() {
@@ -108,7 +115,7 @@ function setupDefaultUnits() {
 	}
 }
 
-function addButton(text, x, y, width, height, callback) {
-	var id = api.addButton(text, x, y, width, height);
+function addButton(text, x, y, callback) {
+	var id = api.addButton(text, x, y);
 	buttonListeners[id] = callback;
 }

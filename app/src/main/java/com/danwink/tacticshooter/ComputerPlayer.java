@@ -214,10 +214,10 @@ public abstract class ComputerPlayer implements Runnable {
 	}
 
 	public enum PlayType {
-		AGGRESSIVE(Aggressive.class),
-		PASSIVE(Passive.class),
+		GOOD3(Good3.class),
 		GOOD2(Good2.class),
-		GOOD3(Good3.class);
+		AGGRESSIVE(Aggressive.class),
+		PASSIVE(Passive.class);
 
 		Class<? extends ComputerPlayer> c;
 

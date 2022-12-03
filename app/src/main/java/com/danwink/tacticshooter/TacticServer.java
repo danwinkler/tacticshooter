@@ -630,7 +630,10 @@ public class TacticServer {
 					break;
 				}
 				case BUTTONPRESS: {
-					js.buttonPressed((String) m.message, m.sender);
+					Object[] arr = (Object[]) m.message;
+					String id = (String) arr[0];
+					boolean shiftPressed = (boolean) arr[1];
+					js.buttonPressed(id, m.sender, shiftPressed);
 					break;
 				}
 			}

@@ -116,6 +116,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 
 	long lastClick;
 
+	public DButton[][] buttonSlots = new DButton[3][3];
+
 	public void onActivate(GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh) {
 		this.dsh = dsh;
 		this.gc = gc;
@@ -278,13 +280,16 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 					Object[] arr = (Object[]) m.message;
 					String id = (String) arr[0];
 					String text = (String) arr[1];
-					int width = (int) arr[4] * 75;
-					int height = (int) arr[5] * 75;
-					int x = (int) arr[2] * 75;
-					int y = gc.getHeight() - ((int) arr[3] * 75) - height;
-					DButton button = new DButton(text, x, y, width, height);
+					int xSlot = (int) arr[2];
+					int ySlot = (int) arr[3];
+					int buttonWidth = 75;
+					int buttonHeight = 75;
+					DButton button = new DButton(text, xSlot * buttonWidth,
+							gc.getHeight() - ((3 - ySlot) * buttonHeight),
+							buttonWidth, buttonHeight);
 					button.name = id;
 					dui.add(button);
+					buttonSlots[xSlot][ySlot] = button;
 					break;
 				}
 			}
@@ -299,17 +304,17 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			Rectangle screenBounds = getScreenBounds();
 
 			boolean scrollup = cs.scrolly > screenBounds.getMinY() && (input.isKeyDown(Input.KEY_UP)
-					|| input.isKeyDown(Input.KEY_W) || (gc.isFullscreen() && input.getMouseY() < 10));
+					|| (gc.isFullscreen() && input.getMouseY() < 10));
 			boolean scrolldown = cs.scrolly + gc.getHeight() < screenBounds.getMaxY()
-					&& (input.isKeyDown(Input.KEY_DOWN) || input.isKeyDown(Input.KEY_S)
+					&& (input.isKeyDown(Input.KEY_DOWN)
 							|| (gc.isFullscreen() && input.getMouseY() > gc.getHeight() - 10));
 			boolean scrollleft = cs.scrollx > screenBounds.getMinX() && (input.isKeyDown(Input.KEY_LEFT)
-					|| input.isKeyDown(Input.KEY_A) || (gc.isFullscreen() && input.getMouseX() < 10));
+					|| (gc.isFullscreen() && input.getMouseX() < 10));
 			boolean scrollright = cs.scrollx + gc.getWidth() < screenBounds.getMaxX()
-					&& (input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D)
+					&& (input.isKeyDown(Input.KEY_RIGHT)
 							|| (gc.isFullscreen() && input.getMouseX() > gc.getWidth() - 10));
 
-			float scrollMultiplier = input.isKeyDown(Input.KEY_LSHIFT) ? 2 : 1;
+			float scrollMultiplier = (input.isKeyDown(Input.KEY_LSHIFT) || input.isKeyDown(Input.KEY_RSHIFT)) ? 2 : 1;
 
 			if (scrollup)
 				cs.scrolly -= scrollSpeed * d * scrollMultiplier;
@@ -560,6 +565,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		wallTexture = null;
 		mapChanged = true;
 		endMap = null;
+		buttonSlots = new DButton[3][3];
 		dui.setEnabled(false);
 		messages.clear();
 	}
@@ -803,6 +809,41 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 					}
 				}
 			}
+		} else {
+			DButton b = null;
+			switch (keyCode) {
+				case Input.KEY_Q:
+					b = buttonSlots[0][0];
+					break;
+				case Input.KEY_W:
+					b = buttonSlots[1][0];
+					break;
+				case Input.KEY_E:
+					b = buttonSlots[2][0];
+					break;
+				case Input.KEY_A:
+					b = buttonSlots[0][1];
+					break;
+				case Input.KEY_S:
+					b = buttonSlots[1][1];
+					break;
+				case Input.KEY_D:
+					b = buttonSlots[2][1];
+					break;
+				case Input.KEY_Z:
+					b = buttonSlots[0][2];
+					break;
+				case Input.KEY_X:
+					b = buttonSlots[1][2];
+					break;
+				case Input.KEY_C:
+					b = buttonSlots[2][2];
+					break;
+			}
+
+			if (b != null) {
+				dui.event(new DUIEvent(b, DButton.MOUSE_UP));
+			}
 		}
 	}
 
@@ -881,7 +922,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			} else if (e == returnToGame) {
 				escapeMenu.setVisible(false);
 			} else if (e.name.startsWith("userbutton")) {
-				ci.sendToServer(new Message(MessageType.BUTTONPRESS, e.name));
+				ci.sendToServer(new Message(MessageType.BUTTONPRESS,
+						new Object[] { e.name, input.isKeyDown(Input.KEY_LSHIFT) }));
 			}
 		}
 	}

@@ -349,8 +349,15 @@ public class Unit {
 		Path tp = ts.finder.findPath(null, l.getTileX(x), l.getTileY(y), tx, ty);
 		path.clear();
 		if (tp != null) {
-			for (int i = 0; i < tp.getLength(); i++) {
-				path.add(new Point2i(tp.getX(i), tp.getY(i)));
+			// If we happen to modify the path while it's being serialized by kryo, we'll
+			// get a ConcurrentModificationException
+			// ServerNetworkInterface synchronizes on the message object for every packet,
+			// and as the UNITUPDATE message is just a Unit,
+			// synchronizing on this here should solve the issue.
+			synchronized (this) {
+				for (int i = 0; i < tp.getLength(); i++) {
+					path.add(new Point2i(tp.getX(i), tp.getY(i)));
+				}
 			}
 		}
 		destx = tx;
@@ -400,8 +407,11 @@ public class Unit {
 		Point2i lastPoint = path.get(path.size() - 1);
 		Path tp = ts.finder.findPath(null, lastPoint.x, lastPoint.y, tx, ty);
 		if (tp != null) {
-			for (int i = 1; i < tp.getLength(); i++) {
-				path.add(new Point2i(tp.getX(i), tp.getY(i)));
+			// See pathTo for why we synchronize on this
+			synchronized (this) {
+				for (int i = 1; i < tp.getLength(); i++) {
+					path.add(new Point2i(tp.getX(i), tp.getY(i)));
+				}
 			}
 		}
 		destx = tx;

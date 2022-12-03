@@ -141,7 +141,14 @@ public class ServerNetworkInterface implements ServerInterface {
 						}
 
 						if (bytes < WRITE_BUFFER - OBJECT_BUFFER) {
-							c.sendTCP(m);
+							if (m.message != null) {
+								synchronized (m.message) {
+									c.sendTCP(m);
+								}
+							} else {
+								c.sendTCP(m);
+							}
+
 							i.remove();
 						} else {
 							if (m.messageType == MessageType.UNITUPDATE) {

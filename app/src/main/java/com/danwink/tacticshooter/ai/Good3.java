@@ -224,7 +224,7 @@ public class Good3 extends ComputerPlayer {
 					}
 				}
 
-				if (ourSize > theirSize * 2.5f) {
+				if (ourSize > theirSize * 2.2f) {
 					ci.sl.received(fc, new Message(MessageType.MESSAGE, "Full Attack"));
 					for (Building b : l.buildings) {
 						if (b.t.id != player.team.id && b.isCapturable(l)) {

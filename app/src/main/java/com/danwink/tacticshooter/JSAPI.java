@@ -122,9 +122,9 @@ public class JSAPI {
 		}
 	}
 
-	public void buttonPressed(String id, int player) {
+	public void buttonPressed(String id, int player, boolean shiftPressed) {
 		try {
-			engine.eval("callButton( '" + id + "', " + player + " );");
+			engine.eval("callButton( '" + id + "', " + player + ", " + shiftPressed + " );");
 		} catch (ScriptException e) {
 			e.printStackTrace();
 		}
@@ -134,9 +134,9 @@ public class JSAPI {
 	// UI
 	// ---------------------------------
 
-	public String addButton(String text, int x, int y, int width, int height) {
+	public String addButton(String text, int x, int y) {
 		String id = "userbutton" + Integer.toString(random.nextInt());
-		ts.si.sendToAllClients(new Message(MessageType.CREATEBUTTON, new Object[] { id, text, x, y, width, height }));
+		ts.si.sendToAllClients(new Message(MessageType.CREATEBUTTON, new Object[] { id, text, x, y }));
 		return id;
 	}
 
