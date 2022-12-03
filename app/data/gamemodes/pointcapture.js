@@ -60,3 +60,9 @@ function pointCaptureTick(frame) {
 
 }
 addTickListener(pointCaptureTick);
+
+addKillListener(function (u) {
+	if (u.killer_owner >= 0) {
+		api.addPlayerMoney(u.killer_owner, 2);
+	}
+});

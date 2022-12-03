@@ -99,6 +99,7 @@ public class JSAPI {
 			engine.eval("callKill( { "
 					+ "unit: " + u.id + ","
 					+ "owner:" + u.owner.id + ","
+					+ "killer_owner:" + (u.killer != null ? u.killer.id : -1) + ","
 					+ "} );");
 		} catch (ScriptException e) {
 			e.printStackTrace();

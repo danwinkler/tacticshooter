@@ -31,7 +31,7 @@ public class LevelRenderer {
 	}
 
 	public BufferedImage loadImage(String theme, String name) throws IOException {
-		return DFile.loadImage("themes" + File.separator + theme + File.separator + name + ".png");
+		return DFile.loadImage("data/themes" + File.separator + theme + File.separator + name + ".png");
 	}
 
 	public void renderFloor(Graphics2DIRenderer g) {

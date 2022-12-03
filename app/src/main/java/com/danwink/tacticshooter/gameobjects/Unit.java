@@ -450,7 +450,6 @@ public class Unit {
 		if (alive && health <= 0) {
 			alive = false;
 			killer = bullet.owner;
-			bullet.owner.money += 2;
 			if (type.explodesOnDeath) {
 				explode(ts);
 			}
