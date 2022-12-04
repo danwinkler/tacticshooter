@@ -463,6 +463,26 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 					g.drawString(messages.get(i), 10, 300 - (messages.size() - 1 - i) * 25);
 				}
 			}
+
+			// Draw selected unit portraits
+			for (int i = 0; i < cs.selected.size(); i++) {
+				Unit u = cs.unitMap.get(cs.selected.get(i));
+				int portraitSize = 48;
+				int padding = 4;
+				int healthBarHeight = 4;
+				int columns = 4;
+				int x = gc.getWidth() - (portraitSize + padding) * (i % columns + 1) - 10;
+				int y = 100 + (portraitSize + padding + healthBarHeight) * (i / columns);
+				var portrait = cs.l.theme.getPortrait(u.type.name);
+				g.drawImage(portrait, x, y, x + portraitSize, y + portraitSize, 0, 0, portrait.getWidth(),
+						portrait.getHeight());
+
+				var healthBarWidth = portraitSize * (u.health / (float) u.type.health);
+				g.setColor(Color.green);
+				g.fillRect(x, y + portraitSize, healthBarWidth, healthBarHeight);
+				g.setColor(Color.black);
+				g.drawRect(x, y + portraitSize, healthBarWidth, healthBarHeight);
+			}
 		}
 
 		dui.render(renderer.renderTo(g));

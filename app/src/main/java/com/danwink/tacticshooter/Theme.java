@@ -2,6 +2,7 @@ package com.danwink.tacticshooter;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
@@ -25,6 +26,8 @@ public class Theme {
 	public SpriteSheet dir4;
 	public SpriteSheet dir8;
 
+	public Map<String, Image> portraits = new HashMap<String, Image>();
+
 	private Theme(String name) throws SlickException {
 		this.name = name;
 
@@ -41,6 +44,17 @@ public class Theme {
 
 		// dir4 = loadSS( "4dirtest", 16 );
 		// dir8 = loadSS( "8dirtest", 48 );
+	}
+
+	public Image getPortrait(String portrait) {
+		if (!portraits.containsKey(portrait)) {
+			try {
+				portraits.put(portrait, new Image("data/themes/" + name + "/portraits/" + portrait + ".png"));
+			} catch (SlickException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		return portraits.get(portrait);
 	}
 
 	private Image load(String s) throws SlickException {
