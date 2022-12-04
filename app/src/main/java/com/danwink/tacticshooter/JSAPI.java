@@ -134,10 +134,14 @@ public class JSAPI {
 	// UI
 	// ---------------------------------
 
-	public String addButton(String text, int x, int y) {
+	public String addButton(String text, int x, int y, String image) {
 		String id = "userbutton" + Integer.toString(random.nextInt());
-		ts.si.sendToAllClients(new Message(MessageType.CREATEBUTTON, new Object[] { id, text, x, y }));
+		ts.si.sendToAllClients(new Message(MessageType.CREATEBUTTON, new Object[] { id, text, x, y, image }));
 		return id;
+	}
+
+	public String addButton(String text, int x, int y) {
+		return addButton(text, x, y, null);
 	}
 
 	// ---------------------------------

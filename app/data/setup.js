@@ -73,8 +73,8 @@ var defaultUnitTypes = {
 };
 
 function setupDefaultButtons() {
-	function makeButton(unit, x, y) {
-		addButton(unit.name + "\n" + unit.price, x, y,
+	function makeButton(unit, x, y, image) {
+		addButton(unit.name + "\n" + unit.price, x, y, image,
 			function (unit) {
 				function callback(player, shiftPressed) {
 					var nTimes = shiftPressed ? 5 : 1;
@@ -90,12 +90,12 @@ function setupDefaultButtons() {
 		);
 	}
 
-	makeButton(defaultUnitTypes.LIGHT, 0, 0);
-	makeButton(defaultUnitTypes.SCOUT, 1, 0);
-	makeButton(defaultUnitTypes.HEAVY, 0, 1);
-	makeButton(defaultUnitTypes.SHOTGUN, 1, 1);
-	makeButton(defaultUnitTypes.SNIPER, 0, 2);
-	makeButton(defaultUnitTypes.SABOTEUR, 1, 2);
+	makeButton(defaultUnitTypes.LIGHT, 0, 0, "LIGHT");
+	makeButton(defaultUnitTypes.SCOUT, 1, 0, "SCOUT");
+	makeButton(defaultUnitTypes.HEAVY, 0, 1, "HEAVY");
+	makeButton(defaultUnitTypes.SHOTGUN, 1, 1, "SHOTGUN");
+	makeButton(defaultUnitTypes.SNIPER, 0, 2, "SNIPER");
+	makeButton(defaultUnitTypes.SABOTEUR, 1, 2, "SABOTEUR");
 }
 
 function setupDefaultUnits() {
@@ -115,7 +115,7 @@ function setupDefaultUnits() {
 	}
 }
 
-function addButton(text, x, y, callback) {
-	var id = api.addButton(text, x, y);
+function addButton(text, x, y, image, callback) {
+	var id = api.addButton(text, x, y, image);
 	buttonListeners[id] = callback;
 }

@@ -1,25 +1,17 @@
 package com.danwink.tacticshooter.slick;
 
 import java.awt.Font;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.HashMap;
-
-import jp.objectclub.vecmath.Vector2f;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.SlickException;
-import org.newdawn.slick.opengl.Texture;
-import org.newdawn.slick.util.BufferedImageUtil;
+import org.newdawn.slick.Image;
 
 import com.phyloa.dlib.renderer.Renderer2D;
-import com.phyloa.dlib.util.DGraphics;
 
-public class Slick2DRenderer implements Renderer2D {
+import jp.objectclub.vecmath.Vector2f;
+
+public class Slick2DRenderer implements Renderer2D<Image> {
 	Graphics gc;
-	private HashMap<Image, org.newdawn.slick.Image> imageHash = new HashMap<Image, org.newdawn.slick.Image>();
 
 	public Slick2DRenderer renderTo(Graphics g) {
 		gc = g;
@@ -144,46 +136,13 @@ public class Slick2DRenderer implements Renderer2D {
 
 	@Override
 	public void drawImage(Image img, float x, float y) {
-		gc.drawImage(getImage(img), x, y);
-	}
-
-	private org.newdawn.slick.Image getImage(Image img) {
-		org.newdawn.slick.Image simg = imageHash.get(img);
-		if (simg == null) {
-			simg = getSlickImage(convertToBufferedImage(img));
-			imageHash.put(img, simg);
-		}
-		return simg;
-	}
-
-	private org.newdawn.slick.Image getSlickImage(BufferedImage img) {
-
-		org.newdawn.slick.Image slickImage = null;
-		try {
-			Texture texture = BufferedImageUtil.getTexture("", img);
-			slickImage = new org.newdawn.slick.Image(texture.getImageWidth(), texture.getImageHeight());
-			slickImage.setTexture(texture);
-		} catch (SlickException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return slickImage;
-	}
-
-	private BufferedImage convertToBufferedImage(Image img) {
-		BufferedImage buffImg = DGraphics.createBufferedImage(img.getWidth(null), img.getHeight(null));
-		java.awt.Graphics g = buffImg.getGraphics();
-		g.drawImage(img, 0, 0, null);
-		return buffImg;
+		gc.drawImage(img, x, y);
 	}
 
 	@Override
 	public void drawImage(Image img, float x, float y, float width,
 			float height) {
-		// gc.drawImage( getImage( img ), x, y, width, height );
+		gc.drawImage(img, x, y, width, height, 0, 0, img.getWidth(), img.getHeight());
 	}
 
 	@Override
@@ -233,6 +192,11 @@ public class Slick2DRenderer implements Renderer2D {
 	@Override
 	public void setLineWidth(float width) {
 		gc.setLineWidth(width);
+	}
+
+	@Override
+	public Graphics getRenderer() {
+		return gc;
 	}
 
 }

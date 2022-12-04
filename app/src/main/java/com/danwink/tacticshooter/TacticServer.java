@@ -1,6 +1,7 @@
 package com.danwink.tacticshooter;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -156,14 +157,14 @@ public class TacticServer {
 				if (slots[i].p.isBot) {
 					ComputerPlayer cp = null;
 
-					// TODO: handle errors correctly :/
+					// TODO: do something with these errors?
 					try {
-						cp = (ComputerPlayer) slots[i].p.playType.c.newInstance();
-					} catch (InstantiationException e) {
-						e.printStackTrace();
-					} catch (IllegalAccessException e) {
-						e.printStackTrace();
+						cp = (ComputerPlayer) slots[i].p.playType.c.getConstructor().newInstance();
+					} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+							| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+						throw new RuntimeException(e);
 					}
+
 					cp.setup((ServerNetworkInterface) si);
 					cp.player = slots[i].p;
 					cp.l = l;

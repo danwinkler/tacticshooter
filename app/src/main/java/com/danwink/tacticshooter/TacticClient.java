@@ -2,8 +2,6 @@ package com.danwink.tacticshooter;
 
 import java.io.File;
 
-import javax.script.ScriptEngineManager;
-
 import org.lwjgl.openal.OpenALException;
 import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.AppGameContainer;
@@ -24,7 +22,6 @@ import com.danwink.tacticshooter.screens.PostGameScreen;
 import com.danwink.tacticshooter.screens.ServerConnectScreen;
 import com.danwink.tacticshooter.screens.SettingsScreen;
 import com.phyloa.dlib.game.DScreenHandler;
-import com.phyloa.dlib.util.DFile;
 
 public class TacticClient extends BasicGame {
 	DScreenHandler<GameContainer, Graphics> dsh = new DScreenHandler<GameContainer, Graphics>();

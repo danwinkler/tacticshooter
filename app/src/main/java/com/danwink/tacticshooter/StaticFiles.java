@@ -2,19 +2,10 @@ package com.danwink.tacticshooter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.stream.Stream;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Music;
@@ -25,7 +16,6 @@ import com.phyloa.dlib.renderer.DScreenTransition;
 import com.phyloa.dlib.util.DFile;
 import com.phyloa.dlib.util.DOptions;
 
-@SuppressWarnings("deprecation")
 public class StaticFiles {
 	static HashMap<String, Music> music = new HashMap<String, Music>();
 	static HashMap<String, Sound> sound = new HashMap<String, Sound>();

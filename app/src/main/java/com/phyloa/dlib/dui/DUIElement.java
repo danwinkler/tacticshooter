@@ -6,16 +6,16 @@ import com.phyloa.dlib.math.Point2i;
 
 import com.phyloa.dlib.renderer.Renderer2D;
 
-public abstract class DUIElement implements DKeyListener, DMouseListener {
+public abstract class DUIElement<ImageClass> implements DKeyListener, DMouseListener {
 	public int x, y, width, height;
 	public String name;
 
 	boolean visible = true;
-	DUI ui;
+	DUI<ImageClass> ui;
 
-	ArrayList<DUIElement> children = new ArrayList<DUIElement>();
+	ArrayList<DUIElement<ImageClass>> children = new ArrayList<>();
 
-	DUIElement parent;
+	DUIElement<ImageClass> parent;
 
 	boolean isInside = false;
 
@@ -26,9 +26,9 @@ public abstract class DUIElement implements DKeyListener, DMouseListener {
 		this.height = height;
 	}
 
-	public abstract void render(Renderer2D r);
+	public abstract void render(Renderer2D<ImageClass> r);
 
-	public abstract void update(DUI ui);
+	public abstract void update(DUI<ImageClass> ui);
 
 	public String getName() {
 		return name;
@@ -206,7 +206,7 @@ public abstract class DUIElement implements DKeyListener, DMouseListener {
 		children.clear();
 	}
 
-	public ArrayList<DUIElement> getChildren() {
+	public ArrayList<DUIElement<ImageClass>> getChildren() {
 		return children;
 	}
 }

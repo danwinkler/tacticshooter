@@ -56,13 +56,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	float sx, sy, sx2, sy2;
 	boolean selecting = false;
 
-	DButton buildScoutUnit;
-	DButton buildLightUnit;
-	DButton buildHeavyUnit;
-	DButton buildShotgunUnit;
-	DButton buildSniperUnit;
-	DButton buildSaboteurUnit;
-
 	DPanel escapeMenu;
 	DButton quit;
 	DButton returnToGame;
@@ -72,7 +65,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	DTextBox chatBox;
 	DCheckBox teamChat;
 
-	DUI dui;
+	DUI<Image> dui;
 
 	public Input input;
 
@@ -127,7 +120,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		}
 
 		if (dui == null) {
-			dui = new DUI(new Slick2DEventMapper(gc.getInput()));
+			dui = new DUI<Image>(new Slick2DEventMapper(gc.getInput()));
 
 			escapeMenu = new DPanel(gc.getWidth() / 2 - 100, gc.getHeight() / 2 - 100, 200, 300);
 			quit = new DButton("Quit Game", 0, 0, 200, 100);
@@ -282,11 +275,16 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 					String text = (String) arr[1];
 					int xSlot = (int) arr[2];
 					int ySlot = (int) arr[3];
+					String imageKey = (String) arr[4];
 					int buttonWidth = 75;
 					int buttonHeight = 75;
 					DButton button = new DButton(text, xSlot * buttonWidth,
 							gc.getHeight() - ((3 - ySlot) * buttonHeight),
 							buttonWidth, buttonHeight);
+					var backgroundImage = cs.l.theme.getPortrait(imageKey);
+					if (backgroundImage != null) {
+						button.setBackground(backgroundImage);
+					}
 					button.name = id;
 					dui.add(button);
 					buttonSlots[xSlot][ySlot] = button;

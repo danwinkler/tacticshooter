@@ -1,20 +1,10 @@
 package com.phyloa.dlib.dui;
 
-import java.awt.Component;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
 
 import com.phyloa.dlib.renderer.Renderer2D;
-import com.phyloa.dlib.util.DKeyHandler;
-import com.phyloa.dlib.util.DMouseHandler;
 
-public class DUI implements DMouseListener, DKeyListener {
+public class DUI<ImageClass> implements DMouseListener, DKeyListener {
 	DEventMapper dem;
 	ArrayList<DUIListener> listeners = new ArrayList<DUIListener>();
 	ArrayList<DDialog> dialogs = new ArrayList<DDialog>();
@@ -72,7 +62,7 @@ public class DUI implements DMouseListener, DKeyListener {
 		}
 	}
 
-	public void render(Renderer2D r) {
+	public void render(Renderer2D<ImageClass> r) {
 		if (enabled) {
 			rootPane.render(r);
 			rootPane.renderChildren(r);
