@@ -21,6 +21,7 @@ import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Building.BuildingType;
 import com.danwink.tacticshooter.gameobjects.Bullet;
 import com.danwink.tacticshooter.gameobjects.Level;
+import com.danwink.tacticshooter.gameobjects.Marker;
 import com.danwink.tacticshooter.gameobjects.Level.TileType;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.gameobjects.Team;
@@ -288,6 +289,16 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 					button.name = id;
 					dui.add(button);
 					buttonSlots[xSlot][ySlot] = button;
+					break;
+				}
+				case MARKERCREATE: {
+					Marker marker = (Marker) m.message;
+					cs.markers.add(marker);
+					break;
+				}
+				case MARKERDELETE: {
+					Integer id = (Integer) m.message;
+					cs.markers.removeIf(marker -> marker.id == id);
 					break;
 				}
 			}

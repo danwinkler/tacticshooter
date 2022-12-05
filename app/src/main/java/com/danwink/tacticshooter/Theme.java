@@ -25,6 +25,7 @@ public class Theme {
 	public SpriteSheet heavyColor;
 	public SpriteSheet dir4;
 	public SpriteSheet dir8;
+	public SpriteSheet flag;
 
 	public Map<String, Image> portraits = new HashMap<String, Image>();
 
@@ -41,6 +42,7 @@ public class Theme {
 		lightColor = loadSS("light_color", 16);
 		heavy = loadSS("heavy", 32);
 		heavyColor = loadSS("heavy_color", 32);
+		flag = loadSS("flag", 16);
 
 		// dir4 = loadSS( "4dirtest", 16 );
 		// dir8 = loadSS( "8dirtest", 48 );

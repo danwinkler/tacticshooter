@@ -88,6 +88,7 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 
 		gameType = new DDropDown(20, 130, 500, 25);
 		gameType.addItems(StaticFiles.getGameTypes());
+		gameType.setSelected(gameType.items.indexOf("pointcapture"));
 		dui.add(gameType);
 
 		leaveGame = new DButton("Leave", 105, 700, 90, 50);

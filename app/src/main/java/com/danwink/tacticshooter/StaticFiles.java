@@ -142,14 +142,21 @@ public class StaticFiles {
 	}
 
 	public static String[] getGameTypes() {
-		return Stream.concat(Arrays.stream(gameModeDir.listFiles()).filter(f -> f.isFile()).map(f -> {
-			// Remove suffix
-			String name = f.getName();
-			int i = name.lastIndexOf('.');
-			if (i > 0) {
-				name = name.substring(0, i);
-			}
-			return name;
-		}), Stream.of("UMS")).toArray(String[]::new);
+		// Order is: pointcapture, then everything else, then UMS
+		return Stream.concat(
+				Stream.concat(Stream.of("pointcapture"), Arrays.stream(gameModeDir.listFiles()).filter(f -> f.isFile())
+						.filter(f -> {
+							// Remove pointcapture (we'll add it back in as the first choice)
+							return !f.getName().contains("pointcapture");
+						}).map(f -> {
+							// Remove suffix
+							String name = f.getName();
+							int i = name.lastIndexOf('.');
+							if (i > 0) {
+								name = name.substring(0, i);
+							}
+							return name;
+						})),
+				Stream.of("UMS")).toArray(String[]::new);
 	}
 }

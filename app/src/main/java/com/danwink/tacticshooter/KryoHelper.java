@@ -10,6 +10,7 @@ import com.phyloa.dlib.math.Point2i;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Bullet;
 import com.danwink.tacticshooter.gameobjects.Level;
+import com.danwink.tacticshooter.gameobjects.Marker;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.gameobjects.Team;
 import com.danwink.tacticshooter.gameobjects.Unit;
@@ -49,6 +50,7 @@ public class KryoHelper {
 		k.register(float[].class);
 		k.register(float[][].class);
 		k.register(Vector2f.class);
+		k.register(Marker.class);
 
 		// LEVEL
 		for (Class<?> c : Level.class.getDeclaredClasses()) {

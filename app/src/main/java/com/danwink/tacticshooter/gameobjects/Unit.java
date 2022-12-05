@@ -55,6 +55,8 @@ public class Unit {
 	public int occupyX = -1;
 	public int occupyY = -1;
 
+	public boolean marked = false;
+
 	// CLIENT ONLY
 	public boolean selected = false;
 	public int timeSinceUpdate = 0;
@@ -253,97 +255,6 @@ public class Unit {
 		timeSinceUpdate++;
 	}
 
-	public void render(Graphics g, Player p, float mx, float my, Level l, Graphics fog) {
-		if (selected && state == UnitState.MOVING) {
-			g.setColor(Color.black);
-			g.setLineWidth(3);
-			for (int i = Math.max(onStep - 2, 0); i < path.size() - 1; i++) {
-				Point2i p1 = path.get(i);
-				Point2i p2 = path.get(i + 1);
-				g.drawLine((p1.x + .5f) * Level.tileSize, (p1.y + .5f) * Level.tileSize, (p2.x + .5f) * Level.tileSize,
-						(p2.y + .5f) * Level.tileSize);
-			}
-
-			g.setColor(Color.lightGray);
-			g.setLineWidth(1);
-			for (int i = Math.max(onStep - 2, 0); i < path.size() - 1; i++) {
-				Point2i p1 = path.get(i);
-				Point2i p2 = path.get(i + 1);
-				g.drawLine((p1.x + .5f) * Level.tileSize, (p1.y + .5f) * Level.tileSize, (p2.x + .5f) * Level.tileSize,
-						(p2.y + .5f) * Level.tileSize);
-			}
-		}
-
-		g.pushTransform();
-		g.translate(x, y);
-
-		if (selected) {
-			g.setColor(Color.blue);
-			g.drawRect(-10, -10, 20, 20);
-		}
-
-		int healthBarDist = 0;
-		// TODO: define these in the gamemode file
-		switch (type.name) {
-			case "SCOUT":
-			case "SHOTGUN":
-			case "LIGHT":
-			case "SNIPER":
-			case "SABOTEUR":
-				healthBarDist = -11;
-				break;
-			case "HEAVY":
-				healthBarDist = -14;
-				break;
-		}
-
-		g.setColor(Color.black);
-		g.fillRect(-9, healthBarDist, (18.f * health / type.health), 4);
-
-		g.setColor(
-				new Color(DMath.bound(1.f - health / type.health, 0, 1), DMath.bound(health / type.health, 0, 1), 0));
-		g.fillRect(-8, healthBarDist + 1, (16.f * health / type.health), 2);
-
-		float dmx = x - mx;
-		float dmy = y - my;
-		if (dmx * dmx + dmy * dmy < 100) {
-			float strWidth = g.getFont().getWidth(owner.name);
-			g.setColor(Color.black);
-			g.drawString(owner.name, -strWidth / 2, 10);
-		}
-
-		g.popTransform();
-
-		if (fog != null && this.owner.team.id == p.team.id) {
-			fog.setColor(Color.white);
-			int lx = l.getTileX(this.x);
-			int ly = l.getTileY(this.y);
-
-			Point2f loc = new Point2f(x, y);
-			Vector2f v = new Vector2f();
-			Point2f result = new Point2f();
-
-			int xmin = Math.max(lx - 10, 0);
-			int ymin = Math.max(ly - 10, 0);
-			int xmax = Math.min(lx + 10, l.width - 1);
-			int ymax = Math.min(ly + 10, l.height - 1);
-
-			float maxView = 10 * Level.tileSize;
-			float maxView2 = maxView * maxView;
-
-			for (int xx = xmin; xx <= xmax; xx++) {
-				for (int yy = ymin; yy < ymax; yy++) {
-					v.set(xx * Level.tileSize - x + (Level.tileSize * .5f),
-							yy * Level.tileSize - y + (Level.tileSize * .5f));
-					if (v.lengthSquared() < maxView2 && !l.hitwall(loc, v, result)) {
-						fog.fillOval(xx * Level.tileSize - (Level.tileSize * .5f),
-								yy * Level.tileSize - (Level.tileSize * .5f), Level.tileSize * 2, Level.tileSize * 2);
-					}
-				}
-			}
-		}
-	}
-
 	public void pathTo(int tx, int ty, TacticServer ts) {
 		Level l = ts.l;
 		Path tp = ts.finder.findPath(null, l.getTileX(x), l.getTileY(y), tx, ty);
@@ -434,6 +345,7 @@ public class Unit {
 		this.onStep = u.onStep;
 		this.owner = u.owner;
 		this.stoppedAt = u.stoppedAt;
+		this.marked = u.marked;
 		timeSinceUpdate = 0;
 	}
 

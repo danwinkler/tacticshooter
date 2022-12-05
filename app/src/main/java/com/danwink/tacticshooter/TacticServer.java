@@ -15,6 +15,7 @@ import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Building.BuildingType;
 import com.danwink.tacticshooter.gameobjects.Bullet;
 import com.danwink.tacticshooter.gameobjects.Level;
+import com.danwink.tacticshooter.gameobjects.Marker;
 import com.danwink.tacticshooter.gameobjects.Level.SlotOption;
 import com.danwink.tacticshooter.gameobjects.Level.SlotType;
 import com.danwink.tacticshooter.gameobjects.Player;
@@ -42,6 +43,7 @@ public class TacticServer {
 	public ArrayList<Unit> units = new ArrayList<Unit>();
 	public ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 	public Unit[][] unitGrid;
+	public ArrayList<Marker> markers = new ArrayList<Marker>();
 
 	public HashMap<Integer, Player> players = new HashMap<Integer, Player>();
 	public Level l;
@@ -663,6 +665,17 @@ public class TacticServer {
 					unitGrid[u.occupyX][u.occupyY] = null;
 				}
 				i--;
+			}
+		}
+
+		for (int i = 0; i < markers.size(); i++) {
+			Marker m = markers.get(i);
+			for (int unit_i = 0; unit_i < units.size(); unit_i++) {
+				Unit u = units.get(unit_i);
+				if (DMath.d2(m.x, m.y, u.x, u.y) < Level.tileSize * Level.tileSize) {
+					js.touchMarker(u, m);
+					break;
+				}
 			}
 		}
 

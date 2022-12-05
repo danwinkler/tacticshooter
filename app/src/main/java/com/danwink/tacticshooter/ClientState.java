@@ -7,6 +7,7 @@ import org.newdawn.slick.GameContainer;
 
 import com.danwink.tacticshooter.gameobjects.Bullet;
 import com.danwink.tacticshooter.gameobjects.Level;
+import com.danwink.tacticshooter.gameobjects.Marker;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.gameobjects.Unit;
 import com.danwink.tacticshooter.screens.MultiplayerGameScreen;
@@ -16,6 +17,7 @@ public class ClientState {
 	public ArrayList<Unit> units = new ArrayList<Unit>();
 
 	public ArrayList<Bullet> bullets = new ArrayList<Bullet>();
+	public ArrayList<Marker> markers = new ArrayList<Marker>();
 
 	public Level l;
 

@@ -36,5 +36,11 @@ public enum MessageType {
 	// Sent by the server to all clients at the beginning of the game to inform the
 	// clients of the available unit definitions
 	// Type: UnitDef[]
-	UNITDEFS;
+	UNITDEFS,
+	// Sent by the server when a marker is created
+	// Type: Marker
+	MARKERCREATE,
+	// Sent by the server when a marker is deleted
+	// Type: int (id)
+	MARKERDELETE;
 }

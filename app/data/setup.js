@@ -1,9 +1,11 @@
 var tickListeners = [];
 var killListeners = [];
+var touchMarkerListeners = [];
 
 var stepListeners = {};
 var stopListeners = {};
 var buttonListeners = {};
+
 
 function addTickListener(f) {
 	tickListeners.push(f);
@@ -54,6 +56,16 @@ function callStop(building, unit) {
 		for (i in sl) {
 			sl[i](building, unit);
 		}
+	}
+}
+
+function addTouchMarkerListener(f) {
+	touchMarkerListeners.push(f);
+}
+
+function callTouchMarker(unit_id, marker_id) {
+	for (var i in touchMarkerListeners) {
+		touchMarkerListeners[i](unit_id, marker_id);
 	}
 }
 

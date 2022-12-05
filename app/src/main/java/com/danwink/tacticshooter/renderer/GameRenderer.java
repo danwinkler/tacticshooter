@@ -17,6 +17,7 @@ import com.danwink.tacticshooter.ClientState;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Bullet;
 import com.danwink.tacticshooter.gameobjects.Level;
+import com.danwink.tacticshooter.gameobjects.Marker;
 import com.danwink.tacticshooter.gameobjects.Unit;
 import com.danwink.tacticshooter.gameobjects.Unit.UnitState;
 import com.phyloa.dlib.math.Point2i;
@@ -100,6 +101,7 @@ public class GameRenderer {
 		bloodExplosion.render(g, cs, unitBody);
 		building.render(g, cs, false);
 		wall.render(g, cs);
+		renderMarkers(g, cs);
 		unitBody.render(g, cs);
 		bullet.render(g, cs);
 		particle.render(g);
@@ -127,6 +129,14 @@ public class GameRenderer {
 
 	public void createExplosion(float x, float y, ClientState cs) {
 		particle.createExplosion(x, y, cs);
+	}
+
+	public void renderMarkers(Graphics g, ClientState cs) {
+		for (int i = 0; i < cs.markers.size(); i++) {
+			Marker m = cs.markers.get(i);
+			int frame = (int) (System.currentTimeMillis() / 250) % 4;
+			g.drawImage(cs.l.theme.flag, m.x - 16, m.y - 32, m.x + 16, m.y, frame * 16, 0, (frame + 1) * 16, 16);
+		}
 	}
 
 	public class UnitInfoRenderer {
@@ -162,6 +172,13 @@ public class GameRenderer {
 
 			g.pushTransform();
 			g.translate(u.x, u.y);
+
+			if (u.marked) {
+				g.setColor(Color.red);
+				g.setLineWidth(3);
+				g.drawOval(-12, -12, 24, 24);
+				g.setLineWidth(1);
+			}
 
 			if (u.selected) {
 				g.setColor(Color.blue);

@@ -14,6 +14,7 @@ import javax.script.ScriptException;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Building.BuildingType;
 import com.danwink.tacticshooter.gameobjects.Level;
+import com.danwink.tacticshooter.gameobjects.Marker;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.gameobjects.Team;
 import com.danwink.tacticshooter.gameobjects.Unit;
@@ -58,6 +59,8 @@ public class JSAPI {
 		bindings.put("buildings", buildings);
 
 		bindings.put("out", System.out);
+
+		bindings.put("tileSize", Level.tileSize);
 	}
 
 	public void tick(int frame) {
@@ -100,6 +103,9 @@ public class JSAPI {
 					+ "unit: " + u.id + ","
 					+ "owner:" + u.owner.id + ","
 					+ "killer_owner:" + (u.killer != null ? u.killer.id : -1) + ","
+					+ "marked:" + u.marked + ","
+					+ "x:" + u.x + ","
+					+ "y:" + u.y + ","
 					+ "} );");
 		} catch (ScriptException e) {
 			e.printStackTrace();
@@ -190,6 +196,15 @@ public class JSAPI {
 		return -1;
 	}
 
+	public int getBaseForTeam(int team) {
+		for (Building b : ts.l.buildings) {
+			if (b.bt == BuildingType.CENTER && b.t.id == team) {
+				return b.id;
+			}
+		}
+		return -1;
+	}
+
 	public int getBaseX(int id) {
 		Player p = ts.players.get(id);
 		Building base = null;
@@ -243,6 +258,15 @@ public class JSAPI {
 			}
 		}
 		return -1;
+	}
+
+	public String getBuildingType(int id) {
+		for (Building bu : ts.l.buildings) {
+			if (bu.id == id) {
+				return bu.bt.name();
+			}
+		}
+		return "ERROR";
 	}
 
 	// ---------------------------------
@@ -315,6 +339,25 @@ public class JSAPI {
 		}
 	}
 
+	public void setUnitMarked(int u, boolean marked) {
+		for (Unit unit : ts.units) {
+			if (unit.id == u) {
+				unit.marked = marked;
+				ts.si.sendToAllClients(new Message(MessageType.UNITUPDATE, unit));
+				break;
+			}
+		}
+	}
+
+	public boolean getUnitMarked(int u) {
+		for (Unit unit : ts.units) {
+			if (unit.id == u) {
+				return unit.marked;
+			}
+		}
+		return false;
+	}
+
 	// ---------------------------------
 	// GAME
 	// ---------------------------------
@@ -330,5 +373,43 @@ public class JSAPI {
 
 	public UnitDef[] getUnitDefsArray() {
 		return unitDefs.values().toArray(new UnitDef[0]);
+	}
+
+	// ---------------------------------
+	// MARKER
+	// ---------------------------------
+
+	public int createMarker(float x, float y) {
+		int id = random.nextInt();
+		var marker = new Marker(x, y);
+		marker.id = id;
+		ts.markers.add(marker);
+		ts.si.sendToAllClients(new Message(MessageType.MARKERCREATE, marker));
+		return id;
+	}
+
+	public void deleteMarker(int id) {
+		ts.markers.removeIf(m -> m.id == id);
+		ts.si.sendToAllClients(new Message(MessageType.MARKERDELETE, id));
+	}
+
+	public void touchMarker(Unit u, Marker m) {
+		try {
+			engine.eval("callTouchMarker( " + u.id + ", " + m.id + " );");
+		} catch (ScriptException e) {
+			e.printStackTrace();
+		}
+	}
+
+	// ---------------------------------
+	// MAP
+	// ---------------------------------
+
+	public int getPathLength(int x1, int y1, int x2, int y2) {
+		var path = ts.finder.findPath(null, x1, y1, x2, y2);
+		if (path != null) {
+			return path.getLength();
+		}
+		return -1;
 	}
 }
