@@ -215,6 +215,7 @@ public class Good3 extends ComputerPlayer {
 				// is the enemy base, which we can't take. normally if this happens we are
 				// overpowering them anyway
 				// so this check helps us not gridlock
+				// Also very small random chance to do this
 				int ourSize = 0, theirSize = 0;
 				for (Unit u : units) {
 					if (u.owner.team.id == player.team.id) {
@@ -224,11 +225,14 @@ public class Good3 extends ComputerPlayer {
 					}
 				}
 
-				if (ourSize > theirSize * 2.2f) {
+				boolean randomAttack = Math.random() < 0.001f;
+
+				if (ourSize > theirSize * 2.0f || randomAttack) {
 					ci.sl.received(fc, new Message(MessageType.MESSAGE, "Full Attack"));
 					for (Building b : l.buildings) {
 						if (b.t.id != player.team.id && b.isCapturable(l)) {
 							army.move(b.x, b.y);
+							break armyBreak;
 						}
 					}
 				}
