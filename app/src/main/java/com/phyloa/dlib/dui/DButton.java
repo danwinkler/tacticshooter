@@ -8,7 +8,7 @@ import jp.objectclub.vecmath.Vector2f;
 
 import com.phyloa.dlib.renderer.Renderer2D;
 
-public class DButton extends DUIElement<Image> {
+public class DButton extends DUIElement {
 	public static final int RELEASED = 0;
 	public static final int HOVER = 1;
 	public static final int PRESSED = 2;

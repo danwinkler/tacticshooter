@@ -2,9 +2,11 @@ package com.phyloa.dlib.dui;
 
 import java.util.ArrayList;
 
+import org.newdawn.slick.Image;
+
 import com.phyloa.dlib.renderer.Renderer2D;
 
-public class DUI<ImageClass> implements DMouseListener, DKeyListener {
+public class DUI implements DMouseListener, DKeyListener {
 	DEventMapper dem;
 	ArrayList<DUIListener> listeners = new ArrayList<DUIListener>();
 	ArrayList<DDialog> dialogs = new ArrayList<DDialog>();
@@ -41,6 +43,10 @@ public class DUI<ImageClass> implements DMouseListener, DKeyListener {
 		topPanel.setUI(this);
 	}
 
+	public void doLayout() {
+		rootPane.doLayout();
+	}
+
 	public void update() {
 		if (enabled) {
 			if (topPanel.visible) {
@@ -62,7 +68,7 @@ public class DUI<ImageClass> implements DMouseListener, DKeyListener {
 		}
 	}
 
-	public void render(Renderer2D<ImageClass> r) {
+	public void render(Renderer2D<Image> r) {
 		if (enabled) {
 			rootPane.render(r);
 			rootPane.renderChildren(r);
@@ -242,5 +248,10 @@ public class DUI<ImageClass> implements DMouseListener, DKeyListener {
 
 	public void setTheme(DUITheme theme) {
 		this.theme = theme;
+	}
+
+	public void resize(int width, int height) {
+		rootPane.setSize(width, height);
+		topPanel.setSize(width, height);
 	}
 }

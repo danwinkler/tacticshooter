@@ -22,10 +22,12 @@ import com.danwink.tacticshooter.network.ServerNetworkInterface;
 import com.danwink.tacticshooter.slick.Slick2DEventMapper;
 import com.danwink.tacticshooter.slick.Slick2DRenderer;
 import com.phyloa.dlib.dui.DButton;
+import com.phyloa.dlib.dui.DColumnPanel;
 import com.phyloa.dlib.dui.DUI;
 import com.phyloa.dlib.dui.DUIElement;
 import com.phyloa.dlib.dui.DUIEvent;
 import com.phyloa.dlib.dui.DUIListener;
+import com.phyloa.dlib.dui.RelativePosition;
 import com.phyloa.dlib.game.DScreen;
 import com.phyloa.dlib.game.DScreenHandler;
 import com.phyloa.dlib.util.DMath;
@@ -48,25 +50,34 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 
 	boolean openEditor = false;
 
+	int frame;
+
 	public void onActivate(GameContainer e, DScreenHandler<GameContainer, Graphics> dsh) {
 		if (dui == null) {
-			dui = new DUI(new Slick2DEventMapper(e.getInput()));
+			dui = new DUI(new Slick2DEventMapper(e.getInput()), 0, 0, gc.getWidth(), gc.getHeight());
 
-			singlePlayer = new DButton("Start Local Server", e.getWidth() / 2 - 200, e.getHeight() / 2 - 150, 400, 100);
-			multiPlayer = new DButton("Multiplayer", e.getWidth() / 2 - 200, e.getHeight() / 2 - 50, 400, 100);
-			settings = new DButton("Settings", e.getWidth() / 2 - 200, e.getHeight() / 2 + 50, 400, 100);
-			exit = new DButton("Exit", e.getWidth() / 2 - 200, e.getHeight() / 2 + 150, 400, 100);
+			DColumnPanel mainButtons = new DColumnPanel(0, 0, 0, 0);
+			mainButtons.setRelativePosition(RelativePosition.CENTER, 0, 0);
+
+			singlePlayer = new DButton("Start Local Server", 0, 0, 400, 100);
+			multiPlayer = new DButton("Multiplayer", 0, 0, 400, 100);
+			settings = new DButton("Settings", 0, 0, 400, 100);
+			exit = new DButton("Exit", 0, 0, 400, 100);
 
 			editor = new DButton("Editor", 50, 50, 200, 100);
 
-			dui.add(singlePlayer);
-			dui.add(multiPlayer);
-			dui.add(settings);
-			dui.add(exit);
+			mainButtons.add(singlePlayer);
+			mainButtons.add(multiPlayer);
+			mainButtons.add(settings);
+			mainButtons.add(exit);
+
+			dui.add(mainButtons);
 
 			dui.add(editor);
 
 			dui.addDUIListener(this);
+
+			dui.doLayout();
 		}
 
 		dui.setEnabled(true);
@@ -104,8 +115,7 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 		var textWidth = g.getFont().getWidth(message);
 		g.translate(gc.getWidth() / 2 + title.getWidth() * .45f, 170);
 		g.rotate(textWidth / 2, 0, 45);
-		var t = (int) (gc.getTime() - 1400000000l);
-		var scaleAmount = 2 + DMath.sinf(t * .0025f) * .75f;
+		var scaleAmount = 2 + DMath.sinf(frame * .05f) * .75f;
 		g.scale(scaleAmount, scaleAmount);
 		g.drawString(message, -textWidth / 2, 0);
 		g.popTransform();
@@ -119,6 +129,8 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 			}
 			Editor.main(new String[] {});
 		}
+
+		frame++;
 	}
 
 	public void onExit() {
@@ -178,5 +190,7 @@ public class HomeScreen extends DScreen<GameContainer, Graphics> implements DUIL
 	}
 
 	public void onResize(int width, int height) {
+		dui.resize(width, height);
+		dui.doLayout();
 	}
 }

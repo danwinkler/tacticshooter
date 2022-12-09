@@ -1,4 +1,4 @@
 menuTransitionSpeed .4
 antialias false
 diagonalMove false
-multisample 8
+multisample 1

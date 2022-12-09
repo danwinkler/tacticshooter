@@ -2,22 +2,39 @@ package com.phyloa.dlib.dui;
 
 import java.util.ArrayList;
 
+import org.newdawn.slick.Image;
+
 import com.phyloa.dlib.math.Point2i;
 
 import com.phyloa.dlib.renderer.Renderer2D;
 
-public abstract class DUIElement<ImageClass> implements DKeyListener, DMouseListener {
+public abstract class DUIElement implements DKeyListener, DMouseListener {
 	public int x, y, width, height;
+	public int relX, relY;
+	public boolean isRel = false;
+	public RelativePosition relative;
 	public String name;
 
 	boolean visible = true;
-	DUI<ImageClass> ui;
+	DUI ui;
 
-	ArrayList<DUIElement<ImageClass>> children = new ArrayList<>();
+	ArrayList<DUIElement> children = new ArrayList<>();
 
-	DUIElement<ImageClass> parent;
+	DUIElement parent;
 
 	boolean isInside = false;
+
+	public DUIElement() {
+	}
+
+	public DUIElement(RelativePosition relative, int x, int y, int width, int height) {
+		this.relative = relative;
+		this.relX = x;
+		this.relY = y;
+		this.width = width;
+		this.height = height;
+		isRel = true;
+	}
 
 	public DUIElement(int x, int y, int width, int height) {
 		this.x = x;
@@ -26,9 +43,42 @@ public abstract class DUIElement<ImageClass> implements DKeyListener, DMouseList
 		this.height = height;
 	}
 
-	public abstract void render(Renderer2D<ImageClass> r);
+	public abstract void render(Renderer2D<Image> r);
 
-	public abstract void update(DUI<ImageClass> ui);
+	public abstract void update(DUI ui);
+
+	/**
+	 * Caclulate the layout for all child elements
+	 */
+	protected void calcLayout() {
+		// Default behavior is to do nothing unless a relative position is set, in which
+		// case to stuff the element in that position
+		// If two elements specify the same position, they'll overlap
+		for (DUIElement child : children) {
+			if (child.isRel) {
+				var pos = child.relative.calcPos(child, this);
+				child.x = (int) pos.x;
+				child.y = (int) pos.y;
+			}
+		}
+	}
+
+	/**
+	 * Called when you want to recalculate the whole layout
+	 */
+	public void doLayout() {
+		for (DUIElement child : children) {
+			child.doLayout();
+		}
+		calcLayout();
+	}
+
+	public void setRelativePosition(RelativePosition relative, int x, int y) {
+		this.relative = relative;
+		this.relX = x;
+		this.relY = y;
+		isRel = true;
+	}
 
 	public String getName() {
 		return name;
@@ -206,7 +256,7 @@ public abstract class DUIElement<ImageClass> implements DKeyListener, DMouseList
 		children.clear();
 	}
 
-	public ArrayList<DUIElement<ImageClass>> getChildren() {
+	public ArrayList<DUIElement> getChildren() {
 		return children;
 	}
 }

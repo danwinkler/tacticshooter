@@ -66,7 +66,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	DTextBox chatBox;
 	DCheckBox teamChat;
 
-	DUI<Image> dui;
+	DUI dui;
 
 	public Input input;
 
@@ -121,7 +121,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		}
 
 		if (dui == null) {
-			dui = new DUI<Image>(new Slick2DEventMapper(gc.getInput()));
+			dui = new DUI(new Slick2DEventMapper(gc.getInput()));
 
 			escapeMenu = new DPanel(gc.getWidth() / 2 - 100, gc.getHeight() / 2 - 100, 200, 300);
 			quit = new DButton("Quit Game", 0, 0, 200, 100);
