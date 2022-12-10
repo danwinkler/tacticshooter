@@ -3,100 +3,69 @@ package com.danwink.tacticshooter.screens;
 import java.awt.event.KeyEvent;
 
 import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
-
-
+import com.danwink.tacticshooter.DUIScreen;
 import com.danwink.tacticshooter.StaticFiles;
-import com.danwink.tacticshooter.slick.Slick2DEventMapper;
-import com.danwink.tacticshooter.slick.Slick2DRenderer;
 import com.phyloa.dlib.dui.DButton;
+import com.phyloa.dlib.dui.DColumnPanel;
+import com.phyloa.dlib.dui.DRowPanel;
 import com.phyloa.dlib.dui.DTextBox;
 import com.phyloa.dlib.dui.DUI;
 import com.phyloa.dlib.dui.DUIElement;
 import com.phyloa.dlib.dui.DUIEvent;
-import com.phyloa.dlib.dui.DUIListener;
-import com.phyloa.dlib.game.DScreen;
-import com.phyloa.dlib.game.DScreenHandler;
+import com.phyloa.dlib.dui.RelativePosition;
 
-public class MultiplayerSetupScreen extends DScreen<GameContainer, Graphics> implements DUIListener
-{
-	DUI dui;
+public class MultiplayerSetupScreen extends DUIScreen {
 	DTextBox address;
 	DButton enter;
 	DButton back;
-	
-	Slick2DRenderer r = new Slick2DRenderer();
-	
-	public void onActivate( GameContainer e, DScreenHandler<GameContainer, Graphics> dsh )
-	{
-		if( dui == null )
-		{
-			dui = new DUI( new Slick2DEventMapper( e.getInput() ) );
-			address = new DTextBox( e.getWidth() / 2 - 200, e.getHeight()/2 - 120, 400, 100 );
-			back = new DButton( "Back", e.getWidth() / 2 - 200, e.getHeight()/2 + 20, 200, 100 );
-			enter = new DButton( "Join", e.getWidth() / 2, e.getHeight()/2 + 20, 200, 100 );
-			
-			dui.add( address );
-			dui.add( enter );
-			dui.add( back );
-			
-			dui.setFocus( address );
-			
-			dui.addDUIListener( this );
-		}
-		dui.setEnabled( true );
-		
-		if( ((HomeScreen)dsh.get( "home" )).server != null )
-		{
-			address.setText( "localhost" );
+
+	public void init(GameContainer e) {
+		address = new DTextBox(0, 0, 0, 0);
+
+		if (((HomeScreen) dsh.get("home")).server != null) {
+			address.setText("localhost");
 		}
 	}
-	
-	public void update( GameContainer gc, float delta )
-	{
-		dui.update();
+
+	public void createUIElements(DUI dui, float windowHeight) {
+		DColumnPanel column = new DColumnPanel(0, 0, 0, 0);
+		column.setRelativePosition(RelativePosition.CENTER, 0, 0);
+		address.setSize(400 * uiScale, 100 * uiScale);
+		DRowPanel row = new DRowPanel(0, 0, 0, 0);
+		back = new DButton("Back", 0, 0, 200 * uiScale, 100 * uiScale);
+		enter = new DButton("Join", 0, 0, 200 * uiScale, 100 * uiScale);
+		row.add(back);
+		row.add(enter);
+
+		column.add(address);
+		column.add(row);
+
+		dui.add(column);
+
+		dui.setFocus(address);
 	}
 
-	public void render( GameContainer gc, Graphics g )
-	{
-		dui.render( r.renderTo( g ) );
-	}
-
-	public void onExit()
-	{
-		dui.setEnabled( false );
-	}
-	
-	public void event( DUIEvent event )
-	{
+	public void event(DUIEvent event) {
 		DUIElement e = event.getElement();
-		if( e instanceof DButton && event.getType() == DButton.MOUSE_UP )
-		{
-			if( e == enter )
-			{
-				dsh.message( "connect", address.getText().trim() );
-				dsh.activate( "connect", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
-			} 
-			else if( e == back )
-			{
-				dsh.activate( "home", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
+		if (e instanceof DButton && event.getType() == DButton.MOUSE_UP) {
+			if (e == enter) {
+				dsh.message("connect", address.getText().trim());
+				dsh.activate("connect", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
+			} else if (e == back) {
+				dsh.activate("home", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
 			}
-		} else if( e instanceof DTextBox )
-		{
-			if( event.getType() == KeyEvent.VK_ENTER )
-			{
-				dsh.message( "connect", address.getText().trim() );
-				dsh.activate( "connect", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
+		} else if (e instanceof DTextBox) {
+			if (event.getType() == KeyEvent.VK_ENTER) {
+				dsh.message("connect", address.getText().trim());
+				dsh.activate("connect", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
 			}
 		}
 	}
 
 	@Override
-	public void message( Object o )
-	{
+	public void message(Object o) {
 		// TODO Auto-generated method stub
-		
-	} 
-	
-	public void onResize( int width, int height ) {}
+
+	}
+
 }

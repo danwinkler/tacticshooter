@@ -6,7 +6,7 @@ public class DColumnPanel extends DPanel {
     }
 
     @Override
-    protected void calcLayout() {
+    protected void calcLayout(DUI dui) {
         int rootY = 0;
         int maxWidth = 0;
         for (var child : children) {

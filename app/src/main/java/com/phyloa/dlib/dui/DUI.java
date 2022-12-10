@@ -15,6 +15,8 @@ public class DUI implements DMouseListener, DKeyListener {
 	DUIElement hover = null;
 	public DUIElement rootPane = new DPanel(0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE);
 
+	// Top panel is for things like dropdown menus, which need to overlay over all
+	// other elements breifly, and one at a time
 	DUIElement topPanelOwner = rootPane;
 	DUIElement topPanel = new DPanel(0, 0, 0, 0);
 
@@ -44,7 +46,7 @@ public class DUI implements DMouseListener, DKeyListener {
 	}
 
 	public void doLayout() {
-		rootPane.doLayout();
+		rootPane.doLayout(this);
 	}
 
 	public void update() {

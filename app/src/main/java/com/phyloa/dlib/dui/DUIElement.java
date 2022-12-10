@@ -50,7 +50,7 @@ public abstract class DUIElement implements DKeyListener, DMouseListener {
 	/**
 	 * Caclulate the layout for all child elements
 	 */
-	protected void calcLayout() {
+	protected void calcLayout(DUI dui) {
 		// Default behavior is to do nothing unless a relative position is set, in which
 		// case to stuff the element in that position
 		// If two elements specify the same position, they'll overlap
@@ -66,11 +66,11 @@ public abstract class DUIElement implements DKeyListener, DMouseListener {
 	/**
 	 * Called when you want to recalculate the whole layout
 	 */
-	public void doLayout() {
+	public void doLayout(DUI dui) {
 		for (DUIElement child : children) {
-			child.doLayout();
+			child.doLayout(dui);
 		}
-		calcLayout();
+		calcLayout(dui);
 	}
 
 	public void setRelativePosition(RelativePosition relative, int x, int y) {

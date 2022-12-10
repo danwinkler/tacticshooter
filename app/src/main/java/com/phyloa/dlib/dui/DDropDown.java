@@ -83,6 +83,13 @@ public class DDropDown extends DUIElement {
 
 	}
 
+	@Override
+	public void setSize(int width, int height) {
+		super.setSize(width, height);
+		topPanel.width = width;
+		topPanel.height = (int) getExpandedHeight();
+	}
+
 	public void setSelected(int i) {
 		selected = i;
 	}

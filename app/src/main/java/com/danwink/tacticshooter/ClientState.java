@@ -27,6 +27,9 @@ public class ClientState {
 
 	public float scrollx = 0;
 	public float scrolly = 0;
+	public float zoom = 1;
+	public float minZoom = 0.25f;
+	public float maxZoom = 3.f;
 
 	public float soundFadeDist = 1000;
 	public Player[] players;
@@ -44,6 +47,7 @@ public class ClientState {
 		selected.clear();
 		scrollx = 0;
 		scrolly = 0;
+		zoom = 1;
 	}
 
 	public float getSoundMag(GameContainer gc, float x, float y) {

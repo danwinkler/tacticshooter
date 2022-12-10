@@ -6,6 +6,7 @@ import org.lwjgl.openal.OpenALException;
 import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
+import org.newdawn.slick.Font;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
@@ -26,13 +27,19 @@ import com.phyloa.dlib.game.DScreenHandler;
 public class TacticClient extends BasicGame {
 	DScreenHandler<GameContainer, Graphics> dsh = new DScreenHandler<GameContainer, Graphics>();
 
-	org.newdawn.slick.Font f;
+	Font f;
+
+	int lastWindowWidth = 0;
+	int lastWindowHeight = 0;
 
 	public TacticClient() {
 		super("Tactic Shooter Client");
 	}
 
 	public void init(GameContainer gc) throws SlickException {
+		lastWindowWidth = gc.getWidth();
+		lastWindowHeight = gc.getHeight();
+
 		dsh.register("openload", new OpenLoadScreen());
 
 		dsh.register("home", new HomeScreen());
@@ -51,11 +58,10 @@ public class TacticClient extends BasicGame {
 
 		dsh.activate("openload", gc);
 
-		f = new AngelCodeFont("data" + File.separator + "pixelfont1_16px.fnt",
-				"data" + File.separator + "pixelfont1_16px_0.png");
-
 		gc.setMusicVolume(StaticFiles.options.getF("slider.music"));
 		gc.setSoundVolume(StaticFiles.options.getF("slider.sound"));
+
+		f = UIHelper.getFontForScale(UIHelper.getUIScale(lastWindowHeight));
 	}
 
 	public void update(GameContainer gc, int delta) throws SlickException {
@@ -68,8 +74,15 @@ public class TacticClient extends BasicGame {
 	}
 
 	public void render(GameContainer gc, Graphics g) throws SlickException {
-		g.setFont(f);
+		if (lastWindowWidth != gc.getWidth() || lastWindowHeight != gc.getHeight()) {
+			lastWindowWidth = gc.getWidth();
+			lastWindowHeight = gc.getHeight();
+			f = UIHelper.getFontForScale(UIHelper.getUIScale(lastWindowHeight));
+			dsh.get().onResize(lastWindowWidth, lastWindowHeight);
+		}
+
 		g.setAntiAlias(StaticFiles.advOptions.getB("antialias"));
+		g.setFont(f);
 
 		// Render background if not in a game
 		if (!(dsh.get() instanceof MultiplayerGameScreen)) {
@@ -93,7 +106,7 @@ public class TacticClient extends BasicGame {
 				app.setVSync(StaticFiles.options.getB("vsync"));
 				app.setUpdateOnlyWhenVisible(false);
 				app.setAlwaysRender(true);
-				app.setResizable(false); // UI expects that window size never changes :(
+				app.setResizable(true);
 				app.start();
 			} catch (OpenALException ex) {
 				// These seem to happen fairly often on macs, not quite sure what to do about

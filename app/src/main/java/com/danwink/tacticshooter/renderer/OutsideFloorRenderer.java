@@ -5,17 +5,20 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
-import com.danwink.tacticshooter.AutoTileDrawer;
 import com.danwink.tacticshooter.ClientState;
 import com.danwink.tacticshooter.gameobjects.Level;
 
 public class OutsideFloorRenderer {
 	Image texture;
 
+	int lastScreenWidth, lastScreenHeight;
+
 	public void render(Graphics g, ClientState cs, GameContainer gc) {
-		if (texture == null) {
+		if (texture == null || lastScreenWidth != gc.getWidth() || lastScreenHeight != gc.getHeight()) {
 			if (cs.l != null) {
 				generateTexture(cs, gc);
+				lastScreenWidth = gc.getWidth();
+				lastScreenHeight = gc.getHeight();
 			} else {
 				return;
 			}

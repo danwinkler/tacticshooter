@@ -11,31 +11,30 @@ import org.newdawn.slick.Graphics;
 
 import com.danwink.tacticshooter.ComputerPlayer;
 import com.danwink.tacticshooter.ComputerPlayer.PlayType;
+import com.danwink.tacticshooter.DUIScreen;
 import com.danwink.tacticshooter.MessageType;
 import com.danwink.tacticshooter.StaticFiles;
+import com.danwink.tacticshooter.UIHelper;
 import com.danwink.tacticshooter.gameobjects.Level.SlotType;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.network.ClientInterface;
 import com.danwink.tacticshooter.network.Message;
 import com.danwink.tacticshooter.slick.Slick2DEventMapper;
-import com.danwink.tacticshooter.slick.Slick2DRenderer;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DCheckBox;
+import com.phyloa.dlib.dui.DColumnPanel;
 import com.phyloa.dlib.dui.DDropDown;
 import com.phyloa.dlib.dui.DPanel;
+import com.phyloa.dlib.dui.DRowPanel;
+import com.phyloa.dlib.dui.DSpacer;
 import com.phyloa.dlib.dui.DText;
 import com.phyloa.dlib.dui.DTextBox;
 import com.phyloa.dlib.dui.DUI;
 import com.phyloa.dlib.dui.DUIEvent;
-import com.phyloa.dlib.dui.DUIListener;
-import com.phyloa.dlib.game.DScreen;
-import com.phyloa.dlib.game.DScreenHandler;
+import com.phyloa.dlib.dui.RelativePosition;
 
-public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUIListener {
+public class LobbyScreen extends DUIScreen {
 	ClientInterface ci;
-
-	DUI dui;
-	Slick2DRenderer r = new Slick2DRenderer();
 
 	DButton[] names = new DButton[16];
 	DDropDown[] humanOrBot = new DDropDown[16];
@@ -47,25 +46,32 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 	DButton startGame;
 	DButton leaveGame;
 	DCheckBox fog;
+	DPanel chatBackground;
 
 	Slot[] slots = new Slot[16];
 
 	ArrayList<String> messages = new ArrayList<String>();
 
-	public void onActivate(GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh) {
+	public void init(GameContainer gc) {
+		initializeUIElements(dui);
+
 		messages.clear();
-		dui = new DUI(new Slick2DEventMapper(gc.getInput()));
-		dui.addDUIListener(this);
+		ci.sendToServer(new Message(MessageType.CLIENTJOIN, StaticFiles.getUsername()));
+	}
+
+	/*
+	 * Creating all the UI elements here one time, and then in createUIElements I'll
+	 * place them in the DUI and resize them
+	 */
+	public void initializeUIElements(DUI dui) {
 		for (int i = 0; i < 16; i++) {
 			int baseHeight = i < 8 ? 160 : 200;
 			names[i] = new DButton("Open", 20, baseHeight + i * 30, 170, 25);
 			names[i].setName("na " + i);
-			dui.add(names[i]);
 
 			humanOrBot[i] = new DDropDown(200, baseHeight + i * 30, 100, 25);
 			humanOrBot[i].name = "hb " + i;
 			humanOrBot[i].addItems("HUMAN", "BOT");
-			dui.add(humanOrBot[i]);
 
 			botType[i] = new DDropDown(310, baseHeight + i * 30, 100, 25);
 			botType[i].name = "bt " + i;
@@ -73,47 +79,104 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 			for (ComputerPlayer.PlayType pt : ComputerPlayer.PlayType.values()) {
 				botType[i].addItems(pt.name());
 			}
-			dui.add(botType[i]);
 
 			spectator[i] = new DDropDown(420, baseHeight + i * 30, 90, 25);
 			spectator[i].name = "sp " + i;
 			spectator[i].setVisible(false);
 			spectator[i].addItems("Player", "Spec");
-
-			dui.add(spectator[i]);
 		}
 
 		maps = new DDropDown(20, 100, 500, 25);
-		dui.add(maps);
 
 		gameType = new DDropDown(20, 130, 500, 25);
 		gameType.addItems(StaticFiles.getGameTypes());
 		gameType.setSelected(gameType.items.indexOf("pointcapture"));
-		dui.add(gameType);
 
 		leaveGame = new DButton("Leave", 105, 700, 90, 50);
-		dui.add(leaveGame);
 
 		startGame = new DButton("Start", 205, 700, 90, 50);
-		dui.add(startGame);
 
 		chatBox = new DTextBox(gc.getWidth() - 600, gc.getHeight() - 200, 500, 50);
-		dui.add(chatBox);
 
 		fog = new DCheckBox(gc.getWidth() - 600, gc.getHeight() - 130, 20, 20);
-		dui.add(fog);
+	}
 
-		dui.add(new DText("Enable Fog", gc.getWidth() - 570, gc.getHeight() - 126));
+	private DRowPanel createSlotRow(int i) {
+		DRowPanel row = new DRowPanel(0, 0, 0, 0);
+		names[i].setSize(180 * uiScale, 25 * uiScale);
+		row.add(names[i]);
+		row.add(new DSpacer(10 * uiScale, 0));
+		humanOrBot[i].setSize(100 * uiScale, 25 * uiScale);
+		row.add(humanOrBot[i]);
+		row.add(new DSpacer(10 * uiScale, 0));
+		botType[i].setSize(100 * uiScale, 25 * uiScale);
+		row.add(botType[i]);
+		row.add(new DSpacer(10 * uiScale, 0));
+		spectator[i].setSize(90 * uiScale, 25 * uiScale);
+		row.add(spectator[i]);
 
-		DPanel chatBackground = new DPanel(gc.getWidth() - 600, 100, 500, gc.getHeight() - 310);
+		return row;
+	}
+
+	@Override
+	public void createUIElements(DUI dui, float windowHeight) {
+		int uiScale = UIHelper.getUIScale(windowHeight);
+
+		DColumnPanel leftColumn = new DColumnPanel(0, 0, 0, 0);
+		leftColumn.setRelativePosition(RelativePosition.TOP_LEFT, 20 * uiScale, 130 * uiScale);
+
+		maps.setSize(500 * uiScale, 25 * uiScale);
+		leftColumn.add(maps);
+		gameType.setSize(500 * uiScale, 25 * uiScale);
+		leftColumn.add(gameType);
+		leftColumn.add(new DSpacer(0, 10 * uiScale));
+
+		// TEAM A
+		DColumnPanel teamAColumn = new DColumnPanel(0, 0, 0, 0);
+		for (int i = 0; i < 8; i++) {
+			var row = createSlotRow(i);
+			teamAColumn.add(row);
+		}
+		leftColumn.add(teamAColumn);
+		leftColumn.add(new DSpacer(0, 30 * uiScale));
+
+		// TEAM B
+		DColumnPanel teamBColumn = new DColumnPanel(0, 0, 0, 0);
+		for (int i = 8; i < 16; i++) {
+			var row = createSlotRow(i);
+			teamBColumn.add(row);
+		}
+		leftColumn.add(teamBColumn);
+		leftColumn.add(new DSpacer(0, 30 * uiScale));
+
+		// LEAVE AND START
+		DRowPanel startLeaveRow = new DRowPanel(0, 0, 0, 0);
+		leaveGame.setSize(90 * uiScale, 50 * uiScale);
+		startLeaveRow.add(leaveGame);
+		startLeaveRow.add(new DSpacer(10 * uiScale, 0));
+		startGame.setSize(90 * uiScale, 50 * uiScale);
+		startLeaveRow.add(startGame);
+		leftColumn.add(startLeaveRow);
+
+		dui.add(leftColumn);
+
+		// dui.add(new DText("Enable Fog", gc.getWidth() - 570, gc.getHeight() - 126));
+
+		DColumnPanel rightColumn = new DColumnPanel(0, 0, 0, 0);
+		rightColumn.setRelativePosition(RelativePosition.TOP_RIGHT, -20 * uiScale, 130 * uiScale);
+
+		chatBackground = new DPanel(0, 0, 500 * uiScale, gc.getHeight() - 310 * uiScale);
 		chatBackground.setDrawBackground(true);
-		dui.add(chatBackground);
+		rightColumn.add(chatBackground);
+		rightColumn.add(new DSpacer(0, uiScale * 10));
+		chatBox.setSize(500 * uiScale, 50 * uiScale);
+		rightColumn.add(chatBox);
 
-		ci.sendToServer(new Message(MessageType.CLIENTJOIN, StaticFiles.getUsername()));
+		dui.add(rightColumn);
 	}
 
 	public void update(GameContainer gc, float delta) {
-		dui.update();
+		super.update(gc, delta);
 
 		while (ci.hasClientMessages()) {
 			Message m = ci.getNextClientMessage();
@@ -180,10 +243,14 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 	}
 
 	public void render(GameContainer gc, Graphics g) {
-		dui.render(r.renderTo(g));
+		super.render(gc, g);
 		int count = 0;
+
+		var chatPos = chatBackground.getScreenLocation();
+
 		for (int i = messages.size() - 1; i >= Math.max(messages.size() - 10, 0); i--) {
-			g.drawString(messages.get(i), gc.getWidth() - 600 + 10, gc.getHeight() - 230 + count * -20);
+			g.drawString(messages.get(i), chatPos.x + 10,
+					chatPos.y + chatBackground.height + (count + 1) * -20 * uiScale);
 			count++;
 		}
 
@@ -199,18 +266,10 @@ public class LobbyScreen extends DScreen<GameContainer, Graphics> implements DUI
 		g.drawString("Server Address: " + hostname, 30, 30);
 	}
 
-	public void onExit() {
-		dui.setEnabled(false);
-		dui = null;
-	}
-
 	public void message(Object o) {
 		if (o instanceof ClientInterface) {
 			ci = (ClientInterface) o;
 		}
-	}
-
-	public void onResize(int width, int height) {
 	}
 
 	public void event(DUIEvent event) {

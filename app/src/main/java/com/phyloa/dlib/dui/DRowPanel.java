@@ -6,12 +6,16 @@ public class DRowPanel extends DPanel {
     }
 
     @Override
-    protected void calcLayout() {
+    protected void calcLayout(DUI dui) {
         int rootX = 0;
+        int maxHeight = 0;
         for (var child : children) {
-            child.y = rootX;
+            child.x = rootX;
             child.y = 0;
             rootX += child.width;
+            maxHeight = Math.max(maxHeight, child.height);
         }
+        width = rootX;
+        height = maxHeight;
     }
 }

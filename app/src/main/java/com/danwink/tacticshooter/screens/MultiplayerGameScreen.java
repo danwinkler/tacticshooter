@@ -14,6 +14,7 @@ import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.opengl.shader.ShaderProgram;
 
 import com.danwink.tacticshooter.ClientState;
+import com.danwink.tacticshooter.DUIScreen;
 import com.danwink.tacticshooter.MessageType;
 import com.danwink.tacticshooter.MusicQueuer;
 import com.danwink.tacticshooter.StaticFiles;
@@ -34,6 +35,8 @@ import com.danwink.tacticshooter.slick.Slick2DEventMapper;
 import com.danwink.tacticshooter.slick.Slick2DRenderer;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DCheckBox;
+import com.phyloa.dlib.dui.DColumnPanel;
+import com.phyloa.dlib.dui.DGrid;
 import com.phyloa.dlib.dui.DPanel;
 import com.phyloa.dlib.dui.DText;
 import com.phyloa.dlib.dui.DTextBox;
@@ -41,14 +44,19 @@ import com.phyloa.dlib.dui.DUI;
 import com.phyloa.dlib.dui.DUIElement;
 import com.phyloa.dlib.dui.DUIEvent;
 import com.phyloa.dlib.dui.DUIListener;
+import com.phyloa.dlib.dui.RelativePosition;
 import com.phyloa.dlib.game.DScreen;
 import com.phyloa.dlib.game.DScreenHandler;
 import com.phyloa.dlib.math.Point2i;
 import com.phyloa.dlib.util.DMath;
 
+import jp.objectclub.vecmath.Point2f;
 import jp.objectclub.vecmath.Vector3f;
 
-public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> implements InputListener, DUIListener {
+public class MultiplayerGameScreen extends DUIScreen implements InputListener {
+	int gamemodeButtonWidth = 75;
+	int gamemodeButtonHeight = 75;
+
 	ClientInterface ci;
 	public ClientState cs = new ClientState(this);
 
@@ -57,7 +65,7 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	float sx, sy, sx2, sy2;
 	boolean selecting = false;
 
-	DPanel escapeMenu;
+	DColumnPanel escapeMenu;
 	DButton quit;
 	DButton returnToGame;
 	DButton switchTeams;
@@ -65,16 +73,9 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	DPanel chatPanel;
 	DTextBox chatBox;
 	DCheckBox teamChat;
-
-	DUI dui;
+	DGrid gamemodeButtons;
 
 	public Input input;
-
-	// DScreenHandler<GameContainer, Graphics> dsh;
-
-	Slick2DRenderer renderer = new Slick2DRenderer();
-
-	public GameContainer gc;
 
 	Image miniMap;
 
@@ -112,40 +113,12 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 
 	public DButton[][] buttonSlots = new DButton[3][3];
 
-	public void onActivate(GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh) {
-		this.dsh = dsh;
-		this.gc = gc;
+	public void init(GameContainer gc) {
+		initializeUIElements(dui);
 
 		for (int i = 0; i < 10; i++) {
 			battleGroups[i] = new ArrayList<Integer>();
 		}
-
-		if (dui == null) {
-			dui = new DUI(new Slick2DEventMapper(gc.getInput()));
-
-			escapeMenu = new DPanel(gc.getWidth() / 2 - 100, gc.getHeight() / 2 - 100, 200, 300);
-			quit = new DButton("Quit Game", 0, 0, 200, 100);
-			escapeMenu.add(quit);
-			returnToGame = new DButton("Return to Game", 0, 100, 200, 100);
-			escapeMenu.add(returnToGame);
-			escapeMenu.setVisible(false);
-
-			chatPanel = new DPanel(gc.getWidth() / 2 - 200, gc.getHeight() / 2 - 50, 400, 100);
-			chatBox = new DTextBox(0, 50, 400, 50);
-			teamChat = new DCheckBox(10, 10, 30, 30);
-
-			chatPanel.add(new DText("Team Chat", 50, 25));
-			chatPanel.add(teamChat);
-			chatPanel.add(chatBox);
-
-			chatPanel.setVisible(false);
-
-			dui.add(chatPanel);
-			dui.add(escapeMenu);
-
-			dui.addDUIListener(this);
-		}
-		dui.setEnabled(true);
 
 		input = gc.getInput();
 		input.addListener(this);
@@ -161,6 +134,39 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		gameRenderer = new GameRenderer();
 
 		running = true;
+	}
+
+	public void initializeUIElements(DUI dui) {
+		escapeMenu = new DColumnPanel(0, 0, 200, 300);
+		quit = new DButton("Quit Game", 0, 0, 200, 100);
+		escapeMenu.add(quit);
+		returnToGame = new DButton("Return to Game", 0, 100, 200, 100);
+		escapeMenu.add(returnToGame);
+		escapeMenu.setVisible(false);
+		gamemodeButtons = new DGrid(0, 0, gamemodeButtonWidth * 3 * uiScale, gamemodeButtonHeight * 3 * uiScale, 3, 3);
+		gamemodeButtons.setRelativePosition(RelativePosition.BOTTOM_LEFT, 0, 0);
+
+		chatPanel = new DPanel(gc.getWidth() / 2 - 200, gc.getHeight() / 2 - 50, 400, 100);
+		chatBox = new DTextBox(0, 50, 400, 50);
+		teamChat = new DCheckBox(10, 10, 30, 30);
+
+		chatPanel.add(new DText("Team Chat", 50, 25));
+		chatPanel.add(teamChat);
+		chatPanel.add(chatBox);
+
+		chatPanel.setVisible(false);
+	}
+
+	public void createUIElements(DUI dui, float screenHeight) {
+		escapeMenu.setRelativePosition(RelativePosition.CENTER, 0, 0);
+		quit.setSize(200 * uiScale, 100 * uiScale);
+		returnToGame.setSize(200 * uiScale, 100 * uiScale);
+
+		gamemodeButtons.setSize(gamemodeButtonWidth * 3 * uiScale, gamemodeButtonHeight * 3 * uiScale);
+
+		dui.add(chatPanel);
+		dui.add(escapeMenu);
+		dui.add(gamemodeButtons);
 	}
 
 	public void update(GameContainer gc, float d) {
@@ -277,17 +283,17 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 					int xSlot = (int) arr[2];
 					int ySlot = (int) arr[3];
 					String imageKey = (String) arr[4];
-					int buttonWidth = 75;
-					int buttonHeight = 75;
-					DButton button = new DButton(text, xSlot * buttonWidth,
-							gc.getHeight() - ((3 - ySlot) * buttonHeight),
-							buttonWidth, buttonHeight);
+					DButton button = new DButton(text,
+							xSlot * gamemodeButtonWidth,
+							ySlot * gamemodeButtonHeight,
+							gamemodeButtonWidth,
+							gamemodeButtonHeight);
 					var backgroundImage = cs.l.theme.getPortrait(imageKey);
 					if (backgroundImage != null) {
 						button.setBackground(backgroundImage);
 					}
 					button.name = id;
-					dui.add(button);
+					gamemodeButtons.add(button, xSlot, ySlot);
 					buttonSlots[xSlot][ySlot] = button;
 					break;
 				}
@@ -377,7 +383,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			}
 		}
 
-		dui.update();
+		// Update UI
+		super.update(gc, d);
 
 		if (cs.l != null && miniMap == null) {
 			try {
@@ -461,11 +468,11 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		g.popTransform();
 
 		g.setColor(new Color(0, 0, 0, 128));
-		g.fillRect(0, 0, gc.getWidth(), 30);
+		g.fillRect(0, 0, gc.getWidth(), 30 * uiScale);
 		g.setColor(Color.white);
 		if (cs.player != null) {
-			g.drawString("Money: " + cs.player.money, 100, 10);
-			g.drawString("Selected: " + cs.selected.size(), 200, 10);
+			g.drawString("Money: " + cs.player.money, 100 * uiScale, 10 * uiScale);
+			g.drawString("Selected: " + cs.selected.size(), 200 * uiScale, 10 * uiScale);
 			g.setColor(Color.black);
 			if (messages.size() > 0) {
 				for (int i = messages.size() - 1; i >= Math.max(messages.size() - 12, 0); i--) {
@@ -476,12 +483,12 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			// Draw selected unit portraits
 			for (int i = 0; i < cs.selected.size(); i++) {
 				Unit u = cs.unitMap.get(cs.selected.get(i));
-				int portraitSize = 48;
-				int padding = 4;
-				int healthBarHeight = 4;
+				int portraitSize = 48 * uiScale;
+				int padding = 4 * uiScale;
+				int healthBarHeight = 4 * uiScale;
 				int columns = 4;
-				int x = gc.getWidth() - (portraitSize + padding) * (i % columns + 1) - 10;
-				int y = 100 + (portraitSize + padding + healthBarHeight) * (i / columns);
+				int x = gc.getWidth() - (portraitSize + padding) * (i % columns + 1) - 10 * uiScale;
+				int y = 100 * uiScale + (portraitSize + padding + healthBarHeight) * (i / columns);
 				var portrait = cs.l.theme.getPortrait(u.type.name);
 				g.drawImage(portrait, x, y, x + portraitSize, y + portraitSize, 0, 0, portrait.getWidth(),
 						portrait.getHeight());
@@ -494,7 +501,8 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 			}
 		}
 
-		dui.render(renderer.renderTo(g));
+		// Render UI
+		super.render(gc, g);
 
 		// Draw minimap
 		g.setClip(gc.getWidth() - 200, gc.getHeight() - 200, 200, 200);
@@ -773,8 +781,30 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 	}
 
 	@Override
-	public void mouseWheelMoved(int arg0) {
+	public void mouseWheelMoved(int amount) {
+		// TODO:
+		// float zoomSpeed = 0.1f;
+		// int dir = amount > 0 ? 1 : -1;
+		// float zoom = 1 + dir * zoomSpeed;
 
+		// var mx = input.getMouseX();
+		// var my = input.getMouseY();
+
+		// var worldCoords = screenToWorld(mx, my);
+
+		// cs.zoom *= zoom;
+		// if (cs.zoom < cs.minZoom) {
+		// cs.zoom = cs.minZoom;
+		// }
+
+		// if (cs.zoom > cs.maxZoom) {
+		// cs.zoom = cs.maxZoom;
+		// }
+
+		// var afterWorldCoords = screenToWorld(mx, my);
+
+		// cs.scrollx += worldCoords.x - afterWorldCoords.x;
+		// cs.scrolly += worldCoords.y - afterWorldCoords.y;
 	}
 
 	@Override
@@ -936,9 +966,6 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 		this.ci = (ClientInterface) o;
 	}
 
-	public void onResize(int width, int height) {
-	}
-
 	public void event(DUIEvent event) {
 		DUIElement e = event.getElement();
 		if (e instanceof DButton && event.getType() == DButton.MOUSE_UP) {
@@ -963,5 +990,18 @@ public class MultiplayerGameScreen extends DScreen<GameContainer, Graphics> impl
 
 	public void bulletImpact(Bullet bullet) {
 		gameRenderer.bulletImpact(bullet);
+	}
+
+	public Point2f worldToScreen(float x, float y) {
+		// I think it's likely these two functions are incorrect
+		float sx = (x - cs.scrollx) * cs.zoom;
+		float sy = (y - cs.scrolly) * cs.zoom;
+		return new Point2f(sx, sy);
+	}
+
+	public Point2f screenToWorld(float x, float y) {
+		float wx = cs.scrollx + x / cs.zoom;
+		float wy = cs.scrolly + y / cs.zoom;
+		return new Point2f(wx, wy);
 	}
 }

@@ -8,42 +8,35 @@ import com.danwink.tacticshooter.StaticFiles;
 import com.phyloa.dlib.game.DScreen;
 import com.phyloa.dlib.game.DScreenHandler;
 
-public class OpenLoadScreen extends DScreen<GameContainer, Graphics>
-{
-	public void onActivate( GameContainer e, DScreenHandler<GameContainer, Graphics> dsh )
-	{
-		StaticFiles.loadAllMusic();
-		StaticFiles.loopWhenReady( "menu" );
+public class OpenLoadScreen extends DScreen<GameContainer, Graphics> {
+	public void onActivate(GameContainer e, DScreenHandler<GameContainer, Graphics> dsh) {
+		StaticFiles.loadAll();
+		StaticFiles.loopWhenReady("menu");
 	}
-	
-	public void update( GameContainer gc, float delta )
-	{
-		if( StaticFiles.ready )
-		{
-			dsh.activate( "home", gc );
+
+	public void update(GameContainer gc, float delta) {
+		if (StaticFiles.ready) {
+			dsh.activate("home", gc);
 		}
 	}
 
-	public void render( GameContainer gc, Graphics g )
-	{
-		g.setColor( new Color( 0, 0, 0, 100 ) );
-		g.fillRect( 0, 0, gc.getWidth(), gc.getHeight() );
-		
-		g.setColor( Color.red );
-		g.drawString( StaticFiles.status, 50, 50 );
+	public void render(GameContainer gc, Graphics g) {
+		g.setColor(new Color(0, 0, 0, 100));
+		g.fillRect(0, 0, gc.getWidth(), gc.getHeight());
+
+		g.setColor(Color.red);
+		g.drawString(StaticFiles.status, 50, 50);
 	}
 
-	public void onExit()
-	{
-		
+	public void onExit() {
+
 	}
 
-	public void message( Object o )
-	{
+	public void message(Object o) {
 		// TODO Auto-generated method stub
-		
-	}
-	
-	public void onResize( int width, int height ) {}
-}
 
+	}
+
+	public void onResize(int width, int height) {
+	}
+}

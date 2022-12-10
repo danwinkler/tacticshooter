@@ -95,6 +95,7 @@ public class GameRenderer {
 
 		g.pushTransform();
 		g.translate(-(int) cs.scrollx, -(int) cs.scrolly);
+		g.scale(cs.zoom, cs.zoom);
 
 		floor.render(g, cs);
 		footprint.render(g, cs);

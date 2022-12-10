@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.stream.Stream;
 
+import org.newdawn.slick.AngelCodeFont;
+import org.newdawn.slick.Font;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Music;
@@ -34,6 +36,8 @@ public class StaticFiles {
 
 	public static File gameModeDir = new File("data" + File.separator + "gamemodes");
 
+	public static Font[] fonts = new Font[3];
+
 	static {
 		try {
 			names = DFile.loadText("data" + File.separator + "dist.male.first.txt");
@@ -42,8 +46,20 @@ public class StaticFiles {
 		}
 	}
 
-	public static void loadAllMusic() {
+	public static void loadAll() {
 		if (!ready && !started) {
+			try {
+				fonts[0] = new AngelCodeFont("data" + File.separator + "pixelfont1_16px.fnt",
+						"data" + File.separator + "pixelfont1_16px.png");
+				fonts[1] = new AngelCodeFont("data" + File.separator + "pixelfont1_32px.fnt",
+						"data" + File.separator + "pixelfont1_32px.png");
+				fonts[2] = new AngelCodeFont("data" + File.separator + "pixelfont1_48px.fnt",
+						"data" + File.separator + "pixelfont1_48px.png");
+			} catch (SlickException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 			new Thread(new Runnable() {
 				public void run() {
 					started = true;
