@@ -90,13 +90,10 @@ public class GameRenderer {
 			}
 		}
 
-		// Main Rendering
 		outsideFloor.render(g, cs, gc);
 
-		g.pushTransform();
-		g.translate(-(int) cs.scrollx, -(int) cs.scrolly);
-		g.scale(cs.zoom, cs.zoom);
-
+		cs.camera.start(gc, g);
+		// Main Rendering
 		floor.render(g, cs);
 		footprint.render(g, cs);
 		bloodExplosion.render(g, cs, unitBody);
@@ -106,11 +103,11 @@ public class GameRenderer {
 		unitBody.render(g, cs);
 		bullet.render(g, cs);
 		particle.render(g);
-		unitInfo.render(g, cs, gc.getInput());
+		unitInfo.render(g, gc, cs, gc.getInput());
 		if (fogEnabled)
 			fog.render(g, cs);
 
-		g.popTransform();
+		cs.camera.end(g);
 	}
 
 	public void renderEndGameMap(Graphics g, ClientState cs) {
@@ -141,16 +138,17 @@ public class GameRenderer {
 	}
 
 	public class UnitInfoRenderer {
-		public void render(Graphics g, ClientState cs, Input input) {
+		public void render(Graphics g, GameContainer gc, ClientState cs, Input input) {
 			for (int i = 0; i < cs.units.size(); i++) {
 				Unit u = cs.units.get(i);
-				renderInfo(g, cs, input, u);
+				renderInfo(g, gc, cs, input, u);
 			}
 		}
 
-		public void renderInfo(Graphics g, ClientState cs, Input input, Unit u) {
-			float mx = input.getMouseX() + cs.scrollx;
-			float my = input.getMouseY() + cs.scrolly;
+		public void renderInfo(Graphics g, GameContainer gc, ClientState cs, Input input, Unit u) {
+			var worldCoords = cs.camera.screenToWorld(input.getMouseX(), input.getMouseY(), gc);
+			float mx = worldCoords.x;
+			float my = worldCoords.y;
 			if (u.selected && u.state == UnitState.MOVING) {
 				g.setColor(Color.black);
 				g.setLineWidth(3);

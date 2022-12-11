@@ -11,6 +11,7 @@ import com.danwink.tacticshooter.gameobjects.Marker;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.gameobjects.Unit;
 import com.danwink.tacticshooter.screens.MultiplayerGameScreen;
+import com.danwink.tacticshooter.slick.Slick2DCamera;
 
 public class ClientState {
 	public HashMap<Integer, Unit> unitMap = new HashMap<Integer, Unit>();
@@ -25,11 +26,7 @@ public class ClientState {
 
 	public Player player;
 
-	public float scrollx = 0;
-	public float scrolly = 0;
-	public float zoom = 1;
-	public float minZoom = 0.25f;
-	public float maxZoom = 3.f;
+	public Slick2DCamera camera = new Slick2DCamera();
 
 	public float soundFadeDist = 1000;
 	public Player[] players;
@@ -45,14 +42,12 @@ public class ClientState {
 		bullets.clear();
 		l = null;
 		selected.clear();
-		scrollx = 0;
-		scrolly = 0;
-		zoom = 1;
+		camera.reset();
 	}
 
 	public float getSoundMag(GameContainer gc, float x, float y) {
-		float dx = (scrollx + (gc.getWidth() / 2)) - x;
-		float dy = (scrolly + (gc.getHeight() / 2)) - y;
+		float dx = (camera.x + (gc.getWidth() / 2)) - x;
+		float dy = (camera.y + (gc.getHeight() / 2)) - y;
 		float dist = (float) Math.sqrt((dx * dx) + (dy * dy));
 		return Math.max((float) ((soundFadeDist - dist) / soundFadeDist), 0);
 	}

@@ -24,8 +24,9 @@ public class OutsideFloorRenderer {
 			}
 		}
 
-		float x = -Level.tileSize - (cs.scrollx - ((int) (cs.scrollx / Level.tileSize)) * Level.tileSize);
-		float y = -Level.tileSize - (cs.scrolly - ((int) (cs.scrolly / Level.tileSize) * Level.tileSize));
+		// TODO: this isn't going to work anymore with zoom
+		float x = -Level.tileSize - (cs.camera.x - ((int) (cs.camera.x / Level.tileSize)) * Level.tileSize);
+		float y = -Level.tileSize - (cs.camera.y - ((int) (cs.camera.y / Level.tileSize) * Level.tileSize));
 		g.drawImage(texture, x, y);
 	}
 

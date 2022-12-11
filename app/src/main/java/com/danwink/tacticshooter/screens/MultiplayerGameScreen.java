@@ -318,27 +318,27 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 			float scrollSpeed = 20;
 			Rectangle screenBounds = getScreenBounds();
 
-			boolean scrollup = cs.scrolly > screenBounds.getMinY() && (input.isKeyDown(Input.KEY_UP)
+			boolean scrollup = cs.camera.y > screenBounds.getMinY() && (input.isKeyDown(Input.KEY_UP)
 					|| (gc.isFullscreen() && input.getMouseY() < 10));
-			boolean scrolldown = cs.scrolly + gc.getHeight() < screenBounds.getMaxY()
+			boolean scrolldown = cs.camera.y + gc.getHeight() < screenBounds.getMaxY()
 					&& (input.isKeyDown(Input.KEY_DOWN)
 							|| (gc.isFullscreen() && input.getMouseY() > gc.getHeight() - 10));
-			boolean scrollleft = cs.scrollx > screenBounds.getMinX() && (input.isKeyDown(Input.KEY_LEFT)
+			boolean scrollleft = cs.camera.x > screenBounds.getMinX() && (input.isKeyDown(Input.KEY_LEFT)
 					|| (gc.isFullscreen() && input.getMouseX() < 10));
-			boolean scrollright = cs.scrollx + gc.getWidth() < screenBounds.getMaxX()
+			boolean scrollright = cs.camera.x + gc.getWidth() < screenBounds.getMaxX()
 					&& (input.isKeyDown(Input.KEY_RIGHT)
 							|| (gc.isFullscreen() && input.getMouseX() > gc.getWidth() - 10));
 
 			float scrollMultiplier = (input.isKeyDown(Input.KEY_LSHIFT) || input.isKeyDown(Input.KEY_RSHIFT)) ? 2 : 1;
 
 			if (scrollup)
-				cs.scrolly -= scrollSpeed * d * scrollMultiplier;
+				cs.camera.y -= scrollSpeed * d * scrollMultiplier;
 			if (scrolldown)
-				cs.scrolly += scrollSpeed * d * scrollMultiplier;
+				cs.camera.y += scrollSpeed * d * scrollMultiplier;
 			if (scrollleft)
-				cs.scrollx -= scrollSpeed * d * scrollMultiplier;
+				cs.camera.x -= scrollSpeed * d * scrollMultiplier;
 			if (scrollright)
-				cs.scrollx += scrollSpeed * d * scrollMultiplier;
+				cs.camera.x += scrollSpeed * d * scrollMultiplier;
 		}
 
 		for (int i = 0; i < cs.units.size(); i++) {
@@ -455,8 +455,7 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 
 		gameRenderer.render(g, cs, gc, fogEnabled);
 
-		g.pushTransform();
-		g.translate(-cs.scrollx, -cs.scrolly);
+		cs.camera.start(gc, g);
 		if (selecting) {
 			g.setColor(Color.blue);
 			float x1 = Math.min(sx, sx2);
@@ -465,7 +464,7 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 			float y2 = Math.max(sy, sy2);
 			g.drawRect(x1, y1, x2 - x1, y2 - y1);
 		}
-		g.popTransform();
+		cs.camera.end(g);
 
 		g.setColor(new Color(0, 0, 0, 128));
 		g.fillRect(0, 0, gc.getWidth(), 30 * uiScale);
@@ -544,9 +543,12 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 			g.drawOval(v.x - size / 2, v.y - size / 2, size, size);
 		}
 
+		// Draw window
 		g.setColor(Color.blue);
-		g.drawRect(xOffset + cs.scrollx * scale, yOffset + cs.scrolly * scale, gc.getWidth() * scale,
-				gc.getHeight() * scale);
+		var topLeft = cs.camera.screenToWorld(0, 0, gc);
+		var bottomRight = cs.camera.screenToWorld(gc.getWidth(), gc.getHeight(), gc);
+		g.drawRect(xOffset + topLeft.x * scale, yOffset + topLeft.y * scale, (bottomRight.x - topLeft.x) * scale,
+				(bottomRight.y - topLeft.y) * scale);
 
 		g.setColor(Color.black);
 		g.setLineWidth(2);
@@ -623,14 +625,15 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 
 		if (found) {
 			Rectangle screenBounds = getScreenBounds();
-			cs.scrollx = DMath.bound(destX - gc.getWidth() / 2, screenBounds.getMinX(), screenBounds.getMaxX());
-			cs.scrolly = DMath.bound(destY - gc.getHeight() / 2, screenBounds.getMinY(), screenBounds.getMaxY());
+			cs.camera.x = DMath.bound(destX - gc.getWidth() / 2, screenBounds.getMinX(), screenBounds.getMaxX());
+			cs.camera.y = DMath.bound(destY - gc.getHeight() / 2, screenBounds.getMinY(), screenBounds.getMaxY());
 		}
 	}
 
 	public Rectangle getScreenBounds() {
-		return new Rectangle(-gc.getWidth() / 2, -gc.getHeight() / 2, cs.l.width * Level.tileSize + gc.getWidth(),
-				cs.l.height * Level.tileSize + gc.getHeight());
+		var topLeft = cs.camera.screenToWorld(0, 0, gc);
+		var bottomRight = cs.camera.screenToWorld(gc.getWidth(), gc.getHeight(), gc);
+		return new Rectangle(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y);
 	}
 
 	public void mousePressed(int button, int x, int y) {
@@ -650,8 +653,9 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 			} else {
 				if (button == Input.MOUSE_LEFT_BUTTON) {
 					Rectangle screenBounds = getScreenBounds();
-					cs.scrollx = DMath.bound(mapX - gc.getWidth() / 2, screenBounds.getMinX(), screenBounds.getMaxX());
-					cs.scrolly = DMath.bound(mapY - gc.getHeight() / 2, screenBounds.getMinY(), screenBounds.getMaxY());
+					cs.camera.x = DMath.bound(mapX, screenBounds.getMinX(), screenBounds.getMaxX());
+					cs.camera.y = DMath.bound(mapY, screenBounds.getMinY(),
+							screenBounds.getMaxY());
 				} else if (button == Input.MOUSE_RIGHT_BUTTON) {
 					int tx = cs.l.getTileX(((x - (gc.getWidth() - 200.f)) / 200.f) * cs.l.width * Level.tileSize);
 					int ty = cs.l.getTileY(((y - (gc.getHeight() - 200.f)) / 200.f) * cs.l.height * Level.tileSize);
@@ -661,15 +665,16 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 				}
 			}
 		} else {
+			var worldCoords = cs.camera.screenToWorld(x, y, gc);
 			if (button == Input.MOUSE_LEFT_BUTTON) {
-				sx = x + cs.scrollx;
-				sy = y + cs.scrolly;
+				sx = worldCoords.x;
+				sy = worldCoords.y;
 				sx2 = sx;
 				sy2 = sy;
 				selecting = true;
 			} else if (button == Input.MOUSE_RIGHT_BUTTON) {
-				int tx = (int) ((x + cs.scrollx) / Level.tileSize);
-				int ty = (int) ((y + cs.scrolly) / Level.tileSize);
+				int tx = (int) (worldCoords.x / Level.tileSize);
+				int ty = (int) (worldCoords.y / Level.tileSize);
 				if (input.isKeyDown(Input.KEY_LCONTROL)) {
 					ci.sendToServer(new Message(MessageType.SETATTACKPOINTCONTINUE,
 							new Object[] { new Point2i(tx, ty), cs.selected }));
@@ -693,10 +698,11 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 			}
 			cs.selected.clear();
 
-			float x1 = Math.min(sx, x + cs.scrollx);
-			float y1 = Math.min(sy, y + cs.scrolly);
-			float x2 = Math.max(sx, x + cs.scrollx);
-			float y2 = Math.max(sy, y + cs.scrolly);
+			var worldCoords = cs.camera.screenToWorld(x, y, gc);
+			float x1 = Math.min(sx, worldCoords.x);
+			float y1 = Math.min(sy, worldCoords.y);
+			float x2 = Math.max(sx, worldCoords.x);
+			float y2 = Math.max(sy, worldCoords.y);
 
 			if (x2 - x1 > 2 || y2 - y1 > 2) {
 				for (Unit u : cs.units) {
@@ -723,13 +729,15 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 				// Double click select same type units
 				long timeDiff = System.currentTimeMillis() - lastClick;
 				if (matchType != null && cs.selected.size() == 1 && timeDiff > 100 && timeDiff < 500) {
+					var topLeft = cs.camera.screenToWorld(0, 0, gc);
+					var bottomRight = cs.camera.screenToWorld(gc.getWidth(), gc.getHeight(), gc);
 					for (Unit u : cs.units) {
 						if (u.type.name.equals(matchType.name)
 								&& u.owner.id == this.cs.player.id
-								&& u.x > cs.scrollx
-								&& u.y > cs.scrolly
-								&& u.x < cs.scrollx + gc.getWidth()
-								&& u.y < cs.scrolly + gc.getHeight()
+								&& u.x > topLeft.x
+								&& u.y > topLeft.y
+								&& u.x < bottomRight.x
+								&& u.y < bottomRight.y
 								&& !cs.selected.contains(u.id)) {
 							u.selected = true;
 							cs.selected.add(u.id);
@@ -756,16 +764,18 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 				float mapY = minimapY / scale;
 
 				Rectangle screenBounds = getScreenBounds();
-				cs.scrollx = DMath.bound(mapX - gc.getWidth() / 2, screenBounds.getMinX(), screenBounds.getMaxX());
-				cs.scrolly = DMath.bound(mapY - gc.getHeight() / 2, screenBounds.getMinY(), screenBounds.getMaxY());
+				cs.camera.x = DMath.bound(mapX, screenBounds.getMinX(), screenBounds.getMaxX());
+				cs.camera.y = DMath.bound(mapY, screenBounds.getMinY(), screenBounds.getMaxY());
 			}
 		} else {
 			if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
-				sx2 = newx + cs.scrollx;
-				sy2 = newy + cs.scrolly;
+				var worldCoords = cs.camera.screenToWorld(newx, newy, gc);
+				sx2 = worldCoords.x;
+				sy2 = worldCoords.y;
 			} else if (input.isMouseButtonDown(Input.MOUSE_MIDDLE_BUTTON)) {
-				cs.scrollx += oldx - newx;
-				cs.scrolly += oldy - newy;
+				// TODO: this needs to be scaled by zoom
+				cs.camera.x += oldx - newx;
+				cs.camera.y += oldy - newy;
 			}
 		}
 	}
@@ -782,29 +792,21 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 
 	@Override
 	public void mouseWheelMoved(int amount) {
-		// TODO:
-		// float zoomSpeed = 0.1f;
-		// int dir = amount > 0 ? 1 : -1;
-		// float zoom = 1 + dir * zoomSpeed;
+		float zoomSpeed = 0.1f;
+		int dir = amount > 0 ? 1 : -1;
+		float zoom = dir * zoomSpeed;
 
-		// var mx = input.getMouseX();
-		// var my = input.getMouseY();
+		var mx = input.getMouseX();
+		var my = input.getMouseY();
 
-		// var worldCoords = screenToWorld(mx, my);
+		var worldCoords = cs.camera.screenToWorld(mx, my, gc);
 
-		// cs.zoom *= zoom;
-		// if (cs.zoom < cs.minZoom) {
-		// cs.zoom = cs.minZoom;
-		// }
+		cs.camera.zoom(zoom);
 
-		// if (cs.zoom > cs.maxZoom) {
-		// cs.zoom = cs.maxZoom;
-		// }
+		var afterWorldCoords = cs.camera.screenToWorld(mx, my, gc);
 
-		// var afterWorldCoords = screenToWorld(mx, my);
-
-		// cs.scrollx += worldCoords.x - afterWorldCoords.x;
-		// cs.scrolly += worldCoords.y - afterWorldCoords.y;
+		cs.camera.x += worldCoords.x - afterWorldCoords.x;
+		cs.camera.y += worldCoords.y - afterWorldCoords.y;
 	}
 
 	@Override
@@ -990,18 +992,5 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 
 	public void bulletImpact(Bullet bullet) {
 		gameRenderer.bulletImpact(bullet);
-	}
-
-	public Point2f worldToScreen(float x, float y) {
-		// I think it's likely these two functions are incorrect
-		float sx = (x - cs.scrollx) * cs.zoom;
-		float sy = (y - cs.scrolly) * cs.zoom;
-		return new Point2f(sx, sy);
-	}
-
-	public Point2f screenToWorld(float x, float y) {
-		float wx = cs.scrollx + x / cs.zoom;
-		float wy = cs.scrolly + y / cs.zoom;
-		return new Point2f(wx, wy);
 	}
 }
