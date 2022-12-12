@@ -9,136 +9,118 @@ import jp.objectclub.vecmath.Vector2f;
 
 import com.phyloa.dlib.renderer.Renderer2D;
 
-public class DText extends DUIElement
-{
+public class DText extends DUIElement {
 	String text;
 	Font font;
-	Color color = new Color( 128, 128, 255 );
+	Color color = new Color(128, 128, 255);
 	boolean centered;
-	
-	public DText( String text, int x, int y )
-	{
-		super( x, y, 0, 0 );
+
+	public DText(String text, boolean centered) {
+		this(text, 0, 0, centered);
+	}
+
+	public DText(String text, int x, int y) {
+		super(x, y, 0, 0);
 		this.text = text;
 	}
 
-	public DText( String string, int x, int y, boolean centered )
-	{
-		this( string, x, y );
+	public DText(String string, int x, int y, boolean centered) {
+		this(string, x, y);
 		this.centered = centered;
 	}
 
-	public void render( Renderer2D r )
-	{
-		if( font != null )
-		{
-			
+	public void render(Renderer2D r) {
+		if (font != null) {
+
 		}
-		r.color( ui.theme.borderColor );
-		Vector2f size = r.getStringSize( text );
-		r.text( text, x - (centered ? size.x/2 : 0), y );
+		r.color(ui.theme.borderColor);
+		Vector2f size = r.getStringSize(text);
+		r.text(text, x - (centered ? size.x / 2 : 0), y);
 	}
 
-	public void update( DUI ui )
-	{
-		
+	public void update(DUI ui) {
+
 	}
 
-	public String getText()
-	{
+	public String getText() {
 		return text;
 	}
 
-	public Font getFont()
-	{
+	public Font getFont() {
 		return font;
 	}
 
-	public Color getColor()
-	{
+	public Color getColor() {
 		return color;
 	}
 
-	public void setText( String text )
-	{
+	public void setText(String text) {
 		this.text = text;
 	}
 
-	public void setFont( Font font )
-	{
+	public void setFont(Font font) {
 		this.font = font;
 	}
 
-	public void setColor( Color color )
-	{
+	public void setColor(Color color) {
 		this.color = color;
 	}
-	
-	public void setCentered( boolean centered )
-	{
+
+	public void setCentered(boolean centered) {
 		this.centered = centered;
 	}
 
 	@Override
-	public void keyPressed( DKeyEvent dke )
-	{
+	public void keyPressed(DKeyEvent dke) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
-	public void keyReleased( DKeyEvent dke )
-	{
+	public void keyReleased(DKeyEvent dke) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
-	public void mouseEntered( DMouseEvent e )
-	{
+	public void mouseEntered(DMouseEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
-	public void mouseExited( DMouseEvent e )
-	{
+	public void mouseExited(DMouseEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
-	public void mousePressed( DMouseEvent e )
-	{
+	public void mousePressed(DMouseEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
-	public void mouseReleased( DMouseEvent e )
-	{
+	public void mouseReleased(DMouseEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
-	public void mouseMoved( DMouseEvent e )
-	{
+	public void mouseMoved(DMouseEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
-	public void mouseDragged( DMouseEvent e )
-	{
+	public void mouseDragged(DMouseEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
-	public void mouseWheel( DMouseEvent dme )
-	{
+	public void mouseWheel(DMouseEvent dme) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

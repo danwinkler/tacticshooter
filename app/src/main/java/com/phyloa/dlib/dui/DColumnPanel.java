@@ -17,5 +17,17 @@ public class DColumnPanel extends DPanel {
         }
         width = maxWidth;
         height = rootY;
+
+        // Now that we know the dimensions of the column, we can center children that
+        // requested it
+        for (var child : children) {
+            if (child.relative == RelativePosition.CENTER) {
+                child.x = (width - child.width) / 2;
+            }
+        }
+    }
+
+    public void addSpacer(int pixels) {
+        add(new DSpacer(0, pixels));
     }
 }

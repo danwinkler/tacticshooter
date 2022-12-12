@@ -22,6 +22,8 @@ import com.danwink.tacticshooter.screens.OptionsScreen;
 import com.danwink.tacticshooter.screens.PostGameScreen;
 import com.danwink.tacticshooter.screens.ServerConnectScreen;
 import com.danwink.tacticshooter.screens.SettingsScreen;
+import com.danwink.tacticshooter.screens.dev.DevMenu;
+import com.danwink.tacticshooter.screens.dev.SpriteEditor;
 import com.phyloa.dlib.game.DScreenHandler;
 
 public class TacticClient extends BasicGame {
@@ -57,6 +59,10 @@ public class TacticClient extends BasicGame {
 		dsh.register("advoptions", new OptionsScreen("data" + File.separator + "advoptions.txt", "settings"));
 
 		dsh.activate("openload", gc);
+
+		// Dev screens
+		dsh.register("devmenu", new DevMenu());
+		dsh.register("spriteeditor", new SpriteEditor());
 
 		gc.setMusicVolume(StaticFiles.options.getF("slider.music"));
 		gc.setSoundVolume(StaticFiles.options.getF("slider.sound"));

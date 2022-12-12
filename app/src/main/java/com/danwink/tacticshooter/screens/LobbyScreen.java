@@ -19,7 +19,6 @@ import com.danwink.tacticshooter.gameobjects.Level.SlotType;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.network.ClientInterface;
 import com.danwink.tacticshooter.network.Message;
-import com.danwink.tacticshooter.slick.Slick2DEventMapper;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DCheckBox;
 import com.phyloa.dlib.dui.DColumnPanel;
@@ -27,7 +26,6 @@ import com.phyloa.dlib.dui.DDropDown;
 import com.phyloa.dlib.dui.DPanel;
 import com.phyloa.dlib.dui.DRowPanel;
 import com.phyloa.dlib.dui.DSpacer;
-import com.phyloa.dlib.dui.DText;
 import com.phyloa.dlib.dui.DTextBox;
 import com.phyloa.dlib.dui.DUI;
 import com.phyloa.dlib.dui.DUIEvent;
@@ -47,6 +45,7 @@ public class LobbyScreen extends DUIScreen {
 	DButton leaveGame;
 	DCheckBox fog;
 	DPanel chatBackground;
+	DButton fillBots;
 
 	Slot[] slots = new Slot[16];
 
@@ -99,6 +98,8 @@ public class LobbyScreen extends DUIScreen {
 		chatBox = new DTextBox(gc.getWidth() - 600, gc.getHeight() - 200, 500, 50);
 
 		fog = new DCheckBox(gc.getWidth() - 600, gc.getHeight() - 130, 20, 20);
+
+		fillBots = new DButton("Fill Bots", 0, 0, 90, 50);
 	}
 
 	private DRowPanel createSlotRow(int i) {
@@ -123,7 +124,7 @@ public class LobbyScreen extends DUIScreen {
 		int uiScale = UIHelper.getUIScale(windowHeight);
 
 		DColumnPanel leftColumn = new DColumnPanel(0, 0, 0, 0);
-		leftColumn.setRelativePosition(RelativePosition.TOP_LEFT, 20 * uiScale, 130 * uiScale);
+		leftColumn.setRelativePosition(RelativePosition.CENTER_LEFT, 20 * uiScale, 0);
 
 		maps.setSize(500 * uiScale, 25 * uiScale);
 		leftColumn.add(maps);
@@ -147,6 +148,13 @@ public class LobbyScreen extends DUIScreen {
 			teamBColumn.add(row);
 		}
 		leftColumn.add(teamBColumn);
+		leftColumn.add(new DSpacer(0, 30 * uiScale));
+
+		// MISC Buttons
+		DRowPanel miscRow = new DRowPanel(0, 0, 0, 0);
+		fillBots.setSize(90 * uiScale, 50 * uiScale);
+		miscRow.add(fillBots);
+		leftColumn.add(miscRow);
 		leftColumn.add(new DSpacer(0, 30 * uiScale));
 
 		// LEAVE AND START
@@ -312,6 +320,12 @@ public class LobbyScreen extends DUIScreen {
 				} else if (b == leaveGame) {
 					ci.stop();
 					dsh.activate("home", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn());
+				} else if (b == fillBots) {
+					for (int i = 0; i < 16; i++) {
+						if (names[i].getText().equals("Open")) {
+							ci.sendToServer(new Message(MessageType.SETBOT, new Object[] { i, true }));
+						}
+					}
 				} else {
 					String[] name = b.name.split(" ");
 					if (name.length == 2) {

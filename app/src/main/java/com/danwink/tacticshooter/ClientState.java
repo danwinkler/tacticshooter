@@ -32,6 +32,9 @@ public class ClientState {
 	public Player[] players;
 	public MultiplayerGameScreen mgs;
 
+	public int frame = 0;
+	public int[][] lastWalked;
+
 	public ClientState(MultiplayerGameScreen mgs) {
 		this.mgs = mgs;
 	}
@@ -43,12 +46,22 @@ public class ClientState {
 		l = null;
 		selected.clear();
 		camera.reset();
+		lastWalked = null;
+		frame = 0;
 	}
 
 	public float getSoundMag(GameContainer gc, float x, float y) {
-		float dx = (camera.x + (gc.getWidth() / 2)) - x;
-		float dy = (camera.y + (gc.getHeight() / 2)) - y;
+		float dx = (camera.x) - x;
+		float dy = (camera.y) - y;
 		float dist = (float) Math.sqrt((dx * dx) + (dy * dy));
 		return Math.max((float) ((soundFadeDist - dist) / soundFadeDist), 0);
+	}
+
+	public void setWalked(float x, float y) {
+		int ix = (int) (x / Level.tileSize);
+		int iy = (int) (y / Level.tileSize);
+		if (ix >= 0 && ix < l.width && iy >= 0 && iy < l.height) {
+			lastWalked[ix][iy] = frame;
+		}
 	}
 }

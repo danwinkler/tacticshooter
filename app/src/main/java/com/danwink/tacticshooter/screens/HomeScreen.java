@@ -1,8 +1,11 @@
 package com.danwink.tacticshooter.screens;
 
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -13,6 +16,7 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
+import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 
 import com.danwink.tacticshooter.DUIScreen;
@@ -23,10 +27,13 @@ import com.danwink.tacticshooter.editor.Editor;
 import com.danwink.tacticshooter.network.ServerNetworkInterface;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DColumnPanel;
+import com.phyloa.dlib.dui.DKeyEvent;
+import com.phyloa.dlib.dui.DMouseEvent;
 import com.phyloa.dlib.dui.DUI;
 import com.phyloa.dlib.dui.DUIElement;
 import com.phyloa.dlib.dui.DUIEvent;
 import com.phyloa.dlib.dui.RelativePosition;
+import com.phyloa.dlib.renderer.Renderer2D;
 import com.phyloa.dlib.util.DMath;
 
 public class HomeScreen extends DUIScreen {
@@ -79,6 +86,9 @@ public class HomeScreen extends DUIScreen {
 		dui.add(mainButtons);
 
 		dui.add(editor);
+
+		var devKeyListener = new DevKeyListener();
+		dui.add(devKeyListener);
 	}
 
 	public void render(GameContainer gc, Graphics g) {
@@ -170,5 +180,89 @@ public class HomeScreen extends DUIScreen {
 
 	@Override
 	public void message(Object o) {
+	}
+
+	public class DevKeyListener extends DUIElement {
+		List<Integer> lastPressedKeys = new ArrayList<>();
+
+		@Override
+		public void keyPressed(DKeyEvent dke) {
+			System.out.println(dke.keyCode);
+			lastPressedKeys.add(dke.keyCode);
+
+			if (lastPressedKeys.size() > 3) {
+				lastPressedKeys.remove(0);
+			}
+
+			if (lastPressedKeys.size() >= 3) {
+				var k0 = lastPressedKeys.get(0) == KeyEvent.VK_D;
+				var k1 = lastPressedKeys.get(1) == KeyEvent.VK_E;
+				var k2 = lastPressedKeys.get(2) == KeyEvent.VK_V;
+
+				if (k0 && k1 && k2) {
+					dsh.activate("devmenu", gc);
+				}
+			}
+		}
+
+		@Override
+		public void keyReleased(DKeyEvent dke) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mouseEntered(DMouseEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mouseExited(DMouseEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mousePressed(DMouseEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mouseReleased(DMouseEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mouseMoved(DMouseEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mouseDragged(DMouseEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mouseWheel(DMouseEvent dme) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void render(Renderer2D<Image> r) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void update(DUI ui) {
+			ui.setFocus(this);
+
+		}
 	}
 }

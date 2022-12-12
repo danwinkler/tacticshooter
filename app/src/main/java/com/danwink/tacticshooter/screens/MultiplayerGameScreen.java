@@ -192,12 +192,16 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 					tu.sync(u);
 					break;
 				case LEVELUPDATE:
+					boolean newLevel = cs.l == null;
 					cs.l = (Level) m.message;
 					cs.l.loadTextures();
-					if (cs.player != null) {
-						scrollToTeamBase(cs.player.team);
-					} else {
 
+					if (newLevel) {
+						cs.lastWalked = new int[cs.l.width][cs.l.height];
+
+						if (cs.player != null) {
+							scrollToTeamBase(cs.player.team);
+						}
 					}
 					break;
 				case BULLETUPDATE:
@@ -406,7 +410,9 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 			}
 		}
 
-		gameRenderer.update(d);
+		gameRenderer.update(cs, d);
+
+		cs.frame++;
 	}
 
 	public void render(GameContainer gc, Graphics g) {
@@ -475,7 +481,8 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 			g.setColor(Color.black);
 			if (messages.size() > 0) {
 				for (int i = messages.size() - 1; i >= Math.max(messages.size() - 12, 0); i--) {
-					g.drawString(messages.get(i), 10, 300 - (messages.size() - 1 - i) * 25);
+					g.drawString(messages.get(i), 15 * uiScale,
+							330 * uiScale - (messages.size() - 1 - i) * 25 * uiScale);
 				}
 			}
 
@@ -561,16 +568,17 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 		if (escapeMenu.isVisible()) {
 			g.setColor(new Color(0, 0, 0, 128));
 			// Left side
-			g.fillRect(0, 0, gc.getWidth() / 2 - 100, gc.getHeight());
+			g.fillRect(0, 0, gc.getWidth() / 2 - 100 * uiScale, gc.getHeight());
 
 			// Right side
-			g.fillRect(gc.getWidth() / 2 + 100, 0, gc.getWidth() / 2 - 100, gc.getHeight());
+			g.fillRect(gc.getWidth() / 2 + 100 * uiScale, 0, gc.getWidth() / 2 - 100 * uiScale, gc.getHeight());
 
 			// Top
-			g.fillRect(gc.getWidth() / 2 - 100, 0, 200, gc.getHeight() / 2 - 100);
+			g.fillRect(gc.getWidth() / 2 - 100 * uiScale, 0, 200 * uiScale, gc.getHeight() / 2 - 100 * uiScale);
 
 			// bottom
-			g.fillRect(gc.getWidth() / 2 - 100, gc.getHeight() / 2 + 100, 200, gc.getHeight() / 2 - 100);
+			g.fillRect(gc.getWidth() / 2 - 100 * uiScale, gc.getHeight() / 2 + 100 * uiScale, 200 * uiScale,
+					gc.getHeight() / 2 - 100 * uiScale);
 		}
 
 		if (input.isKeyDown(Input.KEY_TAB) && cs.players != null) {
@@ -625,8 +633,8 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 
 		if (found) {
 			Rectangle screenBounds = getScreenBounds();
-			cs.camera.x = DMath.bound(destX - gc.getWidth() / 2, screenBounds.getMinX(), screenBounds.getMaxX());
-			cs.camera.y = DMath.bound(destY - gc.getHeight() / 2, screenBounds.getMinY(), screenBounds.getMaxY());
+			cs.camera.x = DMath.bound(destX, screenBounds.getMinX(), screenBounds.getMaxX());
+			cs.camera.y = DMath.bound(destY, screenBounds.getMinY(), screenBounds.getMaxY());
 		}
 	}
 

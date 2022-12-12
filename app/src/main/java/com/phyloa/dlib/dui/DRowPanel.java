@@ -18,4 +18,8 @@ public class DRowPanel extends DPanel {
         width = rootX;
         height = maxHeight;
     }
+
+    public void addSpacer(int pixels) {
+        add(new DSpacer(pixels, 0));
+    }
 }

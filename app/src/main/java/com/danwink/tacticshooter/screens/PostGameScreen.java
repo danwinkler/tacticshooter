@@ -8,28 +8,28 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
-import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.imageout.ImageOut;
 
+import com.danwink.tacticshooter.DUIScreen;
 import com.danwink.tacticshooter.GameStats;
 import com.danwink.tacticshooter.GameStats.TeamStats;
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.slick.Slick2DEventMapper;
 import com.danwink.tacticshooter.slick.Slick2DRenderer;
 import com.phyloa.dlib.dui.DButton;
+import com.phyloa.dlib.dui.DColumnPanel;
 import com.phyloa.dlib.dui.DLinePlot;
+import com.phyloa.dlib.dui.DRowPanel;
 import com.phyloa.dlib.dui.DText;
 import com.phyloa.dlib.dui.DUI;
 import com.phyloa.dlib.dui.DUIElement;
 import com.phyloa.dlib.dui.DUIEvent;
-import com.phyloa.dlib.dui.DUIListener;
 import com.phyloa.dlib.dui.DUITheme;
-import com.phyloa.dlib.game.DScreen;
-import com.phyloa.dlib.game.DScreenHandler;
+import com.phyloa.dlib.dui.RelativePosition;
 import com.phyloa.dlib.util.DUtil;
 
-public class PostGameScreen extends DScreen<GameContainer, Graphics> implements DUIListener {
+public class PostGameScreen extends DUIScreen {
 	DUI dui;
 	DButton okay;
 	DButton rejoin;
@@ -42,66 +42,70 @@ public class PostGameScreen extends DScreen<GameContainer, Graphics> implements 
 
 	boolean rd = false;
 
-	public void onActivate(GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh) {
+	public void init(GameContainer gc) {
 		StaticFiles.getMusic("menu").loop();
-		rebuildUI(gc);
 		rd = false;
 	}
 
-	public void rebuildUI(GameContainer gc) {
-		dui = new DUI(new Slick2DEventMapper(gc.getInput()));
-
+	public void createUIElements(DUI dui, float windowHeight) {
 		dui.setTheme(new DUITheme(DUITheme.defaultTheme) {
 			{
 				borderColor = new java.awt.Color(64, 170, 255);
 			}
 		});
 
-		dui.add(new DText("Post Game Stats", gc.getWidth() / 2 - 300, 30, true));
+		var centerColumn = new DColumnPanel(0, 0, 0, 0);
+		centerColumn.setRelativePosition(RelativePosition.CENTER, 0, 0);
 
-		int x = gc.getWidth() / 2 - 400;
+		centerColumn.add(new DText("Post Game Stats", false).setSize(0, 30 * uiScale));
+
+		DRowPanel statsRow = new DRowPanel(0, 0, 0, 0);
+
+		var statsTextWidth = 300 * uiScale;
+		var statsTextHeight = 20 * uiScale;
+
 		for (TeamStats ts : stats.teamStats) {
-			dui.add(new DText("Team: " + ts.t.id, x, 100));
-			dui.add(new DText("Bullets Shot: " + ts.bulletsShot, x, 130));
-			dui.add(new DText("Money Earned: " + ts.moneyEarned, x, 160));
-			dui.add(new DText("Points Taken: " + ts.pointsTaken, x, 190));
-			dui.add(new DText("Units Created: " + ts.unitsCreated, x, 220));
-			dui.add(new DText("Units Lost: " + ts.unitsLost, x, 250));
-			x += 250;
+			DColumnPanel teamStatsCol = new DColumnPanel(0, 0, 0, 0);
+			teamStatsCol.add(new DText("Team: " + ts.t.id, false).setSize(statsTextWidth, statsTextHeight));
+			teamStatsCol
+					.add(new DText("Bullets Shot: " + ts.bulletsShot, false).setSize(statsTextWidth, statsTextHeight));
+			teamStatsCol
+					.add(new DText("Money Earned: " + ts.moneyEarned, false).setSize(statsTextWidth, statsTextHeight));
+			teamStatsCol
+					.add(new DText("Points Taken: " + ts.pointsTaken, false).setSize(statsTextWidth, statsTextHeight));
+			teamStatsCol.add(
+					new DText("Units Created: " + ts.unitsCreated, false).setSize(statsTextWidth, statsTextHeight));
+			teamStatsCol.add(new DText("Units Lost: " + ts.unitsLost, false).setSize(statsTextWidth, statsTextHeight));
+
+			statsRow.add(teamStatsCol);
 		}
 
 		// Top stats
-		var topStatsXPos = gc.getWidth() / 2 + 50;
+		var topStatsCol = new DColumnPanel(0, 0, 0, 0);
 		var mostKills = stats.getMostKills();
-		dui.add(new DText("Most Kills: " + mostKills.playerName + " with " + mostKills.kills + " kills",
-				topStatsXPos, 130));
+		topStatsCol.add(new DText("Most Kills: " + mostKills.playerName + " with " + mostKills.kills + " kills",
+				false).setSize(statsTextWidth, statsTextHeight));
 
 		var mostUnitsCreated = stats.getMostUnitsCreated();
-		dui.add(new DText("Most Units Created: " + mostUnitsCreated.playerName + " with "
-				+ mostUnitsCreated.unitsCreated + " units created", topStatsXPos, 160));
+		topStatsCol.add(new DText("Most Units Created: " + mostUnitsCreated.playerName + " with "
+				+ mostUnitsCreated.unitsCreated + " units created", false).setSize(statsTextWidth, statsTextHeight));
 
 		var mostUnitsLost = stats.getMostUnitsLost();
-		dui.add(new DText("Most Units Lost: " + mostUnitsLost.playerName + " with "
-				+ mostUnitsLost.unitsLost + " units lost", topStatsXPos, 190));
+		topStatsCol.add(new DText("Most Units Lost: " + mostUnitsLost.playerName + " with "
+				+ mostUnitsLost.unitsLost + " units lost", false).setSize(statsTextWidth, statsTextHeight));
 
 		var leastUnitsLost = stats.getLeastUnitsLost();
-		dui.add(new DText("Least Units Lost: " + leastUnitsLost.playerName + " with "
-				+ leastUnitsLost.unitsLost + " units lost", topStatsXPos, 220));
+		topStatsCol.add(new DText("Least Units Lost: " + leastUnitsLost.playerName + " with "
+				+ leastUnitsLost.unitsLost + " units lost", false).setSize(statsTextWidth, statsTextHeight));
 
 		var mostBulletShot = stats.getMostBulletsShot();
-		dui.add(new DText("Most Bullets Shot: " + mostBulletShot.playerName + " with "
-				+ mostBulletShot.bulletsShot + " bullets shot", topStatsXPos, 250));
+		topStatsCol.add(new DText("Most Bullets Shot: " + mostBulletShot.playerName + " with "
+				+ mostBulletShot.bulletsShot + " bullets shot", false).setSize(statsTextWidth, statsTextHeight));
 
-		okay = new DButton("Okay", gc.getWidth() / 2 - 300, gc.getHeight() - 200, 200, 100);
-		rejoin = new DButton("Rejoin", gc.getWidth() / 2 - 100, gc.getHeight() - 200, 200, 100);
-		saveImage = new DButton("Save Image of End Map", gc.getWidth() / 2 + 100, gc.getHeight() - 200, 200, 100);
+		statsRow.add(topStatsCol);
 
-		dui.add(okay);
-		dui.add(rejoin);
-		dui.add(saveImage);
-
-		dui.add(new DText("Points:", gc.getWidth() / 2 - 500, gc.getHeight() / 2 - 100));
-		dui.add(new DText("Units:", gc.getWidth() / 2 - 500, gc.getHeight() / 2 + 100));
+		centerColumn.add(statsRow);
+		centerColumn.addSpacer(30 * uiScale);
 
 		// Test and see if extraneous data got added on to end :/
 		ArrayList<Integer> lastPointA = stats.teamStats[0].pointCount;
@@ -113,38 +117,52 @@ public class PostGameScreen extends DScreen<GameContainer, Graphics> implements 
 			}
 		}
 
-		DLinePlot pointPlot = new DLinePlot(gc.getWidth() / 2 - 400, gc.getHeight() / 2 - 150, 800, 100);
+		var pointsCol = new DColumnPanel(0, 0, 0, 0);
+		pointsCol.add(new DText("Points:", 0, 0).setSize(0, 30 * uiScale));
+		DLinePlot pointPlot = new DLinePlot(0, 0, 800 * uiScale, 100 * uiScale);
 		for (TeamStats ts : stats.teamStats) {
 			Color c = ts.t.getColor();
 			pointPlot.addLine(DUtil.integerArrayListToIntArray(ts.pointCount), new java.awt.Color(c.r, c.g, c.b, .8f));
 		}
-		dui.add(pointPlot);
+		pointsCol.add(pointPlot);
+		pointsCol.setRelativePosition(RelativePosition.CENTER, 0, 0);
+		centerColumn.add(pointsCol);
+		centerColumn.addSpacer(30 * uiScale);
 
-		DLinePlot unitPlot = new DLinePlot(gc.getWidth() / 2 - 400, gc.getHeight() / 2 + 50, 800, 100);
+		var unitsCol = new DColumnPanel(0, 0, 0, 0);
+		unitsCol.add(new DText("Units:", 0, 0).setSize(0, 30 * uiScale));
+		DLinePlot unitPlot = new DLinePlot(0, 0, 800 * uiScale, 100 * uiScale);
 		for (TeamStats ts : stats.teamStats) {
 			Color c = ts.t.getColor();
 			unitPlot.addLine(DUtil.integerArrayListToIntArray(ts.unitCount), new java.awt.Color(c.r, c.g, c.b, .8f));
 		}
-		dui.add(unitPlot);
+		unitsCol.add(unitPlot);
+		unitsCol.setRelativePosition(RelativePosition.CENTER, 0, 0);
+		centerColumn.add(unitsCol);
+		centerColumn.addSpacer(30 * uiScale);
 
-		dui.addDUIListener(this);
+		var buttonsRow = new DRowPanel(0, 0, 0, 0);
+		buttonsRow.setRelativePosition(RelativePosition.CENTER, 0, 0);
 
-		dui.setEnabled(true);
-	}
+		okay = new DButton("Okay", 0, 0, 200 * uiScale, 100 * uiScale);
+		rejoin = new DButton("Rejoin", 0, 0, 200 * uiScale, 100 * uiScale);
+		saveImage = new DButton("Save Image of\n End Map", 0, 0, 200 * uiScale, 100 * uiScale);
 
-	public void update(GameContainer gc, float delta) {
-		dui.update();
+		buttonsRow.add(okay);
+		buttonsRow.add(rejoin);
+		buttonsRow.add(saveImage);
 
-		if (gc.getInput().isKeyPressed(Input.KEY_R)) {
-			rebuildUI(gc);
-		}
+		centerColumn.add(buttonsRow);
+
+		dui.add(centerColumn);
 	}
 
 	public void render(GameContainer gc, Graphics g) {
 		g.setColor(new Color(0, 0, 0, 200));
 		g.fillRect(0, 0, gc.getWidth(), gc.getHeight());
 
-		dui.render(r.renderTo(g));
+		// Render UI
+		super.render(gc, g);
 
 		// SO yeah I have to render here in order to get the blood to show up :/
 		if (!rd) {
@@ -158,11 +176,6 @@ public class PostGameScreen extends DScreen<GameContainer, Graphics> implements 
 			}
 			rd = true;
 		}
-	}
-
-	public void onExit() {
-		dui.setEnabled(false);
-		dui = null;
 	}
 
 	public void event(DUIEvent event) {
@@ -200,9 +213,5 @@ public class PostGameScreen extends DScreen<GameContainer, Graphics> implements 
 		} else if (o instanceof Image) {
 			endMap = (Image) o;
 		}
-
-	}
-
-	public void onResize(int width, int height) {
 	}
 }

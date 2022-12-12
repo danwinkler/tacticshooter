@@ -235,6 +235,8 @@ public class Unit {
 				frame = (frame + 1) % 8;
 				tc.mgs.gameRenderer.footprint.unitFrameUpdate(this);
 			}
+
+			tc.setWalked(x, y);
 		}
 		if (state == UnitState.STOPPED) {
 			frame = 0;

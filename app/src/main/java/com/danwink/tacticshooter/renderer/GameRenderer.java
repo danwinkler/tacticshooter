@@ -53,6 +53,7 @@ public class GameRenderer {
 	public UnitInfoRenderer unitInfo;
 	public FogRenderer fog;
 	public FootprintLayerRenderer footprint;
+	public GrassRenderer grass;
 
 	ConcurrentLinkedDeque<Unit> unitsToKill = new ConcurrentLinkedDeque<>();
 
@@ -68,10 +69,12 @@ public class GameRenderer {
 		unitInfo = new UnitInfoRenderer();
 		fog = new FogRenderer();
 		footprint = new FootprintLayerRenderer();
+		// grass = new GrassRenderer();
 	}
 
-	public void update(float d) {
+	public void update(ClientState cs, float d) {
 		particle.update(d);
+		// grass.update(cs);
 	}
 
 	public void render(Graphics g, ClientState cs, GameContainer gc, boolean fogEnabled) {
@@ -98,6 +101,7 @@ public class GameRenderer {
 		footprint.render(g, cs);
 		bloodExplosion.render(g, cs, unitBody);
 		building.render(g, cs, false);
+		// grass.render(g, cs);
 		wall.render(g, cs);
 		renderMarkers(g, cs);
 		unitBody.render(g, cs);

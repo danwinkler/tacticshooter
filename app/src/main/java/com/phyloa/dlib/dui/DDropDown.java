@@ -84,10 +84,11 @@ public class DDropDown extends DUIElement {
 	}
 
 	@Override
-	public void setSize(int width, int height) {
+	public DUIElement setSize(int width, int height) {
 		super.setSize(width, height);
 		topPanel.width = width;
 		topPanel.height = (int) getExpandedHeight();
+		return this;
 	}
 
 	public void setSelected(int i) {
@@ -174,8 +175,10 @@ public class DDropDown extends DUIElement {
 				r.fillRect(0, hover * ddd.height, width, ddd.height);
 			}
 
+			r.setLineWidth(2);
 			r.color(ui.theme.borderColor);
 			r.drawRect(0, 0, width, height);
+			r.setLineWidth(1);
 
 			for (int i = 0; i < ddd.items.size(); i++) {
 				// For some reason I added ddd.height to the text location when I was doing
