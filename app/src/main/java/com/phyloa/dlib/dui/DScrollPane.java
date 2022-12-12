@@ -38,12 +38,12 @@ public class DScrollPane<ImageClass> extends DUIElement {
 
 	}
 
-	public void mousePressed(DMouseEvent e) {
-
+	public boolean mousePressed(DMouseEvent e) {
+		return false;
 	}
 
-	public void mouseReleased(DMouseEvent e) {
-
+	public boolean mouseReleased(DMouseEvent e) {
+		return false;
 	}
 
 	public void mouseMoved(DMouseEvent e) {
@@ -110,8 +110,10 @@ public class DScrollPane<ImageClass> extends DUIElement {
 		}
 	}
 
-	public void handleChildrenMousePressed(DMouseEvent e) {
+	public boolean handleChildrenMousePressed(DMouseEvent e) {
 		if (visible) {
+			boolean thisHandled = false;
+			boolean childrenHandled = false;
 			int tx = e.x;
 			int ty = e.y;
 			ui.setFocus(this);
@@ -120,17 +122,24 @@ public class DScrollPane<ImageClass> extends DUIElement {
 			for (int i = 0; i < children.size(); i++) {
 				DUIElement el = children.get(i);
 				if (el.isInside(e.x, e.y)) {
-					el.mousePressed(e);
-					el.handleChildrenMousePressed(e);
+					thisHandled = el.mousePressed(e);
+					childrenHandled = el.handleChildrenMousePressed(e);
+					if (thisHandled || childrenHandled) {
+						break;
+					}
 				}
 			}
 			e.x = tx;
 			e.y = ty;
+			return thisHandled || childrenHandled;
 		}
+		return false;
 	}
 
-	public void handleChildrenMouseReleased(DMouseEvent e) {
+	public boolean handleChildrenMouseReleased(DMouseEvent e) {
 		if (visible) {
+			boolean thisHandled = false;
+			boolean childrenHandled = false;
 			int tx = e.x;
 			int ty = e.y;
 			e.x = e.x - this.x + scrollx;
@@ -138,13 +147,19 @@ public class DScrollPane<ImageClass> extends DUIElement {
 			for (int i = 0; i < children.size(); i++) {
 				DUIElement el = children.get(i);
 				if (el.isInside(e.x, e.y)) {
-					el.mouseReleased(e);
-					el.handleChildrenMouseReleased(e);
+					thisHandled = el.mouseReleased(e);
+					childrenHandled = el.handleChildrenMouseReleased(e);
+					if (thisHandled || childrenHandled) {
+						break;
+					}
 				}
 			}
 			e.x = tx;
 			e.y = ty;
+
+			return thisHandled || childrenHandled;
 		}
+		return false;
 	}
 
 	@Override

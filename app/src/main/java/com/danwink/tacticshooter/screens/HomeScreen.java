@@ -19,12 +19,12 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 
-import com.danwink.tacticshooter.DUIScreen;
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.TacticServer;
 import com.danwink.tacticshooter.UIHelper;
 import com.danwink.tacticshooter.editor.Editor;
 import com.danwink.tacticshooter.network.ServerNetworkInterface;
+import com.danwink.tacticshooter.ui.DUIScreen;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DColumnPanel;
 import com.phyloa.dlib.dui.DKeyEvent;
@@ -224,15 +224,15 @@ public class HomeScreen extends DUIScreen {
 		}
 
 		@Override
-		public void mousePressed(DMouseEvent e) {
+		public boolean mousePressed(DMouseEvent e) {
 			// TODO Auto-generated method stub
-
+			return false;
 		}
 
 		@Override
-		public void mouseReleased(DMouseEvent e) {
+		public boolean mouseReleased(DMouseEvent e) {
 			// TODO Auto-generated method stub
-
+			return false;
 		}
 
 		@Override

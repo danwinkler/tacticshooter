@@ -8,7 +8,7 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
-import com.danwink.tacticshooter.DUIScreen;
+import com.danwink.tacticshooter.ui.DUIScreen;
 import com.phyloa.dlib.dui.DUI;
 import com.phyloa.dlib.dui.DUIEvent;
 import com.phyloa.dlib.math.Point2i;

@@ -10,6 +10,8 @@ public class DUI implements DMouseListener, DKeyListener {
 	DEventMapper dem;
 	ArrayList<DUIListener> listeners = new ArrayList<DUIListener>();
 	ArrayList<DDialog> dialogs = new ArrayList<DDialog>();
+	ArrayList<DMouseListener> passThroughMouseListeners = new ArrayList<DMouseListener>();
+	ArrayList<DKeyListener> passThroughKeyListeners = new ArrayList<DKeyListener>();
 
 	DUIElement focus = null;
 	DUIElement hover = null;
@@ -88,8 +90,21 @@ public class DUI implements DMouseListener, DKeyListener {
 	}
 
 	public void addDUIListener(DUIListener l) {
-		if (!listeners.contains(l))
+		if (!listeners.contains(l)) {
 			listeners.add(l);
+		}
+	}
+
+	public void addPassthroughMouseListener(DMouseListener l) {
+		if (!passThroughMouseListeners.contains(l)) {
+			passThroughMouseListeners.add(l);
+		}
+	}
+
+	public void addPassthroughKeyListener(DKeyListener l) {
+		if (!passThroughKeyListeners.contains(l)) {
+			passThroughKeyListeners.add(l);
+		}
 	}
 
 	public void add(DUIElement e) {
@@ -139,44 +154,59 @@ public class DUI implements DMouseListener, DKeyListener {
 				d.handleChildrenMouseMoved(e);
 			}
 		}
+		passThroughMouseListeners.forEach(l -> l.mouseMoved(e));
 	}
 
 	public boolean dialogPresent() {
 		return dialogs.size() > 0;
 	}
 
-	public void mousePressed(DMouseEvent e) {
+	public boolean mousePressed(DMouseEvent e) {
+		boolean handled = false;
 		if (enabled) {
 			if (topPanel.visible && topPanel.isInside(e.x, e.y)) {
-				topPanel.mousePressed(e);
-				topPanel.handleChildrenMousePressed(e);
+				handled |= topPanel.mousePressed(e);
+				handled |= topPanel.handleChildrenMousePressed(e);
 			} else {
-				rootPane.mousePressed(e);
-				rootPane.handleChildrenMousePressed(e);
+				handled |= rootPane.mousePressed(e);
+				handled |= rootPane.handleChildrenMousePressed(e);
 			}
 
 			if (dialogs.size() > 0) {
 				DDialog d = dialogs.get(dialogs.size() - 1);
-				d.handleChildrenMousePressed(e);
+				handled |= d.handleChildrenMousePressed(e);
 			}
 		}
+
+		if (!handled) {
+			passThroughMouseListeners.forEach(l -> l.mousePressed(e));
+		}
+
+		return handled;
 	}
 
-	public void mouseReleased(DMouseEvent e) {
+	public boolean mouseReleased(DMouseEvent e) {
+		boolean handled = false;
 		if (enabled) {
 			if (topPanel.visible && topPanel.isInside(e.x, e.y)) {
-				topPanel.mouseReleased(e);
-				topPanel.handleChildrenMouseReleased(e);
+				handled |= topPanel.mouseReleased(e);
+				handled |= topPanel.handleChildrenMouseReleased(e);
 			} else {
-				rootPane.mouseReleased(e);
-				rootPane.handleChildrenMouseReleased(e);
+				handled |= rootPane.mouseReleased(e);
+				handled |= rootPane.handleChildrenMouseReleased(e);
 			}
 
 			if (dialogs.size() > 0) {
 				DDialog d = dialogs.get(dialogs.size() - 1);
-				d.handleChildrenMouseReleased(e);
+				handled |= d.handleChildrenMouseReleased(e);
 			}
 		}
+
+		if (!handled) {
+			passThroughMouseListeners.forEach(l -> l.mouseReleased(e));
+		}
+
+		return handled;
 	}
 
 	@Override
@@ -184,6 +214,8 @@ public class DUI implements DMouseListener, DKeyListener {
 		if (enabled && focus != null) {
 			focus.keyPressed(dke);
 		}
+
+		passThroughKeyListeners.forEach(l -> l.keyPressed(dke));
 	}
 
 	@Override
@@ -191,16 +223,18 @@ public class DUI implements DMouseListener, DKeyListener {
 		if (enabled && focus != null) {
 			focus.keyReleased(dke);
 		}
+
+		passThroughKeyListeners.forEach(l -> l.keyReleased(dke));
 	}
 
 	@Override
 	public void mouseEntered(DMouseEvent e) {
-
+		passThroughMouseListeners.forEach(l -> l.mouseEntered(e));
 	}
 
 	@Override
 	public void mouseExited(DMouseEvent e) {
-
+		passThroughMouseListeners.forEach(l -> l.mouseExited(e));
 	}
 
 	@Override
@@ -219,6 +253,7 @@ public class DUI implements DMouseListener, DKeyListener {
 				d.handleChildrenMouseDragged(e);
 			}
 		}
+		passThroughMouseListeners.forEach(l -> l.mouseDragged(e));
 	}
 
 	public void setEnabled(boolean enabled) {
@@ -246,6 +281,8 @@ public class DUI implements DMouseListener, DKeyListener {
 			DDialog d = dialogs.get(dialogs.size() - 1);
 			d.handleChildrenMouseWheel(dme);
 		}
+
+		passThroughMouseListeners.forEach(l -> l.mouseWheel(dme));
 	}
 
 	public void setTheme(DUITheme theme) {

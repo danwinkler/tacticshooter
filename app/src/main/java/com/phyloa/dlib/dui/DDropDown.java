@@ -111,11 +111,11 @@ public class DDropDown extends DUIElement {
 
 	}
 
-	public void mousePressed(DMouseEvent e) {
-
+	public boolean mousePressed(DMouseEvent e) {
+		return false;
 	}
 
-	public void mouseReleased(DMouseEvent e) {
+	public boolean mouseReleased(DMouseEvent e) {
 		float mx = e.x - this.x;
 		float my = e.y - this.y;
 
@@ -129,6 +129,7 @@ public class DDropDown extends DUIElement {
 				ui.setTopPanel(this, topPanel);
 			}
 		}
+		return true;
 	}
 
 	public void mouseMoved(DMouseEvent e) {
@@ -208,17 +209,18 @@ public class DDropDown extends DUIElement {
 
 		}
 
-		public void mousePressed(DMouseEvent e) {
-
+		public boolean mousePressed(DMouseEvent e) {
+			return false;
 		}
 
-		public void mouseReleased(DMouseEvent e) {
+		public boolean mouseReleased(DMouseEvent e) {
 			float my = e.y - y;
 			int i = (int) (my / ddd.height);
 			ddd.setSelected(i);
 			this.visible = false;
 			ddd.expanded = false;
 			ui.event(new DUIEvent(ddd, ddd.selected));
+			return true;
 		}
 
 		public void mouseMoved(DMouseEvent e) {

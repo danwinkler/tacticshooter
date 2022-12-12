@@ -1,20 +1,19 @@
 package com.danwink.tacticshooter.screens;
 
 import java.util.ArrayList;
+import java.awt.event.KeyEvent;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
-import org.newdawn.slick.InputListener;
 import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.opengl.shader.ShaderProgram;
 
 import com.danwink.tacticshooter.ClientState;
-import com.danwink.tacticshooter.DUIScreen;
 import com.danwink.tacticshooter.MessageType;
 import com.danwink.tacticshooter.MusicQueuer;
 import com.danwink.tacticshooter.StaticFiles;
@@ -31,29 +30,29 @@ import com.danwink.tacticshooter.gameobjects.Unit.UnitDef;
 import com.danwink.tacticshooter.network.ClientInterface;
 import com.danwink.tacticshooter.network.Message;
 import com.danwink.tacticshooter.renderer.GameRenderer;
-import com.danwink.tacticshooter.slick.Slick2DEventMapper;
-import com.danwink.tacticshooter.slick.Slick2DRenderer;
+import com.danwink.tacticshooter.ui.DUIScreen;
+import com.danwink.tacticshooter.ui.SelectedUnitsDisplay;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DCheckBox;
 import com.phyloa.dlib.dui.DColumnPanel;
 import com.phyloa.dlib.dui.DGrid;
+import com.phyloa.dlib.dui.DKeyEvent;
+import com.phyloa.dlib.dui.DKeyListener;
+import com.phyloa.dlib.dui.DMouseEvent;
+import com.phyloa.dlib.dui.DMouseListener;
 import com.phyloa.dlib.dui.DPanel;
 import com.phyloa.dlib.dui.DText;
 import com.phyloa.dlib.dui.DTextBox;
 import com.phyloa.dlib.dui.DUI;
 import com.phyloa.dlib.dui.DUIElement;
 import com.phyloa.dlib.dui.DUIEvent;
-import com.phyloa.dlib.dui.DUIListener;
 import com.phyloa.dlib.dui.RelativePosition;
-import com.phyloa.dlib.game.DScreen;
-import com.phyloa.dlib.game.DScreenHandler;
 import com.phyloa.dlib.math.Point2i;
 import com.phyloa.dlib.util.DMath;
 
-import jp.objectclub.vecmath.Point2f;
 import jp.objectclub.vecmath.Vector3f;
 
-public class MultiplayerGameScreen extends DUIScreen implements InputListener {
+public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DMouseListener {
 	int gamemodeButtonWidth = 75;
 	int gamemodeButtonHeight = 75;
 
@@ -74,6 +73,7 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 	DTextBox chatBox;
 	DCheckBox teamChat;
 	DGrid gamemodeButtons;
+	SelectedUnitsDisplay selectedUnitsDisplay;
 
 	public Input input;
 
@@ -113,15 +113,18 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 
 	public DButton[][] buttonSlots = new DButton[3][3];
 
+	int lastMouseX, lastMouseY;
+
 	public void init(GameContainer gc) {
+		input = gc.getInput();
 		initializeUIElements(dui);
 
 		for (int i = 0; i < 10; i++) {
 			battleGroups[i] = new ArrayList<Integer>();
 		}
 
-		input = gc.getInput();
-		input.addListener(this);
+		dui.addPassthroughKeyListener(this);
+		dui.addPassthroughMouseListener(this);
 
 		Music music;
 		int musicChoice = DMath.randomi(1, 3);
@@ -155,6 +158,10 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 		chatPanel.add(chatBox);
 
 		chatPanel.setVisible(false);
+
+		selectedUnitsDisplay = new SelectedUnitsDisplay(RelativePosition.TOP_RIGHT, 4, 48);
+		selectedUnitsDisplay.setClientState(cs);
+		selectedUnitsDisplay.setInput(input);
 	}
 
 	public void createUIElements(DUI dui, float screenHeight) {
@@ -164,9 +171,13 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 
 		gamemodeButtons.setSize(gamemodeButtonWidth * 3 * uiScale, gamemodeButtonHeight * 3 * uiScale);
 
+		selectedUnitsDisplay.setRelativePosition(RelativePosition.TOP_RIGHT, -8 * uiScale, 100 * uiScale);
+		selectedUnitsDisplay.setPortraitSize(48 * uiScale);
+
 		dui.add(chatPanel);
 		dui.add(escapeMenu);
 		dui.add(gamemodeButtons);
+		dui.add(selectedUnitsDisplay);
 	}
 
 	public void update(GameContainer gc, float d) {
@@ -356,6 +367,8 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 				cs.units.remove(i);
 				cs.unitMap.remove(u.id);
 				cs.selected.remove((Object) u.id);
+				// Trigger recalc of selected units display
+				dui.doLayout();
 				gameRenderer.killUnit(u);
 				if (u.type.explodesOnDeath) {
 					StaticFiles.getSound("explode1").play();
@@ -484,26 +497,6 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 					g.drawString(messages.get(i), 15 * uiScale,
 							330 * uiScale - (messages.size() - 1 - i) * 25 * uiScale);
 				}
-			}
-
-			// Draw selected unit portraits
-			for (int i = 0; i < cs.selected.size(); i++) {
-				Unit u = cs.unitMap.get(cs.selected.get(i));
-				int portraitSize = 48 * uiScale;
-				int padding = 4 * uiScale;
-				int healthBarHeight = 4 * uiScale;
-				int columns = 4;
-				int x = gc.getWidth() - (portraitSize + padding) * (i % columns + 1) - 10 * uiScale;
-				int y = 100 * uiScale + (portraitSize + padding + healthBarHeight) * (i / columns);
-				var portrait = cs.l.theme.getPortrait(u.type.name);
-				g.drawImage(portrait, x, y, x + portraitSize, y + portraitSize, 0, 0, portrait.getWidth(),
-						portrait.getHeight());
-
-				var healthBarWidth = portraitSize * (u.health / (float) u.type.health);
-				g.setColor(Color.green);
-				g.fillRect(x, y + portraitSize, healthBarWidth, healthBarHeight);
-				g.setColor(Color.black);
-				g.drawRect(x, y + portraitSize, healthBarWidth, healthBarHeight);
 			}
 		}
 
@@ -644,14 +637,15 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 		return new Rectangle(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y);
 	}
 
-	public void mousePressed(int button, int x, int y) {
-		if (x > gc.getWidth() - 200 && y > gc.getHeight() - 200 && !selecting) {
+	@Override
+	public boolean mousePressed(DMouseEvent e) {
+		if (e.x > gc.getWidth() - 200 && e.y > gc.getHeight() - 200 && !selecting) {
 			boolean xLarger = cs.l.width > cs.l.height;
 			float xOffset = xLarger ? 0 : 100 - 100 * cs.l.width / (float) cs.l.height;
 			float yOffset = !xLarger ? 0 : 100 - 100 * (float) cs.l.height / cs.l.width;
 			float scale = 200.f / ((xLarger ? cs.l.width : cs.l.height) * Level.tileSize);
-			float minimapX = (x - (gc.getWidth() - 200 + xOffset));
-			float minimapY = (y - (gc.getHeight() - 200 + yOffset));
+			float minimapX = (e.x - (gc.getWidth() - 200 + xOffset));
+			float minimapY = (e.y - (gc.getHeight() - 200 + yOffset));
 			float mapX = minimapX / scale;
 			float mapY = minimapY / scale;
 
@@ -659,28 +653,28 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 				ci.sendToServer(new Message(MessageType.MESSAGE, "/ping " + (input.getMouseX() - (gc.getWidth() - 200))
 						+ " " + (input.getMouseY() - (gc.getHeight() - 200))));
 			} else {
-				if (button == Input.MOUSE_LEFT_BUTTON) {
+				if (e.button == Input.MOUSE_LEFT_BUTTON) {
 					Rectangle screenBounds = getScreenBounds();
 					cs.camera.x = DMath.bound(mapX, screenBounds.getMinX(), screenBounds.getMaxX());
 					cs.camera.y = DMath.bound(mapY, screenBounds.getMinY(),
 							screenBounds.getMaxY());
-				} else if (button == Input.MOUSE_RIGHT_BUTTON) {
-					int tx = cs.l.getTileX(((x - (gc.getWidth() - 200.f)) / 200.f) * cs.l.width * Level.tileSize);
-					int ty = cs.l.getTileY(((y - (gc.getHeight() - 200.f)) / 200.f) * cs.l.height * Level.tileSize);
+				} else if (e.button == Input.MOUSE_RIGHT_BUTTON) {
+					int tx = cs.l.getTileX(((e.x - (gc.getWidth() - 200.f)) / 200.f) * cs.l.width * Level.tileSize);
+					int ty = cs.l.getTileY(((e.y - (gc.getHeight() - 200.f)) / 200.f) * cs.l.height * Level.tileSize);
 					ci.sendToServer(new Message(input.isKeyDown(Input.KEY_LCONTROL) ? MessageType.SETATTACKPOINTCONTINUE
 							: MessageType.SETATTACKPOINT, new Object[] { new Point2i(tx, ty), cs.selected }));
 					this.waitingForMoveConfirmation = true;
 				}
 			}
 		} else {
-			var worldCoords = cs.camera.screenToWorld(x, y, gc);
-			if (button == Input.MOUSE_LEFT_BUTTON) {
+			var worldCoords = cs.camera.screenToWorld(e.x, e.y, gc);
+			if (e.button == Input.MOUSE_LEFT_BUTTON) {
 				sx = worldCoords.x;
 				sy = worldCoords.y;
 				sx2 = sx;
 				sy2 = sy;
 				selecting = true;
-			} else if (button == Input.MOUSE_RIGHT_BUTTON) {
+			} else if (e.button == Input.MOUSE_RIGHT_BUTTON) {
 				int tx = (int) (worldCoords.x / Level.tileSize);
 				int ty = (int) (worldCoords.y / Level.tileSize);
 				if (input.isKeyDown(Input.KEY_LCONTROL)) {
@@ -697,16 +691,17 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 				this.waitingForMoveConfirmation = true;
 			}
 		}
+		lastMouseX = e.x;
+		lastMouseY = e.y;
+		return false;
 	}
 
-	public void mouseReleased(int button, int x, int y) {
-		if (button == Input.MOUSE_LEFT_BUTTON && selecting) {
-			for (int i = 0; i < cs.selected.size(); i++) {
-				cs.unitMap.get(cs.selected.get(i)).selected = false;
-			}
-			cs.selected.clear();
+	@Override
+	public boolean mouseReleased(DMouseEvent e) {
+		if (e.button == Input.MOUSE_LEFT_BUTTON && selecting) {
+			cs.clearSelected();
 
-			var worldCoords = cs.camera.screenToWorld(x, y, gc);
+			var worldCoords = cs.camera.screenToWorld(e.x, e.y, gc);
 			float x1 = Math.min(sx, worldCoords.x);
 			float y1 = Math.min(sy, worldCoords.y);
 			float x2 = Math.max(sx, worldCoords.x);
@@ -754,20 +749,25 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 				}
 			}
 			selecting = false;
+			// Trigger recalc of selected units display
+			dui.doLayout();
 		}
-		if (cs.selected.size() > 0)
+		if (cs.selected.size() > 0) {
 			lastClick = System.currentTimeMillis();
+		}
+		return false;
 	}
 
-	public void mouseDragged(int oldx, int oldy, int newx, int newy) {
-		if (newx > gc.getWidth() - 200 && newy > gc.getHeight() - 200 && !selecting) {
+	@Override
+	public void mouseDragged(DMouseEvent e) {
+		if (e.x > gc.getWidth() - 200 && e.y > gc.getHeight() - 200 && !selecting) {
 			if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && !input.isKeyDown(Input.KEY_LCONTROL)) {
 				boolean xLarger = cs.l.width > cs.l.height;
 				float xOffset = xLarger ? 0 : 100 - 100 * cs.l.width / (float) cs.l.height;
 				float yOffset = !xLarger ? 0 : 100 - 100 * (float) cs.l.height / cs.l.width;
 				float scale = 200.f / ((xLarger ? cs.l.width : cs.l.height) * Level.tileSize);
-				float minimapX = (newx - (gc.getWidth() - 200 + xOffset));
-				float minimapY = (newy - (gc.getHeight() - 200 + yOffset));
+				float minimapX = (e.x - (gc.getWidth() - 200 + xOffset));
+				float minimapY = (e.y - (gc.getHeight() - 200 + yOffset));
 				float mapX = minimapX / scale;
 				float mapY = minimapY / scale;
 
@@ -777,31 +777,28 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 			}
 		} else {
 			if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
-				var worldCoords = cs.camera.screenToWorld(newx, newy, gc);
+				var worldCoords = cs.camera.screenToWorld(e.x, e.y, gc);
 				sx2 = worldCoords.x;
 				sy2 = worldCoords.y;
 			} else if (input.isMouseButtonDown(Input.MOUSE_MIDDLE_BUTTON)) {
-				// TODO: this needs to be scaled by zoom
-				cs.camera.x += oldx - newx;
-				cs.camera.y += oldy - newy;
+				cs.camera.x += (lastMouseX - e.x) / cs.camera.zoom;
+				cs.camera.y += (lastMouseY - e.y) / cs.camera.zoom;
 			}
 		}
+
+		lastMouseX = e.x;
+		lastMouseY = e.y;
 	}
 
 	@Override
-	public void mouseClicked(int arg0, int arg1, int arg2, int arg3) {
+	public void mouseMoved(DMouseEvent e) {
 
 	}
 
 	@Override
-	public void mouseMoved(int arg0, int arg1, int arg2, int arg3) {
-
-	}
-
-	@Override
-	public void mouseWheelMoved(int amount) {
+	public void mouseWheel(DMouseEvent e) {
 		float zoomSpeed = 0.1f;
-		int dir = amount > 0 ? 1 : -1;
+		int dir = e.wheel > 0 ? 1 : -1;
 		float zoom = dir * zoomSpeed;
 
 		var mx = input.getMouseX();
@@ -818,31 +815,12 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 	}
 
 	@Override
-	public void inputEnded() {
-
-	}
-
-	@Override
-	public void inputStarted() {
-
-	}
-
-	public boolean isAcceptingInput() {
-		return true;
-	}
-
-	@Override
-	public void setInput(Input arg0) {
-
-	}
-
-	@Override
-	public void keyPressed(int keyCode, char arg1) {
-		if (keyCode == Input.KEY_ESCAPE) {
+	public void keyPressed(DKeyEvent e) {
+		if (e.keyCode == KeyEvent.VK_ESCAPE) {
 			escapeMenu.setVisible(!escapeMenu.isVisible());
 			chatPanel.setVisible(false);
 			chatBox.setText("");
-		} else if (keyCode == Input.KEY_ENTER) {
+		} else if (e.keyCode == KeyEvent.VK_ENTER) {
 			if (chatPanel.isVisible()) {
 				if (chatBox.getText().trim().length() > 0) {
 					ci.sendToServer(new Message(MessageType.MESSAGE,
@@ -855,8 +833,8 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 				chatPanel.setVisible(true);
 				dui.setFocus(chatBox);
 			}
-		} else if (keyCode >= Input.KEY_1 && keyCode <= Input.KEY_0) {
-			ArrayList<Integer> bg = battleGroups[keyCode - Input.KEY_1];
+		} else if (e.keyCode >= KeyEvent.VK_1 && e.keyCode <= KeyEvent.VK_9) {
+			ArrayList<Integer> bg = battleGroups[e.keyCode - KeyEvent.VK_1];
 			if (input.isKeyPressed(Input.KEY_LCONTROL)) {
 				bg.clear();
 				for (int i = 0; i < cs.selected.size(); i++) {
@@ -877,35 +855,37 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 						cs.selected.add(bg.get(i));
 					}
 				}
+				// Trigger recalc of selected units display
+				dui.doLayout();
 			}
 		} else {
 			DButton b = null;
-			switch (keyCode) {
-				case Input.KEY_Q:
+			switch (e.keyCode) {
+				case KeyEvent.VK_Q:
 					b = buttonSlots[0][0];
 					break;
-				case Input.KEY_W:
+				case KeyEvent.VK_W:
 					b = buttonSlots[1][0];
 					break;
-				case Input.KEY_E:
+				case KeyEvent.VK_E:
 					b = buttonSlots[2][0];
 					break;
-				case Input.KEY_A:
+				case KeyEvent.VK_A:
 					b = buttonSlots[0][1];
 					break;
-				case Input.KEY_S:
+				case KeyEvent.VK_S:
 					b = buttonSlots[1][1];
 					break;
-				case Input.KEY_D:
+				case KeyEvent.VK_D:
 					b = buttonSlots[2][1];
 					break;
-				case Input.KEY_Z:
+				case KeyEvent.VK_Z:
 					b = buttonSlots[0][2];
 					break;
-				case Input.KEY_X:
+				case KeyEvent.VK_X:
 					b = buttonSlots[1][2];
 					break;
-				case Input.KEY_C:
+				case KeyEvent.VK_C:
 					b = buttonSlots[2][2];
 					break;
 			}
@@ -914,61 +894,6 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 				dui.event(new DUIEvent(b, DButton.MOUSE_UP));
 			}
 		}
-	}
-
-	@Override
-	public void keyReleased(int arg0, char arg1) {
-
-	}
-
-	@Override
-	public void controllerButtonPressed(int arg0, int arg1) {
-
-	}
-
-	@Override
-	public void controllerButtonReleased(int arg0, int arg1) {
-
-	}
-
-	@Override
-	public void controllerDownPressed(int arg0) {
-
-	}
-
-	@Override
-	public void controllerDownReleased(int arg0) {
-
-	}
-
-	@Override
-	public void controllerLeftPressed(int arg0) {
-
-	}
-
-	@Override
-	public void controllerLeftReleased(int arg0) {
-
-	}
-
-	@Override
-	public void controllerRightPressed(int arg0) {
-
-	}
-
-	@Override
-	public void controllerRightReleased(int arg0) {
-
-	}
-
-	@Override
-	public void controllerUpPressed(int arg0) {
-
-	}
-
-	@Override
-	public void controllerUpReleased(int arg0) {
-
 	}
 
 	@Override
@@ -1000,5 +925,23 @@ public class MultiplayerGameScreen extends DUIScreen implements InputListener {
 
 	public void bulletImpact(Bullet bullet) {
 		gameRenderer.bulletImpact(bullet);
+	}
+
+	@Override
+	public void mouseEntered(DMouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void mouseExited(DMouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void keyReleased(DKeyEvent dke) {
+		// TODO Auto-generated method stub
+
 	}
 }

@@ -16,7 +16,7 @@ public abstract class DUIElement implements DKeyListener, DMouseListener {
 	public String name;
 
 	boolean visible = true;
-	DUI ui;
+	protected DUI ui;
 
 	ArrayList<DUIElement> children = new ArrayList<>();
 
@@ -147,37 +147,51 @@ public abstract class DUIElement implements DKeyListener, DMouseListener {
 		}
 	}
 
-	public void handleChildrenMousePressed(DMouseEvent e) {
+	public boolean handleChildrenMousePressed(DMouseEvent e) {
 		if (visible) {
+			boolean thisHandled = false;
+			boolean childrenHandled = false;
 			ui.setFocus(this);
 			e.x = e.x - this.x;
 			e.y = e.y - this.y;
 			for (int i = 0; i < children.size(); i++) {
 				DUIElement el = children.get(i);
 				if (el.isInside(e.x, e.y) && el.isVisible()) {
-					el.mousePressed(e);
-					el.handleChildrenMousePressed(e);
+					thisHandled = el.mousePressed(e);
+					childrenHandled = el.handleChildrenMousePressed(e);
+					if (thisHandled || childrenHandled) {
+						break;
+					}
 				}
 			}
 			e.x += this.x;
 			e.y += this.y;
+			return thisHandled || childrenHandled;
 		}
+		return false;
 	}
 
-	public void handleChildrenMouseReleased(DMouseEvent e) {
+	public boolean handleChildrenMouseReleased(DMouseEvent e) {
 		if (visible) {
+			boolean thisHandled = false;
+			boolean childrenHandled = false;
 			e.x = e.x - this.x;
 			e.y = e.y - this.y;
 			for (int i = 0; i < children.size(); i++) {
 				DUIElement el = children.get(i);
 				if (el.isInside(e.x, e.y) && el.isVisible()) {
-					el.mouseReleased(e);
-					el.handleChildrenMouseReleased(e);
+					thisHandled = el.mouseReleased(e);
+					childrenHandled = el.handleChildrenMouseReleased(e);
+					if (thisHandled || childrenHandled) {
+						break;
+					}
 				}
 			}
 			e.x += this.x;
 			e.y += this.y;
+			return thisHandled || childrenHandled;
 		}
+		return false;
 	}
 
 	public void handleChildrenMouseDragged(DMouseEvent e) {

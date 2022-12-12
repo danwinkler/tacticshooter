@@ -1,8 +1,9 @@
-package com.danwink.tacticshooter;
+package com.danwink.tacticshooter.ui;
 
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
+import com.danwink.tacticshooter.UIHelper;
 import com.danwink.tacticshooter.slick.Slick2DEventMapper;
 import com.danwink.tacticshooter.slick.Slick2DRenderer;
 import com.phyloa.dlib.dui.DUI;
@@ -25,10 +26,10 @@ public abstract class DUIScreen extends DScreen<GameContainer, Graphics> impleme
     public abstract void createUIElements(DUI dui, float windowHeight);
 
     public void onActivate(GameContainer e, DScreenHandler<GameContainer, Graphics> dsh) {
-        init(e);
 
         dui = new DUI(new Slick2DEventMapper(e.getInput()), 0, 0, gc.getWidth(), gc.getHeight());
         uiScale = UIHelper.getUIScale(gc.getHeight());
+        init(e);
         createUIElements(dui, gc.getHeight());
         dui.doLayout();
         dui.setEnabled(true);

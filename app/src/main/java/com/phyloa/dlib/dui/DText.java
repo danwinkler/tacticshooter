@@ -94,16 +94,12 @@ public class DText extends DUIElement {
 
 	}
 
-	@Override
-	public void mousePressed(DMouseEvent e) {
-		// TODO Auto-generated method stub
-
+	public boolean mousePressed(DMouseEvent e) {
+		return false;
 	}
 
-	@Override
-	public void mouseReleased(DMouseEvent e) {
-		// TODO Auto-generated method stub
-
+	public boolean mouseReleased(DMouseEvent e) {
+		return false;
 	}
 
 	@Override

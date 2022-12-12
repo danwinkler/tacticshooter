@@ -14,7 +14,7 @@ public class DButton extends DUIElement {
 	public static final int PRESSED = 2;
 	public static final int MOUSE_DOWN = 0;
 	public static final int MOUSE_UP = 1;
-	int state = 0; // 0 = released, 1 = hover, 2 = pressed
+	protected int state = 0; // 0 = released, 1 = hover, 2 = pressed
 
 	String text;
 
@@ -25,6 +25,8 @@ public class DButton extends DUIElement {
 	Color hoverColor = new Color(180, 180, 255);
 	Color pressedColor = new Color(64, 64, 255);
 	Color textColor = new Color(0, 0, 0);
+
+	float imageAlpha = .25f;
 
 	public DButton(String text, int x, int y, int width, int height) {
 		super(x, y, width, height);
@@ -68,7 +70,7 @@ public class DButton extends DUIElement {
 		if (background != null) {
 
 			g.drawImage(background, 0, 0, width, height, 0, 0, background.getWidth(), background.getHeight(),
-					new org.newdawn.slick.Color(1, 1, 1, .25f));
+					new org.newdawn.slick.Color(1, 1, 1, imageAlpha));
 		}
 
 		r.color(borderColor.getRed(), borderColor.getGreen(), borderColor.getBlue(), borderColor.getAlpha());
@@ -146,23 +148,27 @@ public class DButton extends DUIElement {
 		return textColor;
 	}
 
-	public void mousePressed(DMouseEvent e) {
+	public boolean mousePressed(DMouseEvent e) {
 		if (isInside(e.x, e.y)) {
 			state = PRESSED;
 			ui.event(new DUIEvent(this, MOUSE_DOWN));
 			ui.setFocus(this);
+			return true;
 		}
+		return false;
 	}
 
 	@Override
-	public void mouseReleased(DMouseEvent e) {
+	public boolean mouseReleased(DMouseEvent e) {
 		if (isInside(e.x, e.y)) {
 			state = HOVER;
 			ui.event(new DUIEvent(this, MOUSE_UP));
 			ui.setFocus(this);
+			return true;
 		} else {
 			state = RELEASED;
 		}
+		return false;
 	}
 
 	@Override

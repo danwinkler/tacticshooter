@@ -4,8 +4,8 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
-import com.danwink.tacticshooter.DUIScreen;
 import com.danwink.tacticshooter.StaticFiles;
+import com.danwink.tacticshooter.ui.DUIScreen;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DColumnPanel;
 import com.phyloa.dlib.dui.DUI;

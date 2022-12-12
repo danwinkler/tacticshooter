@@ -11,7 +11,6 @@ import org.newdawn.slick.Graphics;
 
 import com.danwink.tacticshooter.ComputerPlayer;
 import com.danwink.tacticshooter.ComputerPlayer.PlayType;
-import com.danwink.tacticshooter.DUIScreen;
 import com.danwink.tacticshooter.MessageType;
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.UIHelper;
@@ -19,6 +18,7 @@ import com.danwink.tacticshooter.gameobjects.Level.SlotType;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.network.ClientInterface;
 import com.danwink.tacticshooter.network.Message;
+import com.danwink.tacticshooter.ui.DUIScreen;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DCheckBox;
 import com.phyloa.dlib.dui.DColumnPanel;

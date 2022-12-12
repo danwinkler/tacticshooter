@@ -64,4 +64,17 @@ public class ClientState {
 			lastWalked[ix][iy] = frame;
 		}
 	}
+
+	public void clearSelected() {
+		// Coding a bit defensively here as there's a tendency to modify these
+		// structures from different threads :/
+		// Kind of have to assume that selected and or unitMap could be modified
+		for (int i = 0; i < selected.size(); i++) {
+			var u = unitMap.get(selected.get(i));
+			if (u != null) {
+				u.selected = false;
+			}
+		}
+		selected.clear();
+	}
 }

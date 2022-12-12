@@ -148,8 +148,7 @@ public class Slick2DRenderer implements Renderer2D<Image> {
 	@Override
 	public void drawImage(Image img, float dx1, float dy1, float dx2,
 			float dy2, float sx1, float sy1, float sx2, float sy2) {
-		// TODO Auto-generated method stub
-
+		gc.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2);
 	}
 
 	@Override
