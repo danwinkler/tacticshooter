@@ -15,6 +15,7 @@ import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Unit;
 import com.danwink.tacticshooter.gameobjects.Building.BuildingType;
+import com.danwink.tacticshooter.gameobjects.Unit.UnitDef;
 import com.danwink.tacticshooter.gameobjects.Unit.UnitState;
 import com.danwink.tacticshooter.network.Message;
 import com.phyloa.dlib.math.Point2i;
@@ -28,10 +29,14 @@ public class Good3 extends ComputerPlayer {
 	HashMap<Unit, Army> unitArmyMap = new HashMap<>();
 	Building homeBase;
 
+	UnitDef scout;
+	UnitDef light;
+
 	public void update(PathFinder finder) {
 		if (la == null) {
 			la = new LevelAnalysis();
 			la.build(l, finder);
+			determineUnitTypes();
 
 			// Find Home Base
 			for (Building b : l.buildings) {
@@ -42,6 +47,12 @@ public class Good3 extends ComputerPlayer {
 			}
 		}
 		assert (homeBase != null);
+
+		if (homeBase.t.id != player.team.id) {
+			// We lost our home base, gg
+			return;
+		}
+
 		if (!battlePhase)
 			expandPhase(finder);
 		else
@@ -49,11 +60,16 @@ public class Good3 extends ComputerPlayer {
 
 	}
 
+	public void determineUnitTypes() {
+		light = AIUtils.findLightUnitLikeDef(unitDefs);
+		scout = AIUtils.findScoutLikeUnitDef(unitDefs);
+	}
+
 	// In this phase we try to expand and take every untaken point
 	public void expandPhase(PathFinder finder) {
 		// Build SCOUTS
-		if (player.money >= unitDefs.get("SCOUT").price) {
-			ci.sl.received(fc, new Message(MessageType.BUILDUNIT, "SCOUT"));
+		if (player.money >= scout.price) {
+			ci.sl.received(fc, new Message(MessageType.BUILDUNIT, scout.name));
 		}
 
 		// If any unit is not moving, send it to the closest untaken point
@@ -80,8 +96,8 @@ public class Good3 extends ComputerPlayer {
 	// This is the main game phase
 	public void battlePhase(PathFinder finder) {
 		// TODO: figure out army composition
-		if (player.money >= unitDefs.get("LIGHT").price) {
-			ci.sl.received(fc, new Message(MessageType.BUILDUNIT, "LIGHT"));
+		if (player.money >= light.price) {
+			ci.sl.received(fc, new Message(MessageType.BUILDUNIT, light.name));
 		}
 
 		// Update Armies
@@ -227,7 +243,7 @@ public class Good3 extends ComputerPlayer {
 
 				boolean randomAttack = Math.random() < 0.001f;
 
-				if (ourSize > theirSize * 2.0f || randomAttack) {
+				if (ourSize > theirSize * 2.5f || randomAttack) {
 					ci.sl.received(fc, new Message(MessageType.MESSAGE, "Full Attack"));
 					for (Building b : l.buildings) {
 						if (b.t.id != player.team.id && b.isCapturable(l)) {

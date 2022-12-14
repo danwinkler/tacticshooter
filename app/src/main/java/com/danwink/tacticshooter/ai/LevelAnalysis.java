@@ -16,6 +16,7 @@ import com.danwink.tacticshooter.gameobjects.Team;
 import com.phyloa.dlib.util.DMath;
 
 import jp.objectclub.vecmath.Point2f;
+import jp.objectclub.vecmath.Vector2f;
 
 public class LevelAnalysis {
 	int width, height;
@@ -172,6 +173,15 @@ public class LevelAnalysis {
 		// (so we dont feed)
 		pruneNeighbors(finder);
 
+		for (Zone z : zones) {
+			for (Zone oz : zones) {
+				var hit = l.hitwall(new Point2f(z.b.x, z.b.y), new Vector2f(oz.b.x, oz.b.y));
+				if (!hit) {
+					z.visible.add(oz);
+				}
+			}
+		}
+
 		l.randomFinding = true;
 	}
 
@@ -192,6 +202,7 @@ public class LevelAnalysis {
 	class Zone {
 		Color c;
 		ArrayList<Neighbor> neighbors = new ArrayList<Neighbor>();
+		ArrayList<Zone> visible = new ArrayList<Zone>();
 		Building b;
 
 		public void addNeightbor(Zone z) {
@@ -229,6 +240,12 @@ public class LevelAnalysis {
 					// g.drawString( Integer.toString( ta.side.id ), x * Level.tileSize + 5, y *
 					// Level.tileSize );
 				}
+			}
+		}
+		g.setColor(Color.black);
+		for (Zone z : zones) {
+			for (Neighbor n : z.neighbors) {
+				g.drawLine(z.b.x, z.b.y, n.z.b.x, n.z.b.y);
 			}
 		}
 	}

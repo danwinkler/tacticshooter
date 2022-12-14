@@ -12,11 +12,13 @@ import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.opengl.shader.ShaderProgram;
+import org.newdawn.slick.util.pathfinding.AStarPathFinder;
 
 import com.danwink.tacticshooter.ClientState;
 import com.danwink.tacticshooter.MessageType;
 import com.danwink.tacticshooter.MusicQueuer;
 import com.danwink.tacticshooter.StaticFiles;
+import com.danwink.tacticshooter.ai.LevelAnalysis;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Building.BuildingType;
 import com.danwink.tacticshooter.gameobjects.Bullet;
@@ -114,6 +116,9 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 	public DButton[][] buttonSlots = new DButton[3][3];
 
 	int lastMouseX, lastMouseY;
+
+	LevelAnalysis levelAnalysis;
+	boolean showLevelAnalysis = false;
 
 	public void init(GameContainer gc) {
 		input = gc.getInput();
@@ -333,14 +338,14 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 			float scrollSpeed = 20;
 			Rectangle screenBounds = getScreenBounds();
 
-			boolean scrollup = cs.camera.y > screenBounds.getMinY() && (input.isKeyDown(Input.KEY_UP)
+			boolean scrollup = cs.camera.y > 0 && (input.isKeyDown(Input.KEY_UP)
 					|| (gc.isFullscreen() && input.getMouseY() < 10));
-			boolean scrolldown = cs.camera.y + gc.getHeight() < screenBounds.getMaxY()
+			boolean scrolldown = cs.camera.y < cs.l.height * Level.tileSize
 					&& (input.isKeyDown(Input.KEY_DOWN)
 							|| (gc.isFullscreen() && input.getMouseY() > gc.getHeight() - 10));
-			boolean scrollleft = cs.camera.x > screenBounds.getMinX() && (input.isKeyDown(Input.KEY_LEFT)
+			boolean scrollleft = cs.camera.x > 0 && (input.isKeyDown(Input.KEY_LEFT)
 					|| (gc.isFullscreen() && input.getMouseX() < 10));
-			boolean scrollright = cs.camera.x + gc.getWidth() < screenBounds.getMaxX()
+			boolean scrollright = cs.camera.x < cs.l.width * Level.tileSize
 					&& (input.isKeyDown(Input.KEY_RIGHT)
 							|| (gc.isFullscreen() && input.getMouseX() > gc.getWidth() - 10));
 
@@ -475,6 +480,11 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 		gameRenderer.render(g, cs, gc, fogEnabled);
 
 		cs.camera.start(gc, g);
+
+		if (showLevelAnalysis) {
+			levelAnalysis.render(g);
+		}
+
 		if (selecting) {
 			g.setColor(Color.blue);
 			float x1 = Math.min(sx, sx2);
@@ -858,6 +868,13 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 				// Trigger recalc of selected units display
 				dui.doLayout();
 			}
+		} else if (e.keyCode == KeyEvent.VK_F8) {
+			if (levelAnalysis == null) {
+				levelAnalysis = new LevelAnalysis();
+				levelAnalysis.build(cs.l, new AStarPathFinder(cs.l, 500, StaticFiles.options.getB("diagonalMove")));
+			}
+
+			showLevelAnalysis = !showLevelAnalysis;
 		} else {
 			DButton b = null;
 			switch (e.keyCode) {
