@@ -4,7 +4,7 @@ import org.newdawn.slick.Font;
 
 public class UIHelper {
     public static int getUIScale(float height) {
-        if (height < 1300) {
+        if (height < 1400) {
             return 1;
         } else if (height < 2000) {
             return 2;

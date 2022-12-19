@@ -23,6 +23,8 @@ import com.danwink.tacticshooter.screens.PostGameScreen;
 import com.danwink.tacticshooter.screens.ServerConnectScreen;
 import com.danwink.tacticshooter.screens.SettingsScreen;
 import com.danwink.tacticshooter.screens.dev.DevMenu;
+import com.danwink.tacticshooter.screens.dev.SDImageParseScreen;
+import com.danwink.tacticshooter.screens.dev.SDLevelGenScreen;
 import com.danwink.tacticshooter.screens.dev.SpriteEditor;
 import com.phyloa.dlib.game.DScreenHandler;
 
@@ -63,6 +65,8 @@ public class TacticClient extends BasicGame {
 		// Dev screens
 		dsh.register("devmenu", new DevMenu());
 		dsh.register("spriteeditor", new SpriteEditor());
+		dsh.register("sdlevelgen", new SDLevelGenScreen());
+		dsh.register("sdimageparse", new SDImageParseScreen());
 
 		gc.setMusicVolume(StaticFiles.options.getF("slider.music"));
 		gc.setSoundVolume(StaticFiles.options.getF("slider.sound"));

@@ -15,6 +15,7 @@ import com.phyloa.dlib.dui.RelativePosition;
 
 public class DevMenu extends DUIScreen {
     DButton spriteEditor;
+    DButton sdLevelGen;
     DButton back;
 
     @Override
@@ -31,6 +32,9 @@ public class DevMenu extends DUIScreen {
         spriteEditor = new DButton("Sprite Editor", 0, 0, 200 * uiScale, 100 * uiScale);
         buttonpanel.add(spriteEditor);
 
+        sdLevelGen = new DButton("SD Level Gen", 0, 0, 200 * uiScale, 100 * uiScale);
+        buttonpanel.add(sdLevelGen);
+
         back = new DButton("Back", 0, 0, 200 * uiScale, 100 * uiScale);
         buttonpanel.add(back);
 
@@ -45,6 +49,8 @@ public class DevMenu extends DUIScreen {
                 dsh.activate("home", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn());
             } else if (e == spriteEditor) {
                 dsh.activate("spriteeditor", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
+            } else if (e == sdLevelGen) {
+                dsh.activate("sdlevelgen", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
             }
         }
     }

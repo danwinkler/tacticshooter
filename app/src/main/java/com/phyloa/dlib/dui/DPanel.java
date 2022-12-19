@@ -10,7 +10,6 @@ public class DPanel extends DUIElement {
 
 	public DPanel(int x, int y, int width, int height) {
 		super(x, y, width, height);
-
 	}
 
 	public void render(Renderer2D r) {

@@ -57,6 +57,8 @@ public class GameRenderer {
 
 	ConcurrentLinkedDeque<Unit> unitsToKill = new ConcurrentLinkedDeque<>();
 
+	Image saveBuffer;
+
 	public GameRenderer() {
 		outsideFloor = new OutsideFloorRenderer();
 		floor = new FloorRenderer();
@@ -112,6 +114,50 @@ public class GameRenderer {
 			fog.render(g, cs);
 
 		cs.camera.end(g);
+	}
+
+	public Image renderToTexture(int width, int height, ClientState cs, GameContainer gc) {
+		if (saveBuffer == null) {
+			try {
+				saveBuffer = new Image(cs.l.width * Level.tileSize, cs.l.height * Level.tileSize);
+			} catch (SlickException e) {
+				// TODO Auto-generated catch block
+				throw new RuntimeException(e);
+			}
+		}
+
+		Image im;
+		Graphics ig = null;
+		Graphics g = null;
+		try {
+			im = new Image(width, height);
+			ig = im.getGraphics();
+			ig.setAntiAlias(false);
+			g = saveBuffer.getGraphics();
+			g.setAntiAlias(false);
+		} catch (SlickException e) {
+			throw new RuntimeException(e);
+		}
+
+		g.clear();
+		g.clearAlphaMap();
+
+		floor.render(g, cs);
+		footprint.render(g, cs);
+		bloodExplosion.render(g, cs, unitBody);
+		building.render(g, cs, false);
+		wall.render(g, cs);
+		renderMarkers(g, cs);
+		unitBody.render(g, cs);
+		bullet.render(g, cs);
+		particle.render(g);
+
+		g.flush();
+
+		ig.drawImage(saveBuffer, 0, 0, width, height, 0, 0, saveBuffer.getWidth(), saveBuffer.getHeight());
+		ig.flush();
+
+		return im;
 	}
 
 	public void renderEndGameMap(Graphics g, ClientState cs) {

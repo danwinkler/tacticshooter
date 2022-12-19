@@ -17,7 +17,11 @@ function pointCaptureTick(frame) {
 			}
 
 			if (!hasUnit) {
-				api.createUnit(p, "LIGHT", api.getBaseX(p), api.getBaseY(p));
+				var bx = api.getBaseX(p);
+				var by = api.getBaseY(p);
+				if (bx != -1 && by != -1) {
+					api.createUnit(p, "LIGHT", bx, by);
+				}
 			}
 		}
 

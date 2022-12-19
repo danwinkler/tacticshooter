@@ -5,6 +5,11 @@ public class DColumnPanel extends DPanel {
         super(x, y, width, height);
     }
 
+    public DColumnPanel(RelativePosition relative, int relX, int relY) {
+        super(0, 0, 0, 0);
+        this.setRelativePosition(relative, relX, relY);
+    }
+
     @Override
     protected void calcLayout(DUI dui) {
         int rootY = 0;

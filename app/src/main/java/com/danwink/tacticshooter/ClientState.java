@@ -35,6 +35,9 @@ public class ClientState {
 	public int frame = 0;
 	public int[][] lastWalked;
 
+	public ClientState() {
+	}
+
 	public ClientState(MultiplayerGameScreen mgs) {
 		this.mgs = mgs;
 	}

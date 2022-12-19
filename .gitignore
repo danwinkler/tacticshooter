@@ -165,3 +165,6 @@ pip-log.txt
 # Ignore Gradle project-specific cache directory
 .gradle
 jre/*
+
+
+screenshots/

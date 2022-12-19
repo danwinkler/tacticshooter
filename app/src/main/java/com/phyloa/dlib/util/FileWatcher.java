@@ -10,98 +10,74 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.ArrayList;
 
-public class FileWatcher
-{
+public class FileWatcher {
 	Thread t;
 	File f;
-	
+
 	ArrayList<FileWatcherListener> listeners = new ArrayList<FileWatcherListener>();
-	
-	public FileWatcher( File f )
-	{
+
+	public FileWatcher(File f) {
 		this.f = f;
 	}
-	
-	public void start()
-	{
-		t = new Thread( new FileWatcherThread( f ) );
+
+	public void start() {
+		t = new Thread(new FileWatcherThread(f));
 		t.start();
 	}
-	
-	public void addListener( FileWatcherListener fwl )
-	{
-		listeners.add( fwl );
+
+	public void addListener(FileWatcherListener fwl) {
+		listeners.add(fwl);
 	}
-	
-	public class FileWatcherThread implements Runnable
-	{
+
+	public class FileWatcherThread implements Runnable {
 		WatchService watcher;
 		Path path;
 		WatchKey regKey;
 		boolean terminate = false;
-		
-		public FileWatcherThread( File f )
-		{
+
+		public FileWatcherThread(File f) {
 			path = f.toPath().getParent();
-			try
-			{
+			try {
 				watcher = FileSystems.getDefault().newWatchService();
-				regKey = path.register( watcher, StandardWatchEventKinds.ENTRY_MODIFY );
-			}
-			catch( IOException e )
-			{
+				regKey = path.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
+			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
-		
-		public void run()
-		{
-			while( !terminate )
-			{
+
+		public void run() {
+			while (!terminate) {
 				WatchKey key;
-                try
-				{
+				try {
 					key = watcher.take();
+				} catch (InterruptedException e) {
+					break;
 				}
-				catch( InterruptedException e )
-				{
-					 break;
-				}
-                for( WatchEvent<?> event: key.pollEvents() ) 
-                {
-                    WatchEvent.Kind<?> kind = event.kind();
-                    
-                    System.out.println( kind );
-                    
-                    if( kind == StandardWatchEventKinds.OVERFLOW ) 
-                    {
-                        continue;
-                    }
-                    
-					try
-					{
-						for( int i = 0; i < listeners.size(); i++ )
-						{
-							listeners.get( i ).changed( f );
+				for (WatchEvent<?> event : key.pollEvents()) {
+					WatchEvent.Kind<?> kind = event.kind();
+
+					if (kind == StandardWatchEventKinds.OVERFLOW) {
+						continue;
+					}
+
+					try {
+						for (int i = 0; i < listeners.size(); i++) {
+							listeners.get(i).changed(f);
 						}
-					} 
-					catch( Exception ex )
-					{
+					} catch (Exception ex) {
 						ex.printStackTrace();
 					}
-                }
-                
-                boolean valid = key.reset();
-                if( !valid )
-                {
-                    break;
-                }
+				}
+
+				boolean valid = key.reset();
+				if (!valid) {
+					break;
+				}
 			}
 		}
 	}
-	
-	public interface FileWatcherListener
-	{
-		public void changed( File f );
+
+	public interface FileWatcherListener {
+		public void changed(File f);
 	}
 }

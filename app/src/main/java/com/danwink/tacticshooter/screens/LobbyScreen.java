@@ -324,6 +324,9 @@ public class LobbyScreen extends DUIScreen {
 					for (int i = 0; i < 16; i++) {
 						if (names[i].getText().equals("Open")) {
 							ci.sendToServer(new Message(MessageType.SETBOT, new Object[] { i, true }));
+							// ci.sendToServer(
+							// new Message(MessageType.SETPLAYTYPE, new Object[] { i,
+							// PlayType.STRATEGYTESTER }));
 						}
 					}
 				} else {

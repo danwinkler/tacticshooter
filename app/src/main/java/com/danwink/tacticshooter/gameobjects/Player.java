@@ -10,7 +10,7 @@ public class Player {
 	public int money;
 	public int respawn = 0;
 	public boolean isBot = false;
-	public ComputerPlayer.PlayType playType = ComputerPlayer.PlayType.GOOD3;
+	public ComputerPlayer.PlayType playType = ComputerPlayer.PlayType.DEFAULT;
 	public String name;
 	public int slot;
 	public boolean spectator;

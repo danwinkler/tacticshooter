@@ -34,6 +34,11 @@ public class DButton extends DUIElement {
 		this.name = text;
 	}
 
+	public DButton(String text) {
+		this.text = text;
+		this.name = text;
+	}
+
 	public void setBackground(Image background) {
 		this.background = background;
 	}

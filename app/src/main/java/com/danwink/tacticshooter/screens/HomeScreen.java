@@ -187,7 +187,6 @@ public class HomeScreen extends DUIScreen {
 
 		@Override
 		public void keyPressed(DKeyEvent dke) {
-			System.out.println(dke.keyCode);
 			lastPressedKeys.add(dke.keyCode);
 
 			if (lastPressedKeys.size() > 3) {

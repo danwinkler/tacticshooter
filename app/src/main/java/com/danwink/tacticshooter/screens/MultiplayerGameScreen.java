@@ -2,6 +2,8 @@ package com.danwink.tacticshooter.screens;
 
 import java.util.ArrayList;
 import java.awt.event.KeyEvent;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
@@ -11,6 +13,7 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.imageout.ImageOut;
 import org.newdawn.slick.opengl.shader.ShaderProgram;
 import org.newdawn.slick.util.pathfinding.AStarPathFinder;
 
@@ -599,6 +602,21 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 					red++;
 				} else {
 					green++;
+				}
+			}
+		}
+
+		boolean writeScreenFrames = false;
+		if (writeScreenFrames) {
+			if (cs.frame % 200 == 0) {
+				try {
+					Image im = gameRenderer.renderToTexture(cs.l.width * 8, cs.l.height * 8, cs, gc);
+					FileOutputStream fos = new FileOutputStream("screenshots/tmp/" + cs.frame + ".png");
+					ImageOut.write(im.getFlippedCopy(false, false), "png", fos);
+					fos.close();
+					im.destroy();
+				} catch (SlickException | IOException e) {
+					throw new RuntimeException(e);
 				}
 			}
 		}

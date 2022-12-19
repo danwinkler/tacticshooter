@@ -425,7 +425,7 @@ public class Level implements TileBasedMap {
 
 	public static class SlotOption {
 		public SlotType st = SlotType.ANY;
-		public PlayType bt = PlayType.GOOD3;
+		public PlayType bt = PlayType.DEFAULT;
 
 		public SlotOption() {
 

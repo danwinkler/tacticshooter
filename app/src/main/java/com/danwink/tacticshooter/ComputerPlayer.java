@@ -221,6 +221,8 @@ public abstract class ComputerPlayer implements Runnable {
 		AGGRESSIVE(Aggressive.class),
 		PASSIVE(Passive.class);
 
+		public static PlayType DEFAULT = STRATEGYTESTER;
+
 		Class<? extends ComputerPlayer> c;
 
 		PlayType(Class<? extends ComputerPlayer> c) {
