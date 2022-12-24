@@ -787,7 +787,7 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 	}
 
 	@Override
-	public void mouseDragged(DMouseEvent e) {
+	public boolean mouseDragged(DMouseEvent e) {
 		if (e.x > gc.getWidth() - 200 && e.y > gc.getHeight() - 200 && !selecting) {
 			if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && !input.isKeyDown(Input.KEY_LCONTROL)) {
 				boolean xLarger = cs.l.width > cs.l.height;
@@ -816,6 +816,8 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 
 		lastMouseX = e.x;
 		lastMouseY = e.y;
+
+		return true;
 	}
 
 	@Override

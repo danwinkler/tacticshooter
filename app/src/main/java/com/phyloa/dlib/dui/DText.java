@@ -35,7 +35,11 @@ public class DText extends DUIElement {
 		}
 		r.color(ui.theme.borderColor);
 		Vector2f size = r.getStringSize(text);
-		r.text(text, x - (centered ? size.x / 2 : 0), y);
+		if (centered) {
+			r.text(text, x + width / 2 - size.x / 2, y + height / 2 - size.y / 2);
+		} else {
+			r.text(text, x, y);
+		}
 	}
 
 	public void update(DUI ui) {
@@ -109,9 +113,8 @@ public class DText extends DUIElement {
 	}
 
 	@Override
-	public void mouseDragged(DMouseEvent e) {
-		// TODO Auto-generated method stub
-
+	public boolean mouseDragged(DMouseEvent e) {
+		return false;
 	}
 
 	@Override

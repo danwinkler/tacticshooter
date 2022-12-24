@@ -1,6 +1,10 @@
 package com.phyloa.dlib.dui;
 
 public class DColumnPanel extends DPanel {
+    public DColumnPanel() {
+        super(0, 0, 0, 0);
+    }
+
     public DColumnPanel(int x, int y, int width, int height) {
         super(x, y, width, height);
     }

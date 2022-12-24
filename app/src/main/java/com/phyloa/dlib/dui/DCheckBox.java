@@ -47,8 +47,8 @@ public class DCheckBox extends DUIElement {
 
 	}
 
-	public void mouseDragged(DMouseEvent e) {
-
+	public boolean mouseDragged(DMouseEvent e) {
+		return true;
 	}
 
 	public void mouseWheel(DMouseEvent dme) {

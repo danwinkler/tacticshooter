@@ -3,7 +3,6 @@ package com.danwink.tacticshooter;
 import java.io.File;
 
 import org.lwjgl.openal.OpenALException;
-import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.Font;
@@ -26,6 +25,7 @@ import com.danwink.tacticshooter.screens.dev.DevMenu;
 import com.danwink.tacticshooter.screens.dev.SDImageParseScreen;
 import com.danwink.tacticshooter.screens.dev.SDLevelGenScreen;
 import com.danwink.tacticshooter.screens.dev.SpriteEditor;
+import com.danwink.tacticshooter.screens.editor.EditorScreen;
 import com.phyloa.dlib.game.DScreenHandler;
 
 public class TacticClient extends BasicGame {
@@ -59,6 +59,7 @@ public class TacticClient extends BasicGame {
 		dsh.register("settings", new SettingsScreen());
 		dsh.register("options", new OptionsScreen("options.txt", "settings"));
 		dsh.register("advoptions", new OptionsScreen("data" + File.separator + "advoptions.txt", "settings"));
+		dsh.register("editor", new EditorScreen());
 
 		dsh.activate("openload", gc);
 

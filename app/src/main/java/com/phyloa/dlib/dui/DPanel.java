@@ -1,12 +1,14 @@
 package com.phyloa.dlib.dui;
 
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-
 import com.phyloa.dlib.renderer.Renderer2D;
 
 public class DPanel extends DUIElement {
 	boolean renderBackground = false;
+	boolean consumeMouseEvents = true;
+
+	public DPanel() {
+		super();
+	}
 
 	public DPanel(int x, int y, int width, int height) {
 		super(x, y, width, height);
@@ -56,13 +58,13 @@ public class DPanel extends DUIElement {
 	@Override
 	public boolean mousePressed(DMouseEvent e) {
 		// TODO Auto-generated method stub
-		return false;
+		return consumeMouseEvents;
 	}
 
 	@Override
 	public boolean mouseReleased(DMouseEvent e) {
 		// TODO Auto-generated method stub
-		return false;
+		return consumeMouseEvents;
 	}
 
 	@Override
@@ -72,9 +74,8 @@ public class DPanel extends DUIElement {
 	}
 
 	@Override
-	public void mouseDragged(DMouseEvent e) {
-		// TODO Auto-generated method stub
-
+	public boolean mouseDragged(DMouseEvent e) {
+		return consumeMouseEvents;
 	}
 
 	@Override

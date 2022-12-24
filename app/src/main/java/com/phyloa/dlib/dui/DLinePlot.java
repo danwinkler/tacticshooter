@@ -130,8 +130,8 @@ public class DLinePlot extends DUIElement {
 		calcMouseHover(e.x - x, e.y - y);
 	}
 
-	public void mouseDragged(DMouseEvent e) {
-
+	public boolean mouseDragged(DMouseEvent e) {
+		return true;
 	}
 
 	public void mouseWheel(DMouseEvent dme) {

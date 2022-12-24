@@ -15,7 +15,7 @@ public interface DMouseListener {
 
 	public void mouseMoved(DMouseEvent e);
 
-	public void mouseDragged(DMouseEvent e);
+	public boolean mouseDragged(DMouseEvent e);
 
 	public void mouseWheel(DMouseEvent dme);
 }

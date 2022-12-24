@@ -141,8 +141,8 @@ public class DDropDown extends DUIElement {
 
 	}
 
-	public void mouseDragged(DMouseEvent e) {
-
+	public boolean mouseDragged(DMouseEvent e) {
+		return true;
 	}
 
 	public void mouseWheel(DMouseEvent dme) {
@@ -225,6 +225,7 @@ public class DDropDown extends DUIElement {
 			this.visible = false;
 			ddd.expanded = false;
 			ui.event(new DUIEvent(ddd, ddd.selected));
+			ui.topPanel.setVisible(false);
 			return true;
 		}
 
@@ -236,8 +237,8 @@ public class DDropDown extends DUIElement {
 			}
 		}
 
-		public void mouseDragged(DMouseEvent e) {
-
+		public boolean mouseDragged(DMouseEvent e) {
+			return true;
 		}
 
 		public void mouseWheel(DMouseEvent dme) {

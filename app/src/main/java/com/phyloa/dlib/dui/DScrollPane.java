@@ -6,7 +6,7 @@ import com.phyloa.dlib.math.Point2i;
 
 import com.phyloa.dlib.renderer.Renderer2D;
 
-public class DScrollPane<ImageClass> extends DUIElement {
+public class DScrollPane extends DUIElement {
 	Color borderColor = new Color(32, 32, 128);
 	Color barColor = new Color(128, 128, 255);
 	int scrollx;
@@ -50,8 +50,8 @@ public class DScrollPane<ImageClass> extends DUIElement {
 
 	}
 
-	public void mouseDragged(DMouseEvent e) {
-
+	public boolean mouseDragged(DMouseEvent e) {
+		return true;
 	}
 
 	public void render(Renderer2D r) {

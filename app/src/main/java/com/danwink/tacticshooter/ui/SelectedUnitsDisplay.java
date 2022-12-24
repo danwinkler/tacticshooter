@@ -112,9 +112,8 @@ public class SelectedUnitsDisplay extends DUIElement {
     }
 
     @Override
-    public void mouseDragged(DMouseEvent e) {
-        // TODO Auto-generated method stub
-
+    public boolean mouseDragged(DMouseEvent e) {
+        return true;
     }
 
     @Override

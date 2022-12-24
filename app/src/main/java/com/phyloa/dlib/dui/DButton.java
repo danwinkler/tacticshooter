@@ -1,6 +1,8 @@
 package com.phyloa.dlib.dui;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.function.Consumer;
 
 import org.newdawn.slick.Image;
 
@@ -27,6 +29,8 @@ public class DButton extends DUIElement {
 	Color textColor = new Color(0, 0, 0);
 
 	float imageAlpha = .25f;
+
+	ArrayList<Consumer<DMouseEvent>> mouseUpListeners = new ArrayList<Consumer<DMouseEvent>>();
 
 	public DButton(String text, int x, int y, int width, int height) {
 		super(x, y, width, height);
@@ -101,6 +105,10 @@ public class DButton extends DUIElement {
 
 	}
 
+	public void onMouseUp(Consumer<DMouseEvent> c) {
+		mouseUpListeners.add(c);
+	}
+
 	public void setText(String text) {
 		this.text = text;
 	}
@@ -168,6 +176,7 @@ public class DButton extends DUIElement {
 		if (isInside(e.x, e.y)) {
 			state = HOVER;
 			ui.event(new DUIEvent(this, MOUSE_UP));
+			mouseUpListeners.forEach(c -> c.accept(e));
 			ui.setFocus(this);
 			return true;
 		} else {
@@ -177,9 +186,8 @@ public class DButton extends DUIElement {
 	}
 
 	@Override
-	public void mouseDragged(DMouseEvent e) {
-		// TODO Auto-generated method stub
-
+	public boolean mouseDragged(DMouseEvent e) {
+		return true;
 	}
 
 	@Override

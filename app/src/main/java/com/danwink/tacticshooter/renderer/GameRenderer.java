@@ -99,12 +99,12 @@ public class GameRenderer {
 
 		cs.camera.start(gc, g);
 		// Main Rendering
-		floor.render(g, cs);
+		floor.render(g, cs.l);
 		footprint.render(g, cs);
 		bloodExplosion.render(g, cs, unitBody);
-		building.render(g, cs, false);
+		building.render(g, cs.l, false);
 		// grass.render(g, cs);
-		wall.render(g, cs);
+		wall.render(g, cs.l);
 		renderMarkers(g, cs);
 		unitBody.render(g, cs);
 		bullet.render(g, cs);
@@ -142,11 +142,11 @@ public class GameRenderer {
 		g.clear();
 		g.clearAlphaMap();
 
-		floor.render(g, cs);
+		floor.render(g, cs.l);
 		footprint.render(g, cs);
 		bloodExplosion.render(g, cs, unitBody);
-		building.render(g, cs, false);
-		wall.render(g, cs);
+		building.render(g, cs.l, false);
+		wall.render(g, cs.l);
 		renderMarkers(g, cs);
 		unitBody.render(g, cs);
 		bullet.render(g, cs);
@@ -161,10 +161,10 @@ public class GameRenderer {
 	}
 
 	public void renderEndGameMap(Graphics g, ClientState cs) {
-		floor.render(g, cs);
+		floor.render(g, cs.l);
 		bloodExplosion.render(g, cs, unitBody);
-		building.render(g, cs, true);
-		wall.render(g, cs);
+		building.render(g, cs.l, true);
+		wall.render(g, cs.l);
 	}
 
 	public void killUnit(Unit u) {
@@ -362,6 +362,6 @@ public class GameRenderer {
 	}
 
 	public void updateWalls(ClientState cs) {
-		wall.renderWalls(cs);
+		wall.redrawLevel(cs.l);
 	}
 }

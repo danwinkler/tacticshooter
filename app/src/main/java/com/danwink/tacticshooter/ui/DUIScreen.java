@@ -26,7 +26,6 @@ public abstract class DUIScreen extends DScreen<GameContainer, Graphics> impleme
     public abstract void createUIElements(DUI dui, float windowHeight);
 
     public void onActivate(GameContainer e, DScreenHandler<GameContainer, Graphics> dsh) {
-
         dui = new DUI(new Slick2DEventMapper(e.getInput()), 0, 0, gc.getWidth(), gc.getHeight());
         uiScale = UIHelper.getUIScale(gc.getHeight());
         init(e);

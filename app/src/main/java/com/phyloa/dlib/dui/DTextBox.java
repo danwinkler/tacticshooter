@@ -179,11 +179,11 @@ public class DTextBox extends DUIElement implements KeyListener {
 	}
 
 	public boolean mousePressed(DMouseEvent e) {
-		return false;
+		return true;
 	}
 
 	public boolean mouseReleased(DMouseEvent e) {
-		return false;
+		return true;
 	}
 
 	@Override
@@ -193,9 +193,8 @@ public class DTextBox extends DUIElement implements KeyListener {
 	}
 
 	@Override
-	public void mouseDragged(DMouseEvent e) {
-		// TODO Auto-generated method stub
-
+	public boolean mouseDragged(DMouseEvent e) {
+		return true;
 	}
 
 	@Override

@@ -152,7 +152,11 @@ public class HomeScreen extends DUIScreen {
 			} else if (e == exit) {
 				gc.exit();
 			} else if (e == editor) {
-				openEditor = true;
+				if (gc.getInput().isKeyDown(Input.KEY_LCONTROL)) {
+					openEditor = true;
+				} else {
+					dsh.activate("editor", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
+				}
 			}
 	}
 
@@ -241,9 +245,8 @@ public class HomeScreen extends DUIScreen {
 		}
 
 		@Override
-		public void mouseDragged(DMouseEvent e) {
-			// TODO Auto-generated method stub
-
+		public boolean mouseDragged(DMouseEvent e) {
+			return true;
 		}
 
 		@Override

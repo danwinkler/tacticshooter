@@ -77,9 +77,8 @@ public class DDialog extends DPanel implements DUIListener {
 	}
 
 	@Override
-	public void mouseDragged(DMouseEvent e) {
-		// TODO Auto-generated method stub
-
+	public boolean mouseDragged(DMouseEvent e) {
+		return true;
 	}
 
 	@Override

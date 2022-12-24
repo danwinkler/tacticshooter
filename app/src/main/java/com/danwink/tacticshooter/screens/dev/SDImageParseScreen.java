@@ -112,8 +112,8 @@ public class SDImageParseScreen extends DUIScreen {
             g.drawImage(levelImage, gc.getWidth() / 2, gc.getHeight() / 2 - levelImage.getHeight() / 2);
         }
         if (intermediate != null) {
-            g.drawImage(intermediate, gc.getWidth() / 2 + intermediate.getWidth(),
-                    gc.getHeight() / 2 - intermediate.getHeight() / 2);
+            g.drawImage(intermediate, gc.getWidth() / 2 - intermediate.getWidth(),
+                    gc.getHeight() / 2 + intermediate.getHeight() / 2);
         }
     }
 
@@ -128,10 +128,12 @@ public class SDImageParseScreen extends DUIScreen {
                 e.printStackTrace();
             }
         } else if (event.getElement() == generate) {
-            try {
-                genLevel();
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (event.getType() == DButton.MOUSE_UP) {
+                try {
+                    genLevel();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -204,9 +206,17 @@ public class SDImageParseScreen extends DUIScreen {
         for (int x = 0; x < image.getWidth(); x++) {
             for (int y = 0; y < image.getHeight(); y++) {
                 Color c = image.getColor(x, y);
-                float r = c.r > .75f ? 1 : c.r < .25f ? 0 : 0.5f;
-                float g = c.g > .75f ? 1 : c.g < .25f ? 0 : 0.5f;
-                float b = c.b > .75f ? 1 : c.b < .25f ? 0 : 0.5f;
+                float r = c.r > .5f ? 1.f : 0.f;
+                float g = c.g > .5f ? 1.f : 0.f;
+                float b = c.b > .5f ? 1.f : 0.f;
+
+                float gray = (r + g + b) / 3.f;
+
+                if (gray > .4f && gray < .6f) {
+                    r = 0.5f;
+                    g = 0.5f;
+                    b = 0.5f;
+                }
 
                 ig.setColor(new Color(r, g, b));
                 ig.fillRect(x + offsetX, y + offsetY, 1, 1);
@@ -279,6 +289,8 @@ public class SDImageParseScreen extends DUIScreen {
             } else if (blob.color.equals(Color.red)) {
                 bt = BuildingType.CENTER;
             }
+
+            System.out.println(blob.color + " " + bt);
 
             if (bt != null) {
                 int tx = (int) (((blob.pos.x + offsetX) / tileScaleX));
@@ -385,7 +397,7 @@ public class SDImageParseScreen extends DUIScreen {
         }
 
         GameRenderer gr = new GameRenderer();
-        levelImage = gr.renderToTexture(512, 512, cs, gc);
+        levelImage = gr.renderToTexture(1024, 1024, cs, gc);
     }
 
     public boolean tileIsMostlyColor(Image im, Color color, int x, int y, float tileScaleX, float tileScaleY) {
@@ -448,7 +460,6 @@ public class SDImageParseScreen extends DUIScreen {
                     if (checked.contains(p2)) {
                         continue;
                     }
-                    checked.add(p2);
 
                     if (p2.x < 0 || p2.x >= image.getWidth() || p2.y < 0 || p2.y >= image.getHeight()) {
                         continue;
@@ -459,6 +470,8 @@ public class SDImageParseScreen extends DUIScreen {
                     if (!c.equals(c2)) {
                         continue;
                     }
+
+                    checked.add(p2);
 
                     count++;
 
@@ -473,7 +486,7 @@ public class SDImageParseScreen extends DUIScreen {
                     q.add(new Point2i(p2.x, p2.y + 1));
                 }
 
-                if (count < 100) {
+                if (count < 50) {
                     continue;
                 }
 

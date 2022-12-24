@@ -58,8 +58,9 @@ public class DSlider extends DUIElement {
 	}
 
 	@Override
-	public void mouseDragged(DMouseEvent e) {
+	public boolean mouseDragged(DMouseEvent e) {
 		setPositionFromMouse(e.x);
+		return true;
 	}
 
 	@Override

@@ -1,6 +1,10 @@
 package com.phyloa.dlib.dui;
 
 public class DRowPanel extends DPanel {
+    public DRowPanel() {
+        super();
+    }
+
     public DRowPanel(int x, int y, int width, int height) {
         super(x, y, width, height);
     }

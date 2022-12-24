@@ -20,7 +20,7 @@ public class DUI implements DMouseListener, DKeyListener {
 	// Top panel is for things like dropdown menus, which need to overlay over all
 	// other elements breifly, and one at a time
 	DUIElement topPanelOwner = rootPane;
-	DUIElement topPanel = new DPanel(0, 0, 0, 0);
+	DPanel topPanel = new DPanel(0, 0, 0, 0);
 
 	boolean enabled = true;
 
@@ -31,24 +31,32 @@ public class DUI implements DMouseListener, DKeyListener {
 		dem.addDKeyListener(this);
 		dem.addDMouseListener(this);
 		rootPane.ui = this;
+		topPanel.ui = this;
 		topPanel.visible = false;
 	}
 
 	public DUI(DEventMapper dem, int x, int y, int width, int height) {
 		this(dem);
-		rootPane = new DPanel(x, y, width, height);
-		rootPane.ui = this;
+		rootPane.setLocation(x, y);
+		rootPane.setSize(width, height);
+		topPanel.setLocation(x, y);
+		topPanel.setSize(width, height);
+		topPanel.consumeMouseEvents = true;
 	}
 
-	public void setTopPanel(DUIElement owner, DUIElement topPanel) {
-		topPanelOwner.losingTopPanel(this.topPanel);
+	public void setTopPanel(DUIElement owner, DUIElement topPanelChild) {
+		topPanelOwner.losingTopPanel(topPanel);
 		topPanelOwner = owner;
-		this.topPanel = topPanel;
-		topPanel.setUI(this);
+		topPanel.clearChildren();
+		topPanel.add(topPanelChild);
+		topPanelChild.setUI(this);
+		topPanel.setVisible(true);
+		topPanel.doLayout(this);
 	}
 
 	public void doLayout() {
 		rootPane.doLayout(this);
+		topPanel.doLayout(this);
 	}
 
 	public void update() {
@@ -189,8 +197,13 @@ public class DUI implements DMouseListener, DKeyListener {
 		boolean handled = false;
 		if (enabled) {
 			if (topPanel.visible && topPanel.isInside(e.x, e.y)) {
-				handled |= topPanel.mouseReleased(e);
-				handled |= topPanel.handleChildrenMouseReleased(e);
+				var topPanelHandled = topPanel.mouseReleased(e);
+				var topPanelChildrenHandled = topPanel.handleChildrenMouseReleased(e);
+				if (topPanelHandled && !topPanelChildrenHandled) {
+					topPanel.visible = false;
+				} else {
+					handled |= topPanelChildrenHandled;
+				}
 			} else {
 				handled |= rootPane.mouseReleased(e);
 				handled |= rootPane.handleChildrenMouseReleased(e);
@@ -238,22 +251,28 @@ public class DUI implements DMouseListener, DKeyListener {
 	}
 
 	@Override
-	public void mouseDragged(DMouseEvent e) {
+	public boolean mouseDragged(DMouseEvent e) {
+		boolean handled = false;
 		if (enabled) {
 			if (topPanel.visible && topPanel.isInside(e.x, e.y)) {
-				topPanel.mouseDragged(e);
-				topPanel.handleChildrenMouseDragged(e);
+				handled |= topPanel.mouseDragged(e);
+				handled |= topPanel.handleChildrenMouseDragged(e);
 			} else {
-				rootPane.mouseDragged(e);
-				rootPane.handleChildrenMouseDragged(e);
+				handled |= rootPane.mouseDragged(e);
+				handled |= rootPane.handleChildrenMouseDragged(e);
 			}
 
 			if (dialogs.size() > 0) {
 				DDialog d = dialogs.get(dialogs.size() - 1);
-				d.handleChildrenMouseDragged(e);
+				handled |= d.handleChildrenMouseDragged(e);
 			}
 		}
-		passThroughMouseListeners.forEach(l -> l.mouseDragged(e));
+
+		if (!handled) {
+			passThroughMouseListeners.forEach(l -> l.mouseDragged(e));
+		}
+
+		return handled;
 	}
 
 	public void setEnabled(boolean enabled) {
@@ -273,8 +292,13 @@ public class DUI implements DMouseListener, DKeyListener {
 	@Override
 	public void mouseWheel(DMouseEvent dme) {
 		if (enabled) {
-			rootPane.mouseWheel(dme);
-			rootPane.handleChildrenMouseWheel(dme);
+			if (topPanel.isVisible()) {
+				topPanel.mouseWheel(dme);
+				topPanel.handleChildrenMouseWheel(dme);
+			} else {
+				rootPane.mouseWheel(dme);
+				rootPane.handleChildrenMouseWheel(dme);
+			}
 		}
 
 		if (dialogs.size() > 0) {
@@ -292,5 +316,9 @@ public class DUI implements DMouseListener, DKeyListener {
 	public void resize(int width, int height) {
 		rootPane.setSize(width, height);
 		topPanel.setSize(width, height);
+	}
+
+	public void hideTopPanel() {
+		topPanel.visible = false;
 	}
 }
