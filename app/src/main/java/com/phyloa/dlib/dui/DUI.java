@@ -15,7 +15,7 @@ public class DUI implements DMouseListener, DKeyListener {
 
 	DUIElement focus = null;
 	DUIElement hover = null;
-	public DUIElement rootPane = new DPanel(0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE);
+	public DPanel rootPane = new DPanel(0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE);
 
 	// Top panel is for things like dropdown menus, which need to overlay over all
 	// other elements breifly, and one at a time

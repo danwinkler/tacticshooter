@@ -203,7 +203,7 @@ public abstract class DUIElement implements DKeyListener, DMouseListener {
 			for (int i = 0; i < children.size(); i++) {
 				DUIElement el = children.get(i);
 				boolean inside = el.isInside(e.x, e.y);
-				if (inside || el.isInside && el.isVisible()) {
+				if ((inside || el.isInside) && el.isVisible()) {
 					el.isInside = inside;
 					thisHandled = el.mouseDragged(e);
 					childrenHandled = el.handleChildrenMouseDragged(e);

@@ -4,7 +4,7 @@ import com.phyloa.dlib.renderer.Renderer2D;
 
 public class DPanel extends DUIElement {
 	boolean renderBackground = false;
-	boolean consumeMouseEvents = true;
+	public boolean consumeMouseEvents = true;
 
 	public DPanel() {
 		super();

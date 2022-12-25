@@ -91,13 +91,6 @@ public class LevelFileHelper {
 			m.ums = ums.getText();
 		}
 
-		// Set theme
-		try {
-			m.theme = Theme.getTheme("desertrpg");
-		} catch (SlickException e) {
-			e.printStackTrace();
-		}
-
 		return m;
 	}
 

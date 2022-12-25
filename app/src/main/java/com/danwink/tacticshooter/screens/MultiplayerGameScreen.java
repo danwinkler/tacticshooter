@@ -131,6 +131,7 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 			battleGroups[i] = new ArrayList<Integer>();
 		}
 
+		dui.rootPane.consumeMouseEvents = false;
 		dui.addPassthroughKeyListener(this);
 		dui.addPassthroughMouseListener(this);
 

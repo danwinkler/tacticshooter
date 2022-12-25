@@ -8,7 +8,7 @@ import com.danwink.tacticshooter.ClientState;
 import com.danwink.tacticshooter.gameobjects.Level;
 
 public class FloorRenderer {
-	Image texture;
+	public Image texture;
 
 	public void render(Graphics g, Level l) {
 		if (texture == null) {

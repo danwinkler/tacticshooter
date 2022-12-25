@@ -2,12 +2,12 @@ package com.danwink.tacticshooter.screens.editor;
 
 import java.awt.Color;
 import java.io.File;
+import java.io.IOException;
 
 import org.dom4j.DocumentException;
 import org.newdawn.slick.Image;
 
 import com.danwink.tacticshooter.LevelFileHelper;
-import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.screens.editor.EditorScreen.LevelElement;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DColumnPanel;
@@ -77,6 +77,7 @@ public class FilePane extends DColumnPanel {
             if (f != null && f.isFile()) {
                 try {
                     levelElement.setLevel(LevelFileHelper.loadLevel(f));
+                    levelElement.mapName = f.getName().replace(".xml", "");
                 } catch (DocumentException e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
@@ -92,6 +93,33 @@ public class FilePane extends DColumnPanel {
         openPaneButtonRow.add(openPaneCancelButton);
         openPane.add(openPaneButtonRow);
 
+        // Save Pane - shows up when you click save
+        var savePane = new DColumnPanel();
+        savePane.setRelativePosition(RelativePosition.CENTER, 0, 0);
+        savePane.setDrawBackground(true);
+        savePane.addSpacer(10 * uiScale);
+        var savePaneLevelName = new LabeledTextBox("Name:", 100 * uiScale, 200 * uiScale, 50 * uiScale);
+        savePane.add(savePaneLevelName);
+        savePane.addSpacer(10 * uiScale);
+        var savePaneButtonRow = new DRowPanel();
+        var savePaneSaveButton = new DButton("Save", 0, 0, 75 * uiScale, 50 * uiScale);
+        savePaneSaveButton.onMouseUp(e -> {
+            try {
+                LevelFileHelper.saveLevel(savePaneLevelName.getText(), levelElement.level);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            ui.hideTopPanel();
+        });
+        savePaneButtonRow.add(savePaneSaveButton);
+        var savePaneCancelButton = new DButton("Cancel", 0, 0, 75 * uiScale, 50 * uiScale);
+        savePaneCancelButton.onMouseUp(e -> {
+            ui.hideTopPanel();
+        });
+        savePaneButtonRow.add(savePaneCancelButton);
+        savePane.add(savePaneButtonRow);
+        savePane.addSpacer(10 * uiScale);
+
         var newButton = new DButton("New", 0, 0, 150 * uiScale, 50 * uiScale);
         newButton.onMouseUp(e -> {
             ui.setTopPanel(this, newPane);
@@ -103,6 +131,13 @@ public class FilePane extends DColumnPanel {
             ui.setTopPanel(this, openPane);
         });
         add(openButton);
+
+        var saveButton = new DButton("Save", 0, 0, 150 * uiScale, 50 * uiScale);
+        saveButton.onMouseUp(e -> {
+            savePaneLevelName.setText(levelElement.mapName);
+            ui.setTopPanel(this, savePane);
+        });
+        add(saveButton);
     }
 
     public class LabeledTextBox extends DRowPanel {

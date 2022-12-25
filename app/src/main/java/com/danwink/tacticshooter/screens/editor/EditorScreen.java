@@ -1,13 +1,17 @@
 package com.danwink.tacticshooter.screens.editor;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
+import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
+import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 
+import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.Theme;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Level;
@@ -19,6 +23,7 @@ import com.danwink.tacticshooter.renderer.FloorRenderer;
 import com.danwink.tacticshooter.renderer.WallRenderer;
 import com.danwink.tacticshooter.slick.Slick2DCamera;
 import com.danwink.tacticshooter.ui.DUIScreen;
+import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DKeyEvent;
 import com.phyloa.dlib.dui.DMouseEvent;
 import com.phyloa.dlib.dui.DUI;
@@ -52,6 +57,13 @@ public class EditorScreen extends DUIScreen {
         filePane.setRelativePosition(RelativePosition.TOP_LEFT, 0, 0);
         dui.add(filePane);
 
+        var exitButton = new DButton("Exit", 0, 0, 150 * uiScale, 50 * uiScale);
+        exitButton.setRelativePosition(RelativePosition.BOTTOM_LEFT, 0, 0);
+        exitButton.onMouseUp(e -> {
+            dsh.activate("home", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn());
+        });
+        dui.add(exitButton);
+
         dui.add(levelElement);
     }
 
@@ -68,6 +80,7 @@ public class EditorScreen extends DUIScreen {
     }
 
     public class LevelElement extends DUIElement {
+        String mapName;
         Level level;
 
         Slick2DCamera camera;
@@ -91,18 +104,24 @@ public class EditorScreen extends DUIScreen {
         public void setLevel(Level level) {
             this.level = level;
 
+            try {
+                level.theme = Theme.getTheme("desertrpg");
+            } catch (SlickException e) {
+                e.printStackTrace();
+            }
+
             camera.x = level.width * Level.tileSize / 2;
             camera.y = level.height * Level.tileSize / 2;
+
+            // Reset textures if they are already present
+            wall.texture = null;
+            floor.texture = null;
         }
 
         public void newLevel(int width, int height) {
             var l = new Level(width, height);
-            try {
-                l.theme = Theme.getTheme("desertrpg");
-            } catch (SlickException e) {
-                e.printStackTrace();
-            }
             setLevel(l);
+            mapName = "";
         }
 
         @Override
@@ -120,6 +139,11 @@ public class EditorScreen extends DUIScreen {
             wall.render(g, level);
             building.render(g, level, false);
 
+            mirrorType.mirror.getPoints(level, x, y).stream()
+                    .flatMap(p -> brushType.brush.getPoints(level, p.x, p.y).stream())
+                    .forEach(p -> placeType.placer.render(g));
+
+            g.setColor(Color.black);
             for (var b : level.buildings) {
                 var str = b.bt.name();
                 if (str != null) {
@@ -138,18 +162,18 @@ public class EditorScreen extends DUIScreen {
 
         }
 
-        public void place(int x, int y) {
-            if (level == null) {
-                return;
-            }
+        // public void place(int x, int y) {
+        // if (level == null) {
+        // return;
+        // }
 
-            mirrorType.mirror.getPoints(level, x, y).stream()
-                    .flatMap(p -> brushType.brush.getPoints(level, p.x, p.y).stream())
-                    .forEach(p -> placeType.placer.place(level, p.x, p.y));
+        // mirrorType.mirror.getPoints(level, x, y).stream()
+        // .flatMap(p -> brushType.brush.getPoints(level, p.x, p.y).stream())
+        // .forEach(p -> placeType.placer.place(level, p.x, p.y));
 
-            floor.redrawLevel(level);
-            wall.redrawLevel(level);
-        }
+        // floor.redrawLevel(level);
+        // wall.redrawLevel(level);
+        // }
 
         @Override
         public void keyPressed(DKeyEvent dke) {
@@ -186,7 +210,9 @@ public class EditorScreen extends DUIScreen {
 
             if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
                 if (tx >= 0 && tx < level.width && ty >= 0 && ty < level.height) {
-                    place(tx, ty);
+                    mirrorType.mirror.getPoints(level, tx, ty).stream()
+                            .flatMap(p -> brushType.brush.getPoints(level, p.x, p.y).stream())
+                            .forEach(p -> placeType.placer.mouseDown(this, p.x, p.y));
                 }
             }
 
@@ -197,8 +223,23 @@ public class EditorScreen extends DUIScreen {
 
         @Override
         public boolean mouseReleased(DMouseEvent e) {
-            // TODO Auto-generated method stub
-            return false;
+            if (level == null) {
+                return false;
+            }
+
+            var world = camera.screenToWorld(e.x, e.y, gc);
+            int tx = (int) world.x / Level.tileSize;
+            int ty = (int) world.y / Level.tileSize;
+
+            if (e.button == Input.MOUSE_LEFT_BUTTON) {
+                if (tx >= 0 && tx < level.width && ty >= 0 && ty < level.height) {
+                    mirrorType.mirror.getPoints(level, tx, ty).stream()
+                            .flatMap(p -> brushType.brush.getPoints(level, p.x, p.y).stream())
+                            .forEach(p -> placeType.placer.mouseUp(this, p.x, p.y));
+                }
+            }
+
+            return true;
         }
 
         @Override
@@ -219,7 +260,9 @@ public class EditorScreen extends DUIScreen {
 
             if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
                 if (tx >= 0 && tx < level.width && ty >= 0 && ty < level.height) {
-                    place(tx, ty);
+                    mirrorType.mirror.getPoints(level, tx, ty).stream()
+                            .flatMap(p -> brushType.brush.getPoints(level, p.x, p.y).stream())
+                            .forEach(p -> placeType.placer.mouseDragged(this, p.x, p.y));
                 }
             } else if (input.isMouseButtonDown(Input.MOUSE_MIDDLE_BUTTON)) {
                 camera.x += (lastMouseX - e.x) / camera.zoom;
@@ -255,8 +298,121 @@ public class EditorScreen extends DUIScreen {
         }
     }
 
+    @Override
+    public void onResize(int width, int height) {
+        super.onResize(width, height);
+
+        levelElement.setSize(width, height);
+    }
+
     public interface Placer {
-        public void place(Level l, int x, int y);
+        public void mouseDown(LevelElement l, int x, int y);
+
+        public default void mouseUp(LevelElement l, int x, int y) {
+        };
+
+        public default void mouseDragged(LevelElement l, int x, int y) {
+
+        };
+
+        public default void render(Graphics g) {
+
+        }
+    }
+
+    public static class TilePlacer implements Placer {
+        private TileType tile;
+
+        public HashSet<Point2i> points = new HashSet<>();
+
+        public TilePlacer(TileType tile) {
+            this.tile = tile;
+        }
+
+        @Override
+        public void mouseDown(LevelElement l, int x, int y) {
+            points.add(new Point2i(x, y));
+        }
+
+        @Override
+        public void mouseUp(LevelElement l, int x, int y) {
+            points.forEach(p -> l.level.setTile(p.x, p.y, tile));
+            points.clear();
+
+            l.floor.redrawLevel(l.level);
+            l.wall.redrawLevel(l.level);
+        }
+
+        @Override
+        public void mouseDragged(LevelElement l, int x, int y) {
+            points.add(new Point2i(x, y));
+        }
+
+        @Override
+        public void render(Graphics g) {
+            points.forEach(p -> {
+                g.setColor(Color.red);
+                g.drawRect(p.x * Level.tileSize, p.y * Level.tileSize, Level.tileSize, Level.tileSize);
+            });
+        }
+    }
+
+    public static class BuildingPlacer implements Placer {
+        private BuildingType building;
+
+        public BuildingPlacer(BuildingType building) {
+            this.building = building;
+        }
+
+        @Override
+        public void mouseDown(LevelElement l, int x, int y) {
+            int wx = x * Level.tileSize + Level.tileSize / 2;
+            int wy = y * Level.tileSize + Level.tileSize / 2;
+
+            for (Building b : l.level.buildings) {
+                if (b.x == wx && b.y == wy) {
+                    return;
+                }
+            }
+
+            Building b = new Building(wx, wy, building, null);
+            l.level.buildings.add(b);
+        }
+    }
+
+    public static class EraserPlacer extends TilePlacer {
+        public EraserPlacer() {
+            super(TileType.FLOOR);
+        }
+
+        @Override
+        public void mouseDown(LevelElement l, int x, int y) {
+            super.mouseDown(l, x, y);
+
+            eraseBuildings(l, x, y);
+        }
+
+        @Override
+        public void mouseUp(LevelElement l, int x, int y) {
+            super.mouseUp(l, x, y);
+        }
+
+        @Override
+        public void mouseDragged(LevelElement l, int x, int y) {
+            super.mouseDragged(l, x, y);
+
+            eraseBuildings(l, x, y);
+        }
+
+        public void eraseBuildings(LevelElement l, int x, int y) {
+            for (int i = 0; i < l.level.buildings.size(); i++) {
+                Building b = l.level.buildings.get(i);
+                if (b.x / Level.tileSize == x && b.y / Level.tileSize == y) {
+                    l.level.buildings.remove(i);
+                    i--;
+                }
+            }
+        }
     }
 
     public interface Brush {
@@ -268,22 +424,14 @@ public class EditorScreen extends DUIScreen {
     }
 
     public enum PlaceType {
-        FLOOR((l, x, y) -> l.setTile(x, y, TileType.FLOOR)),
-        WALL((l, x, y) -> l.setTile(x, y, TileType.WALL)),
-        GRATE((l, x, y) -> l.setTile(x, y, TileType.GRATE)),
-        CENTER((l, x, y) -> {
-            Building b = new Building(x * Level.tileSize + Level.tileSize / 2,
-                    y * Level.tileSize + Level.tileSize / 2, BuildingType.CENTER, null);
-            l.buildings.add(b);
-        }),
-        POINT((l, x, y) -> {
-            Building b = new Building(x * Level.tileSize + Level.tileSize / 2,
-                    y * Level.tileSize + Level.tileSize / 2, BuildingType.POINT, null);
-            l.buildings.add(b);
-        }),
+        FLOOR(new TilePlacer(TileType.FLOOR)),
+        WALL(new TilePlacer(TileType.WALL)),
+        GRATE(new TilePlacer(TileType.GRATE)),
+        CENTER(new BuildingPlacer(BuildingType.CENTER)),
+        POINT(new BuildingPlacer(BuildingType.POINT)),
         TOGGLETEAM((l, x, y) -> {
-            for (int i = 0; i < l.buildings.size(); i++) {
-                Building b = l.buildings.get(i);
+            for (int i = 0; i < l.level.buildings.size(); i++) {
+                Building b = l.level.buildings.get(i);
                 if (b.x / Level.tileSize == x && b.y / Level.tileSize == y) {
                     if (b.t == Team.a) {
                         b.t = Team.b;
@@ -298,16 +446,7 @@ public class EditorScreen extends DUIScreen {
                 }
             }
         }),
-        ERASER((l, x, y) -> {
-            l.setTile(x, y, TileType.FLOOR);
-            for (int i = 0; i < l.buildings.size(); i++) {
-                Building b = l.buildings.get(i);
-                if (b.x / Level.tileSize == x && b.y / Level.tileSize == y) {
-                    l.buildings.remove(i);
-                    i--;
-                }
-            }
-        });
+        ERASER(new EraserPlacer());
 
         Placer placer;
 
