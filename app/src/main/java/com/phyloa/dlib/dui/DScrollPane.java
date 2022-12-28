@@ -7,6 +7,8 @@ import com.phyloa.dlib.math.Point2i;
 import com.phyloa.dlib.renderer.Renderer2D;
 
 public class DScrollPane extends DUIElement {
+	public boolean renderBackground = true;
+
 	Color borderColor = new Color(32, 32, 128);
 	Color barColor = new Color(128, 128, 255);
 	int scrollx;
@@ -57,15 +59,19 @@ public class DScrollPane extends DUIElement {
 	public void render(Renderer2D r) {
 		r.pushMatrix();
 		r.translate(x, y);
-		r.color(ui.theme.backgroundColor);
-		r.fillRect(0, 0, width, height);
+		if (renderBackground) {
+			r.color(ui.theme.backgroundColor);
+			r.fillRect(0, 0, width, height);
+		}
 		r.color(barColor);
 		r.fillRect(width - 10, 0, 10, height);
 		r.color(borderColor);
 		float barsize = Math.min(Math.max((height / (float) innerPaneHeight) * height, 20), height);
 		r.fillRect(width - 10, scrolly / (float) (innerPaneHeight) * height, 10, barsize);
 
-		r.drawRect(0, 0, width, height);
+		if (renderBackground) {
+			r.drawRect(0, 0, width, height);
+		}
 		r.popMatrix();
 	}
 
@@ -99,7 +105,7 @@ public class DScrollPane extends DUIElement {
 			for (int i = 0; i < children.size(); i++) {
 				DUIElement el = children.get(i);
 				boolean inside = el.isInside(e.x, e.y);
-				if (inside || el.isInside) {
+				if ((inside || el.isInside) && el.visible) {
 					el.isInside = inside;
 					el.mouseMoved(e);
 					el.handleChildrenMouseMoved(e);

@@ -22,7 +22,7 @@ import com.phyloa.dlib.math.Point2i;
 
 import jp.objectclub.vecmath.Point2f;
 
-public class StrategyTester extends ComputerPlayer {
+public class DecentAI extends ComputerPlayer {
     LevelAnalysis la;
     boolean battlePhase = false;
     ArrayList<Army> armies = new ArrayList<>();

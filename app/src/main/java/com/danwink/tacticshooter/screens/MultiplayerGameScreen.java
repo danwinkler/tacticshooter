@@ -139,7 +139,6 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 		int musicChoice = DMath.randomi(1, 3);
 		while ((music = StaticFiles.getMusic("play" + musicChoice)) == null) {
 		}
-		;
 		music.play();
 		music.addListener(new MusicQueuer(DMath.randomi(0, 2), "play1", "play2", "play3"));
 
@@ -654,9 +653,8 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 		}
 
 		if (found) {
-			Rectangle screenBounds = getScreenBounds();
-			cs.camera.x = DMath.bound(destX, screenBounds.getMinX(), screenBounds.getMaxX());
-			cs.camera.y = DMath.bound(destY, screenBounds.getMinY(), screenBounds.getMaxY());
+			cs.camera.x = destX;
+			cs.camera.y = destY;
 		}
 	}
 

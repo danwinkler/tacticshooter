@@ -2,7 +2,10 @@ package com.danwink.tacticshooter.screens.editor;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.awt.event.KeyEvent;
+import java.io.IOException;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
@@ -11,6 +14,8 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 
+import com.danwink.tacticshooter.KryoHelper;
+import com.danwink.tacticshooter.LevelFileHelper;
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.Theme;
 import com.danwink.tacticshooter.gameobjects.Building;
@@ -23,6 +28,8 @@ import com.danwink.tacticshooter.renderer.FloorRenderer;
 import com.danwink.tacticshooter.renderer.WallRenderer;
 import com.danwink.tacticshooter.slick.Slick2DCamera;
 import com.danwink.tacticshooter.ui.DUIScreen;
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Output;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DKeyEvent;
 import com.phyloa.dlib.dui.DMouseEvent;
@@ -36,6 +43,8 @@ import com.phyloa.dlib.renderer.Renderer2D;
 public class EditorScreen extends DUIScreen {
 
     LevelElement levelElement;
+    MessagePane messagePane;
+    FilePane filePane;
 
     Input input;
 
@@ -43,6 +52,7 @@ public class EditorScreen extends DUIScreen {
     public void init(GameContainer gc) {
         input = gc.getInput();
         levelElement = new LevelElement();
+        messagePane = new MessagePane(0, 0, 0, 0);
     }
 
     @Override
@@ -53,7 +63,7 @@ public class EditorScreen extends DUIScreen {
         toolPane.setRelativePosition(RelativePosition.TOP_RIGHT, 0, 0);
         dui.add(toolPane);
 
-        var filePane = new FilePane(levelElement, uiScale, dui);
+        filePane = new FilePane(levelElement, uiScale, dui);
         filePane.setRelativePosition(RelativePosition.TOP_LEFT, 0, 0);
         dui.add(filePane);
 
@@ -63,6 +73,11 @@ public class EditorScreen extends DUIScreen {
             dsh.activate("home", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn());
         });
         dui.add(exitButton);
+
+        messagePane.setRelativePosition(RelativePosition.BOTTOM_RIGHT, 0, 0);
+        messagePane.setSize(400 * uiScale, 160 * uiScale);
+        messagePane.renderBackground = false;
+        dui.add(messagePane);
 
         dui.add(levelElement);
     }
@@ -94,11 +109,17 @@ public class EditorScreen extends DUIScreen {
 
         int lastMouseX, lastMouseY;
 
+        Kryo kryo;
+        LinkedList<byte[]> undoStack = new LinkedList<byte[]>();
+
         public LevelElement() {
             camera = new Slick2DCamera();
             floor = new FloorRenderer();
             wall = new WallRenderer();
             building = new BuildingRenderer();
+
+            kryo = new Kryo();
+            KryoHelper.register(kryo);
         }
 
         public void setLevel(Level level) {
@@ -116,6 +137,9 @@ public class EditorScreen extends DUIScreen {
             // Reset textures if they are already present
             wall.texture = null;
             floor.texture = null;
+
+            undoStack.clear();
+            pushUndoState();
         }
 
         public void newLevel(int width, int height) {
@@ -156,28 +180,55 @@ public class EditorScreen extends DUIScreen {
             camera.end(g);
         }
 
+        public void pushUndoState() {
+            Output output = new Output(1024, -1);
+            kryo.writeObject(output, this.level);
+            undoStack.push(output.toBytes());
+        }
+
+        public void undo() {
+            if (undoStack.size() > 1) {
+                undoStack.pop();
+                var input = new com.esotericsoftware.kryo.io.Input(undoStack.peek());
+                var l = kryo.readObject(input, Level.class);
+                l.theme = level.theme;
+                level = l;
+
+                floor.redrawLevel(level);
+                wall.redrawLevel(level);
+            }
+        }
+
         @Override
         public void update(DUI ui) {
             // TODO Auto-generated method stub
 
         }
 
-        // public void place(int x, int y) {
-        // if (level == null) {
-        // return;
-        // }
-
-        // mirrorType.mirror.getPoints(level, x, y).stream()
-        // .flatMap(p -> brushType.brush.getPoints(level, p.x, p.y).stream())
-        // .forEach(p -> placeType.placer.place(level, p.x, p.y));
-
-        // floor.redrawLevel(level);
-        // wall.redrawLevel(level);
-        // }
-
         @Override
         public void keyPressed(DKeyEvent dke) {
-
+            switch (dke.keyCode) {
+                case KeyEvent.VK_Z:
+                    if (level != null && input.isKeyDown(Input.KEY_LCONTROL)) {
+                        undo();
+                    }
+                    break;
+                case KeyEvent.VK_S:
+                    if (level != null && input.isKeyDown(Input.KEY_LCONTROL)) {
+                        if (mapName != null && !mapName.isEmpty()) {
+                            try {
+                                LevelFileHelper.saveLevel(mapName, level);
+                                messagePane.addMessage("Saved as " + mapName);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                messagePane.addMessage("Error saving map: " + e.getMessage());
+                            }
+                        } else {
+                            filePane.openSaveMenu();
+                        }
+                    }
+                    break;
+            }
         }
 
         @Override
@@ -236,6 +287,8 @@ public class EditorScreen extends DUIScreen {
                     mirrorType.mirror.getPoints(level, tx, ty).stream()
                             .flatMap(p -> brushType.brush.getPoints(level, p.x, p.y).stream())
                             .forEach(p -> placeType.placer.mouseUp(this, p.x, p.y));
+
+                    pushUndoState();
                 }
             }
 
@@ -277,6 +330,12 @@ public class EditorScreen extends DUIScreen {
         @Override
         public void mouseWheel(DMouseEvent e) {
             if (level == null) {
+                return;
+            }
+
+            // This is a hack because DUI currently doesn't let mouseWheel return whether or
+            // not the event was consumed
+            if (messagePane.isInside) {
                 return;
             }
 
@@ -446,6 +505,7 @@ public class EditorScreen extends DUIScreen {
                 }
             }
         }),
+
         ERASER(new EraserPlacer());
 
         Placer placer;
@@ -475,6 +535,7 @@ public class EditorScreen extends DUIScreen {
             points.add(new Point2i(x, y));
             return points;
         }),
+
         X((l, x, y) -> {
             List<Point2i> points = new ArrayList<>();
             points.add(new Point2i(x, y));

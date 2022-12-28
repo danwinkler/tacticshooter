@@ -32,7 +32,7 @@ public class Level implements TileBasedMap {
 
 	public String themeName = "desertrpg";
 
-	public Theme theme;
+	public transient Theme theme;
 
 	public String code;
 	public String ums;
@@ -425,7 +425,7 @@ public class Level implements TileBasedMap {
 
 	public static class SlotOption {
 		public SlotType st = SlotType.ANY;
-		public PlayType bt = PlayType.DEFAULT;
+		public PlayType bt = null;
 
 		public SlotOption() {
 

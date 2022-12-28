@@ -130,21 +130,21 @@
     <building x="2090" y="470" bt="POINT" team="null" id="-1465576695" radius="50.0" name=""/>
   </buildings>
   <slots>
-    <slot s="ANY" b="STRATEGYTESTER"/>
-    <slot s="ANY" b="STRATEGYTESTER"/>
-    <slot s="ANY" b="STRATEGYTESTER"/>
-    <slot s="ANY" b="STRATEGYTESTER"/>
-    <slot s="ANY" b="STRATEGYTESTER"/>
-    <slot s="ANY" b="STRATEGYTESTER"/>
-    <slot s="ANY" b="STRATEGYTESTER"/>
-    <slot s="ANY" b="STRATEGYTESTER"/>
-    <slot s="ANY" b="STRATEGYTESTER"/>
-    <slot s="ANY" b="STRATEGYTESTER"/>
-    <slot s="ANY" b="STRATEGYTESTER"/>
-    <slot s="ANY" b="STRATEGYTESTER"/>
-    <slot s="ANY" b="STRATEGYTESTER"/>
-    <slot s="ANY" b="STRATEGYTESTER"/>
-    <slot s="ANY" b="STRATEGYTESTER"/>
-    <slot s="ANY" b="STRATEGYTESTER"/>
+    <slot s="ANY" b=""/>
+    <slot s="ANY" b=""/>
+    <slot s="ANY" b=""/>
+    <slot s="ANY" b=""/>
+    <slot s="ANY" b=""/>
+    <slot s="ANY" b=""/>
+    <slot s="ANY" b=""/>
+    <slot s="ANY" b=""/>
+    <slot s="ANY" b=""/>
+    <slot s="ANY" b=""/>
+    <slot s="ANY" b=""/>
+    <slot s="ANY" b=""/>
+    <slot s="ANY" b=""/>
+    <slot s="ANY" b=""/>
+    <slot s="ANY" b=""/>
+    <slot s="ANY" b=""/>
   </slots>
 </level>

@@ -24,8 +24,14 @@ import com.phyloa.dlib.dui.RelativePosition;
 import com.phyloa.dlib.renderer.Renderer2D;
 
 public class FilePane extends DColumnPanel {
+    DColumnPanel savePane;
+    LabeledTextBox savePaneLevelName;
+    private LevelElement levelElement;
+
     public FilePane(LevelElement levelElement, int uiScale, DUI dui) {
         super();
+        this.levelElement = levelElement;
+
         // New Pane - shows up when you click new
         var newPane = new DColumnPanel();
         newPane.setRelativePosition(RelativePosition.CENTER, 0, 0);
@@ -94,11 +100,11 @@ public class FilePane extends DColumnPanel {
         openPane.add(openPaneButtonRow);
 
         // Save Pane - shows up when you click save
-        var savePane = new DColumnPanel();
+        savePane = new DColumnPanel();
         savePane.setRelativePosition(RelativePosition.CENTER, 0, 0);
         savePane.setDrawBackground(true);
         savePane.addSpacer(10 * uiScale);
-        var savePaneLevelName = new LabeledTextBox("Name:", 100 * uiScale, 200 * uiScale, 50 * uiScale);
+        savePaneLevelName = new LabeledTextBox("Name:", 100 * uiScale, 200 * uiScale, 50 * uiScale);
         savePane.add(savePaneLevelName);
         savePane.addSpacer(10 * uiScale);
         var savePaneButtonRow = new DRowPanel();
@@ -106,6 +112,7 @@ public class FilePane extends DColumnPanel {
         savePaneSaveButton.onMouseUp(e -> {
             try {
                 LevelFileHelper.saveLevel(savePaneLevelName.getText(), levelElement.level);
+                levelElement.mapName = savePaneLevelName.getText();
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
@@ -134,10 +141,14 @@ public class FilePane extends DColumnPanel {
 
         var saveButton = new DButton("Save", 0, 0, 150 * uiScale, 50 * uiScale);
         saveButton.onMouseUp(e -> {
-            savePaneLevelName.setText(levelElement.mapName);
-            ui.setTopPanel(this, savePane);
+            openSaveMenu();
         });
         add(saveButton);
+    }
+
+    public void openSaveMenu() {
+        savePaneLevelName.setText(levelElement.mapName);
+        ui.setTopPanel(this, savePane);
     }
 
     public class LabeledTextBox extends DRowPanel {

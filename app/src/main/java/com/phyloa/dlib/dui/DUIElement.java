@@ -22,7 +22,11 @@ public abstract class DUIElement implements DKeyListener, DMouseListener {
 
 	DUIElement parent;
 
-	boolean isInside = false;
+	// This isn't very well named, but basically is whether or not the last mouse
+	// movement event was inside this element
+	// as such we can fire off one last mouse move event for elements when the mouse
+	// moves outside of them
+	public boolean isInside = false;
 
 	public DUIElement() {
 	}
@@ -136,7 +140,7 @@ public abstract class DUIElement implements DKeyListener, DMouseListener {
 			for (int i = 0; i < children.size(); i++) {
 				DUIElement el = children.get(i);
 				boolean inside = el.isInside(e.x, e.y);
-				if (inside || el.isInside && el.isVisible()) {
+				if ((inside || el.isInside) && el.isVisible()) {
 					el.isInside = inside;
 					el.mouseMoved(e);
 					el.handleChildrenMouseMoved(e);

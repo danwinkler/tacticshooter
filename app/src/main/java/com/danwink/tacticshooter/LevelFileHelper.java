@@ -76,7 +76,10 @@ public class LevelFileHelper {
 			for (int i = 0; i < slots.size(); i++) {
 				Node n = slots.get(i);
 				m.slotOptions[i].st = SlotType.valueOf(n.valueOf("@s"));
-				m.slotOptions[i].bt = ComputerPlayer.PlayType.valueOf(n.valueOf("@b"));
+				var playTypeValue = n.valueOf("@b");
+				if (playTypeValue != null && !playTypeValue.isBlank()) {
+					m.slotOptions[i].bt = ComputerPlayer.PlayType.valueOf(playTypeValue);
+				}
 			}
 		}
 
@@ -135,7 +138,7 @@ public class LevelFileHelper {
 			SlotOption so = m.slotOptions[i];
 			Element slot = slots.addElement("slot");
 			slot.addAttribute("s", so.st.toString());
-			slot.addAttribute("b", so.bt.toString());
+			slot.addAttribute("b", so.bt != null ? so.bt.toString() : null);
 		}
 
 		// ADD code
