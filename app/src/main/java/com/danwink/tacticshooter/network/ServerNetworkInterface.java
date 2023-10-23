@@ -143,6 +143,7 @@ public class ServerNetworkInterface implements ServerInterface {
 						if (bytes < WRITE_BUFFER - OBJECT_BUFFER) {
 							if (m.message != null) {
 								synchronized (m.message) {
+									// So, sometimes we can
 									c.sendTCP(m);
 								}
 							} else {

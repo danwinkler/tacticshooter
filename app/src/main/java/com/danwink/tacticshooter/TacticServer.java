@@ -424,7 +424,8 @@ public class TacticServer {
 			js.tick(tick);
 
 			// Every 100 ticks
-			if (tick % 100 == 0) {
+			// checking for l so we don't count points if the game is over
+			if (tick % 100 == 0 && l != null) {
 
 				// Count how many units and points for each team for postgame stats
 				int apoints = 0;

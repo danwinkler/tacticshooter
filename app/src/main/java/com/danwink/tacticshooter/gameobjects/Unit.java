@@ -260,7 +260,6 @@ public class Unit {
 	public void pathTo(int tx, int ty, TacticServer ts) {
 		Level l = ts.l;
 		Path tp = ts.finder.findPath(null, l.getTileX(x), l.getTileY(y), tx, ty);
-		path.clear();
 		if (tp != null) {
 			// If we happen to modify the path while it's being serialized by kryo, we'll
 			// get a ConcurrentModificationException
@@ -268,6 +267,7 @@ public class Unit {
 			// and as the UNITUPDATE message is just a Unit,
 			// synchronizing on this here should solve the issue.
 			synchronized (this) {
+				path.clear();
 				for (int i = 0; i < tp.getLength(); i++) {
 					path.add(new Point2i(tp.getX(i), tp.getY(i)));
 				}

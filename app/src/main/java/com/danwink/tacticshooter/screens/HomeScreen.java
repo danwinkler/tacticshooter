@@ -108,7 +108,7 @@ public class HomeScreen extends DUIScreen {
 		// Pulsing message
 		g.pushTransform();
 		g.setColor(Color.white);
-		var message = "2022 Edtion!";
+		var message = "2022 Edition!";
 		var textWidth = g.getFont().getWidth(message);
 		g.translate(gc.getWidth() / 2 + title.getWidth() * .45f, gc.getHeight() / 6 + 20);
 		g.rotate(textWidth / 2, 0, 45);
