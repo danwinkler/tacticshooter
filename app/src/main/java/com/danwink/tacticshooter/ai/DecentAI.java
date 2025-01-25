@@ -80,15 +80,19 @@ public class DecentAI extends ComputerPlayer {
                 continue;
 
             if (u.state == Unit.UnitState.STOPPED) {
-                Building b = findBuildingShortestPath(new Point2f(u.x, u.y), finder, tb -> {
+                var pathsAndBuildings = findAllBuildingsWithPath(new Point2f(u.x, u.y), finder, tb -> {
                     return tb.t == null;
                 });
 
                 // If all points are taken, head to battlePhase
-                if (b == null) {
+                if (pathsAndBuildings.size() == 0) {
                     battlePhase = true;
                     return;
                 }
+
+                // Choose one of the closest untaken points at random (up to 4)
+                int i = Math.min((int) (Math.random() * pathsAndBuildings.size()), 4);
+                var b = pathsAndBuildings.get(i).b;
 
                 moveUnit(u, new Point2i(b.x / Level.tileSize, b.y / Level.tileSize));
             }

@@ -8,16 +8,21 @@ import java.util.ArrayList;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
+import org.newdawn.slick.SlickException;
 
 import com.danwink.tacticshooter.ComputerPlayer;
 import com.danwink.tacticshooter.ComputerPlayer.PlayType;
 import com.danwink.tacticshooter.MessageType;
 import com.danwink.tacticshooter.StaticFiles;
+import com.danwink.tacticshooter.Theme;
 import com.danwink.tacticshooter.UIHelper;
+import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Level.SlotType;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.network.ClientInterface;
 import com.danwink.tacticshooter.network.Message;
+import com.danwink.tacticshooter.screens.LobbyScreen.Slot;
 import com.danwink.tacticshooter.ui.DUIScreen;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DCheckBox;
@@ -46,6 +51,10 @@ public class LobbyScreen extends DUIScreen {
 	DCheckBox fog;
 	DPanel chatBackground;
 	DButton fillBots;
+
+	Theme theme;
+	Level level;
+	Image miniMap;
 
 	Slot[] slots = new Slot[16];
 
@@ -238,6 +247,11 @@ public class LobbyScreen extends DUIScreen {
 						maps.addItems(s);
 					}
 					maps.setSelected(selectedMap);
+					level = (Level) oa[2];
+					if (level != null) {
+						level.loadTextures();
+						miniMap = null;
+					}
 					break;
 				}
 				case FOGUPDATE:
@@ -272,6 +286,71 @@ public class LobbyScreen extends DUIScreen {
 			}
 		}
 		g.drawString("Server Address: " + hostname, 30, 30);
+
+		// Draw the level between the maps dropdown and the chatbackground
+		if (level != null) {
+			var mapsLoc = maps.getScreenLocation();
+			var chatLoc = chatBackground.getScreenLocation();
+
+			var lx = mapsLoc.x + maps.width + 20;
+			var ly = mapsLoc.y;
+			var boundingWidth = chatLoc.x - lx - 20;
+			var boundingHeight = chatBackground.height;
+
+			float mapWidthPx = level.width * Level.tileSize;
+			float mapHeightPx = level.height * Level.tileSize;
+
+			// Figure out which dimension "dominates" and scale accordingly
+			float mapAspect = mapWidthPx / mapHeightPx;
+			float boundingAspect = (float) boundingWidth / (float) boundingHeight;
+
+			float scale;
+			float xOffset = 0;
+			float yOffset = 0;
+
+			if (mapAspect > boundingAspect) {
+				// Map is relatively wider than the bounding area
+				// Fit to width, adjust vertical offset to center
+				scale = boundingWidth / mapWidthPx;
+				float newHeight = mapHeightPx * scale;
+				yOffset = (boundingHeight - newHeight) * 0.5f;
+			} else {
+				// Map is relatively taller (or same aspect); fit to height, adjust horizontal
+				// offset
+				scale = boundingHeight / mapHeightPx;
+				float newWidth = mapWidthPx * scale;
+				xOffset = (boundingWidth - newWidth) * 0.5f;
+			}
+
+			if (miniMap == null) {
+
+				try {
+					// Now create the image for the minimap and render
+					miniMap = new Image(level.width * Level.tileSize, level.height * Level.tileSize);
+					Graphics mg = miniMap.getGraphics();
+					mg.clearAlphaMap();
+					// mg.setDrawMode(Graphics.MODE_NORMAL);
+					mg.setColor(Color.white);
+
+					mg.fillRect(0, 0, level.width * Level.tileSize, level.height * Level.tileSize);
+
+					// Render level floor, walls, etc.
+					level.renderFloor(mg);
+					level.render(mg);
+					level.renderBuildings(mg, false);
+
+					mg.flush();
+				} catch (SlickException e) {
+					throw new RuntimeException(e);
+				}
+			}
+
+			if (miniMap != null) {
+				g.setColor(Color.white);
+				g.drawImage(miniMap, lx + xOffset, ly + yOffset, lx + xOffset + miniMap.getWidth() * scale,
+						ly + yOffset + miniMap.getHeight() * scale, 0, 0, miniMap.getWidth(), miniMap.getHeight());
+			}
+		}
 	}
 
 	public void message(Object o) {
@@ -341,6 +420,12 @@ public class LobbyScreen extends DUIScreen {
 				ci.sendToServer(new Message(MessageType.FOGUPDATE, fog.checked));
 			}
 		}
+	}
+
+	@Override
+	public void onResize(int width, int height) {
+		super.onResize(width, height);
+		miniMap = null;
 	}
 
 	public static class Slot {

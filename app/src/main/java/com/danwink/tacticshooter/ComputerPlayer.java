@@ -1,7 +1,10 @@
 package com.danwink.tacticshooter;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.util.pathfinding.AStarPathFinder;
@@ -23,6 +26,7 @@ import com.danwink.tacticshooter.network.FakeConnection;
 import com.danwink.tacticshooter.network.Message;
 import com.danwink.tacticshooter.network.ServerNetworkInterface;
 import com.phyloa.dlib.math.Point2i;
+import com.phyloa.dlib.util.Tuple;
 
 import jp.objectclub.vecmath.Point2f;
 
@@ -196,6 +200,13 @@ public abstract class ComputerPlayer implements Runnable {
 			}
 		}
 		return closeb;
+	}
+
+	public List<Tuple<Path, Building>> findAllBuildingsWithPath(Point2f p, PathFinder finder, Filter<Building> f) {
+		return l.buildings.stream().filter(f::valid).map(b -> {
+			Path path = finder.findPath(null, l.getTileX(b.x), l.getTileY(b.y), l.getTileX(p.x), l.getTileY(p.y));
+			return new Tuple<Path, Building>(path, b);
+		}).filter(t -> t.a != null).sorted(Comparator.comparing(t -> t.a.getLength())).collect(Collectors.toList());
 	}
 
 	public void moveUnit(Unit u, Point2i p) {

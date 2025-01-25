@@ -113,17 +113,7 @@ function setupDefaultButtons() {
 function setupDefaultUnits() {
 	for (var unitTypeName in defaultUnitTypes) {
 		var unit = defaultUnitTypes[unitTypeName];
-		api.createUnitDef(
-			unit.name,
-			unit.speed,
-			unit.timeBetweenBullets,
-			unit.bulletSpread,
-			unit.price,
-			unit.health,
-			unit.bulletsAtOnce,
-			unit.damage,
-			unit.explodesOnDeath
-		)
+		api.createUnitDef(unit);
 	}
 }
 

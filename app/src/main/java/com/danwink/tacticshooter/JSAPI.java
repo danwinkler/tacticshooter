@@ -282,19 +282,29 @@ public class JSAPI {
 		return -1;
 	}
 
-	public void createUnitDef(String name, float speed, int timeBetweenBullets, float bulletSpread, int price,
-			float health, int bulletsAtOnce, int damage, boolean explodesOnDeath) {
+	public float getFloat(Map<String, Object> data, String key) {
+		Object value = data.get(key);
+		if (value instanceof Integer) {
+			return (float) (int) value;
+		} else if (value instanceof Double) {
+			return (float) (double) value;
+		} else {
+			return (float) value;
+		}
+	}
+
+	public void createUnitDef(Map<String, Object> data) {
 		UnitDef ud = new UnitDef();
-		ud.name = name;
-		ud.speed = speed;
-		ud.timeBetweenBullets = timeBetweenBullets;
-		ud.bulletSpread = bulletSpread;
-		ud.price = price;
-		ud.health = health;
-		ud.bulletsAtOnce = bulletsAtOnce;
-		ud.damage = damage;
-		ud.explodesOnDeath = explodesOnDeath;
-		unitDefs.put(name, ud);
+		ud.name = (String) data.get("name");
+		ud.speed = getFloat(data, "speed");
+		ud.timeBetweenBullets = (int) data.get("timeBetweenBullets");
+		ud.bulletSpread = getFloat(data, "bulletSpread");
+		ud.price = (int) data.get("price");
+		ud.health = getFloat(data, "health");
+		ud.bulletsAtOnce = (int) data.get("bulletsAtOnce");
+		ud.damage = (int) data.get("damage");
+		ud.explodesOnDeath = (boolean) data.get("explodesOnDeath");
+		unitDefs.put(ud.name, ud);
 	}
 
 	public int createUnit(int player, String type, float x, float y) {

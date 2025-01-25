@@ -302,7 +302,7 @@ public class TacticServer {
 								}
 							}
 							si.sendToClient(m.sender,
-									new Message(MessageType.LEVELUPDATE, new Object[] { selectedMap, maps }));
+									new Message(MessageType.LEVELUPDATE, new Object[] { selectedMap, maps, l }));
 							si.sendToClient(m.sender, new Message(MessageType.FOGUPDATE, fogEnabled));
 							si.sendToAllClients(new Message(MessageType.PLAYERUPDATE,
 									new Object[] { player.slot, slots[player.slot] }));
@@ -349,9 +349,12 @@ public class TacticServer {
 					}
 					case LEVELUPDATE: {
 						selectedMap = (Integer) m.message;
-						si.sendToAllClients(new Message(MessageType.LEVELUPDATE, new Object[] { selectedMap, maps }));
+						// si.sendToAllClients(new Message(MessageType.LEVELUPDATE, new Object[] {
+						// selectedMap, maps }));
 						try {
 							l = LevelFileHelper.loadLevel(maps.get(selectedMap));
+							si.sendToAllClients(
+									new Message(MessageType.LEVELUPDATE, new Object[] { selectedMap, maps, l }));
 						} catch (DocumentException e) {
 							e.printStackTrace();
 						}
@@ -362,6 +365,11 @@ public class TacticServer {
 						if (slots[target].type.allowPlayer()) {
 							for (int i = 0; i < slots.length; i++) {
 								if (slots[i].p != null && slots[i].p.id == m.sender) {
+									if (target == i) {
+										// Doesn't make sense to switch in the same slot
+										break;
+									}
+
 									slots[target].p = slots[i].p;
 									slots[target].p.slot = target;
 									slots[i].p = null;

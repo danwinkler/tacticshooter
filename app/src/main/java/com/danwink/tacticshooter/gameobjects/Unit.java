@@ -178,7 +178,7 @@ public class Unit {
 			case TURNTO:
 				float turnAmount = DMath.turnTowards(heading, turnToAngle) * .4f;
 				heading += turnAmount;
-				if (turnAmount < .00005f) {
+				if (Math.abs(turnAmount) < .00005f) {
 					state = UnitState.STOPPED;
 				}
 				break;
@@ -272,6 +272,10 @@ public class Unit {
 					path.add(new Point2i(tp.getX(i), tp.getY(i)));
 				}
 			}
+		} else {
+			// If we don't find a path, it probably means we are already on that tile. In
+			// any case, if we have an existing path, we don't want to continue it.
+			path.clear();
 		}
 		destx = tx;
 		desty = ty;

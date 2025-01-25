@@ -231,7 +231,12 @@ public class GameRenderer {
 
 			if (u.selected) {
 				g.setColor(Color.blue);
-				g.drawRect(-10, -10, 20, 20);
+				g.pushTransform();
+				g.rotate(0, 0, (u.heading / DMath.PI2F * 360) + 45);
+				g.drawArc(-16, -16, 32, 32, 0, 270);
+				g.drawLine(0, -16, 16, -16);
+				g.drawLine(16, 0, 16, -16);
+				g.popTransform();
 			}
 
 			int healthBarDist = 0;
