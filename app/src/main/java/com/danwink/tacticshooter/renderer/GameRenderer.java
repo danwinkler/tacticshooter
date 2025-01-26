@@ -14,6 +14,8 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 
 import com.danwink.tacticshooter.ClientState;
+import com.danwink.tacticshooter.dal.DAL;
+import com.danwink.tacticshooter.dal.SlickDAL;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Bullet;
 import com.danwink.tacticshooter.gameobjects.Level;
@@ -79,7 +81,7 @@ public class GameRenderer {
 		// grass.update(cs);
 	}
 
-	public void render(Graphics g, ClientState cs, GameContainer gc, boolean fogEnabled) {
+	public void render(DAL dal, ClientState cs, boolean fogEnabled) {
 		// Sort units by y
 		Collections.sort(cs.units, (Unit a, Unit b) -> {
 			return ((int) a.y - (int) b.y);
@@ -95,16 +97,20 @@ public class GameRenderer {
 			}
 		}
 
-		outsideFloor.render(g, cs, gc);
+		var slickDAL = (SlickDAL) dal;
+		GameContainer gc = slickDAL.gc;
+		Graphics g = slickDAL.g;
+
+		outsideFloor.render(dal, cs);
 
 		cs.camera.start(gc, g);
 		// Main Rendering
-		floor.render(g, cs.l);
+		floor.render(dal, cs.l);
 		footprint.render(g, cs);
 		bloodExplosion.render(g, cs, unitBody);
 		building.render(g, cs.l, false);
 		// grass.render(g, cs);
-		wall.render(g, cs.l);
+		wall.render(dal, cs.l);
 		renderMarkers(g, cs);
 		unitBody.render(g, cs);
 		bullet.render(g, cs);
@@ -142,11 +148,13 @@ public class GameRenderer {
 		g.clear();
 		g.clearAlphaMap();
 
-		floor.render(g, cs.l);
+		DAL dal = new SlickDAL(gc, g);
+
+		floor.render(dal, cs.l);
 		footprint.render(g, cs);
 		bloodExplosion.render(g, cs, unitBody);
 		building.render(g, cs.l, false);
-		wall.render(g, cs.l);
+		wall.render(dal, cs.l);
 		renderMarkers(g, cs);
 		unitBody.render(g, cs);
 		bullet.render(g, cs);
@@ -160,11 +168,13 @@ public class GameRenderer {
 		return im;
 	}
 
-	public void renderEndGameMap(Graphics g, ClientState cs) {
-		floor.render(g, cs.l);
+	public void renderEndGameMap(DAL dal, ClientState cs) {
+		Graphics g = ((SlickDAL) dal).g;
+
+		floor.render(dal, cs.l);
 		bloodExplosion.render(g, cs, unitBody);
 		building.render(g, cs.l, true);
-		wall.render(g, cs.l);
+		wall.render(dal, cs.l);
 	}
 
 	public void killUnit(Unit u) {

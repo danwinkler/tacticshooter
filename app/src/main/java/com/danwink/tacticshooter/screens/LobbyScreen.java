@@ -13,6 +13,7 @@ import org.newdawn.slick.SlickException;
 
 import com.danwink.tacticshooter.ComputerPlayer;
 import com.danwink.tacticshooter.ComputerPlayer.PlayType;
+import com.danwink.tacticshooter.dal.SlickDAL;
 import com.danwink.tacticshooter.MessageType;
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.Theme;
@@ -334,9 +335,13 @@ public class LobbyScreen extends DUIScreen {
 
 					mg.fillRect(0, 0, level.width * Level.tileSize, level.height * Level.tileSize);
 
+					SlickDAL dal = new SlickDAL();
+					dal.gc = gc;
+					dal.g = mg;
+
 					// Render level floor, walls, etc.
-					level.renderFloor(mg);
-					level.render(mg);
+					level.renderFloor(dal.getGraphics());
+					level.render(dal.getGraphics());
 					level.renderBuildings(mg, false);
 
 					mg.flush();

@@ -6,6 +6,10 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
+import com.danwink.tacticshooter.dal.DAL;
+import com.danwink.tacticshooter.dal.DAL.DALGraphics;
+import com.danwink.tacticshooter.dal.DAL.DALTexture;
+import com.danwink.tacticshooter.dal.SlickDAL;
 import com.phyloa.dlib.util.DMath;
 import com.phyloa.dlib.util.ImprovedNoise;
 
@@ -30,7 +34,7 @@ public class BackgroundDrawer {
 		scrolly += delta * .03f;
 	}
 
-	public void render(GameContainer gc, Graphics g) {
+	public void render(DAL dal) {
 		if (theme == null) {
 			try {
 				theme = Theme.getTheme(themePath.getName());
@@ -38,6 +42,8 @@ public class BackgroundDrawer {
 				e.printStackTrace();
 			}
 		}
+
+		DALGraphics g = dal.getGraphics();
 
 		g.pushTransform();
 		g.setAntiAlias(true);
@@ -48,13 +54,14 @@ public class BackgroundDrawer {
 		int scrollxTile = (int) (scrollx / tileSize);
 		int scrollyTile = (int) (scrolly / tileSize);
 
-		for (int y = scrollyTile; y < scrollyTile + gc.getHeight() / tileSize + 3; y++) {
-			for (int x = scrollxTile; x < scrollxTile + gc.getWidth() / tileSize + 3; x++) {
+		for (int y = scrollyTile; y < scrollyTile + dal.getHeight() / tileSize + 3; y++) {
+			for (int x = scrollxTile; x < scrollxTile + dal.getWidth() / tileSize + 3; x++) {
 				g.pushTransform();
 				g.translate(x * tileSize, y * tileSize);
-				Image here = getTile(x, y);
-				if (here == theme.wall) {
-					g.drawImage(theme.floor, 0, 0, tileSize, tileSize, theme.floor.getWidth() / 3, 0,
+				DALTexture here = getTile(x, y);
+				if (here == SlickDAL.getTexture(theme.wall)) {
+					g.drawImage(SlickDAL.getTexture(theme.floor), 0, 0, tileSize, tileSize, theme.floor.getWidth() / 3,
+							0,
 							theme.floor.getWidth() / 3 * 2, theme.floor.getHeight() / 4);
 				}
 				AutoTileDrawer.draw(g, here, tileSize, 0,
@@ -73,7 +80,7 @@ public class BackgroundDrawer {
 		g.popTransform();
 	}
 
-	public Image getTile(int x, int y) {
-		return n.noise(x * .1, y * .1, 0) > .2f ? theme.wall : theme.floor;
+	public DALTexture getTile(int x, int y) {
+		return SlickDAL.getTexture(n.noise(x * .1, y * .1, 0) > .2f ? theme.wall : theme.floor);
 	}
 }

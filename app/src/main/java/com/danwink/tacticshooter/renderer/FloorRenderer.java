@@ -1,47 +1,44 @@
 package com.danwink.tacticshooter.renderer;
 
+import org.checkerframework.checker.units.qual.g;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
-import com.danwink.tacticshooter.ClientState;
+import com.danwink.tacticshooter.dal.DAL;
+import com.danwink.tacticshooter.dal.DAL.DALTexture;
 import com.danwink.tacticshooter.gameobjects.Level;
 
 public class FloorRenderer {
-	public Image texture;
+	public DALTexture texture;
 
-	public void render(Graphics g, Level l) {
+	public void render(DAL dal, Level l) {
 		if (texture == null) {
 			if (l != null) {
-				generateTexture(l);
+				generateTexture(dal, l);
 			} else {
 				return;
 			}
 		}
 
+		var g = dal.getGraphics();
+
 		g.drawImage(texture, 0, 0);
 	}
 
-	private void generateTexture(Level l) {
-		try {
-			texture = new Image(l.width * Level.tileSize, l.height * Level.tileSize);
-			var g = texture.getGraphics();
+	private void generateTexture(DAL dal, Level l) {
+		texture = dal.generateRenderableTexture(l.width * Level.tileSize, l.height * Level.tileSize);
+		texture.renderTo(g -> {
 			g.setAntiAlias(false);
 			l.renderFloor(g);
-		} catch (SlickException e) {
-			e.printStackTrace();
-		}
+		});
 	}
 
 	public void redrawLevel(Level l) {
-		try {
-			var g = texture.getGraphics();
+		texture.renderTo(g -> {
 			g.clear();
-			g.clearAlphaMap();
 			l.renderFloor(g);
 			g.flush();
-		} catch (SlickException e) {
-			e.printStackTrace();
-		}
+		});
 	}
 }

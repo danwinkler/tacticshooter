@@ -13,6 +13,7 @@ import org.newdawn.slick.imageout.ImageOut;
 
 import com.danwink.tacticshooter.GameStats;
 import com.danwink.tacticshooter.GameStats.TeamStats;
+import com.danwink.tacticshooter.dal.SlickDAL.SlickTexture;
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.slick.Slick2DEventMapper;
 import com.danwink.tacticshooter.slick.Slick2DRenderer;
@@ -170,7 +171,8 @@ public class PostGameScreen extends DUIScreen {
 				Graphics emg = endMap.getGraphics();
 				MultiplayerGameScreen mgs = ((MultiplayerGameScreen) dsh.get("multiplayergame"));
 				endMap.getGraphics().drawImage(mgs.gameRenderer.bloodExplosion.texture, 0, 0);
-				endMap.getGraphics().drawImage(mgs.gameRenderer.wall.texture, 0, 0);
+				var wallImage = ((SlickTexture) mgs.gameRenderer.wall.texture).image;
+				endMap.getGraphics().drawImage(wallImage, 0, 0);
 			} catch (SlickException e) {
 				e.printStackTrace();
 			}

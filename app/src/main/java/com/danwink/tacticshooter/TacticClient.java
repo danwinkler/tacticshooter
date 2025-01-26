@@ -10,6 +10,8 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
 
+import com.danwink.tacticshooter.dal.DAL;
+import com.danwink.tacticshooter.dal.SlickDAL;
 import com.danwink.tacticshooter.editor.Editor;
 import com.danwink.tacticshooter.screens.HomeScreen;
 import com.danwink.tacticshooter.screens.LobbyScreen;
@@ -35,6 +37,8 @@ public class TacticClient extends BasicGame {
 
 	int lastWindowWidth = 0;
 	int lastWindowHeight = 0;
+
+	DAL dal;
 
 	public TacticClient() {
 		super("Tactic Shooter Client");
@@ -85,6 +89,10 @@ public class TacticClient extends BasicGame {
 	}
 
 	public void render(GameContainer gc, Graphics g) throws SlickException {
+		if (dal == null) {
+			dal = new SlickDAL(gc, g);
+		}
+
 		if (lastWindowWidth != gc.getWidth() || lastWindowHeight != gc.getHeight()) {
 			lastWindowWidth = gc.getWidth();
 			lastWindowHeight = gc.getHeight();
@@ -97,7 +105,7 @@ public class TacticClient extends BasicGame {
 
 		// Render background if not in a game
 		if (!(dsh.get() instanceof MultiplayerGameScreen)) {
-			StaticFiles.bgd.render(gc, g);
+			StaticFiles.bgd.render(dal);
 		}
 
 		dsh.render(gc, g);

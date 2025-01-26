@@ -15,6 +15,8 @@ import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.Theme;
 import com.danwink.tacticshooter.ai.LevelAnalysis.Neighbor;
 import com.danwink.tacticshooter.ai.LevelAnalysis.Zone;
+import com.danwink.tacticshooter.dal.DAL;
+import com.danwink.tacticshooter.dal.SlickDAL;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Level;
 
@@ -61,8 +63,10 @@ public class MapPartitionTest extends BasicGame {
 		g.scale((float) gc.getWidth() / (l.width * Level.tileSize),
 				(float) gc.getHeight() / (l.height * Level.tileSize));
 
-		l.renderFloor(g);
-		l.render(g);
+		DAL dal = new SlickDAL(gc, g);
+
+		l.renderFloor(dal.getGraphics());
+		l.render(dal.getGraphics());
 		l.renderBuildings(g, false);
 
 		la.render(g);

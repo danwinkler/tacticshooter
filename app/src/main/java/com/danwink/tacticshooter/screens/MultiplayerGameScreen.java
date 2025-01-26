@@ -22,6 +22,8 @@ import com.danwink.tacticshooter.MessageType;
 import com.danwink.tacticshooter.MusicQueuer;
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.ai.LevelAnalysis;
+import com.danwink.tacticshooter.dal.DAL;
+import com.danwink.tacticshooter.dal.SlickDAL;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Building.BuildingType;
 import com.danwink.tacticshooter.gameobjects.Bullet;
@@ -123,7 +125,11 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 	LevelAnalysis levelAnalysis;
 	boolean showLevelAnalysis = false;
 
+	SlickDAL dal;
+
 	public void init(GameContainer gc) {
+		dal = new SlickDAL();
+		dal.gc = gc;
 		input = gc.getInput();
 		initializeUIElements(dui);
 
@@ -421,8 +427,11 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 				Graphics mg = miniMap.getGraphics();
 				mg.translate(xOffset, yOffset);
 				mg.scale(scale, scale);
-				cs.l.renderFloor(mg);
-				cs.l.render(mg);
+
+				DAL dal = new SlickDAL(gc, mg);
+
+				cs.l.renderFloor(dal.getGraphics());
+				cs.l.render(dal.getGraphics());
 				mg.flush();
 
 			} catch (SlickException e) {
@@ -442,6 +451,10 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 
 		if (cs.l == null) {
 			return;
+		}
+
+		if (dal.g != g) {
+			dal.g = g;
 		}
 
 		// TODO: faster way to know when game is over, but server hasn't yet send
@@ -467,7 +480,12 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 					endMap = new Image(cs.l.width * Level.tileSize, cs.l.height * Level.tileSize);
 					Graphics emg = endMap.getGraphics();
 					emg.setAntiAlias(true);
-					gameRenderer.renderEndGameMap(emg, cs);
+
+					SlickDAL emgDAL = new SlickDAL();
+					emgDAL.gc = gc;
+					emgDAL.g = emg;
+
+					gameRenderer.renderEndGameMap(emgDAL, cs);
 				} catch (SlickException e) {
 					e.printStackTrace();
 				}
@@ -480,7 +498,7 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 			mapChanged = false;
 		}
 
-		gameRenderer.render(g, cs, gc, fogEnabled);
+		gameRenderer.render(dal, cs, fogEnabled);
 
 		cs.camera.start(gc, g);
 

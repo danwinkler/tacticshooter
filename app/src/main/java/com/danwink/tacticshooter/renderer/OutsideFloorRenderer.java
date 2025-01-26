@@ -1,24 +1,22 @@
 package com.danwink.tacticshooter.renderer;
 
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
-import org.newdawn.slick.SlickException;
-
 import com.danwink.tacticshooter.ClientState;
+import com.danwink.tacticshooter.dal.DAL;
+import com.danwink.tacticshooter.dal.DAL.DALTexture;
+import com.danwink.tacticshooter.dal.SlickDAL;
 import com.danwink.tacticshooter.gameobjects.Level;
 
 public class OutsideFloorRenderer {
-	Image texture;
+	DALTexture texture;
 
 	int lastScreenWidth, lastScreenHeight;
 
-	public void render(Graphics g, ClientState cs, GameContainer gc) {
-		if (texture == null || lastScreenWidth != gc.getWidth() || lastScreenHeight != gc.getHeight()) {
+	public void render(DAL dal, ClientState cs) {
+		if (texture == null || lastScreenWidth != dal.getWidth() || lastScreenHeight != dal.getHeight()) {
 			if (cs.l != null) {
-				generateTexture(cs, gc);
-				lastScreenWidth = gc.getWidth();
-				lastScreenHeight = gc.getHeight();
+				generateTexture(dal, cs);
+				lastScreenWidth = dal.getWidth();
+				lastScreenHeight = dal.getHeight();
 			} else {
 				return;
 			}
@@ -27,19 +25,19 @@ public class OutsideFloorRenderer {
 		// TODO: this isn't going to work anymore with zoom
 		float x = -Level.tileSize - (cs.camera.x - ((int) (cs.camera.x / Level.tileSize)) * Level.tileSize);
 		float y = -Level.tileSize - (cs.camera.y - ((int) (cs.camera.y / Level.tileSize) * Level.tileSize));
+		var g = dal.getGraphics();
 		g.drawImage(texture, x, y);
 	}
 
-	private void generateTexture(ClientState cs, GameContainer gc) {
-		try {
-			texture = new Image(gc.getWidth() + Level.tileSize * 2, gc.getHeight() + Level.tileSize * 2);
+	private void generateTexture(DAL dal, ClientState cs) {
+		texture = dal.generateRenderableTexture(dal.getWidth() + Level.tileSize * 2,
+				dal.getHeight() + Level.tileSize * 2);
 
-			Graphics bgg = texture.getGraphics();
-			for (int y = 0; y < gc.getHeight() + Level.tileSize * 2; y += Level.tileSize) {
-				for (int x = 0; x < gc.getWidth() + Level.tileSize * 2; x += Level.tileSize) {
-					bgg.pushTransform();
-					bgg.drawImage(
-							cs.l.theme.floor,
+		texture.renderTo(g -> {
+			for (int y = 0; y < dal.getHeight() + Level.tileSize * 2; y += Level.tileSize) {
+				for (int x = 0; x < dal.getWidth() + Level.tileSize * 2; x += Level.tileSize) {
+					g.drawImage(
+							SlickDAL.getTexture(cs.l.theme.floor),
 							x,
 							y,
 							x + Level.tileSize,
@@ -48,11 +46,8 @@ public class OutsideFloorRenderer {
 							0,
 							cs.l.theme.floor.getWidth() / 3 * 2,
 							cs.l.theme.floor.getHeight() / 4);
-					bgg.popTransform();
 				}
 			}
-		} catch (SlickException e) {
-			e.printStackTrace();
-		}
+		});
 	}
 }

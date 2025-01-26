@@ -1,61 +1,60 @@
 package com.danwink.tacticshooter.renderer;
 
-import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
-import org.newdawn.slick.SlickException;
-
 import com.danwink.tacticshooter.AutoTileDrawer;
-import com.danwink.tacticshooter.ClientState;
+import com.danwink.tacticshooter.dal.DAL;
+import com.danwink.tacticshooter.dal.DAL.DALGraphics;
+import com.danwink.tacticshooter.dal.DAL.DALTexture;
+import com.danwink.tacticshooter.dal.SlickDAL;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Level.TileType;
 
 public class WallRenderer {
-	public Image texture;
+	public DALTexture texture;
 
-	public void render(Graphics g, Level l) {
+	public void render(DAL dal, Level l) {
 		if (texture == null) {
 			if (l != null) {
-				generateTexture(l);
+				generateTexture(dal, l);
 			} else {
 				return;
 			}
 		}
+		var g = dal.getGraphics();
 		g.drawImage(texture, 0, 0);
 	}
 
 	public void redrawLevel(Level l) {
 		if (texture == null)
 			return;
-		try {
-			// Figure out lower wall stuff
-			RWTile[][] rt = new RWTile[l.width][l.height];
-			for (int y = 0; y < l.height; y++) {
-				for (int x = 0; x < l.width; x++) {
-					if (l.getTile(x, y) == TileType.WALL) {
-						if (l.getTile(x, y + 1) != TileType.WALL) {
-							TileType left = l.getTile(x - 1, y);
-							TileType right = l.getTile(x + 1, y);
-							if (left == TileType.WALL && right == TileType.WALL) {
-								rt[x][y] = RWTile.WALL_BOTH;
-							} else if (left == TileType.WALL) {
-								rt[x][y] = RWTile.WALL_RIGHT;
-							} else if (right == TileType.WALL) {
-								rt[x][y] = RWTile.WALL_LEFT;
-							} else {
-								rt[x][y] = RWTile.WALL_MID;
-							}
 
+		// Figure out lower wall stuff
+		RWTile[][] rt = new RWTile[l.width][l.height];
+		for (int y = 0; y < l.height; y++) {
+			for (int x = 0; x < l.width; x++) {
+				if (l.getTile(x, y) == TileType.WALL) {
+					if (l.getTile(x, y + 1) != TileType.WALL) {
+						TileType left = l.getTile(x - 1, y);
+						TileType right = l.getTile(x + 1, y);
+						if (left == TileType.WALL && right == TileType.WALL) {
+							rt[x][y] = RWTile.WALL_BOTH;
+						} else if (left == TileType.WALL) {
+							rt[x][y] = RWTile.WALL_RIGHT;
+						} else if (right == TileType.WALL) {
+							rt[x][y] = RWTile.WALL_LEFT;
 						} else {
-							rt[x][y] = RWTile.ROOF;
+							rt[x][y] = RWTile.WALL_MID;
 						}
+
+					} else {
+						rt[x][y] = RWTile.ROOF;
 					}
 				}
 			}
+		}
 
-			Graphics g = texture.getGraphics();
+		texture.renderTo(g -> {
 			g.setAntiAlias(false);
 			g.clear();
-			g.clearAlphaMap();
 
 			g.setLineWidth(1);
 			// draw walls
@@ -68,20 +67,19 @@ public class WallRenderer {
 			g.setLineWidth(1);
 
 			g.flush();
-		} catch (SlickException e) {
-			e.printStackTrace();
-		}
+		});
+
 	}
 
-	public void drawTile(RWTile[][] rt, Level l, int x, int y, Graphics g) {
+	public void drawTile(RWTile[][] rt, Level l, int x, int y, DALGraphics g) {
 		switch (l.tiles[x][y]) {
 			case DOOR:
-				drawAutoTile(l, g, x, y, TileType.FLOOR, l.theme.floor);
-				drawAutoTile(l, g, x, y, TileType.WALL, l.theme.wall);
+				drawAutoTile(l, g, x, y, TileType.FLOOR, SlickDAL.getTexture(l.theme.floor));
+				drawAutoTile(l, g, x, y, TileType.WALL, SlickDAL.getTexture(l.theme.wall));
 				break;
 			case GRATE:
-				drawAutoTile(l, g, x, y, TileType.FLOOR, l.theme.floor);
-				drawAutoTile(l, g, x, y, TileType.GRATE, l.theme.grate);
+				drawAutoTile(l, g, x, y, TileType.FLOOR, SlickDAL.getTexture(l.theme.floor));
+				drawAutoTile(l, g, x, y, TileType.GRATE, SlickDAL.getTexture(l.theme.grate));
 				break;
 			case WALL:
 				/*
@@ -94,7 +92,7 @@ public class WallRenderer {
 				 * );
 				 */
 
-				drawAutoTile(l, g, x, y, l.tiles[x][y], l.theme.wall);
+				drawAutoTile(l, g, x, y, l.tiles[x][y], SlickDAL.getTexture(l.theme.wall));
 				/*
 				 * switch( rt[x][y] )
 				 * {
@@ -128,7 +126,8 @@ public class WallRenderer {
 		return rt[x][y];
 	}
 
-	public void drawWallAutoTile(RWTile[][] rt, Level l, Graphics g, int x, int y, TileType autoTile, Image tileImage) {
+	public void drawWallAutoTile(RWTile[][] rt, Level l, DALGraphics g, int x, int y, TileType autoTile,
+			DALTexture tileImage) {
 		g.pushTransform();
 		g.translate(x * Level.tileSize, y * Level.tileSize);
 		// g.scale( tileSize/32f, tileSize/32f );
@@ -144,7 +143,7 @@ public class WallRenderer {
 		g.popTransform();
 	}
 
-	public void drawAutoTile(Level l, Graphics g, int x, int y, TileType autoTile, Image tileImage) {
+	public void drawAutoTile(Level l, DALGraphics g, int x, int y, TileType autoTile, DALTexture tileImage) {
 		g.pushTransform();
 		g.translate(x * Level.tileSize, y * Level.tileSize);
 		// g.scale( tileSize/32f, tileSize/32f );
@@ -160,13 +159,9 @@ public class WallRenderer {
 		g.popTransform();
 	}
 
-	private void generateTexture(Level l) {
-		try {
-			texture = new Image(l.width * Level.tileSize, l.height * Level.tileSize);
-			redrawLevel(l);
-		} catch (SlickException e) {
-			e.printStackTrace();
-		}
+	private void generateTexture(DAL dal, Level l) {
+		texture = dal.generateRenderableTexture(l.width * Level.tileSize, l.height * Level.tileSize);
+		redrawLevel(l);
 	}
 
 	public enum RWTile {

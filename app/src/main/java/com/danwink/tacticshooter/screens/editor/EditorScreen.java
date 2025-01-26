@@ -18,6 +18,7 @@ import com.danwink.tacticshooter.KryoHelper;
 import com.danwink.tacticshooter.LevelFileHelper;
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.Theme;
+import com.danwink.tacticshooter.dal.SlickDAL;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Team;
@@ -50,6 +51,8 @@ public class EditorScreen extends DUIScreen {
 
     @Override
     public void init(GameContainer gc) {
+        this.clearScreen = true;
+
         input = gc.getInput();
         levelElement = new LevelElement();
         messagePane = new MessagePane(0, 0, 0, 0);
@@ -159,8 +162,10 @@ public class EditorScreen extends DUIScreen {
 
             camera.start(gc, g);
 
-            floor.render(g, level);
-            wall.render(g, level);
+            SlickDAL dal = new SlickDAL(gc, g);
+
+            floor.render(dal, level);
+            wall.render(dal, level);
             building.render(g, level, false);
 
             mirrorType.mirror.getPoints(level, x, y).stream()

@@ -1,5 +1,6 @@
 package com.danwink.tacticshooter.ui;
 
+import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
@@ -21,6 +22,8 @@ public abstract class DUIScreen extends DScreen<GameContainer, Graphics> impleme
 
     public int uiScale;
 
+    public boolean clearScreen = false;
+
     public abstract void init(GameContainer gc);
 
     public abstract void createUIElements(DUI dui, float windowHeight);
@@ -40,6 +43,12 @@ public abstract class DUIScreen extends DScreen<GameContainer, Graphics> impleme
     }
 
     public void render(GameContainer gc, Graphics g) {
+        if (clearScreen) {
+            g.clear();
+            g.setColor(Color.lightGray);
+            g.fillRect(0, 0, gc.getWidth(), gc.getHeight());
+        }
+
         dui.render(r.renderTo(g));
     }
 
