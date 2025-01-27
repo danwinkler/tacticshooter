@@ -4,7 +4,6 @@ import com.danwink.tacticshooter.AutoTileDrawer;
 import com.danwink.tacticshooter.dal.DAL;
 import com.danwink.tacticshooter.dal.DAL.DALGraphics;
 import com.danwink.tacticshooter.dal.DAL.DALTexture;
-import com.danwink.tacticshooter.dal.SlickDAL;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Level.TileType;
 

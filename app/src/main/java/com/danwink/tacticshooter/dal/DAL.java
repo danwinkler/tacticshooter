@@ -33,6 +33,15 @@ public abstract class DAL {
     public abstract DALTexture generateRenderableTexture(int width, int height);
 
     public interface DALGraphics {
+        public static int MODE_NORMAL = 1;
+        public static int MODE_ALPHA_MAP = 2;
+        public static int MODE_ALPHA_BLEND = 3;
+        public static int MODE_COLOR_MULTIPLY = 4;
+        public static int MODE_ADD = 5;
+        public static int MODE_SCREEN = 6;
+        public static int MODE_ADD_ALPHA = 7;
+        public static int MODE_COLOR_MULTIPLY_ALPHA = 8;
+
         public int getWidth();
 
         public int getHeight();
@@ -104,6 +113,9 @@ public abstract class DAL {
 
         public void clearClip();
 
+        public void setDrawMode(int mode);
+
+        public void setClearColor(DALColor color);
     }
 
     public interface DALTexture {

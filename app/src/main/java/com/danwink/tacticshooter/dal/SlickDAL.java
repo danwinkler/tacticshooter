@@ -243,6 +243,16 @@ public class SlickDAL extends DAL {
             SlickTexture t = (SlickTexture) texture;
             g.drawImage(t.image, x, y, x2, y2, srcX, srcY, srcx2, srcy2, new Color(color.r, color.g, color.b, color.a));
         }
+
+        @Override
+        public void setDrawMode(int mode) {
+            g.setDrawMode(mode);
+        }
+
+        @Override
+        public void setClearColor(DALColor color) {
+            g.setBackground(new Color(color.r, color.g, color.b, color.a));
+        }
     }
 
     public static class SlickTexture implements DALTexture {

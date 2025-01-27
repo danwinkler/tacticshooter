@@ -65,10 +65,10 @@ public class GrassRenderer {
                         var dx = (size / 100f * 3) * windX;
                         var dy = (size / 100f * 12) * windY;
                         g.drawLine(
-                                x * cs.l.tileSize + p.x,
-                                y * cs.l.tileSize + p.y,
-                                x * cs.l.tileSize + p.x + dx,
-                                y * cs.l.tileSize + p.y + dy);
+                                x * Level.tileSize + p.x,
+                                y * Level.tileSize + p.y,
+                                x * Level.tileSize + p.x + dx,
+                                y * Level.tileSize + p.y + dy);
                     }
                 }
             }

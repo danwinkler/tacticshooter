@@ -1,9 +1,5 @@
 package com.danwink.tacticshooter.renderer;
 
-import org.newdawn.slick.Color;
-import org.newdawn.slick.Graphics;
-import org.newdawn.slick.SpriteSheet;
-
 import com.danwink.tacticshooter.ClientState;
 import com.danwink.tacticshooter.Theme.TSSpriteSheet;
 import com.danwink.tacticshooter.dal.DAL.DALColor;
@@ -45,7 +41,8 @@ public class UnitBodyRenderer {
 		g.popTransform();
 	}
 
-	public void draw4DirSpriteBody(Graphics g, Unit u, SpriteSheet baseSheet, SpriteSheet colorSheet, Color color,
+	public void draw4DirSpriteBody(DALGraphics g, Unit u, TSSpriteSheet baseSheet, TSSpriteSheet colorSheet,
+			DALColor color,
 			int size) {
 		g.pushTransform();
 		int dir = (int) Math.floor((u.heading + DMath.PIF / 4.f) / (DMath.PIF * .5f)) % 4;
@@ -60,7 +57,8 @@ public class UnitBodyRenderer {
 		g.popTransform();
 	}
 
-	public void draw8DirSpriteBody(Graphics g, Unit u, SpriteSheet baseSheet, SpriteSheet colorSheet, Color color,
+	public void draw8DirSpriteBody(DALGraphics g, Unit u, TSSpriteSheet baseSheet, TSSpriteSheet colorSheet,
+			DALColor color,
 			int size) {
 		g.pushTransform();
 		int dir = (int) Math.floor((u.heading + DMath.PIF / 8.f) / (DMath.PIF * .25f)) % 8;
@@ -91,9 +89,9 @@ public class UnitBodyRenderer {
 				// break;
 			case "SABOTEUR":
 				if (player) {
-					g.setColor(Color.white);
+					g.setColor(DALColor.white);
 					g.fillOval(-7, -7, 14, 14);
-					g.setColor(Color.black);
+					g.setColor(DALColor.black);
 					g.drawOval(-7, -7, 14, 14);
 				}
 
@@ -101,7 +99,7 @@ public class UnitBodyRenderer {
 				g.rotate(0, 0, (u.heading / DMath.PI2F * 360));
 				g.setColor(color);
 				g.fillOval(-5, -5, 10, 10);
-				g.setColor(Color.black);
+				g.setColor(DALColor.black);
 				g.drawOval(-5, -5, 10, 10);
 				g.drawLine(0, 0, 5, 0);
 				g.popTransform();
@@ -109,9 +107,9 @@ public class UnitBodyRenderer {
 				break;
 			case "SNIPER":
 				if (player) {
-					g.setColor(Color.white);
+					g.setColor(DALColor.white);
 					g.fillOval(-7, -6, 14, 12);
-					g.setColor(Color.black);
+					g.setColor(DALColor.black);
 					g.drawOval(-7, -6, 14, 12);
 				}
 
@@ -119,7 +117,7 @@ public class UnitBodyRenderer {
 				g.rotate(0, 0, (u.heading / DMath.PI2F * 360));
 				g.setColor(color);
 				g.fillOval(-5, -4, 10, 8);
-				g.setColor(Color.black);
+				g.setColor(DALColor.black);
 				g.drawOval(-5, -4, 10, 8);
 				g.drawLine(0, 0, 5, 0);
 				g.popTransform();

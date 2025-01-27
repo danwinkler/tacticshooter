@@ -3,7 +3,6 @@ package com.danwink.tacticshooter.renderer;
 import com.danwink.tacticshooter.ClientState;
 import com.danwink.tacticshooter.dal.DAL;
 import com.danwink.tacticshooter.dal.DAL.DALTexture;
-import com.danwink.tacticshooter.dal.SlickDAL;
 import com.danwink.tacticshooter.gameobjects.Level;
 
 public class OutsideFloorRenderer {

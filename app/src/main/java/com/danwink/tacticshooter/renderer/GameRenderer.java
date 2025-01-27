@@ -106,15 +106,15 @@ public class GameRenderer {
 		cs.camera.start(gc, g);
 		// Main Rendering
 		floor.render(dal, cs.l);
-		footprint.render(g, cs);
+		footprint.render(dal, cs);
 		bloodExplosion.render(dal, cs, unitBody);
 		building.render(dal.getGraphics(), cs.l, false);
 		// grass.render(g, cs);
 		wall.render(dal, cs.l);
 		renderMarkers(g, cs);
 		unitBody.render(dal.getGraphics(), cs);
-		bullet.render(g, cs);
-		particle.render(g);
+		bullet.render(dal.getGraphics(), cs);
+		particle.render(dal.getGraphics());
 		unitInfo.render(g, gc, cs, gc.getInput());
 		if (fogEnabled)
 			fog.render(g, cs);
@@ -151,14 +151,14 @@ public class GameRenderer {
 		DAL dal = new SlickDAL(gc, g);
 
 		floor.render(dal, cs.l);
-		footprint.render(g, cs);
+		footprint.render(dal, cs);
 		bloodExplosion.render(dal, cs, unitBody);
 		building.render(dal.getGraphics(), cs.l, false);
 		wall.render(dal, cs.l);
 		renderMarkers(g, cs);
 		unitBody.render(dal.getGraphics(), cs);
-		bullet.render(g, cs);
-		particle.render(g);
+		bullet.render(dal.getGraphics(), cs);
+		particle.render(dal.getGraphics());
 
 		g.flush();
 
@@ -169,8 +169,6 @@ public class GameRenderer {
 	}
 
 	public void renderEndGameMap(DAL dal, ClientState cs) {
-		Graphics g = ((SlickDAL) dal).g;
-
 		floor.render(dal, cs.l);
 		bloodExplosion.render(dal, cs, unitBody);
 		building.render(dal.getGraphics(), cs.l, true);

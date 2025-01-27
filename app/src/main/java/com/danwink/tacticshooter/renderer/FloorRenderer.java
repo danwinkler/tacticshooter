@@ -1,10 +1,5 @@
 package com.danwink.tacticshooter.renderer;
 
-import org.checkerframework.checker.units.qual.g;
-import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
-import org.newdawn.slick.SlickException;
-
 import com.danwink.tacticshooter.dal.DAL;
 import com.danwink.tacticshooter.dal.DAL.DALTexture;
 import com.danwink.tacticshooter.gameobjects.Level;
