@@ -167,7 +167,7 @@ public class EditorScreen extends DUIScreen {
 
             floor.render(dal, level);
             wall.render(dal, level);
-            building.render(g, level, false);
+            building.render(dal.getGraphics(), level, false);
 
             mirrorType.mirror.getPoints(level, x, y).stream()
                     .flatMap(p -> brushType.brush.getPoints(level, p.x, p.y).stream())

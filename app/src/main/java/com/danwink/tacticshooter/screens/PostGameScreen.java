@@ -14,6 +14,7 @@ import org.newdawn.slick.imageout.ImageOut;
 import com.danwink.tacticshooter.GameStats;
 import com.danwink.tacticshooter.GameStats.TeamStats;
 import com.danwink.tacticshooter.dal.DAL;
+import com.danwink.tacticshooter.dal.DAL.DALColor;
 import com.danwink.tacticshooter.dal.SlickDAL.SlickTexture;
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.slick.Slick2DEventMapper;
@@ -123,7 +124,7 @@ public class PostGameScreen extends DUIScreen {
 		pointsCol.add(new DText("Points:", 0, 0).setSize(0, 30 * uiScale));
 		DLinePlot pointPlot = new DLinePlot(0, 0, 800 * uiScale, 100 * uiScale);
 		for (TeamStats ts : stats.teamStats) {
-			Color c = ts.t.getColor();
+			DALColor c = ts.t.getColor();
 			pointPlot.addLine(DUtil.integerArrayListToIntArray(ts.pointCount), new java.awt.Color(c.r, c.g, c.b, .8f));
 		}
 		pointsCol.add(pointPlot);
@@ -135,7 +136,7 @@ public class PostGameScreen extends DUIScreen {
 		unitsCol.add(new DText("Units:", 0, 0).setSize(0, 30 * uiScale));
 		DLinePlot unitPlot = new DLinePlot(0, 0, 800 * uiScale, 100 * uiScale);
 		for (TeamStats ts : stats.teamStats) {
-			Color c = ts.t.getColor();
+			DALColor c = ts.t.getColor();
 			unitPlot.addLine(DUtil.integerArrayListToIntArray(ts.unitCount), new java.awt.Color(c.r, c.g, c.b, .8f));
 		}
 		unitsCol.add(unitPlot);
@@ -173,7 +174,7 @@ public class PostGameScreen extends DUIScreen {
 			try {
 				Graphics emg = endMap.getGraphics();
 				MultiplayerGameScreen mgs = ((MultiplayerGameScreen) dsh.get("multiplayergame"));
-				endMap.getGraphics().drawImage(mgs.gameRenderer.bloodExplosion.texture, 0, 0);
+				endMap.getGraphics().drawImage(mgs.gameRenderer.bloodExplosion.texture.slim(), 0, 0);
 				var wallImage = ((SlickTexture) mgs.gameRenderer.wall.texture).image;
 				endMap.getGraphics().drawImage(wallImage, 0, 0);
 			} catch (SlickException e) {

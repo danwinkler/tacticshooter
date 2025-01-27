@@ -83,6 +83,8 @@ public class Theme {
 
 	public static abstract class TSSpriteSheet {
 		public abstract SpriteSheet slim();
+
+		public abstract DALTexture getSprite(int x, int y);
 	}
 
 	public static class SlickTSSpriteSheet extends TSSpriteSheet {
@@ -95,6 +97,11 @@ public class Theme {
 		@Override
 		public SpriteSheet slim() {
 			return ss;
+		}
+
+		@Override
+		public DALTexture getSprite(int x, int y) {
+			return new SlickTexture(ss.getSubImage(x, y));
 		}
 	}
 }

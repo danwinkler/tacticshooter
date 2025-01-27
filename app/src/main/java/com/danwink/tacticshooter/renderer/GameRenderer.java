@@ -107,12 +107,12 @@ public class GameRenderer {
 		// Main Rendering
 		floor.render(dal, cs.l);
 		footprint.render(g, cs);
-		bloodExplosion.render(g, cs, unitBody);
-		building.render(g, cs.l, false);
+		bloodExplosion.render(dal, cs, unitBody);
+		building.render(dal.getGraphics(), cs.l, false);
 		// grass.render(g, cs);
 		wall.render(dal, cs.l);
 		renderMarkers(g, cs);
-		unitBody.render(g, cs);
+		unitBody.render(dal.getGraphics(), cs);
 		bullet.render(g, cs);
 		particle.render(g);
 		unitInfo.render(g, gc, cs, gc.getInput());
@@ -152,11 +152,11 @@ public class GameRenderer {
 
 		floor.render(dal, cs.l);
 		footprint.render(g, cs);
-		bloodExplosion.render(g, cs, unitBody);
-		building.render(g, cs.l, false);
+		bloodExplosion.render(dal, cs, unitBody);
+		building.render(dal.getGraphics(), cs.l, false);
 		wall.render(dal, cs.l);
 		renderMarkers(g, cs);
-		unitBody.render(g, cs);
+		unitBody.render(dal.getGraphics(), cs);
 		bullet.render(g, cs);
 		particle.render(g);
 
@@ -172,8 +172,8 @@ public class GameRenderer {
 		Graphics g = ((SlickDAL) dal).g;
 
 		floor.render(dal, cs.l);
-		bloodExplosion.render(g, cs, unitBody);
-		building.render(g, cs.l, true);
+		bloodExplosion.render(dal, cs, unitBody);
+		building.render(dal.getGraphics(), cs.l, true);
 		wall.render(dal, cs.l);
 	}
 

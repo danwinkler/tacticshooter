@@ -39,6 +39,8 @@ public abstract class DAL {
 
         public void drawImage(DALTexture texture, float x, float y);
 
+        public void drawImage(DALTexture texture, float x, float y, DALColor color);
+
         public void drawImage(DALTexture texture, float x, float y, float width, float height);
 
         public void drawImage(DALTexture texture, float x, float y, float x2, float y2, float srcX, float srcY,
@@ -46,6 +48,9 @@ public abstract class DAL {
 
         public void drawImage(DALTexture texture, float x, float y, float x2, float y2, float srcX, float srcY,
                 float srcx2, float srcy2, float alpha);
+
+        public void drawImage(DALTexture texture, float x, float y, float x2, float y2, float srcX, float srcY,
+                float srcx2, float srcy2, DALColor color);
 
         public void setAntiAlias(boolean b);
 
@@ -63,11 +68,15 @@ public abstract class DAL {
 
         public void rotate(float angle);
 
+        public void rotate(float x, float y, float angle);
+
         public void setLineWidth(int width);
 
         public void setColor(float r, float g, float b, float a);
 
         public void setColor(int c);
+
+        public void setColor(DALColor color);
 
         public void setColor(org.newdawn.slick.Color color);
 
@@ -112,6 +121,21 @@ public abstract class DAL {
     }
 
     public static class DALColor {
+        public static final DALColor transparent = new DALColor(0.0F, 0.0F, 0.0F, 0.0F);
+        public static final DALColor white = new DALColor(1.0F, 1.0F, 1.0F, 1.0F);
+        public static final DALColor yellow = new DALColor(1.0F, 1.0F, 0.0F, 1.0F);
+        public static final DALColor red = new DALColor(1.0F, 0.0F, 0.0F, 1.0F);
+        public static final DALColor blue = new DALColor(0.0F, 0.0F, 1.0F, 1.0F);
+        public static final DALColor green = new DALColor(0.0F, 1.0F, 0.0F, 1.0F);
+        public static final DALColor black = new DALColor(0.0F, 0.0F, 0.0F, 1.0F);
+        public static final DALColor gray = new DALColor(0.5F, 0.5F, 0.5F, 1.0F);
+        public static final DALColor cyan = new DALColor(0.0F, 1.0F, 1.0F, 1.0F);
+        public static final DALColor darkGray = new DALColor(0.3F, 0.3F, 0.3F, 1.0F);
+        public static final DALColor lightGray = new DALColor(0.7F, 0.7F, 0.7F, 1.0F);
+        public static final DALColor pink = new DALColor(255, 175, 175, 255);
+        public static final DALColor orange = new DALColor(255, 200, 0, 255);
+        public static final DALColor magenta = new DALColor(255, 0, 255, 255);
+
         public float r, g, b, a;
 
         public DALColor(float r, float g, float b, float a) {

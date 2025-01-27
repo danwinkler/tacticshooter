@@ -7,6 +7,8 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.util.pathfinding.PathFinder;
 
 import com.danwink.tacticshooter.TacticServer;
+import com.danwink.tacticshooter.dal.DAL.DALColor;
+import com.danwink.tacticshooter.dal.DAL.DALGraphics;
 import com.phyloa.dlib.util.DMath;
 
 public class Building {
@@ -46,11 +48,11 @@ public class Building {
 		radius = bt.bu.getRadius();
 	}
 
-	public void render(Graphics g, boolean endGame) {
+	public void render(DALGraphics g, boolean endGame) {
 		g.pushTransform();
 		g.translate(x, y);
 		if (t != null && !endGame) {
-			Color teamColor = t.getColor();
+			DALColor teamColor = t.getColor();
 			g.setColor(new Color(teamColor.r, teamColor.g, teamColor.b, .3f));
 			float rad = ((float) hold / (float) HOLDMAX) * bt.bu.getRadius();
 			g.fillOval(-rad, -rad, rad * 2, rad * 2);

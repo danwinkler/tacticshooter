@@ -5,27 +5,30 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SpriteSheet;
 
 import com.danwink.tacticshooter.ClientState;
+import com.danwink.tacticshooter.Theme.TSSpriteSheet;
+import com.danwink.tacticshooter.dal.DAL.DALColor;
+import com.danwink.tacticshooter.dal.DAL.DALGraphics;
 import com.danwink.tacticshooter.gameobjects.Unit;
 import com.phyloa.dlib.util.DMath;
 
 public class UnitBodyRenderer {
-	public Color playerColor = new Color(128, 128, 255);
+	public DALColor playerColor = new DALColor(.5f, .5f, 1.f, 1.f);
 
-	public void render(Graphics g, ClientState cs) {
+	public void render(DALGraphics g, ClientState cs) {
 		for (int i = 0; i < cs.units.size(); i++) {
 			Unit u = cs.units.get(i);
 			drawUnit(g, u, cs);
 		}
 	}
 
-	public void drawUnit(Graphics g, Unit u, ClientState cs) {
+	public void drawUnit(DALGraphics g, Unit u, ClientState cs) {
 		g.pushTransform();
 		g.translate((int) u.x, (int) u.y);
 		drawBody(g, u, u.owner.id == cs.player.id, cs);
 		g.popTransform();
 	}
 
-	public void drawDeadUnit(Graphics g, Unit u, ClientState cs) {
+	public void drawDeadUnit(DALGraphics g, Unit u, ClientState cs) {
 		g.pushTransform();
 		g.translate(u.x, u.y);
 		g.rotate(0, 0, u.heading / DMath.PI2F * 360);
@@ -33,7 +36,7 @@ public class UnitBodyRenderer {
 		g.popTransform();
 	}
 
-	public void drawSpriteBody(Graphics g, Unit u, SpriteSheet baseSheet, SpriteSheet colorSheet, Color color,
+	public void drawSpriteBody(DALGraphics g, Unit u, TSSpriteSheet baseSheet, TSSpriteSheet colorSheet, DALColor color,
 			int size) {
 		g.pushTransform();
 		g.rotate(0, 0, (u.heading / DMath.PI2F * 360) + 90);
@@ -73,12 +76,12 @@ public class UnitBodyRenderer {
 		g.popTransform();
 	}
 
-	public void drawBody(Graphics g, Unit u, boolean player, ClientState cs) {
-		Color color = player ? playerColor : u.owner.team.getColor();
+	public void drawBody(DALGraphics g, Unit u, boolean player, ClientState cs) {
+		DALColor color = player ? playerColor : u.owner.team.getColor();
 
 		switch (u.type.name) {
 			case "LIGHT":
-				drawSpriteBody(g, u, cs.l.theme.light.slim(), cs.l.theme.lightColor.slim(), color, 8);
+				drawSpriteBody(g, u, cs.l.theme.light, cs.l.theme.lightColor, color, 8);
 				break;
 			case "SCOUT":
 				// draw4DirSpriteBody( g, u, cs.l.theme.dir4, null, color, 8 );
@@ -122,7 +125,7 @@ public class UnitBodyRenderer {
 				g.popTransform();
 				break;
 			case "HEAVY":
-				drawSpriteBody(g, u, cs.l.theme.heavy.slim(), cs.l.theme.heavyColor.slim(), color, 16);
+				drawSpriteBody(g, u, cs.l.theme.heavy, cs.l.theme.heavyColor, color, 16);
 				break;
 		}
 	}

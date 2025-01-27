@@ -545,10 +545,10 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 		}
 		g.translate(xOffset, yOffset);
 		g.scale(scale, scale);
-		cs.l.renderBuildings(g, false);
+		cs.l.renderBuildings(dal.getGraphics(), false);
 		for (int i = 0; i < cs.units.size(); i++) {
 			Unit u = cs.units.get(i);
-			u.renderMinimap(g, cs.player);
+			u.renderMinimap(dal.getGraphics(), cs.player);
 		}
 
 		if (fogEnabled) {

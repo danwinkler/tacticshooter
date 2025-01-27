@@ -346,7 +346,7 @@ public class LobbyScreen extends DUIScreen {
 					// Render level floor, walls, etc.
 					level.renderFloor(mgDal.getGraphics());
 					level.render(mgDal.getGraphics());
-					level.renderBuildings(mg, false);
+					level.renderBuildings(mgDal.getGraphics(), false);
 
 					mg.flush();
 				} catch (SlickException e) {

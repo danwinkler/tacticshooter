@@ -220,6 +220,29 @@ public class SlickDAL extends DAL {
         public void clearClip() {
             g.clearClip();
         }
+
+        @Override
+        public void drawImage(DALTexture texture, float x, float y, DALColor color) {
+            SlickTexture t = (SlickTexture) texture;
+            g.drawImage(t.image, x, y, new Color(color.r, color.g, color.b, color.a));
+        }
+
+        @Override
+        public void rotate(float x, float y, float angle) {
+            g.rotate(x, y, angle);
+        }
+
+        @Override
+        public void setColor(DALColor color) {
+            g.setColor(new Color(color.r, color.g, color.b, color.a));
+        }
+
+        @Override
+        public void drawImage(DALTexture texture, float x, float y, float x2, float y2, float srcX, float srcY,
+                float srcx2, float srcy2, DALColor color) {
+            SlickTexture t = (SlickTexture) texture;
+            g.drawImage(t.image, x, y, x2, y2, srcX, srcY, srcx2, srcy2, new Color(color.r, color.g, color.b, color.a));
+        }
     }
 
     public static class SlickTexture implements DALTexture {

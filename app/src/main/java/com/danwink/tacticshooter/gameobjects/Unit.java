@@ -9,6 +9,8 @@ import org.newdawn.slick.util.pathfinding.Path;
 
 import com.danwink.tacticshooter.ClientState;
 import com.danwink.tacticshooter.TacticServer;
+import com.danwink.tacticshooter.dal.DAL.DALColor;
+import com.danwink.tacticshooter.dal.DAL.DALGraphics;
 import com.phyloa.dlib.math.Point2i;
 import com.phyloa.dlib.util.DMath;
 
@@ -469,8 +471,8 @@ public class Unit {
 		public boolean explodesOnDeath;
 	}
 
-	public void renderMinimap(Graphics g, Player player) {
-		g.setColor(this.owner.id == player.id ? Color.blue : this.owner.team.getColor());
+	public void renderMinimap(DALGraphics g, Player player) {
+		g.setColor(this.owner.id == player.id ? DALColor.blue : this.owner.team.getColor());
 		g.fillOval(x - 20, y - 20, 40, 40);
 	}
 

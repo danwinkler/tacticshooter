@@ -4,12 +4,10 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 import jp.objectclub.vecmath.Point2f;
 
-import org.newdawn.slick.Color;
-import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
-import org.newdawn.slick.SlickException;
-
 import com.danwink.tacticshooter.ClientState;
+import com.danwink.tacticshooter.dal.DAL;
+import com.danwink.tacticshooter.dal.DAL.DALColor;
+import com.danwink.tacticshooter.dal.DAL.DALTexture;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Unit;
 import com.phyloa.dlib.util.DMath;
@@ -22,17 +20,16 @@ public class BloodLayerRenderer {
 	BloodLayerRenderer(GameRenderer gameRenderer) {
 	}
 
-	public Color bloodColor = new Color(255, 0, 0);
+	public DALColor bloodColor = new DALColor(1.f, 0, 0, 1.f);
 
-	public Image texture;
-	Graphics tg;
+	public DALTexture texture;
 
 	private ConcurrentLinkedDeque<Point2f> bloodToDraw = new ConcurrentLinkedDeque<>();
 
-	public void render(Graphics g, ClientState cs, UnitBodyRenderer ubr) {
+	public void render(DAL dal, ClientState cs, UnitBodyRenderer ubr) {
 		if (texture == null) {
 			if (cs.l != null) {
-				generateTexture(cs);
+				generateTexture(dal, cs);
 			} else {
 				return;
 			}
@@ -43,29 +40,28 @@ public class BloodLayerRenderer {
 			internalDrawBlood(p.x, p.y, cs);
 		}
 
+		var g = dal.getGraphics();
+
 		g.drawImage(texture, 0, 0);
 	}
 
-	public void generateTexture(ClientState cs) {
-		try {
-			texture = new Image(cs.l.width * Level.tileSize, cs.l.height * Level.tileSize);
-			tg = texture.getGraphics();
-		} catch (SlickException e) {
-			e.printStackTrace();
-		}
+	public void generateTexture(DAL dal, ClientState cs) {
+		texture = dal.generateRenderableTexture(cs.l.width * Level.tileSize, cs.l.height * Level.tileSize);
 	}
 
 	public void killUnit(Unit u, ClientState cs, UnitBodyRenderer ubr) {
-		ubr.drawDeadUnit(tg, u, cs);
+		texture.renderTo(tg -> {
+			ubr.drawDeadUnit(tg, u, cs);
 
-		for (int j = 0; j < 10; j++) {
-			internalDrawBlood(u.x, u.y, cs);
-		}
+			for (int j = 0; j < 10; j++) {
+				internalDrawBlood(u.x, u.y, cs);
+			}
 
-		if (u.type.explodesOnDeath) {
-			tg.drawImage(cs.l.theme.crater.slim(), u.x - 16, u.y - 16, u.x + 16, u.y + 16, 0, 0, 32, 32);
-			tg.flush();
-		}
+			if (u.type.explodesOnDeath) {
+				tg.drawImage(cs.l.theme.crater, u.x - 16, u.y - 16, u.x + 16, u.y + 16, 0, 0, 32, 32);
+				tg.flush();
+			}
+		});
 	}
 
 	public void drawBlood(float x, float y) {
@@ -73,10 +69,12 @@ public class BloodLayerRenderer {
 	}
 
 	private void internalDrawBlood(float x, float y, ClientState cs) {
-		x += DMath.randomf(-8, 8);
-		y += DMath.randomf(-8, 8);
+		var drawX = x + DMath.randomf(-8, 8);
+		var drawY = y + DMath.randomf(-8, 8);
 
-		tg.drawImage(cs.l.theme.smoke.slim(), x - 4, y - 4, x + 4, y + 4, 0, 0, 64, 64, bloodColor);
-		tg.flush();
+		texture.renderTo(tg -> {
+			tg.drawImage(cs.l.theme.smoke, drawX - 4, drawY - 4, drawX + 4, drawY + 4, 0, 0, 64, 64, bloodColor);
+			tg.flush();
+		});
 	}
 }
