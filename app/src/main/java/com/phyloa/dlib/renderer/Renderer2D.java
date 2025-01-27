@@ -2,9 +2,6 @@ package com.phyloa.dlib.renderer;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Image;
-import java.awt.event.KeyListener;
-
 import jp.objectclub.vecmath.Vector2f;
 
 /**
@@ -15,29 +12,6 @@ import jp.objectclub.vecmath.Vector2f;
  *
  */
 public interface Renderer2D<ImageClass> {
-	/**
-	 * begin is called to either start the render, or, if the renderer uses a
-	 * game loop, to call initialize() and then loop update().
-	 * 
-	 * If the renderer does not implement the method, it will do nothing.
-	 */
-	public void begin();
-
-	/**
-	 * Sets the size of the rendering area/window
-	 * 
-	 * @param x the width of the rendering area
-	 * @param y the height of the rendering area
-	 */
-	public void size(int x, int y);
-
-	/**
-	 * Sets the frame rate if the Renderer uses a game loop
-	 * 
-	 * @param r the number of time per second update should be called
-	 */
-	public void frameRate(float r);
-
 	/**
 	 * Sets the color to draw in.
 	 * 
@@ -156,16 +130,6 @@ public interface Renderer2D<ImageClass> {
 	public void popMatrix();
 
 	/**
-	 * Called once if game loop is used.
-	 */
-	public void initialize();
-
-	/**
-	 * Called every frame if game loop is used.
-	 */
-	public void update();
-
-	/**
 	 * Draws the image at the specified coordinates in two-space.
 	 * 
 	 * @param img the Image to render
@@ -178,6 +142,9 @@ public interface Renderer2D<ImageClass> {
 
 	public void drawImage(ImageClass img, float dx1, float dy1, float dx2, float dy2, float sx1, float sy1, float sx2,
 			float sy2);
+
+	public void drawImage(ImageClass img, float dx1, float dy1, float dx2, float dy2, float sx1, float sy1, float sx2,
+			float sy2, float alpha);
 
 	public int getWidth();
 

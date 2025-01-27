@@ -5,70 +5,61 @@ import java.io.IOException;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
-
 import com.danwink.tacticshooter.MessageType;
 import com.danwink.tacticshooter.TacticServer.ServerState;
+import com.danwink.tacticshooter.dal.DAL;
 import com.danwink.tacticshooter.network.ClientNetworkInterface;
 import com.danwink.tacticshooter.network.Message;
 import com.phyloa.dlib.game.DScreen;
 import com.phyloa.dlib.game.DScreenHandler;
 
-public class ServerConnectScreen extends DScreen<GameContainer, Graphics>
-{
+public class ServerConnectScreen extends DScreen<GameContainer, DAL> {
 	String address;
 	ClientNetworkInterface ci;
-	
-	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
-	{
+
+	public void onActivate(GameContainer gc, DScreenHandler<GameContainer, DAL> dsh) {
 		try {
-			ci = new ClientNetworkInterface( address );
+			ci = new ClientNetworkInterface(address);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		ci.sendToServer( new Message( MessageType.CONNECTED, null ) );
+
+		ci.sendToServer(new Message(MessageType.CONNECTED, null));
 	}
-	
-	public void update( GameContainer gc, float delta )
-	{
-		while( ci.hasClientMessages() )
-		{
+
+	public void update(GameContainer gc, float delta) {
+		while (ci.hasClientMessages()) {
 			Message m = ci.getNextClientMessage();
-			if( m.messageType == MessageType.SERVERSTATE )
-			{
-				ServerState s = (ServerState)m.message;
-				switch( s )
-				{
-				case LOBBY:
-					dsh.message( "lobby", ci );
-					dsh.activate( "lobby", gc );
-					return;
-				case PLAYING:
-					dsh.message( "message", "Cannot join game in progress." );
-					dsh.activate( "message", gc );
-					return;
+			if (m.messageType == MessageType.SERVERSTATE) {
+				ServerState s = (ServerState) m.message;
+				switch (s) {
+					case LOBBY:
+						dsh.message("lobby", ci);
+						dsh.activate("lobby", gc);
+						return;
+					case PLAYING:
+						dsh.message("message", "Cannot join game in progress.");
+						dsh.activate("message", gc);
+						return;
 				}
 			}
 		}
 	}
 
-	public void render( GameContainer gc, Graphics g )
-	{
-		
+	public void render(GameContainer gc, DAL g) {
+
 	}
 
-	public void onExit()
-	{
-		
+	public void onExit() {
+
 	}
 
-	public void message( Object o )
-	{
-		if( o instanceof String )
-		{
-			address = (String)o;
+	public void message(Object o) {
+		if (o instanceof String) {
+			address = (String) o;
 		}
 	}
-	
-	public void onResize( int width, int height ) {}
+
+	public void onResize(int width, int height) {
+	}
 }

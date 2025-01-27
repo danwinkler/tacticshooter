@@ -7,6 +7,7 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 
 import com.danwink.tacticshooter.ClientState;
+import com.danwink.tacticshooter.dal.DAL.DALTexture;
 import com.danwink.tacticshooter.gameobjects.Unit;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DKeyEvent;
@@ -123,7 +124,7 @@ public class SelectedUnitsDisplay extends DUIElement {
     }
 
     @Override
-    public void render(Renderer2D<Image> r) {
+    public void render(Renderer2D<DALTexture> r) {
         // TODO Auto-generated method stub
 
     }
@@ -144,7 +145,7 @@ public class SelectedUnitsDisplay extends DUIElement {
         }
 
         @Override
-        public void render(Renderer2D<Image> r) {
+        public void render(Renderer2D<DALTexture> r) {
             r.pushMatrix();
             r.translate(x, y);
             var portraitImage = cs.l.theme.getPortrait(u.type.name);

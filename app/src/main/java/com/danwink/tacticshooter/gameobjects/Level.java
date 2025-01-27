@@ -65,9 +65,9 @@ public class Level implements TileBasedMap {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				if (tiles[x][y] != TileType.WALL) {
-					drawAutoTile(g, x, y, TileType.FLOOR, SlickDAL.getTexture(theme.floor));
+					drawAutoTile(g, x, y, TileType.FLOOR, theme.floor);
 				} else {
-					g.drawImage(SlickDAL.getTexture(theme.floor), x * tileSize, y * tileSize, x * tileSize + tileSize,
+					g.drawImage(theme.floor, x * tileSize, y * tileSize, x * tileSize + tileSize,
 							y * tileSize + tileSize, theme.floor.getWidth() / 3, 0, theme.floor.getWidth() / 3 * 2,
 							theme.floor.getHeight() / 4);
 				}
@@ -90,18 +90,18 @@ public class Level implements TileBasedMap {
 	public void drawTile(int x, int y, DALGraphics g) {
 		switch (tiles[x][y]) {
 			case DOOR:
-				drawAutoTile(g, x, y, TileType.FLOOR, SlickDAL.getTexture(theme.floor));
-				drawAutoTile(g, x, y, TileType.WALL, SlickDAL.getTexture(theme.wall));
+				drawAutoTile(g, x, y, TileType.FLOOR, theme.floor);
+				drawAutoTile(g, x, y, TileType.WALL, theme.wall);
 				break;
 			case GRATE:
-				drawAutoTile(g, x, y, TileType.FLOOR, SlickDAL.getTexture(theme.floor));
-				drawAutoTile(g, x, y, TileType.GRATE, SlickDAL.getTexture(theme.grate));
+				drawAutoTile(g, x, y, TileType.FLOOR, theme.floor);
+				drawAutoTile(g, x, y, TileType.GRATE, theme.grate);
 				break;
 			case WALL:
 				// g.drawImage( theme.floor, x*tileSize, y*tileSize, x*tileSize+tileSize,
 				// y*tileSize+tileSize, theme.floor.getWidth()/3, 0, theme.floor.getWidth()/3 *
 				// 2, theme.floor.getHeight()/4 );
-				drawAutoTile(g, x, y, tiles[x][y], SlickDAL.getTexture(theme.wall));
+				drawAutoTile(g, x, y, tiles[x][y], theme.wall);
 				break;
 			case FLOOR:
 				break;

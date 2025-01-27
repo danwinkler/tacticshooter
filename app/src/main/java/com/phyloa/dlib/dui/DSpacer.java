@@ -2,6 +2,7 @@ package com.phyloa.dlib.dui;
 
 import org.newdawn.slick.Image;
 
+import com.danwink.tacticshooter.dal.DAL.DALTexture;
 import com.phyloa.dlib.renderer.Renderer2D;
 
 public class DSpacer extends DUIElement {
@@ -59,7 +60,7 @@ public class DSpacer extends DUIElement {
     }
 
     @Override
-    public void render(Renderer2D<Image> r) {
+    public void render(Renderer2D<DALTexture> r) {
         // TODO Auto-generated method stub
 
     }

@@ -8,6 +8,7 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
 import com.danwink.tacticshooter.ClientState;
+import com.danwink.tacticshooter.dal.DAL.DALColor;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Level.TileType;
 import com.phyloa.dlib.math.Point2i;
@@ -105,7 +106,7 @@ public class GrassRenderer {
         }
     }
 
-    public boolean isDark(Color c) {
+    public boolean isDark(DALColor c) {
         float maxBright = 0.5f;
         return c.r < maxBright && c.g < maxBright && c.b < maxBright;
     }

@@ -14,6 +14,7 @@ import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.Sound;
 
+import com.danwink.tacticshooter.dal.DAL;
 import com.phyloa.dlib.renderer.DScreenTransition;
 import com.phyloa.dlib.util.DFile;
 import com.phyloa.dlib.util.DOptions;
@@ -137,19 +138,19 @@ public class StaticFiles {
 		return sound.get(name);
 	}
 
-	public static DScreenTransition<GameContainer, Graphics> getDownMenuOut() {
+	public static DScreenTransition<GameContainer, DAL> getDownMenuOut() {
 		return new DScreenSlideTransition(-1, 0, StaticFiles.advOptions.getF("menuTransitionSpeed"), false);
 	}
 
-	public static DScreenTransition<GameContainer, Graphics> getDownMenuIn() {
+	public static DScreenTransition<GameContainer, DAL> getDownMenuIn() {
 		return new DScreenSlideTransition(-1, 0, StaticFiles.advOptions.getF("menuTransitionSpeed"), true);
 	}
 
-	public static DScreenTransition<GameContainer, Graphics> getUpMenuOut() {
+	public static DScreenTransition<GameContainer, DAL> getUpMenuOut() {
 		return new DScreenSlideTransition(1, 0, StaticFiles.advOptions.getF("menuTransitionSpeed"), false);
 	}
 
-	public static DScreenTransition<GameContainer, Graphics> getUpMenuIn() {
+	public static DScreenTransition<GameContainer, DAL> getUpMenuIn() {
 		return new DScreenSlideTransition(1, 0, StaticFiles.advOptions.getF("menuTransitionSpeed"), true);
 	}
 

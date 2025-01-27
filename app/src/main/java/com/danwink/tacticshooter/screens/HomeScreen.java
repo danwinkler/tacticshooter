@@ -22,6 +22,9 @@ import org.newdawn.slick.SlickException;
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.TacticServer;
 import com.danwink.tacticshooter.UIHelper;
+import com.danwink.tacticshooter.dal.DAL;
+import com.danwink.tacticshooter.dal.DAL.DALTexture;
+import com.danwink.tacticshooter.dal.SlickDAL;
 import com.danwink.tacticshooter.editor.Editor;
 import com.danwink.tacticshooter.network.ServerNetworkInterface;
 import com.danwink.tacticshooter.ui.DUIScreen;
@@ -91,8 +94,11 @@ public class HomeScreen extends DUIScreen {
 		dui.add(devKeyListener);
 	}
 
-	public void render(GameContainer gc, Graphics g) {
-		super.render(gc, g);
+	public void render(GameContainer gc, DAL dal) {
+		super.render(gc, dal);
+
+		var g = ((SlickDAL) dal).g;
+
 		if (ips != null) {
 			g.setColor(Color.white);
 			g.drawString("Server Address: ", 200 * uiScale, 15 * uiScale);
@@ -256,7 +262,7 @@ public class HomeScreen extends DUIScreen {
 		}
 
 		@Override
-		public void render(Renderer2D<Image> r) {
+		public void render(Renderer2D<DALTexture> r) {
 			// TODO Auto-generated method stub
 
 		}

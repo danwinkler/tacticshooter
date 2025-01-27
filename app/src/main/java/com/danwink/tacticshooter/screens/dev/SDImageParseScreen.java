@@ -20,6 +20,8 @@ import com.danwink.tacticshooter.ClientState;
 import com.danwink.tacticshooter.LevelFileHelper;
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.Theme;
+import com.danwink.tacticshooter.dal.DAL;
+import com.danwink.tacticshooter.dal.SlickDAL;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Team;
@@ -102,8 +104,10 @@ public class SDImageParseScreen extends DUIScreen {
     }
 
     @Override
-    public void render(GameContainer gc, Graphics g) {
-        super.render(gc, g);
+    public void render(GameContainer gc, DAL dal) {
+        super.render(gc, dal);
+
+        var g = ((SlickDAL) dal).g;
 
         if (image != null) {
             g.drawImage(image, gc.getWidth() / 2 - image.getWidth(), gc.getHeight() / 2 - image.getHeight() / 2);

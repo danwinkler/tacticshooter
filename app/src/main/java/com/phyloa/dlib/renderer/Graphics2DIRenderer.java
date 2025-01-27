@@ -235,4 +235,11 @@ public class Graphics2DIRenderer implements IRenderer {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public void drawImage(Image img, float dx1, float dy1, float dx2, float dy2, float sx1, float sy1, float sx2,
+			float sy2, float alpha) {
+		g.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, alpha));
+		g.drawImage(img, (int) dx1, (int) dy1, (int) dx2, (int) dy2, (int) sx1, (int) sy1, (int) sx2, (int) sy2, null);
+	}
 }

@@ -74,12 +74,12 @@ public class WallRenderer {
 	public void drawTile(RWTile[][] rt, Level l, int x, int y, DALGraphics g) {
 		switch (l.tiles[x][y]) {
 			case DOOR:
-				drawAutoTile(l, g, x, y, TileType.FLOOR, SlickDAL.getTexture(l.theme.floor));
-				drawAutoTile(l, g, x, y, TileType.WALL, SlickDAL.getTexture(l.theme.wall));
+				drawAutoTile(l, g, x, y, TileType.FLOOR, l.theme.floor);
+				drawAutoTile(l, g, x, y, TileType.WALL, l.theme.wall);
 				break;
 			case GRATE:
-				drawAutoTile(l, g, x, y, TileType.FLOOR, SlickDAL.getTexture(l.theme.floor));
-				drawAutoTile(l, g, x, y, TileType.GRATE, SlickDAL.getTexture(l.theme.grate));
+				drawAutoTile(l, g, x, y, TileType.FLOOR, l.theme.floor);
+				drawAutoTile(l, g, x, y, TileType.GRATE, l.theme.grate);
 				break;
 			case WALL:
 				/*
@@ -92,7 +92,7 @@ public class WallRenderer {
 				 * );
 				 */
 
-				drawAutoTile(l, g, x, y, l.tiles[x][y], SlickDAL.getTexture(l.theme.wall));
+				drawAutoTile(l, g, x, y, l.tiles[x][y], l.theme.wall);
 				/*
 				 * switch( rt[x][y] )
 				 * {

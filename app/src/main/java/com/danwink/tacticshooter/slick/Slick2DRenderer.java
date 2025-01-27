@@ -6,11 +6,13 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 
+import com.danwink.tacticshooter.dal.DAL.DALTexture;
+import com.danwink.tacticshooter.dal.SlickDAL.SlickTexture;
 import com.phyloa.dlib.renderer.Renderer2D;
 
 import jp.objectclub.vecmath.Vector2f;
 
-public class Slick2DRenderer implements Renderer2D<Image> {
+public class Slick2DRenderer implements Renderer2D<DALTexture> {
 	Graphics gc;
 
 	public Slick2DRenderer renderTo(Graphics g) {
@@ -19,18 +21,6 @@ public class Slick2DRenderer implements Renderer2D<Image> {
 	}
 
 	public void begin() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void size(int x, int y) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void frameRate(float r) {
 		// TODO Auto-generated method stub
 
 	}
@@ -123,32 +113,23 @@ public class Slick2DRenderer implements Renderer2D<Image> {
 	}
 
 	@Override
-	public void initialize() {
-		// TODO Auto-generated method stub
-
+	public void drawImage(DALTexture img, float x, float y) {
+		var image = ((SlickTexture) img).image;
+		gc.drawImage(image, x, y);
 	}
 
 	@Override
-	public void update() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void drawImage(Image img, float x, float y) {
-		gc.drawImage(img, x, y);
-	}
-
-	@Override
-	public void drawImage(Image img, float x, float y, float width,
+	public void drawImage(DALTexture img, float x, float y, float width,
 			float height) {
-		gc.drawImage(img, x, y, width, height, 0, 0, img.getWidth(), img.getHeight());
+		var image = ((SlickTexture) img).image;
+		gc.drawImage(image, x, y, width, height, 0, 0, img.getWidth(), img.getHeight());
 	}
 
 	@Override
-	public void drawImage(Image img, float dx1, float dy1, float dx2,
+	public void drawImage(DALTexture img, float dx1, float dy1, float dx2,
 			float dy2, float sx1, float sy1, float sx2, float sy2) {
-		gc.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2);
+		var image = ((SlickTexture) img).image;
+		gc.drawImage(image, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2);
 	}
 
 	@Override
@@ -196,6 +177,13 @@ public class Slick2DRenderer implements Renderer2D<Image> {
 	@Override
 	public Graphics getRenderer() {
 		return gc;
+	}
+
+	@Override
+	public void drawImage(DALTexture img, float dx1, float dy1, float dx2, float dy2, float sx1, float sy1, float sx2,
+			float sy2, float alpha) {
+		var image = ((SlickTexture) img).image;
+		gc.drawImage(image, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, new Color(1, 1, 1, alpha));
 	}
 
 }

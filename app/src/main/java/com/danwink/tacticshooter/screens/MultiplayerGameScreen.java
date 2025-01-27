@@ -125,11 +125,7 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 	LevelAnalysis levelAnalysis;
 	boolean showLevelAnalysis = false;
 
-	SlickDAL dal;
-
 	public void init(GameContainer gc) {
-		dal = new SlickDAL();
-		dal.gc = gc;
 		input = gc.getInput();
 		initializeUIElements(dui);
 
@@ -445,7 +441,7 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 		cs.frame++;
 	}
 
-	public void render(GameContainer gc, Graphics g) {
+	public void render(GameContainer gc, DAL dal) {
 		if (!running)
 			return;
 
@@ -453,9 +449,7 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 			return;
 		}
 
-		if (dal.g != g) {
-			dal.g = g;
-		}
+		var g = ((SlickDAL) dal).g;
 
 		// TODO: faster way to know when game is over, but server hasn't yet send
 		// GAMEOVER command?
@@ -532,7 +526,7 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 		}
 
 		// Render UI
-		super.render(gc, g);
+		super.render(gc, dal);
 
 		// Draw minimap
 		g.setClip(gc.getWidth() - 200, gc.getHeight() - 200, 200, 200);

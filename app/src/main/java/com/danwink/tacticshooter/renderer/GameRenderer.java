@@ -193,7 +193,7 @@ public class GameRenderer {
 		for (int i = 0; i < cs.markers.size(); i++) {
 			Marker m = cs.markers.get(i);
 			int frame = (int) (System.currentTimeMillis() / 250) % 4;
-			g.drawImage(cs.l.theme.flag, m.x - 16, m.y - 32, m.x + 16, m.y, frame * 16, 0, (frame + 1) * 16, 16);
+			g.drawImage(cs.l.theme.flag.slim(), m.x - 16, m.y - 32, m.x + 16, m.y, frame * 16, 0, (frame + 1) * 16, 16);
 		}
 	}
 

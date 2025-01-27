@@ -2,8 +2,7 @@ package com.phyloa.dlib.dui;
 
 import java.util.ArrayList;
 
-import org.newdawn.slick.Image;
-
+import com.danwink.tacticshooter.dal.DAL.DALTexture;
 import com.phyloa.dlib.renderer.Renderer2D;
 
 public class DUI implements DMouseListener, DKeyListener {
@@ -80,7 +79,7 @@ public class DUI implements DMouseListener, DKeyListener {
 		}
 	}
 
-	public void render(Renderer2D<Image> r) {
+	public void render(Renderer2D<DALTexture> r) {
 		if (enabled) {
 			rootPane.render(r);
 			rootPane.renderChildren(r);

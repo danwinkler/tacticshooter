@@ -258,7 +258,8 @@ public class DecentAI extends ComputerPlayer {
 
                 boolean randomAttack = Math.random() < 0.001f;
 
-                if (ourSize > theirSize * 2.5f || randomAttack) {
+                // Plus 10 to account for the auto respawning of units at their base
+                if (ourSize > (theirSize * 2.5f + 10) || randomAttack) {
                     ci.sl.received(fc, new Message(MessageType.MESSAGE, "Full Attack"));
                     for (Building b : l.buildings) {
                         if (b.t.id != player.team.id && b.isCapturable(l)) {

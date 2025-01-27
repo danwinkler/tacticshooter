@@ -15,6 +15,8 @@ import org.newdawn.slick.imageout.ImageOut;
 
 import com.danwink.tacticshooter.LevelFileHelper;
 import com.danwink.tacticshooter.StaticFiles;
+import com.danwink.tacticshooter.dal.DAL;
+import com.danwink.tacticshooter.dal.SlickDAL;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Building.BuildingType;
 import com.danwink.tacticshooter.gameobjects.Level.TileType;
@@ -76,8 +78,10 @@ public class SDLevelGenScreen extends DUIScreen {
     }
 
     @Override
-    public void render(GameContainer gc, Graphics g) {
-        super.render(gc, g);
+    public void render(GameContainer gc, DAL dal) {
+        super.render(gc, dal);
+
+        var g = ((SlickDAL) dal).g;
 
         if (test != null) {
             g.drawImage(test, 0, 0);

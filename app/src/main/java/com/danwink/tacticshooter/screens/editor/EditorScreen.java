@@ -18,6 +18,7 @@ import com.danwink.tacticshooter.KryoHelper;
 import com.danwink.tacticshooter.LevelFileHelper;
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.Theme;
+import com.danwink.tacticshooter.dal.DAL.DALTexture;
 import com.danwink.tacticshooter.dal.SlickDAL;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Level;
@@ -152,7 +153,7 @@ public class EditorScreen extends DUIScreen {
         }
 
         @Override
-        public void render(Renderer2D<Image> r) {
+        public void render(Renderer2D<DALTexture> r) {
             if (level == null) {
                 return;
             }

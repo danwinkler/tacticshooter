@@ -5,6 +5,7 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
 import com.danwink.tacticshooter.UIHelper;
+import com.danwink.tacticshooter.dal.DAL;
 import com.danwink.tacticshooter.slick.Slick2DEventMapper;
 import com.danwink.tacticshooter.slick.Slick2DRenderer;
 import com.phyloa.dlib.dui.DUI;
@@ -15,7 +16,7 @@ import com.phyloa.dlib.game.DScreenHandler;
 /**
  * A superclass for screens to DRY out some common DUI logic (like scaling)
  */
-public abstract class DUIScreen extends DScreen<GameContainer, Graphics> implements DUIListener {
+public abstract class DUIScreen extends DScreen<GameContainer, DAL> implements DUIListener {
     public DUI dui;
 
     Slick2DRenderer r = new Slick2DRenderer();
@@ -28,7 +29,7 @@ public abstract class DUIScreen extends DScreen<GameContainer, Graphics> impleme
 
     public abstract void createUIElements(DUI dui, float windowHeight);
 
-    public void onActivate(GameContainer e, DScreenHandler<GameContainer, Graphics> dsh) {
+    public void onActivate(GameContainer e, DScreenHandler<GameContainer, DAL> dsh) {
         dui = new DUI(new Slick2DEventMapper(e.getInput()), 0, 0, gc.getWidth(), gc.getHeight());
         uiScale = UIHelper.getUIScale(gc.getHeight());
         init(e);
@@ -42,14 +43,16 @@ public abstract class DUIScreen extends DScreen<GameContainer, Graphics> impleme
         dui.update();
     }
 
-    public void render(GameContainer gc, Graphics g) {
+    public void render(GameContainer gc, DAL dal) {
+        var g = dal.getGraphics();
+
         if (clearScreen) {
             g.clear();
             g.setColor(Color.lightGray);
             g.fillRect(0, 0, gc.getWidth(), gc.getHeight());
         }
 
-        dui.render(r.renderTo(g));
+        dui.render(DAL.getDUIRenderer(g));
     }
 
     public void onExit() {

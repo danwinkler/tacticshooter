@@ -1,6 +1,16 @@
 package com.danwink.tacticshooter.dal;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.util.function.Consumer;
+
+import javax.swing.Renderer;
+
+import org.newdawn.slick.Graphics;
+
+import com.phyloa.dlib.renderer.Renderer2D;
+
+import jp.objectclub.vecmath.Vector2f;
 
 /**
  * DAL is the Dan Abstraction Layer.
@@ -23,12 +33,19 @@ public abstract class DAL {
     public abstract DALTexture generateRenderableTexture(int width, int height);
 
     public interface DALGraphics {
+        public int getWidth();
+
+        public int getHeight();
+
         public void drawImage(DALTexture texture, float x, float y);
 
         public void drawImage(DALTexture texture, float x, float y, float width, float height);
 
         public void drawImage(DALTexture texture, float x, float y, float x2, float y2, float srcX, float srcY,
                 float srcx2, float srcy2);
+
+        public void drawImage(DALTexture texture, float x, float y, float x2, float y2, float srcX, float srcY,
+                float srcx2, float srcy2, float alpha);
 
         public void setAntiAlias(boolean b);
 
@@ -42,7 +59,42 @@ public abstract class DAL {
 
         public void translate(float x, float y);
 
+        public void scale(float x, float y);
+
+        public void rotate(float angle);
+
         public void setLineWidth(int width);
+
+        public void setColor(float r, float g, float b, float a);
+
+        public void setColor(int c);
+
+        public void setColor(org.newdawn.slick.Color color);
+
+        public void fillRect(float x, float y, float width, float height);
+
+        public void drawRect(float x, float y, float width, float height);
+
+        public void fillRoundedRect(float x, float y, float width, float height, int cornerRadius, int segs);
+
+        public void drawRoundedRect(float x, float y, float width, float height, int cornerRadius, int segs);
+
+        public void fillOval(float x, float y, float width, float height);
+
+        public void drawOval(float x, float y, float width, float height);
+
+        public void setLineWidth(float width);
+
+        public void drawLine(float x1, float y1, float x2, float y2);
+
+        public void drawText(String text, float x, float y);
+
+        public Vector2f getStringSize(String text);
+
+        public void setClip(int x, int y, int width, int height);
+
+        public void clearClip();
+
     }
 
     public interface DALTexture {
@@ -51,5 +103,184 @@ public abstract class DAL {
         public int getHeight();
 
         public void renderTo(Consumer<DALGraphics> consumer);
+
+        public org.newdawn.slick.Image slim();
+
+        public DALTexture getSubImage(int x, int y, int width, int height);
+
+        public DALColor getColor(int x, int y);
+    }
+
+    public static class DALColor {
+        public float r, g, b, a;
+
+        public DALColor(float r, float g, float b, float a) {
+            this.r = r;
+            this.g = g;
+            this.b = b;
+            this.a = a;
+        }
+    }
+
+    public static Renderer2D<DALTexture> getDUIRenderer(DALGraphics g) {
+        return new DALRenderer2D(g);
+    }
+
+    public static class DALRenderer2D implements Renderer2D<DALTexture> {
+        DALGraphics g;
+
+        public DALRenderer2D(DALGraphics g) {
+            this.g = g;
+        }
+
+        @Override
+        public void color(int c) {
+            g.setColor(c);
+        }
+
+        @Override
+        public void color(float r, float g, float b) {
+            this.g.setColor(r / 255, g / 255, b / 255, 1);
+        }
+
+        @Override
+        public void color(float r, float g, float b, float a) {
+            this.g.setColor(r / 255, g / 255, b / 255, a / 255);
+        }
+
+        @Override
+        public void color(Color color) {
+            this.g.setColor(color.getRed() / 255.f, color.getGreen() / 255.f, color.getBlue() / 255.f,
+                    color.getAlpha() / 255.f);
+        }
+
+        @Override
+        public void line(float x1, float y1, float x2, float y2) {
+            g.drawLine(x1, y1, x2, y2);
+        }
+
+        @Override
+        public void fillRect(float x, float y, float width, float height) {
+            g.fillRect(x, y, width, height);
+        }
+
+        @Override
+        public void drawRect(float x, float y, float width, float height) {
+            g.drawRect(x, y, width, height);
+        }
+
+        @Override
+        public void fillRoundedRect(float x, float y, float width, float height, float arcWidth, float arcHeight) {
+            g.fillRoundedRect(x, y, width, height, (int) arcWidth, 16);
+        }
+
+        @Override
+        public void drawRoundedRect(float x, float y, float width, float height, float arcWidth, float arcHeight) {
+            g.drawRoundedRect(x, y, width, height, (int) arcWidth, 16);
+        }
+
+        @Override
+        public void fillOval(float x, float y, float width, float height) {
+            g.fillOval(x, y, width, height);
+        }
+
+        @Override
+        public void drawOval(float x, float y, float width, float height) {
+            g.drawOval(x, y, width, height);
+        }
+
+        @Override
+        public void text(String text, float x, float y) {
+            g.drawText(text, x, y);
+        }
+
+        @Override
+        public void translate(float x, float y) {
+            g.translate(x, y);
+        }
+
+        @Override
+        public void scale(float x, float y) {
+            g.scale(x, y);
+        }
+
+        @Override
+        public void rotate(float angle) {
+            g.rotate(angle);
+        }
+
+        @Override
+        public void pushMatrix() {
+            g.pushTransform();
+        }
+
+        @Override
+        public void popMatrix() {
+            g.popTransform();
+        }
+
+        @Override
+        public void drawImage(DALTexture img, float x, float y) {
+            g.drawImage(img, x, y);
+        }
+
+        @Override
+        public void drawImage(DALTexture img, float x, float y, float width, float height) {
+            g.drawImage(img, x, y, width, height);
+        }
+
+        @Override
+        public void drawImage(DALTexture img, float dx1, float dy1, float dx2, float dy2, float sx1, float sy1,
+                float sx2, float sy2) {
+            g.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2);
+        }
+
+        @Override
+        public int getWidth() {
+            return g.getWidth();
+        }
+
+        @Override
+        public int getHeight() {
+            return g.getHeight();
+        }
+
+        @Override
+        public Vector2f getStringSize(String text) {
+            return g.getStringSize(text);
+        }
+
+        @Override
+        public void setFont(Font font) {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'setFont'");
+        }
+
+        @Override
+        public void setClip(int x, int y, int width, int height) {
+            g.setClip(x, y, width, height);
+        }
+
+        @Override
+        public void clearClip() {
+            g.clearClip();
+        }
+
+        @Override
+        public void setLineWidth(float width) {
+            g.setLineWidth(width);
+        }
+
+        @Override
+        public Graphics getRenderer() {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'getRenderer'");
+        }
+
+        public void drawImage(DALTexture img, float dx1, float dy1, float dx2, float dy2, float sx1, float sy1,
+                float sx2, float sy2, float alpha) {
+            this.g.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, alpha);
+        }
+
     }
 }

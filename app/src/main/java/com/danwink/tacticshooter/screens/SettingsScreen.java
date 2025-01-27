@@ -1,11 +1,10 @@
 package com.danwink.tacticshooter.screens;
 
 import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
 
-
 import com.danwink.tacticshooter.StaticFiles;
+import com.danwink.tacticshooter.dal.DAL;
 import com.danwink.tacticshooter.slick.Slick2DEventMapper;
 import com.danwink.tacticshooter.slick.Slick2DRenderer;
 import com.phyloa.dlib.dui.DButton;
@@ -16,87 +15,71 @@ import com.phyloa.dlib.dui.DUIListener;
 import com.phyloa.dlib.game.DScreen;
 import com.phyloa.dlib.game.DScreenHandler;
 
-public class SettingsScreen extends DScreen<GameContainer, Graphics> implements DUIListener
-{
+public class SettingsScreen extends DScreen<GameContainer, DAL> implements DUIListener {
 	DUI dui;
 	DButton toggleFullscreen;
 	DButton options;
 	DButton advOptions;
 	DButton back;
-	
+
 	Slick2DRenderer r = new Slick2DRenderer();
-	
-	public void onActivate( GameContainer gc, DScreenHandler<GameContainer, Graphics> dsh )
-	{
-		if( dui == null )
-		{
-			dui = new DUI( new Slick2DEventMapper( gc.getInput() ) );
-			
-			toggleFullscreen = new DButton( "Toggle Fullscreen", gc.getWidth()/2-100, gc.getHeight()/2-200, 200, 100 );
-			options = new DButton( "Options", gc.getWidth()/2-100, gc.getHeight()/2-100, 200, 100 );
-			advOptions = new DButton( "Advanced Options", gc.getWidth()/2-100, gc.getHeight()/2, 200, 100 );
-			back = new DButton( "Back", gc.getWidth()/2-100, gc.getHeight()/2+100, 200, 100 );
-			
-			dui.add( toggleFullscreen );
-			dui.add( options );
-			dui.add( advOptions );
-			dui.add( back );
-			
-			dui.addDUIListener( this );
+
+	public void onActivate(GameContainer gc, DScreenHandler<GameContainer, DAL> dsh) {
+		if (dui == null) {
+			dui = new DUI(new Slick2DEventMapper(gc.getInput()));
+
+			toggleFullscreen = new DButton("Toggle Fullscreen", gc.getWidth() / 2 - 100, gc.getHeight() / 2 - 200, 200,
+					100);
+			options = new DButton("Options", gc.getWidth() / 2 - 100, gc.getHeight() / 2 - 100, 200, 100);
+			advOptions = new DButton("Advanced Options", gc.getWidth() / 2 - 100, gc.getHeight() / 2, 200, 100);
+			back = new DButton("Back", gc.getWidth() / 2 - 100, gc.getHeight() / 2 + 100, 200, 100);
+
+			dui.add(toggleFullscreen);
+			dui.add(options);
+			dui.add(advOptions);
+			dui.add(back);
+
+			dui.addDUIListener(this);
 		}
-		dui.setEnabled( true );
+		dui.setEnabled(true);
 	}
-	
-	public void update( GameContainer gc, float delta )
-	{
+
+	public void update(GameContainer gc, float delta) {
 		dui.update();
 	}
 
-	public void render( GameContainer gc, Graphics g )
-	{
-		dui.render( r.renderTo( g ) );
+	public void render(GameContainer gc, DAL g) {
+		dui.render(DAL.getDUIRenderer(g.getGraphics()));
 	}
 
-	public void onExit()
-	{
-		dui.setEnabled( false );
+	public void onExit() {
+		dui.setEnabled(false);
 	}
 
-	public void message( Object o )
-	{
-		
+	public void message(Object o) {
+
 	}
 
-	public void event( DUIEvent event )
-	{
+	public void event(DUIEvent event) {
 		DUIElement e = event.getElement();
-		if( e instanceof DButton && event.getType() == DButton.MOUSE_UP )
-		{
-			if( e == toggleFullscreen )
-			{
-				try
-				{
-					gc.setFullscreen( !gc.isFullscreen() );
-				} catch( SlickException e1 )
-				{
+		if (e instanceof DButton && event.getType() == DButton.MOUSE_UP) {
+			if (e == toggleFullscreen) {
+				try {
+					gc.setFullscreen(!gc.isFullscreen());
+				} catch (SlickException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
+			} else if (e == options) {
+				dsh.activate("options", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
+			} else if (e == advOptions) {
+				dsh.activate("advoptions", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
+			} else if (e == back) {
+				dsh.activate("home", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn());
 			}
-			else if( e == options )
-			{
-				dsh.activate( "options", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
-			}
-			else if( e == advOptions )
-			{
-				dsh.activate( "advoptions", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn() );
-			}
-			else if( e == back )
-			{
-				dsh.activate( "home", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn() );
-			} 
 		}
 	}
-	
-	public void onResize( int width, int height ) {}
+
+	public void onResize(int width, int height) {
+	}
 }

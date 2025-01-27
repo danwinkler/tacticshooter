@@ -4,10 +4,9 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 
-import org.newdawn.slick.Image;
-
 import jp.objectclub.vecmath.Vector2f;
 
+import com.danwink.tacticshooter.dal.DAL.DALTexture;
 import com.phyloa.dlib.renderer.Renderer2D;
 
 public class DButton extends DUIElement {
@@ -20,7 +19,7 @@ public class DButton extends DUIElement {
 
 	String text;
 
-	org.newdawn.slick.Image background = null;
+	DALTexture background = null;
 
 	Color borderColor = new Color(32, 32, 128);
 	Color releaseColor = new Color(128, 128, 255);
@@ -43,11 +42,11 @@ public class DButton extends DUIElement {
 		this.name = text;
 	}
 
-	public void setBackground(Image background) {
+	public void setBackground(DALTexture background) {
 		this.background = background;
 	}
 
-	public void render(Renderer2D<Image> r) {
+	public void render(Renderer2D<DALTexture> r) {
 		r.pushMatrix();
 
 		r.translate(x, y);
@@ -74,12 +73,11 @@ public class DButton extends DUIElement {
 		}
 		r.color(red, green, blue, alpha);
 		r.fillRect(0, 0, width - 1, height - 1);
-		var g = r.getRenderer();
 
 		if (background != null) {
 
-			g.drawImage(background, 0, 0, width, height, 0, 0, background.getWidth(), background.getHeight(),
-					new org.newdawn.slick.Color(1, 1, 1, imageAlpha));
+			r.drawImage(background, 0, 0, width, height, 0, 0, background.getWidth(), background.getHeight(),
+					imageAlpha);
 		}
 
 		r.color(borderColor.getRed(), borderColor.getGreen(), borderColor.getBlue(), borderColor.getAlpha());

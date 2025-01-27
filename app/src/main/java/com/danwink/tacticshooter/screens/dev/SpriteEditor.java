@@ -8,6 +8,8 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
+import com.danwink.tacticshooter.dal.DAL;
+import com.danwink.tacticshooter.dal.SlickDAL;
 import com.danwink.tacticshooter.ui.DUIScreen;
 import com.phyloa.dlib.dui.DUI;
 import com.phyloa.dlib.dui.DUIEvent;
@@ -24,7 +26,9 @@ public class SpriteEditor extends DUIScreen {
     }
 
     @Override
-    public void render(GameContainer gc, Graphics g) {
+    public void render(GameContainer gc, DAL dal) {
+        var g = ((SlickDAL) dal).g;
+
         if (image == null) {
             try {
                 image = new Image(32, 32);
@@ -75,7 +79,7 @@ public class SpriteEditor extends DUIScreen {
         g.popTransform();
 
         // Render ui
-        super.render(gc, g);
+        super.render(gc, dal);
     }
 
     public void outline(Graphics g, int width, int height) {

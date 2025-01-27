@@ -63,7 +63,7 @@ public class BloodLayerRenderer {
 		}
 
 		if (u.type.explodesOnDeath) {
-			tg.drawImage(cs.l.theme.crater, u.x - 16, u.y - 16, u.x + 16, u.y + 16, 0, 0, 32, 32);
+			tg.drawImage(cs.l.theme.crater.slim(), u.x - 16, u.y - 16, u.x + 16, u.y + 16, 0, 0, 32, 32);
 			tg.flush();
 		}
 	}
@@ -76,7 +76,7 @@ public class BloodLayerRenderer {
 		x += DMath.randomf(-8, 8);
 		y += DMath.randomf(-8, 8);
 
-		tg.drawImage(cs.l.theme.smoke, x - 4, y - 4, x + 4, y + 4, 0, 0, 64, 64, bloodColor);
+		tg.drawImage(cs.l.theme.smoke.slim(), x - 4, y - 4, x + 4, y + 4, 0, 0, 64, 64, bloodColor);
 		tg.flush();
 	}
 }

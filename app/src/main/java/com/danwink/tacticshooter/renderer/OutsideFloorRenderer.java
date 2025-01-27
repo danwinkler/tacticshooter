@@ -37,7 +37,7 @@ public class OutsideFloorRenderer {
 			for (int y = 0; y < dal.getHeight() + Level.tileSize * 2; y += Level.tileSize) {
 				for (int x = 0; x < dal.getWidth() + Level.tileSize * 2; x += Level.tileSize) {
 					g.drawImage(
-							SlickDAL.getTexture(cs.l.theme.floor),
+							cs.l.theme.floor,
 							x,
 							y,
 							x + Level.tileSize,

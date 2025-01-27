@@ -59,8 +59,8 @@ public class BackgroundDrawer {
 				g.pushTransform();
 				g.translate(x * tileSize, y * tileSize);
 				DALTexture here = getTile(x, y);
-				if (here == SlickDAL.getTexture(theme.wall)) {
-					g.drawImage(SlickDAL.getTexture(theme.floor), 0, 0, tileSize, tileSize, theme.floor.getWidth() / 3,
+				if (here == theme.wall) {
+					g.drawImage(theme.floor, 0, 0, tileSize, tileSize, theme.floor.getWidth() / 3,
 							0,
 							theme.floor.getWidth() / 3 * 2, theme.floor.getHeight() / 4);
 				}
@@ -81,6 +81,6 @@ public class BackgroundDrawer {
 	}
 
 	public DALTexture getTile(int x, int y) {
-		return SlickDAL.getTexture(n.noise(x * .1, y * .1, 0) > .2f ? theme.wall : theme.floor);
+		return n.noise(x * .1, y * .1, 0) > .2f ? theme.wall : theme.floor;
 	}
 }

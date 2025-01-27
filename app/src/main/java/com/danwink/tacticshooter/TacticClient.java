@@ -31,7 +31,7 @@ import com.danwink.tacticshooter.screens.editor.EditorScreen;
 import com.phyloa.dlib.game.DScreenHandler;
 
 public class TacticClient extends BasicGame {
-	DScreenHandler<GameContainer, Graphics> dsh = new DScreenHandler<GameContainer, Graphics>();
+	DScreenHandler<GameContainer, DAL> dsh = new DScreenHandler<>();
 
 	Font f;
 
@@ -47,6 +47,9 @@ public class TacticClient extends BasicGame {
 	public void init(GameContainer gc) throws SlickException {
 		lastWindowWidth = gc.getWidth();
 		lastWindowHeight = gc.getHeight();
+
+		Theme.getTheme("desertrpg").load();
+		Theme.getTheme("junglerpg").load();
 
 		dsh.register("openload", new OpenLoadScreen());
 
@@ -108,7 +111,7 @@ public class TacticClient extends BasicGame {
 			StaticFiles.bgd.render(dal);
 		}
 
-		dsh.render(gc, g);
+		dsh.render(gc, dal);
 	}
 
 	public static void main(String[] args) {

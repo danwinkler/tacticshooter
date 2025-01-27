@@ -5,11 +5,12 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
 import com.danwink.tacticshooter.StaticFiles;
+import com.danwink.tacticshooter.dal.DAL;
 import com.phyloa.dlib.game.DScreen;
 import com.phyloa.dlib.game.DScreenHandler;
 
-public class OpenLoadScreen extends DScreen<GameContainer, Graphics> {
-	public void onActivate(GameContainer e, DScreenHandler<GameContainer, Graphics> dsh) {
+public class OpenLoadScreen extends DScreen<GameContainer, DAL> {
+	public void onActivate(GameContainer e, DScreenHandler<GameContainer, DAL> dsh) {
 		StaticFiles.loadAll();
 		StaticFiles.loopWhenReady("menu");
 	}
@@ -20,12 +21,14 @@ public class OpenLoadScreen extends DScreen<GameContainer, Graphics> {
 		}
 	}
 
-	public void render(GameContainer gc, Graphics g) {
+	public void render(GameContainer gc, DAL dal) {
+		var g = dal.getGraphics();
+
 		g.setColor(new Color(0, 0, 0, 100));
 		g.fillRect(0, 0, gc.getWidth(), gc.getHeight());
 
 		g.setColor(Color.red);
-		g.drawString(StaticFiles.status, 50, 50);
+		g.drawText(StaticFiles.status, 50, 50);
 	}
 
 	public void onExit() {

@@ -8,6 +8,7 @@ import org.dom4j.DocumentException;
 import org.newdawn.slick.Image;
 
 import com.danwink.tacticshooter.LevelFileHelper;
+import com.danwink.tacticshooter.dal.DAL.DALTexture;
 import com.danwink.tacticshooter.screens.editor.EditorScreen.LevelElement;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DColumnPanel;
@@ -209,7 +210,7 @@ public class FilePane extends DColumnPanel {
             int doubleClickInterval = 500;
 
             @Override
-            public void render(Renderer2D<Image> r) {
+            public void render(Renderer2D<DALTexture> r) {
                 r.color(textColor);
                 if (selectedIndex == 0) {
                     r.color(hoverColor);

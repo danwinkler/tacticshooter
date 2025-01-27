@@ -13,6 +13,7 @@ import org.newdawn.slick.imageout.ImageOut;
 
 import com.danwink.tacticshooter.GameStats;
 import com.danwink.tacticshooter.GameStats.TeamStats;
+import com.danwink.tacticshooter.dal.DAL;
 import com.danwink.tacticshooter.dal.SlickDAL.SlickTexture;
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.slick.Slick2DEventMapper;
@@ -158,12 +159,14 @@ public class PostGameScreen extends DUIScreen {
 		dui.add(centerColumn);
 	}
 
-	public void render(GameContainer gc, Graphics g) {
+	public void render(GameContainer gc, DAL dal) {
+		var g = dal.getGraphics();
+
 		g.setColor(new Color(0, 0, 0, 200));
 		g.fillRect(0, 0, gc.getWidth(), gc.getHeight());
 
 		// Render UI
-		super.render(gc, g);
+		super.render(gc, dal);
 
 		// SO yeah I have to render here in order to get the blood to show up :/
 		if (!rd) {

@@ -13,6 +13,7 @@ import org.newdawn.slick.SlickException;
 
 import com.danwink.tacticshooter.ComputerPlayer;
 import com.danwink.tacticshooter.ComputerPlayer.PlayType;
+import com.danwink.tacticshooter.dal.DAL;
 import com.danwink.tacticshooter.dal.SlickDAL;
 import com.danwink.tacticshooter.MessageType;
 import com.danwink.tacticshooter.StaticFiles;
@@ -265,8 +266,11 @@ public class LobbyScreen extends DUIScreen {
 		}
 	}
 
-	public void render(GameContainer gc, Graphics g) {
-		super.render(gc, g);
+	public void render(GameContainer gc, DAL dal) {
+		super.render(gc, dal);
+
+		var g = ((SlickDAL) dal).g;
+
 		int count = 0;
 
 		var chatPos = chatBackground.getScreenLocation();
@@ -335,13 +339,13 @@ public class LobbyScreen extends DUIScreen {
 
 					mg.fillRect(0, 0, level.width * Level.tileSize, level.height * Level.tileSize);
 
-					SlickDAL dal = new SlickDAL();
-					dal.gc = gc;
-					dal.g = mg;
+					SlickDAL mgDal = new SlickDAL();
+					mgDal.gc = gc;
+					mgDal.g = mg;
 
 					// Render level floor, walls, etc.
-					level.renderFloor(dal.getGraphics());
-					level.render(dal.getGraphics());
+					level.renderFloor(mgDal.getGraphics());
+					level.render(mgDal.getGraphics());
 					level.renderBuildings(mg, false);
 
 					mg.flush();

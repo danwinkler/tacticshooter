@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.newdawn.slick.Image;
 
+import com.danwink.tacticshooter.dal.DAL.DALTexture;
 import com.phyloa.dlib.math.Point2i;
 
 import com.phyloa.dlib.renderer.Renderer2D;
@@ -47,7 +48,7 @@ public abstract class DUIElement implements DKeyListener, DMouseListener {
 		this.height = height;
 	}
 
-	public abstract void render(Renderer2D<Image> r);
+	public abstract void render(Renderer2D<DALTexture> r);
 
 	public abstract void update(DUI ui);
 

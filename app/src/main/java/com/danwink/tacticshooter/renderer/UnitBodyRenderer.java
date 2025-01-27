@@ -78,7 +78,7 @@ public class UnitBodyRenderer {
 
 		switch (u.type.name) {
 			case "LIGHT":
-				drawSpriteBody(g, u, cs.l.theme.light, cs.l.theme.lightColor, color, 8);
+				drawSpriteBody(g, u, cs.l.theme.light.slim(), cs.l.theme.lightColor.slim(), color, 8);
 				break;
 			case "SCOUT":
 				// draw4DirSpriteBody( g, u, cs.l.theme.dir4, null, color, 8 );
@@ -122,7 +122,7 @@ public class UnitBodyRenderer {
 				g.popTransform();
 				break;
 			case "HEAVY":
-				drawSpriteBody(g, u, cs.l.theme.heavy, cs.l.theme.heavyColor, color, 16);
+				drawSpriteBody(g, u, cs.l.theme.heavy.slim(), cs.l.theme.heavyColor.slim(), color, 16);
 				break;
 		}
 	}
