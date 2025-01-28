@@ -1,8 +1,5 @@
 package com.danwink.tacticshooter.screens;
 
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
-
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.dal.DAL;
 import com.danwink.tacticshooter.slick.Slick2DEventMapper;
@@ -16,7 +13,7 @@ import com.phyloa.dlib.dui.DUIListener;
 import com.phyloa.dlib.game.DScreen;
 import com.phyloa.dlib.game.DScreenHandler;
 
-public class MessageScreen extends DScreen<GameContainer, DAL> implements DUIListener {
+public class MessageScreen extends DScreen<DAL> implements DUIListener {
 	DUI dui;
 	DButton okay;
 	DText text;
@@ -25,11 +22,11 @@ public class MessageScreen extends DScreen<GameContainer, DAL> implements DUILis
 
 	String message;
 
-	public void onActivate(GameContainer e, DScreenHandler<GameContainer, DAL> dsh) {
-		dui = new DUI(new Slick2DEventMapper(e.getInput()));
+	public void onActivate(DAL dal, DScreenHandler<DAL> dsh) {
+		dui = new DUI(new Slick2DEventMapper(dal.getInput()));
 
-		okay = new DButton("Okay", e.getWidth() / 2 - 100, e.getHeight() / 2, 200, 100);
-		text = new DText(message, e.getWidth() / 2 - 100, e.getHeight() / 2 - 100);
+		okay = new DButton("Okay", dal.getWidth() / 2 - 100, dal.getHeight() / 2, 200, 100);
+		text = new DText(message, dal.getWidth() / 2 - 100, dal.getHeight() / 2 - 100);
 		text.setCentered(true);
 
 		dui.add(okay);
@@ -40,11 +37,11 @@ public class MessageScreen extends DScreen<GameContainer, DAL> implements DUILis
 		dui.setEnabled(true);
 	}
 
-	public void update(GameContainer gc, float delta) {
+	public void update(DAL dal, float delta) {
 		dui.update();
 	}
 
-	public void render(GameContainer gc, DAL dal) {
+	public void render(DAL dal) {
 		// g.setColor( new Color( 0, 0, 0, 100 ) );
 		// g.fillRect( 0, 0, gc.getWidth(), gc.getHeight() );
 
@@ -60,7 +57,7 @@ public class MessageScreen extends DScreen<GameContainer, DAL> implements DUILis
 		DUIElement e = event.getElement();
 		if (e instanceof DButton && event.getType() == DButton.MOUSE_UP)
 			if (e == okay) {
-				dsh.activate("home", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn());
+				dsh.activate("home", dal, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn());
 			}
 	}
 

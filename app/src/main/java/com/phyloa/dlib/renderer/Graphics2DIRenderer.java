@@ -13,7 +13,6 @@ import java.util.Stack;
 
 import org.newdawn.slick.Graphics;
 
-import jp.objectclub.vecmath.Point2f;
 import jp.objectclub.vecmath.Vector2f;
 
 import com.phyloa.dlib.util.DGraphics;

@@ -2,11 +2,8 @@ package com.danwink.tacticshooter.editor;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.io.File;
-import java.io.IOException;
 import java.util.LinkedList;
 
-import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;

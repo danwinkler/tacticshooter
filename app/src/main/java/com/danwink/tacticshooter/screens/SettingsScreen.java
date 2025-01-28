@@ -1,8 +1,5 @@
 package com.danwink.tacticshooter.screens;
 
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.SlickException;
-
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.dal.DAL;
 import com.danwink.tacticshooter.slick.Slick2DEventMapper;
@@ -15,7 +12,7 @@ import com.phyloa.dlib.dui.DUIListener;
 import com.phyloa.dlib.game.DScreen;
 import com.phyloa.dlib.game.DScreenHandler;
 
-public class SettingsScreen extends DScreen<GameContainer, DAL> implements DUIListener {
+public class SettingsScreen extends DScreen<DAL> implements DUIListener {
 	DUI dui;
 	DButton toggleFullscreen;
 	DButton options;
@@ -24,7 +21,7 @@ public class SettingsScreen extends DScreen<GameContainer, DAL> implements DUILi
 
 	Slick2DRenderer r = new Slick2DRenderer();
 
-	public void onActivate(GameContainer gc, DScreenHandler<GameContainer, DAL> dsh) {
+	public void onActivate(DAL gc, DScreenHandler<DAL> dsh) {
 		if (dui == null) {
 			dui = new DUI(new Slick2DEventMapper(gc.getInput()));
 
@@ -44,12 +41,12 @@ public class SettingsScreen extends DScreen<GameContainer, DAL> implements DUILi
 		dui.setEnabled(true);
 	}
 
-	public void update(GameContainer gc, float delta) {
+	public void update(DAL gc, float delta) {
 		dui.update();
 	}
 
-	public void render(GameContainer gc, DAL g) {
-		dui.render(DAL.getDUIRenderer(g.getGraphics()));
+	public void render(DAL dal) {
+		dui.render(DAL.getDUIRenderer(dal.getGraphics()));
 	}
 
 	public void onExit() {
@@ -64,18 +61,13 @@ public class SettingsScreen extends DScreen<GameContainer, DAL> implements DUILi
 		DUIElement e = event.getElement();
 		if (e instanceof DButton && event.getType() == DButton.MOUSE_UP) {
 			if (e == toggleFullscreen) {
-				try {
-					gc.setFullscreen(!gc.isFullscreen());
-				} catch (SlickException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+				dal.setFullscreen(!dal.isFullscreen());
 			} else if (e == options) {
-				dsh.activate("options", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
+				dsh.activate("options", dal, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
 			} else if (e == advOptions) {
-				dsh.activate("advoptions", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
+				dsh.activate("advoptions", dal, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
 			} else if (e == back) {
-				dsh.activate("home", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn());
+				dsh.activate("home", dal, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn());
 			}
 		}
 	}

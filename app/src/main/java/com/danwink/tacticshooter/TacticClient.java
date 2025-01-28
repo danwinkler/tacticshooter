@@ -31,20 +31,23 @@ import com.danwink.tacticshooter.screens.editor.EditorScreen;
 import com.phyloa.dlib.game.DScreenHandler;
 
 public class TacticClient extends BasicGame {
-	DScreenHandler<GameContainer, DAL> dsh = new DScreenHandler<>();
+	DScreenHandler<DAL> dsh = new DScreenHandler<>();
 
 	Font f;
 
 	int lastWindowWidth = 0;
 	int lastWindowHeight = 0;
 
-	DAL dal;
+	SlickDAL dal;
 
 	public TacticClient() {
 		super("Tactic Shooter Client");
 	}
 
 	public void init(GameContainer gc) throws SlickException {
+		dal = new SlickDAL();
+		dal.gc = gc;
+
 		lastWindowWidth = gc.getWidth();
 		lastWindowHeight = gc.getHeight();
 
@@ -68,7 +71,7 @@ public class TacticClient extends BasicGame {
 		dsh.register("advoptions", new OptionsScreen("data" + File.separator + "advoptions.txt", "settings"));
 		dsh.register("editor", new EditorScreen());
 
-		dsh.activate("openload", gc);
+		dsh.activate("openload", dal);
 
 		// Dev screens
 		dsh.register("devmenu", new DevMenu());
@@ -83,7 +86,7 @@ public class TacticClient extends BasicGame {
 	}
 
 	public void update(GameContainer gc, int delta) throws SlickException {
-		dsh.update(gc, delta / 1000.f);
+		dsh.update(dal, delta / 1000.f);
 
 		// Render background if not in a game
 		if (!(dsh.get() instanceof MultiplayerGameScreen)) {
@@ -92,8 +95,8 @@ public class TacticClient extends BasicGame {
 	}
 
 	public void render(GameContainer gc, Graphics g) throws SlickException {
-		if (dal == null) {
-			dal = new SlickDAL(gc, g);
+		if (dal.g == null) {
+			dal.g = g;
 		}
 
 		if (lastWindowWidth != gc.getWidth() || lastWindowHeight != gc.getHeight()) {
@@ -111,7 +114,7 @@ public class TacticClient extends BasicGame {
 			StaticFiles.bgd.render(dal);
 		}
 
-		dsh.render(gc, dal);
+		dsh.render(dal);
 	}
 
 	public static void main(String[] args) {

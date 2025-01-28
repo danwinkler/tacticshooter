@@ -5,8 +5,6 @@ import java.awt.event.KeyEvent;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import org.newdawn.slick.Color;
-import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
@@ -23,7 +21,9 @@ import com.danwink.tacticshooter.MusicQueuer;
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.ai.LevelAnalysis;
 import com.danwink.tacticshooter.dal.DAL;
-import com.danwink.tacticshooter.dal.SlickDAL;
+import com.danwink.tacticshooter.dal.DAL.DALColor;
+import com.danwink.tacticshooter.dal.DAL.DALTexture;
+import com.danwink.tacticshooter.dal.SlickDAL.SlickTexture;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Building.BuildingType;
 import com.danwink.tacticshooter.gameobjects.Bullet;
@@ -84,7 +84,7 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 
 	public Input input;
 
-	Image miniMap;
+	DALTexture miniMap;
 
 	int bottomOffset = 200;
 
@@ -92,14 +92,9 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 
 	Graphics btg;
 
-	Image wallTexture;
-	Image floorTexture;
-	Image backgroundTexture;
-
-	Image bloodTexture;
 	Image fog;
 
-	Image endMap;
+	DALTexture endMap;
 
 	boolean fogEnabled;
 
@@ -125,8 +120,8 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 	LevelAnalysis levelAnalysis;
 	boolean showLevelAnalysis = false;
 
-	public void init(GameContainer gc) {
-		input = gc.getInput();
+	public void init(DAL dal) {
+		input = dal.getInput();
 		initializeUIElements(dui);
 
 		for (int i = 0; i < 10; i++) {
@@ -159,7 +154,7 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 		gamemodeButtons = new DGrid(0, 0, gamemodeButtonWidth * 3 * uiScale, gamemodeButtonHeight * 3 * uiScale, 3, 3);
 		gamemodeButtons.setRelativePosition(RelativePosition.BOTTOM_LEFT, 0, 0);
 
-		chatPanel = new DPanel(gc.getWidth() / 2 - 200, gc.getHeight() / 2 - 50, 400, 100);
+		chatPanel = new DPanel(dal.getWidth() / 2 - 200, dal.getHeight() / 2 - 50, 400, 100);
 		chatBox = new DTextBox(0, 50, 400, 50);
 		teamChat = new DCheckBox(10, 10, 30, 30);
 
@@ -190,7 +185,8 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 		dui.add(selectedUnitsDisplay);
 	}
 
-	public void update(GameContainer gc, float d) {
+	@Override
+	public void update(DAL dal, float d) {
 		if (!running)
 			return;
 
@@ -207,11 +203,13 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 					if (tu == null) {
 						cs.unitMap.put(u.id, u);
 						cs.units.add(u);
-						StaticFiles.getSound("ping1").play(1.f, cs.getSoundMag(gc, u.x, u.y));
+						StaticFiles.getSound("ping1").play(1.f, cs.getSoundMag(u.x, u.y));
 						tu = u;
 					}
 					tu.sync(u);
 					break;
+				case LOBBYLEVELINFO:
+					throw new RuntimeException("Received lobby level info in game");
 				case LEVELUPDATE:
 					boolean newLevel = cs.l == null;
 					cs.l = (Level) m.message;
@@ -229,7 +227,7 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 					Bullet b = (Bullet) m.message;
 					cs.bullets.add(b);
 					(Math.random() > .5 ? StaticFiles.getSound("bullet1") : StaticFiles.getSound("bullet2")).play(1.f,
-							cs.getSoundMag(gc, b.loc.x, b.loc.y) * .2f);
+							cs.getSoundMag(b.loc.x, b.loc.y) * .2f);
 					break;
 				case MOVESUCCESS:
 					this.waitingForMoveConfirmation = false;
@@ -282,7 +280,7 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 				case GAMEOVER:
 					dsh.message("postgame", m.message);
 					dsh.message("postgame", endMap);
-					dsh.activate("postgame", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn());
+					dsh.activate("postgame", dal, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn());
 					return;
 				case FOGUPDATE:
 					fogEnabled = (Boolean) m.message;
@@ -344,15 +342,15 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 			Rectangle screenBounds = getScreenBounds();
 
 			boolean scrollup = cs.camera.y > 0 && (input.isKeyDown(Input.KEY_UP)
-					|| (gc.isFullscreen() && input.getMouseY() < 10));
+					|| (dal.isFullscreen() && input.getMouseY() < 10));
 			boolean scrolldown = cs.camera.y < cs.l.height * Level.tileSize
 					&& (input.isKeyDown(Input.KEY_DOWN)
-							|| (gc.isFullscreen() && input.getMouseY() > gc.getHeight() - 10));
+							|| (dal.isFullscreen() && input.getMouseY() > dal.getHeight() - 10));
 			boolean scrollleft = cs.camera.x > 0 && (input.isKeyDown(Input.KEY_LEFT)
-					|| (gc.isFullscreen() && input.getMouseX() < 10));
+					|| (dal.isFullscreen() && input.getMouseX() < 10));
 			boolean scrollright = cs.camera.x < cs.l.width * Level.tileSize
 					&& (input.isKeyDown(Input.KEY_RIGHT)
-							|| (gc.isFullscreen() && input.getMouseX() > gc.getWidth() - 10));
+							|| (dal.isFullscreen() && input.getMouseX() > dal.getWidth() - 10));
 
 			float scrollMultiplier = (input.isKeyDown(Input.KEY_LSHIFT) || input.isKeyDown(Input.KEY_RSHIFT)) ? 2 : 1;
 
@@ -384,7 +382,7 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 					StaticFiles.getSound("explode1").play();
 				} else {
 					(Math.random() > .5 ? StaticFiles.getSound("death1") : StaticFiles.getSound("death2")).play(1.f,
-							cs.getSoundMag(gc, u.x, u.y));
+							cs.getSoundMag(u.x, u.y));
 				}
 				i--;
 				continue;
@@ -393,7 +391,7 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 
 		for (int i = 0; i < cs.bullets.size(); i++) {
 			Bullet b = cs.bullets.get(i);
-			b.clientUpdate(this, d, gc);
+			b.clientUpdate(this, d);
 			if (!b.alive) {
 				cs.bullets.remove(i);
 				i--;
@@ -411,29 +409,22 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 		}
 
 		// Update UI
-		super.update(gc, d);
+		super.update(dal, d);
 
 		if (cs.l != null && miniMap == null) {
-			try {
-				boolean xLarger = cs.l.width > cs.l.height;
-				float xOffset = xLarger ? 0 : 100 - 100 * cs.l.width / (float) cs.l.height;
-				float yOffset = !xLarger ? 0 : 100 - 100 * (float) cs.l.height / cs.l.width;
-				float scale = 200.f / ((xLarger ? cs.l.width : cs.l.height) * Level.tileSize);
-				miniMap = new Image(200, 200);
-				Graphics mg = miniMap.getGraphics();
+			boolean xLarger = cs.l.width > cs.l.height;
+			float xOffset = xLarger ? 0 : 100 - 100 * cs.l.width / (float) cs.l.height;
+			float yOffset = !xLarger ? 0 : 100 - 100 * (float) cs.l.height / cs.l.width;
+			float scale = 200.f / ((xLarger ? cs.l.width : cs.l.height) * Level.tileSize);
+			miniMap = dal.generateRenderableTexture(200, 200);
+			miniMap.renderTo(mg -> {
 				mg.translate(xOffset, yOffset);
 				mg.scale(scale, scale);
 
-				DAL dal = new SlickDAL(gc, mg);
-
-				cs.l.renderFloor(dal.getGraphics());
-				cs.l.render(dal.getGraphics());
+				cs.l.renderFloor(mg);
+				cs.l.render(mg);
 				mg.flush();
-
-			} catch (SlickException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			});
 		}
 
 		gameRenderer.update(cs, d);
@@ -441,7 +432,8 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 		cs.frame++;
 	}
 
-	public void render(GameContainer gc, DAL dal) {
+	@Override
+	public void render(DAL dal) {
 		if (!running)
 			return;
 
@@ -449,7 +441,7 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 			return;
 		}
 
-		var g = ((SlickDAL) dal).g;
+		var g = dal.getGraphics();
 
 		// TODO: faster way to know when game is over, but server hasn't yet send
 		// GAMEOVER command?
@@ -470,20 +462,12 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 				}
 			}
 			if (gameOver) {
-				try {
-					endMap = new Image(cs.l.width * Level.tileSize, cs.l.height * Level.tileSize);
-					Graphics emg = endMap.getGraphics();
+				endMap = dal.generateRenderableTexture(cs.l.width * Level.tileSize, cs.l.height * Level.tileSize);
+				endMap.renderTo(emg -> {
 					emg.setAntiAlias(true);
 
-					SlickDAL emgDAL = new SlickDAL();
-					emgDAL.gc = gc;
-					emgDAL.g = emg;
-
-					gameRenderer.renderEndGameMap(emgDAL, cs);
-				} catch (SlickException e) {
-					e.printStackTrace();
-				}
-
+					gameRenderer.renderEndGameMap(dal.useGraphics(emg), cs);
+				});
 			}
 		}
 
@@ -494,14 +478,14 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 
 		gameRenderer.render(dal, cs, fogEnabled);
 
-		cs.camera.start(gc, g);
+		cs.camera.start(g);
 
 		if (showLevelAnalysis) {
 			levelAnalysis.render(g);
 		}
 
 		if (selecting) {
-			g.setColor(Color.blue);
+			g.setColor(DALColor.blue);
 			float x1 = Math.min(sx, sx2);
 			float y1 = Math.min(sy, sy2);
 			float x2 = Math.max(sx, sx2);
@@ -510,33 +494,33 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 		}
 		cs.camera.end(g);
 
-		g.setColor(new Color(0, 0, 0, 128));
-		g.fillRect(0, 0, gc.getWidth(), 30 * uiScale);
-		g.setColor(Color.white);
+		g.setColor(new DALColor(0, 0, 0, 128));
+		g.fillRect(0, 0, dal.getWidth(), 30 * uiScale);
+		g.setColor(DALColor.white);
 		if (cs.player != null) {
-			g.drawString("Money: " + cs.player.money, 100 * uiScale, 10 * uiScale);
-			g.drawString("Selected: " + cs.selected.size(), 200 * uiScale, 10 * uiScale);
-			g.setColor(Color.black);
+			g.drawText("Money: " + cs.player.money, 100 * uiScale, 10 * uiScale);
+			g.drawText("Selected: " + cs.selected.size(), 200 * uiScale, 10 * uiScale);
+			g.setColor(DALColor.black);
 			if (messages.size() > 0) {
 				for (int i = messages.size() - 1; i >= Math.max(messages.size() - 12, 0); i--) {
-					g.drawString(messages.get(i), 15 * uiScale,
+					g.drawText(messages.get(i), 15 * uiScale,
 							330 * uiScale - (messages.size() - 1 - i) * 25 * uiScale);
 				}
 			}
 		}
 
 		// Render UI
-		super.render(gc, dal);
+		super.render(dal);
 
 		// Draw minimap
-		g.setClip(gc.getWidth() - 200, gc.getHeight() - 200, 200, 200);
+		g.setClip(g.getWidth() - 200, g.getHeight() - 200, 200, 200);
 		boolean xLarger = cs.l.width > cs.l.height;
 		float xOffset = xLarger ? 0 : 100 - 100 * cs.l.width / (float) cs.l.height;
 		float yOffset = !xLarger ? 0 : 100 - 100 * (float) cs.l.height / cs.l.width;
 		float scale = 200.f / ((xLarger ? cs.l.width : cs.l.height) * Level.tileSize);
 		g.pushTransform();
-		g.translate(gc.getWidth() - 200, gc.getHeight() - 200);
-		g.setColor(Color.white);
+		g.translate(g.getWidth() - 200, g.getHeight() - 200);
+		g.setColor(DALColor.white);
 		g.fillRect(0, 0, 200, 200);
 		g.pushTransform();
 
@@ -562,20 +546,20 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 		for (int i = 0; i < pings.size(); i++) {
 			Vector3f v = pings.get(i);
 			float size = (v.z / 100.f) * 10;
-			g.setColor(Color.pink);
+			g.setColor(DALColor.pink);
 			g.fillOval(v.x - size / 2, v.y - size / 2, size, size);
-			g.setColor(Color.black);
+			g.setColor(DALColor.black);
 			g.drawOval(v.x - size / 2, v.y - size / 2, size, size);
 		}
 
 		// Draw window
-		g.setColor(Color.blue);
-		var topLeft = cs.camera.screenToWorld(0, 0, gc);
-		var bottomRight = cs.camera.screenToWorld(gc.getWidth(), gc.getHeight(), gc);
+		g.setColor(DALColor.blue);
+		var topLeft = cs.camera.screenToWorld(0, 0, g);
+		var bottomRight = cs.camera.screenToWorld(g.getWidth(), g.getHeight(), g);
 		g.drawRect(xOffset + topLeft.x * scale, yOffset + topLeft.y * scale, (bottomRight.x - topLeft.x) * scale,
 				(bottomRight.y - topLeft.y) * scale);
 
-		g.setColor(Color.black);
+		g.setColor(DALColor.black);
 		g.setLineWidth(2);
 		g.drawRect(0, 0, 200, 300);
 		g.setLineWidth(1);
@@ -584,32 +568,32 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 		g.clearClip();
 
 		if (escapeMenu.isVisible()) {
-			g.setColor(new Color(0, 0, 0, 128));
+			g.setColor(new DALColor(0, 0, 0, 128));
 			// Left side
-			g.fillRect(0, 0, gc.getWidth() / 2 - 100 * uiScale, gc.getHeight());
+			g.fillRect(0, 0, dal.getWidth() / 2 - 100 * uiScale, dal.getHeight());
 
 			// Right side
-			g.fillRect(gc.getWidth() / 2 + 100 * uiScale, 0, gc.getWidth() / 2 - 100 * uiScale, gc.getHeight());
+			g.fillRect(dal.getWidth() / 2 + 100 * uiScale, 0, dal.getWidth() / 2 - 100 * uiScale, dal.getHeight());
 
 			// Top
-			g.fillRect(gc.getWidth() / 2 - 100 * uiScale, 0, 200 * uiScale, gc.getHeight() / 2 - 100 * uiScale);
+			g.fillRect(dal.getWidth() / 2 - 100 * uiScale, 0, 200 * uiScale, dal.getHeight() / 2 - 100 * uiScale);
 
 			// bottom
-			g.fillRect(gc.getWidth() / 2 - 100 * uiScale, gc.getHeight() / 2 + 100 * uiScale, 200 * uiScale,
-					gc.getHeight() / 2 - 100 * uiScale);
+			g.fillRect(dal.getWidth() / 2 - 100 * uiScale, dal.getHeight() / 2 + 100 * uiScale, 200 * uiScale,
+					dal.getHeight() / 2 - 100 * uiScale);
 		}
 
 		if (input.isKeyDown(Input.KEY_TAB) && cs.players != null) {
-			g.setColor(new Color(128, 128, 128, 200));
-			g.fillRect(gc.getWidth() / 2 - 400, gc.getHeight() / 2 - 300, 800, 600);
-			g.setColor(Color.black);
-			g.drawRect(gc.getWidth() / 2 - 400, gc.getHeight() / 2 - 300, 800, 600);
+			g.setColor(new DALColor(128, 128, 128, 200));
+			g.fillRect(dal.getWidth() / 2 - 400, dal.getHeight() / 2 - 300, 800, 600);
+			g.setColor(DALColor.black);
+			g.drawRect(dal.getWidth() / 2 - 400, dal.getHeight() / 2 - 300, 800, 600);
 			int red = 0, green = 0;
 			for (int i = 0; i < cs.players.length; i++) {
 				Player p = cs.players[i];
 				boolean teamRed = p.team.id == Team.a.id;
-				g.drawString(p.name + " - " + (teamRed ? "RED" : "GREEN"), gc.getWidth() / 2 - (teamRed ? 390 : -10),
-						gc.getHeight() / 2 - 270 + (teamRed ? red : green) * 30);
+				g.drawText(p.name + " - " + (teamRed ? "RED" : "GREEN"), dal.getWidth() / 2 - (teamRed ? 390 : -10),
+						dal.getHeight() / 2 - 270 + (teamRed ? red : green) * 30);
 				if (p.team.id == Team.a.id) {
 					red++;
 				} else {
@@ -622,7 +606,8 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 		if (writeScreenFrames) {
 			if (cs.frame % 200 == 0) {
 				try {
-					Image im = gameRenderer.renderToTexture(cs.l.width * 8, cs.l.height * 8, cs, gc);
+					DALTexture tex = gameRenderer.renderToTexture(cs.l.width * 8, cs.l.height * 8, cs, dal);
+					Image im = ((SlickTexture) tex).image;
 					FileOutputStream fos = new FileOutputStream("screenshots/tmp/" + cs.frame + ".png");
 					ImageOut.write(im.getFlippedCopy(false, false), "png", fos);
 					fos.close();
@@ -641,8 +626,6 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 		}
 		cs.resetState();
 		miniMap = null;
-		bloodTexture = null;
-		wallTexture = null;
 		mapChanged = true;
 		endMap = null;
 		buttonSlots = new DButton[3][3];
@@ -671,26 +654,26 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 	}
 
 	public Rectangle getScreenBounds() {
-		var topLeft = cs.camera.screenToWorld(0, 0, gc);
-		var bottomRight = cs.camera.screenToWorld(gc.getWidth(), gc.getHeight(), gc);
+		var topLeft = cs.camera.screenToWorld(0, 0, dal.getGraphics());
+		var bottomRight = cs.camera.screenToWorld(dal.getWidth(), dal.getHeight(), dal.getGraphics());
 		return new Rectangle(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y);
 	}
 
 	@Override
 	public boolean mousePressed(DMouseEvent e) {
-		if (e.x > gc.getWidth() - 200 && e.y > gc.getHeight() - 200 && !selecting) {
+		if (e.x > dal.getWidth() - 200 && e.y > dal.getHeight() - 200 && !selecting) {
 			boolean xLarger = cs.l.width > cs.l.height;
 			float xOffset = xLarger ? 0 : 100 - 100 * cs.l.width / (float) cs.l.height;
 			float yOffset = !xLarger ? 0 : 100 - 100 * (float) cs.l.height / cs.l.width;
 			float scale = 200.f / ((xLarger ? cs.l.width : cs.l.height) * Level.tileSize);
-			float minimapX = (e.x - (gc.getWidth() - 200 + xOffset));
-			float minimapY = (e.y - (gc.getHeight() - 200 + yOffset));
+			float minimapX = (e.x - (dal.getWidth() - 200 + xOffset));
+			float minimapY = (e.y - (dal.getHeight() - 200 + yOffset));
 			float mapX = minimapX / scale;
 			float mapY = minimapY / scale;
 
 			if (input.isKeyDown(Input.KEY_LCONTROL)) {
-				ci.sendToServer(new Message(MessageType.MESSAGE, "/ping " + (input.getMouseX() - (gc.getWidth() - 200))
-						+ " " + (input.getMouseY() - (gc.getHeight() - 200))));
+				ci.sendToServer(new Message(MessageType.MESSAGE, "/ping " + (input.getMouseX() - (dal.getWidth() - 200))
+						+ " " + (input.getMouseY() - (dal.getHeight() - 200))));
 			} else {
 				if (e.button == Input.MOUSE_LEFT_BUTTON) {
 					Rectangle screenBounds = getScreenBounds();
@@ -698,15 +681,15 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 					cs.camera.y = DMath.bound(mapY, screenBounds.getMinY(),
 							screenBounds.getMaxY());
 				} else if (e.button == Input.MOUSE_RIGHT_BUTTON) {
-					int tx = cs.l.getTileX(((e.x - (gc.getWidth() - 200.f)) / 200.f) * cs.l.width * Level.tileSize);
-					int ty = cs.l.getTileY(((e.y - (gc.getHeight() - 200.f)) / 200.f) * cs.l.height * Level.tileSize);
+					int tx = cs.l.getTileX(((e.x - (dal.getWidth() - 200.f)) / 200.f) * cs.l.width * Level.tileSize);
+					int ty = cs.l.getTileY(((e.y - (dal.getHeight() - 200.f)) / 200.f) * cs.l.height * Level.tileSize);
 					ci.sendToServer(new Message(input.isKeyDown(Input.KEY_LCONTROL) ? MessageType.SETATTACKPOINTCONTINUE
 							: MessageType.SETATTACKPOINT, new Object[] { new Point2i(tx, ty), cs.selected }));
 					this.waitingForMoveConfirmation = true;
 				}
 			}
 		} else {
-			var worldCoords = cs.camera.screenToWorld(e.x, e.y, gc);
+			var worldCoords = cs.camera.screenToWorld(e.x, e.y, dal.getGraphics());
 			if (e.button == Input.MOUSE_LEFT_BUTTON) {
 				sx = worldCoords.x;
 				sy = worldCoords.y;
@@ -740,7 +723,7 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 		if (e.button == Input.MOUSE_LEFT_BUTTON && selecting) {
 			cs.clearSelected();
 
-			var worldCoords = cs.camera.screenToWorld(e.x, e.y, gc);
+			var worldCoords = cs.camera.screenToWorld(e.x, e.y, dal.getGraphics());
 			float x1 = Math.min(sx, worldCoords.x);
 			float y1 = Math.min(sy, worldCoords.y);
 			float x2 = Math.max(sx, worldCoords.x);
@@ -771,8 +754,8 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 				// Double click select same type units
 				long timeDiff = System.currentTimeMillis() - lastClick;
 				if (matchType != null && cs.selected.size() == 1 && timeDiff > 100 && timeDiff < 500) {
-					var topLeft = cs.camera.screenToWorld(0, 0, gc);
-					var bottomRight = cs.camera.screenToWorld(gc.getWidth(), gc.getHeight(), gc);
+					var topLeft = cs.camera.screenToWorld(0, 0, dal.getGraphics());
+					var bottomRight = cs.camera.screenToWorld(dal.getWidth(), dal.getHeight(), dal.getGraphics());
 					for (Unit u : cs.units) {
 						if (u.type.name.equals(matchType.name)
 								&& u.owner.id == this.cs.player.id
@@ -799,14 +782,14 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 
 	@Override
 	public boolean mouseDragged(DMouseEvent e) {
-		if (e.x > gc.getWidth() - 200 && e.y > gc.getHeight() - 200 && !selecting) {
+		if (e.x > dal.getWidth() - 200 && e.y > dal.getHeight() - 200 && !selecting) {
 			if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && !input.isKeyDown(Input.KEY_LCONTROL)) {
 				boolean xLarger = cs.l.width > cs.l.height;
 				float xOffset = xLarger ? 0 : 100 - 100 * cs.l.width / (float) cs.l.height;
 				float yOffset = !xLarger ? 0 : 100 - 100 * (float) cs.l.height / cs.l.width;
 				float scale = 200.f / ((xLarger ? cs.l.width : cs.l.height) * Level.tileSize);
-				float minimapX = (e.x - (gc.getWidth() - 200 + xOffset));
-				float minimapY = (e.y - (gc.getHeight() - 200 + yOffset));
+				float minimapX = (e.x - (dal.getWidth() - 200 + xOffset));
+				float minimapY = (e.y - (dal.getHeight() - 200 + yOffset));
 				float mapX = minimapX / scale;
 				float mapY = minimapY / scale;
 
@@ -816,7 +799,7 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 			}
 		} else {
 			if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
-				var worldCoords = cs.camera.screenToWorld(e.x, e.y, gc);
+				var worldCoords = cs.camera.screenToWorld(e.x, e.y, dal.getGraphics());
 				sx2 = worldCoords.x;
 				sy2 = worldCoords.y;
 			} else if (input.isMouseButtonDown(Input.MOUSE_MIDDLE_BUTTON)) {
@@ -845,11 +828,11 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 		var mx = input.getMouseX();
 		var my = input.getMouseY();
 
-		var worldCoords = cs.camera.screenToWorld(mx, my, gc);
+		var worldCoords = cs.camera.screenToWorld(mx, my, dal.getGraphics());
 
 		cs.camera.zoom(zoom);
 
-		var afterWorldCoords = cs.camera.screenToWorld(mx, my, gc);
+		var afterWorldCoords = cs.camera.screenToWorld(mx, my, dal.getGraphics());
 
 		cs.camera.x += worldCoords.x - afterWorldCoords.x;
 		cs.camera.y += worldCoords.y - afterWorldCoords.y;
@@ -957,7 +940,7 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 			} else if (e == quit) {
 				running = false;
 				escapeMenu.setVisible(false);
-				dsh.activate("home", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn());
+				dsh.activate("home", dal, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn());
 			} else if (e == returnToGame) {
 				escapeMenu.setVisible(false);
 			} else if (e.name.startsWith("userbutton")) {

@@ -3,9 +3,6 @@ package com.danwink.tacticshooter.gameobjects;
 import jp.objectclub.vecmath.Point2f;
 import jp.objectclub.vecmath.Vector2f;
 
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
-
 import com.danwink.tacticshooter.ClientState;
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.TacticServer;
@@ -106,7 +103,7 @@ public class Bullet {
 		}
 	}
 
-	public void clientUpdate(MultiplayerGameScreen cs, float d, GameContainer gc) {
+	public void clientUpdate(MultiplayerGameScreen cs, float d) {
 		ClientState ts = cs.cs;
 		Level l = ts.l;
 		lastLoc.set(loc);
@@ -129,7 +126,7 @@ public class Bullet {
 				if (sect.lengthSquared() < Unit.radius * Unit.radius) {
 					alive = false;
 
-					StaticFiles.getSound("hit1").play(DMath.randomf(.9f, 1.1f), ts.getSoundMag(gc, loc.x, loc.y) * .3f);
+					StaticFiles.getSound("hit1").play(DMath.randomf(.9f, 1.1f), ts.getSoundMag(loc.x, loc.y) * .3f);
 					cs.drawBlood(loc.x, loc.y);
 					break;
 				}

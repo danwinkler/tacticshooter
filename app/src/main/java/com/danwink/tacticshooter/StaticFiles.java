@@ -8,8 +8,6 @@ import java.util.stream.Stream;
 
 import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.Font;
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.Sound;
@@ -138,19 +136,19 @@ public class StaticFiles {
 		return sound.get(name);
 	}
 
-	public static DScreenTransition<GameContainer, DAL> getDownMenuOut() {
+	public static DScreenTransition<DAL> getDownMenuOut() {
 		return new DScreenSlideTransition(-1, 0, StaticFiles.advOptions.getF("menuTransitionSpeed"), false);
 	}
 
-	public static DScreenTransition<GameContainer, DAL> getDownMenuIn() {
+	public static DScreenTransition<DAL> getDownMenuIn() {
 		return new DScreenSlideTransition(-1, 0, StaticFiles.advOptions.getF("menuTransitionSpeed"), true);
 	}
 
-	public static DScreenTransition<GameContainer, DAL> getUpMenuOut() {
+	public static DScreenTransition<DAL> getUpMenuOut() {
 		return new DScreenSlideTransition(1, 0, StaticFiles.advOptions.getF("menuTransitionSpeed"), false);
 	}
 
-	public static DScreenTransition<GameContainer, DAL> getUpMenuIn() {
+	public static DScreenTransition<DAL> getUpMenuIn() {
 		return new DScreenSlideTransition(1, 0, StaticFiles.advOptions.getF("menuTransitionSpeed"), true);
 	}
 

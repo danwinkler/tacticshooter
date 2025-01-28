@@ -2,14 +2,10 @@ package com.danwink.tacticshooter.screens.dev;
 
 import java.util.ArrayList;
 
-import org.newdawn.slick.Color;
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
-import org.newdawn.slick.SlickException;
-
 import com.danwink.tacticshooter.dal.DAL;
-import com.danwink.tacticshooter.dal.SlickDAL;
+import com.danwink.tacticshooter.dal.DAL.DALColor;
+import com.danwink.tacticshooter.dal.DAL.DALGraphics;
+import com.danwink.tacticshooter.dal.DAL.DALTexture;
 import com.danwink.tacticshooter.ui.DUIScreen;
 import com.phyloa.dlib.dui.DUI;
 import com.phyloa.dlib.dui.DUIEvent;
@@ -17,27 +13,19 @@ import com.phyloa.dlib.math.Point2i;
 
 public class SpriteEditor extends DUIScreen {
 
-    Image image;
-    Graphics ig;
+    DALTexture image;
 
     @Override
-    public void init(GameContainer gc) {
+    public void init(DAL dal) {
 
     }
 
     @Override
-    public void render(GameContainer gc, DAL dal) {
-        var g = ((SlickDAL) dal).g;
+    public void render(DAL dal) {
+        var g = dal.getGraphics();
 
         if (image == null) {
-            try {
-                image = new Image(32, 32);
-                ig = image.getGraphics();
-            } catch (SlickException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-
+            image = dal.generateRenderableTexture(32, 32);
         }
 
         float armOffset = 9;
@@ -45,33 +33,35 @@ public class SpriteEditor extends DUIScreen {
 
         float bodyRadius = 8.5f;
 
-        ig.clear();
-        ig.clearAlphaMap();
+        image.renderTo(ig -> {
+            ig.clear();
 
-        ig.pushTransform();
-        ig.setAntiAlias(false);
-        ig.setDrawMode(Graphics.MODE_NORMAL);
-        ig.translate(image.getWidth() / 2, image.getHeight() / 2);
-        ig.setColor(Color.white);
-        ig.fillOval(armOffset - armRadius, -armRadius, armRadius * 2, armRadius * 2);
-        ig.fillOval(-armOffset - armRadius, -armRadius, armRadius * 2, armRadius * 2);
-        ig.fillOval(-bodyRadius, -bodyRadius, bodyRadius * 2, bodyRadius * 2);
+            ig.pushTransform();
+            ig.setAntiAlias(false);
+            ig.setDrawMode(DALGraphics.MODE_NORMAL);
+            ig.translate(image.getWidth() / 2, image.getHeight() / 2);
+            ig.setColor(DALColor.white);
+            ig.fillOval(armOffset - armRadius, -armRadius, armRadius * 2, armRadius * 2);
+            ig.fillOval(-armOffset - armRadius, -armRadius, armRadius * 2, armRadius * 2);
+            ig.fillOval(-bodyRadius, -bodyRadius, bodyRadius * 2, bodyRadius * 2);
 
-        // Erase a bit off the back
-        ig.setDrawMode(Graphics.MODE_COLOR_MULTIPLY_ALPHA);
-        ig.setColor(Color.black);
-        ig.fillRect(-bodyRadius, 6, bodyRadius * 2, 5);
+            // Erase a bit off the back
+            ig.setDrawMode(DALGraphics.MODE_COLOR_MULTIPLY_ALPHA);
+            ig.setColor(DALColor.black);
+            ig.fillRect(-bodyRadius, 6, bodyRadius * 2, 5);
 
-        ig.setDrawMode(Graphics.MODE_NORMAL);
+            ig.setDrawMode(DALGraphics.MODE_NORMAL);
 
-        ig.popTransform();
+            ig.popTransform();
 
-        ig.flush();
-        image.flushPixelData();
-        outline(ig, image.getWidth(), image.getHeight());
+            ig.flush();
+            image.flushPixelData();
+
+            outline(ig, image.getWidth(), image.getHeight());
+        });
 
         g.pushTransform();
-        g.translate(gc.getWidth() / 2, gc.getHeight() / 2);
+        g.translate(dal.getWidth() / 2, dal.getHeight() / 2);
         g.scale(10, 10);
 
         g.drawImage(image, 0, 0);
@@ -79,10 +69,10 @@ public class SpriteEditor extends DUIScreen {
         g.popTransform();
 
         // Render ui
-        super.render(gc, dal);
+        super.render(dal);
     }
 
-    public void outline(Graphics g, int width, int height) {
+    public void outline(DALGraphics g, int width, int height) {
         ArrayList<Point2i> pixelsToDraw = new ArrayList<Point2i>();
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -99,7 +89,7 @@ public class SpriteEditor extends DUIScreen {
             }
         }
 
-        g.setColor(Color.black);
+        g.setColor(DALColor.black);
         for (var p : pixelsToDraw) {
             g.drawLine(p.x, p.y, p.x, p.y);
         }

@@ -8,9 +8,7 @@ import java.awt.event.KeyEvent;
 import java.io.IOException;
 
 import org.newdawn.slick.Color;
-import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 
@@ -18,6 +16,7 @@ import com.danwink.tacticshooter.KryoHelper;
 import com.danwink.tacticshooter.LevelFileHelper;
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.Theme;
+import com.danwink.tacticshooter.dal.DAL;
 import com.danwink.tacticshooter.dal.DAL.DALTexture;
 import com.danwink.tacticshooter.dal.SlickDAL;
 import com.danwink.tacticshooter.gameobjects.Building;
@@ -51,9 +50,10 @@ public class EditorScreen extends DUIScreen {
     Input input;
 
     @Override
-    public void init(GameContainer gc) {
+    public void init(DAL dal) {
         this.clearScreen = true;
 
+        var gc = ((SlickDAL) dal).gc;
         input = gc.getInput();
         levelElement = new LevelElement();
         messagePane = new MessagePane(0, 0, 0, 0);
@@ -74,7 +74,7 @@ public class EditorScreen extends DUIScreen {
         var exitButton = new DButton("Exit", 0, 0, 150 * uiScale, 50 * uiScale);
         exitButton.setRelativePosition(RelativePosition.BOTTOM_LEFT, 0, 0);
         exitButton.onMouseUp(e -> {
-            dsh.activate("home", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn());
+            dsh.activate("home", dal, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn());
         });
         dui.add(exitButton);
 
@@ -161,9 +161,7 @@ public class EditorScreen extends DUIScreen {
             var g = r.getRenderer();
             g.setAntiAlias(false);
 
-            camera.start(gc, g);
-
-            SlickDAL dal = new SlickDAL(gc, g);
+            camera.start(dal.getGraphics());
 
             floor.render(dal, level);
             wall.render(dal, level);
@@ -183,7 +181,7 @@ public class EditorScreen extends DUIScreen {
                 }
             }
 
-            camera.end(g);
+            camera.end(dal.getGraphics());
         }
 
         public void pushUndoState() {
@@ -261,7 +259,7 @@ public class EditorScreen extends DUIScreen {
                 return false;
             }
 
-            var world = camera.screenToWorld(e.x, e.y, gc);
+            var world = camera.screenToWorld(e.x, e.y, dal.getGraphics());
             int tx = (int) world.x / Level.tileSize;
             int ty = (int) world.y / Level.tileSize;
 
@@ -284,7 +282,7 @@ public class EditorScreen extends DUIScreen {
                 return false;
             }
 
-            var world = camera.screenToWorld(e.x, e.y, gc);
+            var world = camera.screenToWorld(e.x, e.y, dal.getGraphics());
             int tx = (int) world.x / Level.tileSize;
             int ty = (int) world.y / Level.tileSize;
 
@@ -313,7 +311,7 @@ public class EditorScreen extends DUIScreen {
                 return false;
             }
 
-            var world = camera.screenToWorld(e.x, e.y, gc);
+            var world = camera.screenToWorld(e.x, e.y, dal.getGraphics());
             int tx = (int) world.x / Level.tileSize;
             int ty = (int) world.y / Level.tileSize;
 
@@ -352,11 +350,11 @@ public class EditorScreen extends DUIScreen {
             var mx = input.getMouseX();
             var my = input.getMouseY();
 
-            var worldCoords = camera.screenToWorld(mx, my, gc);
+            var worldCoords = camera.screenToWorld(mx, my, dal.getGraphics());
 
             camera.zoom(zoom);
 
-            var afterWorldCoords = camera.screenToWorld(mx, my, gc);
+            var afterWorldCoords = camera.screenToWorld(mx, my, dal.getGraphics());
 
             camera.x += worldCoords.x - afterWorldCoords.x;
             camera.y += worldCoords.y - afterWorldCoords.y;

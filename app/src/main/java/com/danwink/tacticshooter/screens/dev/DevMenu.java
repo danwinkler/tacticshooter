@@ -1,10 +1,7 @@
 package com.danwink.tacticshooter.screens.dev;
 
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Image;
-import org.newdawn.slick.SlickException;
-
 import com.danwink.tacticshooter.StaticFiles;
+import com.danwink.tacticshooter.dal.DAL;
 import com.danwink.tacticshooter.ui.DUIScreen;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DColumnPanel;
@@ -19,7 +16,7 @@ public class DevMenu extends DUIScreen {
     DButton back;
 
     @Override
-    public void init(GameContainer gc) {
+    public void init(DAL dal) {
         // TODO Auto-generated method stub
 
     }
@@ -46,11 +43,11 @@ public class DevMenu extends DUIScreen {
         DUIElement e = event.getElement();
         if (e instanceof DButton && event.getType() == DButton.MOUSE_UP) {
             if (e == back) {
-                dsh.activate("home", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn());
+                dsh.activate("home", dal, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn());
             } else if (e == spriteEditor) {
-                dsh.activate("spriteeditor", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
+                dsh.activate("spriteeditor", dal, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
             } else if (e == sdLevelGen) {
-                dsh.activate("sdlevelgen", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
+                dsh.activate("sdlevelgen", dal, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
             }
         }
     }

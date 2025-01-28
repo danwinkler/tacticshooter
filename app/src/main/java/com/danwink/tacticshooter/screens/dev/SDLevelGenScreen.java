@@ -7,7 +7,6 @@ import java.util.Arrays;
 
 import org.dom4j.DocumentException;
 import org.newdawn.slick.Color;
-import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
@@ -37,7 +36,7 @@ public class SDLevelGenScreen extends DUIScreen {
     Image test;
 
     @Override
-    public void init(GameContainer gc) {
+    public void init(DAL dal) {
         makeImages = new DButton("Make Images");
         convertImage = new DButton("Convert Image");
         back = new DButton("Back");
@@ -64,7 +63,7 @@ public class SDLevelGenScreen extends DUIScreen {
     @Override
     public void event(DUIEvent event) {
         if (event.getElement() == back) {
-            dsh.activate("devmenu", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn());
+            dsh.activate("devmenu", dal, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn());
         } else if (event.getElement() == makeImages) {
             makeImages();
         } else if (event.getElement() == convertImage) {
@@ -73,13 +72,8 @@ public class SDLevelGenScreen extends DUIScreen {
     }
 
     @Override
-    public void update(GameContainer gc, float delta) {
-        super.update(gc, delta);
-    }
-
-    @Override
-    public void render(GameContainer gc, DAL dal) {
-        super.render(gc, dal);
+    public void render(DAL dal) {
+        super.render(dal);
 
         var g = ((SlickDAL) dal).g;
 
@@ -162,6 +156,6 @@ public class SDLevelGenScreen extends DUIScreen {
 
     public void convertImages() {
         dsh.message("sdimageparse", images.getSelected());
-        dsh.activate("sdimageparse", gc);
+        dsh.activate("sdimageparse", dal);
     }
 }

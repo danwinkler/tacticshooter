@@ -9,6 +9,7 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
+import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 
 import com.phyloa.dlib.math.Point2i;
@@ -60,6 +61,50 @@ public class SlickDAL extends DAL {
     @Override
     public DALTexture generateRenderableTexture(int width, int height) {
         return new SlickTexture(width, height);
+    }
+
+    @Override
+    public void setForceExit(boolean b) {
+        gc.setForceExit(b);
+    }
+
+    @Override
+    public void exit() {
+        gc.exit();
+    }
+
+    @Override
+    public Input getInput() {
+        return gc.getInput();
+    }
+
+    @Override
+    public DAL useGraphics(DALGraphics g) {
+        return new SlickDAL(gc, ((SlickGraphics) g).g);
+    }
+
+    public void setMusicVolume(float f) {
+        gc.setMusicVolume(f);
+    }
+
+    public void setSoundVolume(float f) {
+        gc.setSoundVolume(f);
+    }
+
+    public void setVSync(boolean b) {
+        gc.setVSync(b);
+    }
+
+    public void setFullscreen(boolean b) {
+        try {
+            gc.setFullscreen(b);
+        } catch (SlickException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public boolean isFullscreen() {
+        return gc.isFullscreen();
     }
 
     public static class SlickGraphics implements DALGraphics {
@@ -150,11 +195,6 @@ public class SlickDAL extends DAL {
         @Override
         public void setColor(int c) {
             this.g.setColor(new Color(c));
-        }
-
-        @Override
-        public void setColor(Color color) {
-            this.g.setColor(color);
         }
 
         @Override
@@ -253,6 +293,16 @@ public class SlickDAL extends DAL {
         public void setClearColor(DALColor color) {
             g.setBackground(new Color(color.r, color.g, color.b, color.a));
         }
+
+        @Override
+        public float getTextWidth(String text) {
+            return g.getFont().getWidth(text);
+        }
+
+        @Override
+        public void drawArc(float x, float y, float width, float height, float startAngle, float arcAngle) {
+            g.drawArc(x, y, width, height, startAngle, arcAngle);
+        }
     }
 
     public static class SlickTexture implements DALTexture {
@@ -304,6 +354,11 @@ public class SlickDAL extends DAL {
         public DALColor getColor(int x, int y) {
             Color c = image.getColor(x, y);
             return new DALColor(c.r, c.g, c.b, c.a);
+        }
+
+        @Override
+        public void flushPixelData() {
+            image.flushPixelData();
         }
     }
 

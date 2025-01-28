@@ -1,15 +1,11 @@
 package com.danwink.tacticshooter;
 
 import java.io.File;
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
 import com.danwink.tacticshooter.dal.DAL;
 import com.danwink.tacticshooter.dal.DAL.DALGraphics;
 import com.danwink.tacticshooter.dal.DAL.DALTexture;
-import com.danwink.tacticshooter.dal.SlickDAL;
 import com.phyloa.dlib.util.DMath;
 import com.phyloa.dlib.util.ImprovedNoise;
 

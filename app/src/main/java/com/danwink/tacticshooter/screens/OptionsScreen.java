@@ -5,9 +5,6 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Map.Entry;
 
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
-
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.dal.DAL;
 import com.danwink.tacticshooter.slick.Slick2DEventMapper;
@@ -26,7 +23,7 @@ import com.phyloa.dlib.game.DScreenHandler;
 import com.phyloa.dlib.util.DFile;
 import com.phyloa.dlib.util.DOptions;
 
-public class OptionsScreen extends DScreen<GameContainer, DAL> implements DUIListener {
+public class OptionsScreen extends DScreen<DAL> implements DUIListener {
 	DUI dui;
 
 	DScrollPane scrollPane;
@@ -46,7 +43,7 @@ public class OptionsScreen extends DScreen<GameContainer, DAL> implements DUILis
 		this.screenToReturn = screenToReturn;
 	}
 
-	public void onActivate(GameContainer gc, DScreenHandler<GameContainer, DAL> dsh) {
+	public void onActivate(DAL gc, DScreenHandler<DAL> dsh) {
 		dui = new DUI(new Slick2DEventMapper(gc.getInput()));
 
 		DOptions options = new DOptions(optionsFile);
@@ -82,11 +79,11 @@ public class OptionsScreen extends DScreen<GameContainer, DAL> implements DUILis
 		dui.setEnabled(true);
 	}
 
-	public void update(GameContainer gc, float delta) {
+	public void update(DAL dal, float delta) {
 		dui.update();
 	}
 
-	public void render(GameContainer gc, DAL g) {
+	public void render(DAL g) {
 		dui.render(DAL.getDUIRenderer(g.getGraphics()));
 	}
 
@@ -133,11 +130,11 @@ public class OptionsScreen extends DScreen<GameContainer, DAL> implements DUILis
 				StaticFiles.options = new DOptions("options.txt");
 				StaticFiles.advOptions = new DOptions("data" + File.separator + "advoptions.txt");
 
-				gc.setMusicVolume(StaticFiles.options.getF("slider.music"));
-				gc.setSoundVolume(StaticFiles.options.getF("slider.sound"));
-				gc.setVSync(StaticFiles.options.getB("vsync"));
+				dal.setMusicVolume(StaticFiles.options.getF("slider.music"));
+				dal.setSoundVolume(StaticFiles.options.getF("slider.sound"));
+				dal.setVSync(StaticFiles.options.getB("vsync"));
 
-				dsh.activate(screenToReturn, gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn());
+				dsh.activate(screenToReturn, dal, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn());
 			}
 		}
 	}

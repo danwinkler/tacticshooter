@@ -1,11 +1,9 @@
 package com.danwink.tacticshooter.ui;
 
-import org.newdawn.slick.Color;
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
-
 import com.danwink.tacticshooter.UIHelper;
 import com.danwink.tacticshooter.dal.DAL;
+import com.danwink.tacticshooter.dal.SlickDAL;
+import com.danwink.tacticshooter.dal.DAL.DALColor;
 import com.danwink.tacticshooter.slick.Slick2DEventMapper;
 import com.danwink.tacticshooter.slick.Slick2DRenderer;
 import com.phyloa.dlib.dui.DUI;
@@ -16,8 +14,9 @@ import com.phyloa.dlib.game.DScreenHandler;
 /**
  * A superclass for screens to DRY out some common DUI logic (like scaling)
  */
-public abstract class DUIScreen extends DScreen<GameContainer, DAL> implements DUIListener {
+public abstract class DUIScreen extends DScreen<DAL> implements DUIListener {
     public DUI dui;
+    public DAL dal;
 
     Slick2DRenderer r = new Slick2DRenderer();
 
@@ -25,31 +24,35 @@ public abstract class DUIScreen extends DScreen<GameContainer, DAL> implements D
 
     public boolean clearScreen = false;
 
-    public abstract void init(GameContainer gc);
+    public abstract void init(DAL dal);
 
     public abstract void createUIElements(DUI dui, float windowHeight);
 
-    public void onActivate(GameContainer e, DScreenHandler<GameContainer, DAL> dsh) {
-        dui = new DUI(new Slick2DEventMapper(e.getInput()), 0, 0, gc.getWidth(), gc.getHeight());
-        uiScale = UIHelper.getUIScale(gc.getHeight());
-        init(e);
-        createUIElements(dui, gc.getHeight());
+    public void onActivate(DAL dal, DScreenHandler<DAL> dsh) {
+        this.dal = dal;
+
+        var gc = ((SlickDAL) dal).gc;
+
+        dui = new DUI(new Slick2DEventMapper(gc.getInput()), 0, 0, dal.getWidth(), dal.getHeight());
+        uiScale = UIHelper.getUIScale(dal.getHeight());
+        init(dal);
+        createUIElements(dui, dal.getHeight());
         dui.doLayout();
         dui.setEnabled(true);
         dui.addDUIListener(this);
     }
 
-    public void update(GameContainer gc, float delta) {
+    public void update(DAL dal, float delta) {
         dui.update();
     }
 
-    public void render(GameContainer gc, DAL dal) {
+    public void render(DAL dal) {
         var g = dal.getGraphics();
 
         if (clearScreen) {
             g.clear();
-            g.setColor(Color.lightGray);
-            g.fillRect(0, 0, gc.getWidth(), gc.getHeight());
+            g.setColor(DALColor.lightGray);
+            g.fillRect(0, 0, dal.getWidth(), dal.getHeight());
         }
 
         dui.render(DAL.getDUIRenderer(g));

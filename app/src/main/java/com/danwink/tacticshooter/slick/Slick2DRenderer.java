@@ -4,8 +4,6 @@ import java.awt.Font;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
-
 import com.danwink.tacticshooter.dal.DAL.DALTexture;
 import com.danwink.tacticshooter.dal.SlickDAL.SlickTexture;
 import com.phyloa.dlib.renderer.Renderer2D;

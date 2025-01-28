@@ -5,16 +5,11 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-import org.newdawn.slick.Color;
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
-import org.newdawn.slick.SlickException;
-
 import com.danwink.tacticshooter.ComputerPlayer;
 import com.danwink.tacticshooter.ComputerPlayer.PlayType;
 import com.danwink.tacticshooter.dal.DAL;
-import com.danwink.tacticshooter.dal.SlickDAL;
+import com.danwink.tacticshooter.dal.DAL.DALColor;
+import com.danwink.tacticshooter.dal.DAL.DALTexture;
 import com.danwink.tacticshooter.MessageType;
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.Theme;
@@ -24,7 +19,6 @@ import com.danwink.tacticshooter.gameobjects.Level.SlotType;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.network.ClientInterface;
 import com.danwink.tacticshooter.network.Message;
-import com.danwink.tacticshooter.screens.LobbyScreen.Slot;
 import com.danwink.tacticshooter.ui.DUIScreen;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DCheckBox;
@@ -56,13 +50,13 @@ public class LobbyScreen extends DUIScreen {
 
 	Theme theme;
 	Level level;
-	Image miniMap;
+	DALTexture miniMap;
 
 	Slot[] slots = new Slot[16];
 
 	ArrayList<String> messages = new ArrayList<String>();
 
-	public void init(GameContainer gc) {
+	public void init(DAL dal) {
 		initializeUIElements(dui);
 
 		messages.clear();
@@ -106,9 +100,9 @@ public class LobbyScreen extends DUIScreen {
 
 		startGame = new DButton("Start", 205, 700, 90, 50);
 
-		chatBox = new DTextBox(gc.getWidth() - 600, gc.getHeight() - 200, 500, 50);
+		chatBox = new DTextBox(dal.getWidth() - 600, dal.getHeight() - 200, 500, 50);
 
-		fog = new DCheckBox(gc.getWidth() - 600, gc.getHeight() - 130, 20, 20);
+		fog = new DCheckBox(dal.getWidth() - 600, dal.getHeight() - 130, 20, 20);
 
 		fillBots = new DButton("Fill Bots", 0, 0, 90, 50);
 	}
@@ -184,7 +178,7 @@ public class LobbyScreen extends DUIScreen {
 		DColumnPanel rightColumn = new DColumnPanel(0, 0, 0, 0);
 		rightColumn.setRelativePosition(RelativePosition.TOP_RIGHT, -20 * uiScale, 130 * uiScale);
 
-		chatBackground = new DPanel(0, 0, 500 * uiScale, gc.getHeight() - 310 * uiScale);
+		chatBackground = new DPanel(0, 0, 500 * uiScale, dal.getHeight() - 310 * uiScale);
 		chatBackground.setDrawBackground(true);
 		rightColumn.add(chatBackground);
 		rightColumn.add(new DSpacer(0, uiScale * 10));
@@ -194,8 +188,8 @@ public class LobbyScreen extends DUIScreen {
 		dui.add(rightColumn);
 	}
 
-	public void update(GameContainer gc, float delta) {
-		super.update(gc, delta);
+	public void update(DAL dal, float delta) {
+		super.update(dal, delta);
 
 		while (ci.hasClientMessages()) {
 			Message m = ci.getNextClientMessage();
@@ -229,17 +223,17 @@ public class LobbyScreen extends DUIScreen {
 				case KICK:
 					ci.stop();
 					dsh.message("message", m.message);
-					dsh.activate("message", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn());
+					dsh.activate("message", dal, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn());
 					break;
 				case MESSAGE:
 					messages.add((String) m.message);
 					break;
 				case STARTGAME:
 					dsh.message("multiplayergame", ci);
-					dsh.activate("multiplayergame", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
+					dsh.activate("multiplayergame", dal, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
 					return; // YES, RETURN! We don't want lobby to handle any more of the messages from the
 							// server
-				case LEVELUPDATE: {
+				case LOBBYLEVELINFO: {
 					Object[] oa = (Object[]) m.message;
 					@SuppressWarnings("unchecked")
 					ArrayList<String> mapList = (ArrayList<String>) oa[1];
@@ -262,26 +256,29 @@ public class LobbyScreen extends DUIScreen {
 				case GAMETYPE:
 					gameType.setSelected(gameType.items.indexOf(m.message));
 					break;
+				case LEVELUPDATE:
+					throw new RuntimeException("LEVELUPDATE received in LobbyScreen");
 			}
 		}
 	}
 
-	public void render(GameContainer gc, DAL dal) {
-		super.render(gc, dal);
+	@Override
+	public void render(DAL dal) {
+		super.render(dal);
 
-		var g = ((SlickDAL) dal).g;
+		var g = dal.getGraphics();
 
 		int count = 0;
 
 		var chatPos = chatBackground.getScreenLocation();
 
 		for (int i = messages.size() - 1; i >= Math.max(messages.size() - 10, 0); i--) {
-			g.drawString(messages.get(i), chatPos.x + 10,
+			g.drawText(messages.get(i), chatPos.x + 10,
 					chatPos.y + chatBackground.height + (count + 1) * -20 * uiScale);
 			count++;
 		}
 
-		g.setColor(Color.white);
+		g.setColor(DALColor.white);
 		String hostname = ci.getServerAddr();
 		if (hostname.equals("localhost") || hostname.equals("127.0.0.1")) {
 			try {
@@ -290,7 +287,7 @@ public class LobbyScreen extends DUIScreen {
 			} catch (UnknownHostException e1) {
 			}
 		}
-		g.drawString("Server Address: " + hostname, 30, 30);
+		g.drawText("Server Address: " + hostname, 30, 30);
 
 		// Draw the level between the maps dropdown and the chatbackground
 		if (level != null) {
@@ -328,34 +325,28 @@ public class LobbyScreen extends DUIScreen {
 			}
 
 			if (miniMap == null) {
+				// Now create the image for the minimap and render
+				miniMap = dal.generateRenderableTexture(level.width * Level.tileSize,
+						level.height * Level.tileSize);
 
-				try {
-					// Now create the image for the minimap and render
-					miniMap = new Image(level.width * Level.tileSize, level.height * Level.tileSize);
-					Graphics mg = miniMap.getGraphics();
-					mg.clearAlphaMap();
+				miniMap.renderTo(mg -> {
+					mg.clear();
 					// mg.setDrawMode(Graphics.MODE_NORMAL);
-					mg.setColor(Color.white);
+					mg.setColor(DALColor.white);
 
 					mg.fillRect(0, 0, level.width * Level.tileSize, level.height * Level.tileSize);
 
-					SlickDAL mgDal = new SlickDAL();
-					mgDal.gc = gc;
-					mgDal.g = mg;
-
 					// Render level floor, walls, etc.
-					level.renderFloor(mgDal.getGraphics());
-					level.render(mgDal.getGraphics());
-					level.renderBuildings(mgDal.getGraphics(), false);
+					level.renderFloor(mg);
+					level.render(mg);
+					level.renderBuildings(mg, false);
 
 					mg.flush();
-				} catch (SlickException e) {
-					throw new RuntimeException(e);
-				}
+				});
 			}
 
 			if (miniMap != null) {
-				g.setColor(Color.white);
+				g.setColor(DALColor.white);
 				g.drawImage(miniMap, lx + xOffset, ly + yOffset, lx + xOffset + miniMap.getWidth() * scale,
 						ly + yOffset + miniMap.getHeight() * scale, 0, 0, miniMap.getWidth(), miniMap.getHeight());
 			}
@@ -407,7 +398,7 @@ public class LobbyScreen extends DUIScreen {
 					ci.sendToServer(new Message(MessageType.STARTGAME, null));
 				} else if (b == leaveGame) {
 					ci.stop();
-					dsh.activate("home", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn());
+					dsh.activate("home", dal, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn());
 				} else if (b == fillBots) {
 					for (int i = 0; i < 16; i++) {
 						if (names[i].getText().equals("Open")) {

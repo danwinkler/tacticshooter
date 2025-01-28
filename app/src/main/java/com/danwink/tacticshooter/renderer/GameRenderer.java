@@ -6,16 +6,12 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import jp.objectclub.vecmath.Point2f;
 import jp.objectclub.vecmath.Vector2f;
 
-import org.newdawn.slick.Color;
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
-import org.newdawn.slick.SlickException;
-
 import com.danwink.tacticshooter.ClientState;
 import com.danwink.tacticshooter.dal.DAL;
-import com.danwink.tacticshooter.dal.SlickDAL;
+import com.danwink.tacticshooter.dal.DAL.DALColor;
+import com.danwink.tacticshooter.dal.DAL.DALGraphics;
+import com.danwink.tacticshooter.dal.DAL.DALTexture;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Bullet;
 import com.danwink.tacticshooter.gameobjects.Level;
@@ -59,7 +55,7 @@ public class GameRenderer {
 
 	ConcurrentLinkedDeque<Unit> unitsToKill = new ConcurrentLinkedDeque<>();
 
-	Image saveBuffer;
+	DALTexture saveBuffer;
 
 	public GameRenderer() {
 		outsideFloor = new OutsideFloorRenderer();
@@ -97,73 +93,65 @@ public class GameRenderer {
 			}
 		}
 
-		var slickDAL = (SlickDAL) dal;
-		GameContainer gc = slickDAL.gc;
-		Graphics g = slickDAL.g;
+		var g = dal.getGraphics();
 
 		outsideFloor.render(dal, cs);
 
-		cs.camera.start(gc, g);
+		cs.camera.start(g);
 		// Main Rendering
 		floor.render(dal, cs.l);
 		footprint.render(dal, cs);
 		bloodExplosion.render(dal, cs, unitBody);
-		building.render(dal.getGraphics(), cs.l, false);
+		building.render(g, cs.l, false);
 		// grass.render(g, cs);
 		wall.render(dal, cs.l);
 		renderMarkers(g, cs);
-		unitBody.render(dal.getGraphics(), cs);
-		bullet.render(dal.getGraphics(), cs);
-		particle.render(dal.getGraphics());
-		unitInfo.render(g, gc, cs, gc.getInput());
-		if (fogEnabled)
-			fog.render(g, cs);
+		unitBody.render(g, cs);
+		bullet.render(g, cs);
+		particle.render(g);
+		unitInfo.render(g, cs, dal.getInput());
+		if (fogEnabled) {
+			fog.render(dal, cs);
+		}
 
 		cs.camera.end(g);
 	}
 
-	public Image renderToTexture(int width, int height, ClientState cs, GameContainer gc) {
+	public DALTexture renderToTexture(int width, int height, ClientState cs, DAL dal) {
 		if (saveBuffer == null) {
-			try {
-				saveBuffer = new Image(cs.l.width * Level.tileSize, cs.l.height * Level.tileSize);
-			} catch (SlickException e) {
-				// TODO Auto-generated catch block
-				throw new RuntimeException(e);
-			}
+			saveBuffer = dal.generateRenderableTexture(cs.l.width * Level.tileSize, cs.l.height * Level.tileSize);
 		}
 
-		Image im;
-		Graphics ig = null;
-		Graphics g = null;
-		try {
-			im = new Image(width, height);
-			ig = im.getGraphics();
+		DALTexture im = dal.generateRenderableTexture(width, height);
+		im.renderTo(ig -> {
 			ig.setAntiAlias(false);
-			g = saveBuffer.getGraphics();
+		});
+		saveBuffer.renderTo(g -> {
 			g.setAntiAlias(false);
-		} catch (SlickException e) {
-			throw new RuntimeException(e);
-		}
+		});
 
-		g.clear();
-		g.clearAlphaMap();
+		saveBuffer.renderTo(g -> {
+			g.clear();
 
-		DAL dal = new SlickDAL(gc, g);
+			var sbDAL = dal.useGraphics(g);
 
-		floor.render(dal, cs.l);
-		footprint.render(dal, cs);
-		bloodExplosion.render(dal, cs, unitBody);
-		building.render(dal.getGraphics(), cs.l, false);
-		wall.render(dal, cs.l);
-		renderMarkers(g, cs);
-		unitBody.render(dal.getGraphics(), cs);
-		bullet.render(dal.getGraphics(), cs);
-		particle.render(dal.getGraphics());
+			floor.render(sbDAL, cs.l);
+			footprint.render(sbDAL, cs);
+			bloodExplosion.render(sbDAL, cs, unitBody);
+			building.render(g, cs.l, false);
+			wall.render(sbDAL, cs.l);
+			renderMarkers(g, cs);
+			unitBody.render(g, cs);
+			bullet.render(g, cs);
+			particle.render(g);
 
-		g.flush();
+			g.flush();
+		});
 
-		ig.drawImage(saveBuffer, 0, 0, width, height, 0, 0, saveBuffer.getWidth(), saveBuffer.getHeight());
-		ig.flush();
+		im.renderTo(ig -> {
+			ig.drawImage(saveBuffer, 0, 0, width, height, 0, 0, saveBuffer.getWidth(), saveBuffer.getHeight());
+			ig.flush();
+		});
 
 		return im;
 	}
@@ -187,28 +175,29 @@ public class GameRenderer {
 		particle.createExplosion(x, y, cs);
 	}
 
-	public void renderMarkers(Graphics g, ClientState cs) {
+	public void renderMarkers(DALGraphics g, ClientState cs) {
 		for (int i = 0; i < cs.markers.size(); i++) {
 			Marker m = cs.markers.get(i);
 			int frame = (int) (System.currentTimeMillis() / 250) % 4;
-			g.drawImage(cs.l.theme.flag.slim(), m.x - 16, m.y - 32, m.x + 16, m.y, frame * 16, 0, (frame + 1) * 16, 16);
+			g.drawImage(cs.l.theme.flag.getSprite(0, 0), m.x - 16, m.y - 32, m.x + 16, m.y, frame * 16, 0,
+					(frame + 1) * 16, 16);
 		}
 	}
 
 	public class UnitInfoRenderer {
-		public void render(Graphics g, GameContainer gc, ClientState cs, Input input) {
+		public void render(DALGraphics g, ClientState cs, Input input) {
 			for (int i = 0; i < cs.units.size(); i++) {
 				Unit u = cs.units.get(i);
-				renderInfo(g, gc, cs, input, u);
+				renderInfo(g, cs, input, u);
 			}
 		}
 
-		public void renderInfo(Graphics g, GameContainer gc, ClientState cs, Input input, Unit u) {
-			var worldCoords = cs.camera.screenToWorld(input.getMouseX(), input.getMouseY(), gc);
+		public void renderInfo(DALGraphics g, ClientState cs, Input input, Unit u) {
+			var worldCoords = cs.camera.screenToWorld(input.getMouseX(), input.getMouseY(), g);
 			float mx = worldCoords.x;
 			float my = worldCoords.y;
 			if (u.selected && u.state == UnitState.MOVING) {
-				g.setColor(Color.black);
+				g.setColor(DALColor.black);
 				g.setLineWidth(3);
 				for (int i = Math.max(u.onStep - 2, 0); i < u.path.size() - 1; i++) {
 					Point2i p1 = u.path.get(i);
@@ -217,7 +206,7 @@ public class GameRenderer {
 							(p2.x + .5f) * Level.tileSize, (p2.y + .5f) * Level.tileSize);
 				}
 
-				g.setColor(Color.lightGray);
+				g.setColor(DALColor.lightGray);
 				g.setLineWidth(1);
 				for (int i = Math.max(u.onStep - 2, 0); i < u.path.size() - 1; i++) {
 					Point2i p1 = u.path.get(i);
@@ -231,14 +220,14 @@ public class GameRenderer {
 			g.translate(u.x, u.y);
 
 			if (u.marked) {
-				g.setColor(Color.red);
+				g.setColor(DALColor.red);
 				g.setLineWidth(3);
 				g.drawOval(-12, -12, 24, 24);
 				g.setLineWidth(1);
 			}
 
 			if (u.selected) {
-				g.setColor(Color.blue);
+				g.setColor(DALColor.blue);
 				g.pushTransform();
 				g.rotate(0, 0, (u.heading / DMath.PI2F * 360) + 45);
 				g.drawArc(-16, -16, 32, 32, 0, 270);
@@ -263,10 +252,10 @@ public class GameRenderer {
 			}
 
 			if (u.selected) {
-				g.setColor(Color.black);
+				g.setColor(DALColor.black);
 				g.fillRect(-9, healthBarDist, (18.f * u.health / u.type.health), 4);
 
-				g.setColor(new Color(DMath.bound(1.f - u.health / u.type.health, 0, 1),
+				g.setColor(new DALColor(DMath.bound(1.f - u.health / u.type.health, 0, 1),
 						DMath.bound(u.health / u.type.health, 0, 1), 0));
 				g.fillRect(-8, healthBarDist + 1, (16.f * u.health / u.type.health), 2);
 			}
@@ -274,9 +263,9 @@ public class GameRenderer {
 			float dmx = u.x - mx;
 			float dmy = u.y - my;
 			if (dmx * dmx + dmy * dmy < 100) {
-				float strWidth = g.getFont().getWidth(u.owner.name);
-				g.setColor(Color.black);
-				g.drawString(u.owner.name, -strWidth / 2, 10);
+				float strWidth = g.getTextWidth(u.owner.name);
+				g.setColor(DALColor.black);
+				g.drawText(u.owner.name, -strWidth / 2, 10);
 			}
 
 			g.popTransform();
@@ -284,27 +273,26 @@ public class GameRenderer {
 	}
 
 	public class FogRenderer {
-		Image texture;
+		DALTexture texture;
 
-		public void render(Graphics g, ClientState cs) {
+		public void render(DAL dal, ClientState cs) {
 			if (texture == null) {
 				if (cs.l != null) {
-					generateTexture(cs);
+					generateTexture(dal, cs);
 				} else {
 					return;
 				}
 			}
 
-			try {
-				Graphics fogG = texture.getGraphics();
+			texture.renderTo(fogG -> {
 
-				fogG.setColor(Color.black);
+				fogG.setColor(DALColor.black);
 				fogG.fillRect(0, 0, texture.getWidth(), texture.getHeight());
 
 				for (int i = 0; i < cs.l.buildings.size(); i++) {
 					Building b = cs.l.buildings.get(i);
 					if (b.t != null && b.t.id == cs.player.team.id) {
-						fogG.setColor(Color.white);
+						fogG.setColor(DALColor.white);
 						fogG.fillOval(b.x - b.bt.bu.getRadius(), b.y - b.bt.bu.getRadius(), b.bt.bu.getRadius() * 2,
 								b.bt.bu.getRadius() * 2);
 					}
@@ -350,23 +338,19 @@ public class GameRenderer {
 						}
 					}
 				}
+			});
 
-				g.setColor(Color.darkGray);
+			var g = dal.getGraphics();
 
-				g.setDrawMode(Graphics.MODE_COLOR_MULTIPLY);
-				g.drawImage(texture, 0, 0);
-				g.setDrawMode(Graphics.MODE_NORMAL);
-			} catch (SlickException e) {
-				e.printStackTrace();
-			}
+			g.setColor(DALColor.darkGray);
+
+			g.setDrawMode(DALGraphics.MODE_COLOR_MULTIPLY);
+			g.drawImage(texture, 0, 0);
+			g.setDrawMode(DALGraphics.MODE_NORMAL);
 		}
 
-		private void generateTexture(ClientState cs) {
-			try {
-				texture = new Image(cs.l.width * Level.tileSize, cs.l.height * Level.tileSize);
-			} catch (SlickException e) {
-				e.printStackTrace();
-			}
+		private void generateTexture(DAL dal, ClientState cs) {
+			texture = dal.generateRenderableTexture(cs.l.width * Level.tileSize, cs.l.height * Level.tileSize);
 		}
 	}
 

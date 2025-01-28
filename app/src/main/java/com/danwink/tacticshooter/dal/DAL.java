@@ -4,9 +4,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.util.function.Consumer;
 
-import javax.swing.Renderer;
-
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Input;
 
 import com.phyloa.dlib.renderer.Renderer2D;
 
@@ -31,6 +30,25 @@ public abstract class DAL {
     public abstract int getHeight();
 
     public abstract DALTexture generateRenderableTexture(int width, int height);
+
+    public abstract void setForceExit(boolean forceExit);
+
+    public abstract void exit();
+
+    // TODO: remove this
+    public abstract Input getInput();
+
+    public abstract DAL useGraphics(DALGraphics g);
+
+    public abstract void setMusicVolume(float f);
+
+    public abstract void setSoundVolume(float f);
+
+    public abstract void setVSync(boolean b);
+
+    public abstract void setFullscreen(boolean b);
+
+    public abstract boolean isFullscreen();
 
     public interface DALGraphics {
         public static int MODE_NORMAL = 1;
@@ -87,8 +105,6 @@ public abstract class DAL {
 
         public void setColor(DALColor color);
 
-        public void setColor(org.newdawn.slick.Color color);
-
         public void fillRect(float x, float y, float width, float height);
 
         public void drawRect(float x, float y, float width, float height);
@@ -116,6 +132,10 @@ public abstract class DAL {
         public void setDrawMode(int mode);
 
         public void setClearColor(DALColor color);
+
+        public float getTextWidth(String message);
+
+        public void drawArc(float x, float y, float width, float height, float start, float end);
     }
 
     public interface DALTexture {
@@ -130,6 +150,8 @@ public abstract class DAL {
         public DALTexture getSubImage(int x, int y, int width, int height);
 
         public DALColor getColor(int x, int y);
+
+        public void flushPixelData();
     }
 
     public static class DALColor {
@@ -155,6 +177,21 @@ public abstract class DAL {
             this.g = g;
             this.b = b;
             this.a = a;
+        }
+
+        public DALColor(int r, int g, int b, int a) {
+            this.r = r / 255.f;
+            this.g = g / 255.f;
+            this.b = b / 255.f;
+            this.a = a / 255.f;
+        }
+
+        public DALColor(int r, int g, int b) {
+            this(r, g, b, 255);
+        }
+
+        public DALColor(float r, float g, float b) {
+            this(r, g, b, 1.f);
         }
     }
 

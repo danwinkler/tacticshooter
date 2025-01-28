@@ -95,6 +95,12 @@ public class TacticServer {
 			}
 		}
 
+		try {
+			l = LevelFileHelper.loadLevel(maps.get(selectedMap));
+		} catch (DocumentException e) {
+			e.printStackTrace();
+		}
+
 		sl = new ServerLoop();
 		t = new Thread(sl);
 		t.start();
@@ -272,6 +278,8 @@ public class TacticServer {
 						break;
 					case CONNECTED:
 						si.sendToClient(m.sender, new Message(MessageType.SERVERSTATE, this.state));
+						si.sendToClient(m.sender,
+								new Message(MessageType.LOBBYLEVELINFO, new Object[] { selectedMap, maps, l }));
 						break;
 					case CLIENTJOIN:
 						Player player = new Player(m.sender);
@@ -302,7 +310,7 @@ public class TacticServer {
 								}
 							}
 							si.sendToClient(m.sender,
-									new Message(MessageType.LEVELUPDATE, new Object[] { selectedMap, maps, l }));
+									new Message(MessageType.LOBBYLEVELINFO, new Object[] { selectedMap, maps, l }));
 							si.sendToClient(m.sender, new Message(MessageType.FOGUPDATE, fogEnabled));
 							si.sendToAllClients(new Message(MessageType.PLAYERUPDATE,
 									new Object[] { player.slot, slots[player.slot] }));
@@ -354,7 +362,7 @@ public class TacticServer {
 						try {
 							l = LevelFileHelper.loadLevel(maps.get(selectedMap));
 							si.sendToAllClients(
-									new Message(MessageType.LEVELUPDATE, new Object[] { selectedMap, maps, l }));
+									new Message(MessageType.LOBBYLEVELINFO, new Object[] { selectedMap, maps, l }));
 						} catch (DocumentException e) {
 							e.printStackTrace();
 						}

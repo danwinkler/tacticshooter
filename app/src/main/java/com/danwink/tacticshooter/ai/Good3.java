@@ -3,14 +3,14 @@ package com.danwink.tacticshooter.ai;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.newdawn.slick.Color;
-import org.newdawn.slick.Graphics;
 import org.newdawn.slick.util.pathfinding.PathFinder;
 
 import com.danwink.tacticshooter.ComputerPlayer;
 import com.danwink.tacticshooter.MessageType;
 import com.danwink.tacticshooter.ai.LevelAnalysis.Neighbor;
 import com.danwink.tacticshooter.ai.LevelAnalysis.Zone;
+import com.danwink.tacticshooter.dal.DAL.DALColor;
+import com.danwink.tacticshooter.dal.DAL.DALGraphics;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Unit;
@@ -332,9 +332,9 @@ public class Good3 extends ComputerPlayer {
 	}
 
 	// Debug render
-	public void render(Graphics g) {
+	public void render(DALGraphics g) {
 		la.render(g);
-		g.setColor(Color.black);
+		g.setColor(DALColor.black);
 		try {
 			for (int i = 0; i < armies.size(); i++) {
 				Army a = armies.get(i);

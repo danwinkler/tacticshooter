@@ -18,3 +18,5 @@ Idea: AI should coordinate with each other to decide who should be offensive and
 
 TODO:
 - [ ] scale background correctly when zooming in and out
+- [ ] Merge StaticFiles (old) and AssetManager (new) into one
+- [ ] The server lags a bunch at the beginning of every match. Either hide this fact by preventing the units from running off in every direction, or fix the lag.

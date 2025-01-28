@@ -1,13 +1,10 @@
 package com.danwink.tacticshooter;
 
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
-
 import com.danwink.tacticshooter.dal.DAL;
 import com.phyloa.dlib.renderer.DScreenTransition;
 import com.phyloa.dlib.util.DMath;
 
-public class DScreenSlideTransition implements DScreenTransition<GameContainer, DAL> {
+public class DScreenSlideTransition implements DScreenTransition<DAL> {
 	float x, y;
 	int xdir;
 	int ydir;
@@ -29,13 +26,13 @@ public class DScreenSlideTransition implements DScreenTransition<GameContainer, 
 		this.slideIn = slideIn;
 	}
 
-	public void init(GameContainer gc) {
+	public void init(DAL dal) {
 		if (slideIn) {
-			startX = gc.getWidth() * -xdir;
-			startY = gc.getHeight() * -ydir;
+			startX = dal.getWidth() * -xdir;
+			startY = dal.getHeight() * -ydir;
 		} else {
-			goalX = gc.getWidth() * xdir;
-			goalY = gc.getHeight() * ydir;
+			goalX = dal.getWidth() * xdir;
+			goalY = dal.getHeight() * ydir;
 		}
 
 		float v = slideIn ? expOut(time, 0, 1, duration) : expIn(time, 0, 1, duration);
@@ -44,7 +41,7 @@ public class DScreenSlideTransition implements DScreenTransition<GameContainer, 
 		y = DMath.lerp(v, startY, goalY);
 	}
 
-	public void update(GameContainer gc, float d) {
+	public void update(DAL dal, float d) {
 		float v = slideIn ? expOut(time, 0, 1, duration) : expIn(time, 0, 1, duration);
 
 		x = DMath.lerp(v, startX, goalX);
@@ -53,13 +50,13 @@ public class DScreenSlideTransition implements DScreenTransition<GameContainer, 
 		time += d;
 	}
 
-	public void renderPre(GameContainer e, DAL dal) {
+	public void renderPre(DAL dal) {
 		var g = dal.getGraphics();
 		g.pushTransform();
 		g.translate(x, y);
 	}
 
-	public void renderPost(GameContainer e, DAL dal) {
+	public void renderPost(DAL dal) {
 		var g = dal.getGraphics();
 		g.popTransform();
 	}

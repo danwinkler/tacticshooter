@@ -3,7 +3,6 @@ package com.danwink.tacticshooter.ui;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 
 import com.danwink.tacticshooter.ClientState;

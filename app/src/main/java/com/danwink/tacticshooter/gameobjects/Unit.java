@@ -3,8 +3,6 @@ package com.danwink.tacticshooter.gameobjects;
 import java.util.ArrayList;
 import java.util.Random;
 
-import org.newdawn.slick.Color;
-import org.newdawn.slick.Graphics;
 import org.newdawn.slick.util.pathfinding.Path;
 
 import com.danwink.tacticshooter.ClientState;
@@ -429,35 +427,6 @@ public class Unit {
 		TURNTO,
 		STOPPED;
 	}
-
-	// public enum UnitType {
-	// LIGHT(3, 10, .05f, 10, 100, 1, 10),
-	// HEAVY(1.5f, 3, .1f, 20, 200, 1, 10),
-	// SHOTGUN(3.0f, 30, .3f, 15, 150, 6, 10),
-	// SCOUT(6f, 30, .1f, 3, 30, 1, 10),
-	// SNIPER(2.5f, 100, 0, 15, 90, 1, 100),
-	// SABOTEUR(4f, 10000, 0, 20, 150, 0, 0);
-
-	// public float speed;
-	// public int timeBetweenBullets;
-	// public float bulletSpread;
-	// public int price;
-	// public float health;
-	// public int bulletsAtOnce;
-	// public int damage;
-
-	// UnitType(float speed, int timeBetweenBullets, float bulletSpread, int price,
-	// float health, int bulletsAtOnce,
-	// int damage) {
-	// this.speed = speed;
-	// this.timeBetweenBullets = timeBetweenBullets;
-	// this.bulletSpread = bulletSpread;
-	// this.price = price;
-	// this.health = health;
-	// this.bulletsAtOnce = bulletsAtOnce;
-	// this.damage = damage;
-	// }
-	// }
 
 	public static class UnitDef {
 		public String name;

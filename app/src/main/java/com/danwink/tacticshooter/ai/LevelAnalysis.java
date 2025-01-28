@@ -3,12 +3,12 @@ package com.danwink.tacticshooter.ai;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
-import org.newdawn.slick.Color;
-import org.newdawn.slick.Graphics;
 import org.newdawn.slick.util.pathfinding.Path;
 import org.newdawn.slick.util.pathfinding.Path.Step;
 import org.newdawn.slick.util.pathfinding.PathFinder;
 
+import com.danwink.tacticshooter.dal.DAL.DALColor;
+import com.danwink.tacticshooter.dal.DAL.DALGraphics;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Building.BuildingType;
 import com.danwink.tacticshooter.gameobjects.Level;
@@ -89,7 +89,7 @@ public class LevelAnalysis {
 				int x = l.getTileX(b.x);
 				int y = l.getTileY(b.y);
 				Zone z = new Zone();
-				z.c = new Color(b.t.getColor().r, b.t.getColor().g, b.t.getColor().b, .3f);
+				z.c = new DALColor(b.t.getColor().r, b.t.getColor().g, b.t.getColor().b, .3f);
 				z.b = b;
 				tiles[x][y].zone = z;
 				zones.add(z);
@@ -98,7 +98,7 @@ public class LevelAnalysis {
 				int x = l.getTileX(b.x);
 				int y = l.getTileY(b.y);
 				Zone z = new Zone();
-				z.c = new Color(DMath.randomf(), DMath.randomf(), DMath.randomf(), .3f);
+				z.c = new DALColor(DMath.randomf(), DMath.randomf(), DMath.randomf(), .3f);
 				z.b = b;
 				tiles[x][y].zone = z;
 				zones.add(z);
@@ -200,7 +200,7 @@ public class LevelAnalysis {
 	}
 
 	class Zone {
-		Color c;
+		DALColor c;
 		ArrayList<Neighbor> neighbors = new ArrayList<Neighbor>();
 		ArrayList<Zone> visible = new ArrayList<Zone>();
 		Building b;
@@ -223,7 +223,7 @@ public class LevelAnalysis {
 		}
 	}
 
-	public void render(Graphics g) {
+	public void render(DALGraphics g) {
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
 				TileAnalysis ta = tiles[x][y];
@@ -242,7 +242,7 @@ public class LevelAnalysis {
 				}
 			}
 		}
-		g.setColor(Color.black);
+		g.setColor(DALColor.black);
 		for (Zone z : zones) {
 			for (Neighbor n : z.neighbors) {
 				g.drawLine(z.b.x, z.b.y, n.z.b.x, n.z.b.y);

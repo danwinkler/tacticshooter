@@ -2,19 +2,18 @@ package com.danwink.tacticshooter.renderer;
 
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import org.newdawn.slick.Color;
-import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
 import com.danwink.tacticshooter.ClientState;
 import com.danwink.tacticshooter.dal.DAL;
 import com.danwink.tacticshooter.dal.DAL.DALColor;
+import com.danwink.tacticshooter.dal.DAL.DALGraphics;
 import com.danwink.tacticshooter.dal.DAL.DALTexture;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Unit;
 import com.phyloa.dlib.util.DMath;
 
 public class FootprintLayerRenderer {
-    public Color bloodColor = new Color(255, 0, 0);
+    public DALColor bloodColor = new DALColor(255, 0, 0);
 
     public DALTexture texture;
 
@@ -36,8 +35,8 @@ public class FootprintLayerRenderer {
                 tg.clear();
             }
 
-            tg.setDrawMode(Graphics.MODE_NORMAL);
-            tg.setColor(new Color(.3f, .2f, .3f));
+            tg.setDrawMode(DALGraphics.MODE_NORMAL);
+            tg.setColor(new DALColor(.3f, .2f, .3f));
             while (!footprintToDraw.isEmpty()) {
                 var fp = footprintToDraw.removeLast();
                 tg.fillOval(fp.x, fp.y, fp.size, fp.size);
@@ -45,19 +44,19 @@ public class FootprintLayerRenderer {
 
             // Only fade out every few frames
             if (frames % 5 == 0) {
-                tg.setDrawMode(Graphics.MODE_ADD);
+                tg.setDrawMode(DALGraphics.MODE_ADD);
                 float fadeSpeed = .004f;
-                tg.setColor(new Color(fadeSpeed, fadeSpeed, fadeSpeed));
+                tg.setColor(new DALColor(fadeSpeed, fadeSpeed, fadeSpeed));
                 tg.fillRect(0, 0, texture.getWidth(), texture.getHeight());
-                tg.setDrawMode(Graphics.MODE_NORMAL);
+                tg.setDrawMode(DALGraphics.MODE_NORMAL);
             }
         });
 
         var g = dal.getGraphics();
 
-        g.setDrawMode(Graphics.MODE_COLOR_MULTIPLY);
+        g.setDrawMode(DALGraphics.MODE_COLOR_MULTIPLY);
         g.drawImage(texture, 0, 0);
-        g.setDrawMode(Graphics.MODE_NORMAL);
+        g.setDrawMode(DALGraphics.MODE_NORMAL);
 
         frames++;
     }

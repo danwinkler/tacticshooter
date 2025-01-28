@@ -5,26 +5,20 @@ import java.io.File;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import org.newdawn.slick.Color;
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
-import org.newdawn.slick.SlickException;
-
+import com.danwink.tacticshooter.AssetManager;
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.TacticServer;
 import com.danwink.tacticshooter.UIHelper;
 import com.danwink.tacticshooter.dal.DAL;
+import com.danwink.tacticshooter.dal.DAL.DALColor;
 import com.danwink.tacticshooter.dal.DAL.DALTexture;
-import com.danwink.tacticshooter.dal.SlickDAL;
 import com.danwink.tacticshooter.editor.Editor;
 import com.danwink.tacticshooter.network.ServerNetworkInterface;
 import com.danwink.tacticshooter.ui.DUIScreen;
@@ -40,6 +34,10 @@ import com.phyloa.dlib.renderer.Renderer2D;
 import com.phyloa.dlib.util.DMath;
 
 public class HomeScreen extends DUIScreen {
+	static {
+		AssetManager.defineTexture("title", "data" + File.separator + "img" + File.separator + "title.png");
+	}
+
 	TacticServer server;
 
 	DButton singlePlayer;
@@ -50,20 +48,15 @@ public class HomeScreen extends DUIScreen {
 
 	List<String> ips;
 
-	Image title;
+	DALTexture title;
 
 	boolean openEditor = false;
 
 	int frame;
 
 	@Override
-	public void init(GameContainer e) {
-		try {
-			title = new Image("data" + File.separator + "img" + File.separator + "title.png");
-		} catch (SlickException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+	public void init(DAL dal) {
+		title = AssetManager.getTexture("title");
 	}
 
 	public void createUIElements(DUI dui, float windowHeight) {
@@ -74,7 +67,8 @@ public class HomeScreen extends DUIScreen {
 		int buttonWidth = 400 * uiScale;
 		int buttonHeight = 100 * uiScale;
 
-		singlePlayer = new DButton("Start Local Server", 0, 0, buttonWidth, buttonHeight);
+		singlePlayer = new DButton((server == null ? "Start" : "Stop") + " Local Server", 0, 0, buttonWidth,
+				buttonHeight);
 		multiPlayer = new DButton("Multiplayer", 0, 0, buttonWidth, buttonHeight);
 		settings = new DButton("Settings", 0, 0, buttonWidth, buttonHeight);
 		exit = new DButton("Exit", 0, 0, buttonWidth, buttonHeight);
@@ -94,39 +88,39 @@ public class HomeScreen extends DUIScreen {
 		dui.add(devKeyListener);
 	}
 
-	public void render(GameContainer gc, DAL dal) {
-		super.render(gc, dal);
+	public void render(DAL dal) {
+		super.render(dal);
 
-		var g = ((SlickDAL) dal).g;
+		var g = dal.getGraphics();
 
 		if (ips != null) {
-			g.setColor(Color.white);
-			g.drawString("Server Address: ", 200 * uiScale, 15 * uiScale);
+			g.setColor(DALColor.white);
+			g.drawText("Server Address: ", 200 * uiScale, 15 * uiScale);
 			for (int i = 0; i < ips.size(); i++) {
-				g.drawString(ips.get(i), 340 * uiScale, 15 * uiScale + i * 25 * uiScale);
+				g.drawText(ips.get(i), 340 * uiScale, 15 * uiScale + i * 25 * uiScale);
 			}
 
 		}
 
 		// Title
-		g.drawImage(title, gc.getWidth() / 2 - title.getWidth() / 2, gc.getHeight() / 6, new Color(0, 0, 0, 128));
+		g.drawImage(title, dal.getWidth() / 2 - title.getWidth() / 2, dal.getHeight() / 6, new DALColor(0, 0, 0, 0.5f));
 
 		// Pulsing message
 		g.pushTransform();
-		g.setColor(Color.white);
-		var message = "2022 Edition!";
-		var textWidth = g.getFont().getWidth(message);
-		g.translate(gc.getWidth() / 2 + title.getWidth() * .45f, gc.getHeight() / 6 + 20);
+		g.setColor(DALColor.white);
+		var message = "2025 Edition!";
+		var textWidth = g.getTextWidth(message);
+		g.translate(dal.getWidth() / 2 + title.getWidth() * .45f, dal.getHeight() / 6 + 20);
 		g.rotate(textWidth / 2, 0, 45);
 		var scaleAmount = 2 + DMath.sinf(frame * .05f) * .75f;
 		g.scale(scaleAmount, scaleAmount);
-		g.drawString(message, -textWidth / 2, 0);
+		g.drawText(message, -textWidth / 2, 0);
 		g.popTransform();
 
 		if (openEditor) {
 			try {
-				gc.setForceExit(false);
-				gc.exit();
+				dal.setForceExit(false);
+				dal.exit();
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -152,16 +146,16 @@ public class HomeScreen extends DUIScreen {
 					ips = null;
 				}
 			} else if (e == multiPlayer) {
-				dsh.activate("multiplayersetup", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
+				dsh.activate("multiplayersetup", dal, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
 			} else if (e == settings) {
-				dsh.activate("settings", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
+				dsh.activate("settings", dal, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
 			} else if (e == exit) {
-				gc.exit();
+				dal.exit();
 			} else if (e == editor) {
-				if (gc.getInput().isKeyDown(Input.KEY_LCONTROL)) {
+				if (dal.getInput().isKeyDown(Input.KEY_LCONTROL)) {
 					openEditor = true;
 				} else {
-					dsh.activate("editor", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
+					dsh.activate("editor", dal, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
 				}
 			}
 	}
@@ -209,7 +203,7 @@ public class HomeScreen extends DUIScreen {
 				var k2 = lastPressedKeys.get(2) == KeyEvent.VK_V;
 
 				if (k0 && k1 && k2) {
-					dsh.activate("devmenu", gc);
+					dsh.activate("devmenu", dal);
 				}
 			}
 		}

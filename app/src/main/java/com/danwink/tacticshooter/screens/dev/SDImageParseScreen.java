@@ -9,10 +9,7 @@ import java.util.Queue;
 import java.util.stream.Collectors;
 
 import org.newdawn.slick.Color;
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
-import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.util.pathfinding.AStarPathFinder;
 
@@ -21,7 +18,9 @@ import com.danwink.tacticshooter.LevelFileHelper;
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.Theme;
 import com.danwink.tacticshooter.dal.DAL;
-import com.danwink.tacticshooter.dal.SlickDAL;
+import com.danwink.tacticshooter.dal.DAL.DALColor;
+import com.danwink.tacticshooter.dal.DAL.DALTexture;
+import com.danwink.tacticshooter.dal.SlickDAL.SlickTexture;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Team;
@@ -54,16 +53,16 @@ public class SDImageParseScreen extends DUIScreen {
     DButton save;
     DButton back;
 
-    Image image;
-    Image intermediate;
+    DALTexture image;
+    DALTexture intermediate;
 
     Level level;
     ClientState cs;
-    Image levelImage;
+    DALTexture levelImage;
     String name;
 
     @Override
-    public void init(GameContainer gc) {
+    public void init(DAL gc) {
         mirrorMode = new DDropDown(0, 0, 0, 0);
         mirrorMode.addItems("None", "X", "Y", "XY");
 
@@ -104,10 +103,10 @@ public class SDImageParseScreen extends DUIScreen {
     }
 
     @Override
-    public void render(GameContainer gc, DAL dal) {
-        super.render(gc, dal);
+    public void render(DAL gc) {
+        super.render(dal);
 
-        var g = ((SlickDAL) dal).g;
+        var g = dal.getGraphics();
 
         if (image != null) {
             g.drawImage(image, gc.getWidth() / 2 - image.getWidth(), gc.getHeight() / 2 - image.getHeight() / 2);
@@ -124,7 +123,7 @@ public class SDImageParseScreen extends DUIScreen {
     @Override
     public void event(DUIEvent event) {
         if (event.getElement() == back) {
-            dsh.activate("sdlevelgen", gc);
+            dsh.activate("sdlevelgen", dal);
         } else if (event.getElement() == save) {
             try {
                 LevelFileHelper.saveLevel(name, level);
@@ -146,7 +145,7 @@ public class SDImageParseScreen extends DUIScreen {
     public void message(Object o) {
         try {
             var path = (String) o;
-            image = new Image(path);
+            image = new SlickTexture(new Image(path));
 
             name = new File(path).getName().replace(".png", "");
         } catch (SlickException e) {
@@ -175,59 +174,64 @@ public class SDImageParseScreen extends DUIScreen {
             offsetY = (int) tileScaleY;
         }
 
-        Graphics ig;
-        intermediate = new Image(intermediateWidth, intermediateHeight);
-        ig = intermediate.getGraphics();
+        intermediate = new SlickTexture(new Image(intermediateWidth, intermediateHeight));
 
         // Recalculate tile scale to account for border (though should be the same since
         // we added 2 to width and height)
         tileScaleX = intermediate.getWidth() / (float) width;
         tileScaleY = intermediate.getHeight() / (float) height;
 
+        var tileScaleXFinal = tileScaleX;
+        var tileScaleYFinal = tileScaleY;
+        var offsetXFinal = offsetX;
+        var offsetYFinal = offsetY;
+
         level = new Level(width, height);
         level.theme = Theme.getTheme("desertrpg");
         cs = new ClientState();
         cs.l = level;
         cs.mgs = new MultiplayerGameScreen();
-        cs.mgs.input = gc.getInput();
+        cs.mgs.input = dal.getInput();
 
-        ig.setAntiAlias(false);
-        ig.setColor(Color.white);
-        ig.fillRect(0, 0, intermediate.getWidth(), intermediate.getHeight());
+        intermediate.renderTo(ig -> {
+            ig.setAntiAlias(false);
+            ig.setColor(DALColor.white);
+            ig.fillRect(0, 0, intermediate.getWidth(), intermediate.getHeight());
 
-        if (addBorder.checked) {
-            ig.setColor(Color.black);
-            // TOP
-            ig.fillRect(0, 0, intermediate.getWidth(), tileScaleY);
-            // BOTTOM
-            ig.fillRect(0, intermediate.getHeight() - tileScaleY, intermediate.getWidth(), tileScaleY);
-            // LEFT
-            ig.fillRect(0, 0, tileScaleX, intermediate.getHeight());
-            // RIGHT
-            ig.fillRect(intermediate.getWidth() - tileScaleX, 0, tileScaleX, intermediate.getHeight());
-        }
-
-        for (int x = 0; x < image.getWidth(); x++) {
-            for (int y = 0; y < image.getHeight(); y++) {
-                Color c = image.getColor(x, y);
-                float r = c.r > .5f ? 1.f : 0.f;
-                float g = c.g > .5f ? 1.f : 0.f;
-                float b = c.b > .5f ? 1.f : 0.f;
-
-                float gray = (r + g + b) / 3.f;
-
-                if (gray > .4f && gray < .6f) {
-                    r = 0.5f;
-                    g = 0.5f;
-                    b = 0.5f;
-                }
-
-                ig.setColor(new Color(r, g, b));
-                ig.fillRect(x + offsetX, y + offsetY, 1, 1);
+            if (addBorder.checked) {
+                ig.setColor(DALColor.black);
+                // TOP
+                ig.fillRect(0, 0, intermediate.getWidth(), tileScaleYFinal);
+                // BOTTOM
+                ig.fillRect(0, intermediate.getHeight() - tileScaleYFinal, intermediate.getWidth(), tileScaleYFinal);
+                // LEFT
+                ig.fillRect(0, 0, tileScaleXFinal, intermediate.getHeight());
+                // RIGHT
+                ig.fillRect(intermediate.getWidth() - tileScaleXFinal, 0, tileScaleXFinal, intermediate.getHeight());
             }
-        }
 
-        ig.flush();
+            for (int x = 0; x < image.getWidth(); x++) {
+                for (int y = 0; y < image.getHeight(); y++) {
+                    DALColor c = image.getColor(x, y);
+                    float r = c.r > .5f ? 1.f : 0.f;
+                    float g = c.g > .5f ? 1.f : 0.f;
+                    float b = c.b > .5f ? 1.f : 0.f;
+
+                    float gray = (r + g + b) / 3.f;
+
+                    if (gray > .4f && gray < .6f) {
+                        r = 0.5f;
+                        g = 0.5f;
+                        b = 0.5f;
+                    }
+
+                    ig.setColor(new DALColor(r, g, b));
+                    ig.fillRect(x + offsetXFinal, y + offsetYFinal, 1, 1);
+                }
+            }
+
+            ig.flush();
+        });
 
         // STEP 2: Layout tiles
         int xmax = width;
@@ -401,10 +405,10 @@ public class SDImageParseScreen extends DUIScreen {
         }
 
         GameRenderer gr = new GameRenderer();
-        levelImage = gr.renderToTexture(1024, 1024, cs, gc);
+        levelImage = gr.renderToTexture(1024, 1024, cs, dal);
     }
 
-    public boolean tileIsMostlyColor(Image im, Color color, int x, int y, float tileScaleX, float tileScaleY) {
+    public boolean tileIsMostlyColor(DALTexture im, Color color, int x, int y, float tileScaleX, float tileScaleY) {
         int x1 = (int) (x * tileScaleX);
         int y1 = (int) (y * tileScaleY);
         int x2 = (int) ((x + 1) * tileScaleX);
@@ -421,7 +425,7 @@ public class SDImageParseScreen extends DUIScreen {
         int colorPixels = 0;
         for (int i = x1; i < x2; i++) {
             for (int j = y1; j < y2; j++) {
-                Color c = im.getColor(i, j);
+                DALColor c = im.getColor(i, j);
                 if (c.equals(color)) {
                     colorPixels++;
                 }
@@ -432,7 +436,7 @@ public class SDImageParseScreen extends DUIScreen {
         return colorPixels > nPixels / 2;
     }
 
-    public ArrayList<Blob> findBlobs(Image image) {
+    public ArrayList<Blob> findBlobs(DALTexture image) {
         ArrayList<Blob> blobs = new ArrayList<Blob>();
         HashSet<Point2i> checked = new HashSet<Point2i>();
 
@@ -446,7 +450,7 @@ public class SDImageParseScreen extends DUIScreen {
                     continue;
                 }
 
-                Color c = image.getColor(x, y);
+                DALColor c = image.getColor(x, y);
                 if (c.equals(Color.white) || c.equals(Color.black)) {
                     continue;
                 }
@@ -469,7 +473,7 @@ public class SDImageParseScreen extends DUIScreen {
                         continue;
                     }
 
-                    Color c2 = image.getColor(p2.x, p2.y);
+                    DALColor c2 = image.getColor(p2.x, p2.y);
 
                     if (!c.equals(c2)) {
                         continue;
@@ -502,10 +506,10 @@ public class SDImageParseScreen extends DUIScreen {
     }
 
     public class Blob {
-        Color color;
+        DALColor color;
         Point2f pos;
 
-        public Blob(Color color, Point2f pos) {
+        public Blob(DALColor color, Point2f pos) {
             this.color = color;
             this.pos = pos;
         }

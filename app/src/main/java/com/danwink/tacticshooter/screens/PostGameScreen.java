@@ -4,8 +4,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.newdawn.slick.Color;
-import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
@@ -17,7 +15,6 @@ import com.danwink.tacticshooter.dal.DAL;
 import com.danwink.tacticshooter.dal.DAL.DALColor;
 import com.danwink.tacticshooter.dal.SlickDAL.SlickTexture;
 import com.danwink.tacticshooter.StaticFiles;
-import com.danwink.tacticshooter.slick.Slick2DEventMapper;
 import com.danwink.tacticshooter.slick.Slick2DRenderer;
 import com.danwink.tacticshooter.ui.DUIScreen;
 import com.phyloa.dlib.dui.DButton;
@@ -45,7 +42,7 @@ public class PostGameScreen extends DUIScreen {
 
 	boolean rd = false;
 
-	public void init(GameContainer gc) {
+	public void init(DAL dal) {
 		StaticFiles.getMusic("menu").loop();
 		rd = false;
 	}
@@ -160,14 +157,15 @@ public class PostGameScreen extends DUIScreen {
 		dui.add(centerColumn);
 	}
 
-	public void render(GameContainer gc, DAL dal) {
+	@Override
+	public void render(DAL dal) {
 		var g = dal.getGraphics();
 
-		g.setColor(new Color(0, 0, 0, 200));
-		g.fillRect(0, 0, gc.getWidth(), gc.getHeight());
+		g.setColor(new DALColor(0, 0, 0, 200));
+		g.fillRect(0, 0, dal.getWidth(), dal.getHeight());
 
 		// Render UI
-		super.render(gc, dal);
+		super.render(dal);
 
 		// SO yeah I have to render here in order to get the blood to show up :/
 		if (!rd) {
@@ -188,10 +186,10 @@ public class PostGameScreen extends DUIScreen {
 		DUIElement e = event.getElement();
 		if (e instanceof DButton && event.getType() == DButton.MOUSE_UP) {
 			if (e == okay) {
-				dsh.activate("home", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn());
+				dsh.activate("home", dal, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn());
 			} else if (e == rejoin) {
 				dsh.message("connect", ((MultiplayerSetupScreen) dsh.get("multiplayersetup")).address.getText().trim());
-				dsh.activate("connect", gc, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn());
+				dsh.activate("connect", dal, StaticFiles.getUpMenuOut(), StaticFiles.getUpMenuIn());
 			} else if (e == saveImage) {
 				if (endMap == null)
 					return;

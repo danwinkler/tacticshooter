@@ -1,7 +1,6 @@
 package com.danwink.tacticshooter.slick;
 
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
+import com.danwink.tacticshooter.dal.DAL.DALGraphics;
 
 import jp.objectclub.vecmath.Vector2f;
 
@@ -41,14 +40,14 @@ public class Slick2DCamera {
         this.y = y;
     }
 
-    public void start(GameContainer gc, Graphics g) {
+    public void start(DALGraphics g) {
         g.pushTransform();
-        g.translate(gc.getWidth() / 2, gc.getHeight() / 2);
+        g.translate(g.getWidth() / 2, g.getHeight() / 2);
         g.scale(zoom, zoom);
         g.translate(-x, -y);
     }
 
-    public void end(Graphics g) {
+    public void end(DALGraphics g) {
         g.popTransform();
     }
 
@@ -58,7 +57,7 @@ public class Slick2DCamera {
         y = 0;
     }
 
-    public Vector2f screenToWorld(float x, float y, GameContainer gc) {
-        return new Vector2f((x - gc.getWidth() / 2) / zoom + this.x, (y - gc.getHeight() / 2) / zoom + this.y);
+    public Vector2f screenToWorld(float x, float y, DALGraphics g) {
+        return new Vector2f((x - g.getWidth() / 2) / zoom + this.x, (y - g.getHeight() / 2) / zoom + this.y);
     }
 }

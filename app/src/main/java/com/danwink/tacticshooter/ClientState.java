@@ -3,8 +3,6 @@ package com.danwink.tacticshooter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.newdawn.slick.GameContainer;
-
 import com.danwink.tacticshooter.gameobjects.Bullet;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Marker;
@@ -53,7 +51,7 @@ public class ClientState {
 		frame = 0;
 	}
 
-	public float getSoundMag(GameContainer gc, float x, float y) {
+	public float getSoundMag(float x, float y) {
 		float dx = (camera.x) - x;
 		float dy = (camera.y) - y;
 		float dist = (float) Math.sqrt((dx * dx) + (dy * dy));

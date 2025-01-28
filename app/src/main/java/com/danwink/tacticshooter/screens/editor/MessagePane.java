@@ -1,7 +1,5 @@
 package com.danwink.tacticshooter.screens.editor;
 
-import java.util.ArrayList;
-
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DColumnPanel;
 import com.phyloa.dlib.dui.DRowPanel;

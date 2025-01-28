@@ -69,7 +69,7 @@ public class MapPartitionTest extends BasicGame {
 		l.render(dal.getGraphics());
 		l.renderBuildings(dal.getGraphics(), false);
 
-		la.render(g);
+		la.render(dal.getGraphics());
 
 		g.setColor(Color.black);
 

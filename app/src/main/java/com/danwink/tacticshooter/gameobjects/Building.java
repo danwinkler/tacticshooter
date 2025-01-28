@@ -2,8 +2,6 @@ package com.danwink.tacticshooter.gameobjects;
 
 import java.util.Random;
 
-import org.newdawn.slick.Color;
-import org.newdawn.slick.Graphics;
 import org.newdawn.slick.util.pathfinding.PathFinder;
 
 import com.danwink.tacticshooter.TacticServer;
@@ -53,18 +51,18 @@ public class Building {
 		g.translate(x, y);
 		if (t != null && !endGame) {
 			DALColor teamColor = t.getColor();
-			g.setColor(new Color(teamColor.r, teamColor.g, teamColor.b, .3f));
+			g.setColor(new DALColor(teamColor.r, teamColor.g, teamColor.b, .3f));
 			float rad = ((float) hold / (float) HOLDMAX) * bt.bu.getRadius();
 			g.fillOval(-rad, -rad, rad * 2, rad * 2);
 			g.setColor(teamColor);
 			g.drawOval(-rad, -rad, rad * 2, rad * 2);
 		}
 
-		g.setColor(new Color(0, 0, 0));
+		g.setColor(new DALColor(0, 0, 0));
 
 		g.drawOval(-bt.bu.getRadius(), -bt.bu.getRadius(), bt.bu.getRadius() * 2, bt.bu.getRadius() * 2);
 
-		g.setColor(Color.black);
+		g.setColor(DALColor.black);
 		g.popTransform();
 	}
 

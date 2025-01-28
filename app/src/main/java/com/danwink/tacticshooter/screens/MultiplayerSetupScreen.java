@@ -2,9 +2,8 @@ package com.danwink.tacticshooter.screens;
 
 import java.awt.event.KeyEvent;
 
-import org.newdawn.slick.GameContainer;
-
 import com.danwink.tacticshooter.StaticFiles;
+import com.danwink.tacticshooter.dal.DAL;
 import com.danwink.tacticshooter.ui.DUIScreen;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DColumnPanel;
@@ -20,7 +19,7 @@ public class MultiplayerSetupScreen extends DUIScreen {
 	DButton enter;
 	DButton back;
 
-	public void init(GameContainer e) {
+	public void init(DAL e) {
 		address = new DTextBox(0, 0, 0, 0);
 
 		if (((HomeScreen) dsh.get("home")).server != null) {
@@ -51,14 +50,14 @@ public class MultiplayerSetupScreen extends DUIScreen {
 		if (e instanceof DButton && event.getType() == DButton.MOUSE_UP) {
 			if (e == enter) {
 				dsh.message("connect", address.getText().trim());
-				dsh.activate("connect", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
+				dsh.activate("connect", dal, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
 			} else if (e == back) {
-				dsh.activate("home", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
+				dsh.activate("home", dal, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
 			}
 		} else if (e instanceof DTextBox) {
 			if (event.getType() == KeyEvent.VK_ENTER) {
 				dsh.message("connect", address.getText().trim());
-				dsh.activate("connect", gc, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
+				dsh.activate("connect", dal, StaticFiles.getDownMenuOut(), StaticFiles.getDownMenuIn());
 			}
 		}
 	}

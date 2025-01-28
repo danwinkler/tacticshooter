@@ -5,8 +5,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.dom4j.DocumentException;
-import org.newdawn.slick.Image;
-
 import com.danwink.tacticshooter.LevelFileHelper;
 import com.danwink.tacticshooter.dal.DAL.DALTexture;
 import com.danwink.tacticshooter.screens.editor.EditorScreen.LevelElement;
