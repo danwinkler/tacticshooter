@@ -9,12 +9,14 @@
             "name": "Launch DesktopLauncher",
             "request": "launch",
             "mainClass": "com.danwink.tacticshooter.lwjgl3.Lwjgl3Launcher",
-            "projectName": "lwjgl3",
             "windows": {
-                "vmArgs": "-Xmx4G -Xms100m"
+                "vmArgs": "-Xmx4G -Xms100m",
+                "projectName": "lwjgl3",
             },
             "osx": {
-                "vmArgs": "-Xmx4G -Xms100m -XstartOnFirstThread"
+                "vmArgs": "-Xmx4G -Xms100m -XstartOnFirstThread",
+                // I don't know why this is different on mac and windows
+                "projectName": "tacticshooter-lwjgl3",
             },
         }
     ]

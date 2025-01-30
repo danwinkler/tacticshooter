@@ -240,6 +240,15 @@ public class DUI implements DMouseListener, DKeyListener {
 	}
 
 	@Override
+	public void keyTyped(DKeyEvent dke) {
+		if (enabled && focus != null) {
+			focus.keyTyped(dke);
+		}
+
+		passThroughKeyListeners.forEach(l -> l.keyTyped(dke));
+	}
+
+	@Override
 	public void mouseEntered(DMouseEvent e) {
 		passThroughMouseListeners.forEach(l -> l.mouseEntered(e));
 	}

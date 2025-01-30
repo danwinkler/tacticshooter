@@ -3,7 +3,6 @@ package com.phyloa.dlib.dui;
 import java.awt.Color;
 
 import com.phyloa.dlib.math.Point2i;
-
 import com.phyloa.dlib.renderer.Renderer2D;
 
 public class DScrollPane extends DUIElement {
@@ -54,6 +53,11 @@ public class DScrollPane extends DUIElement {
 
 	public boolean mouseDragged(DMouseEvent e) {
 		return true;
+	}
+
+	@Override
+	public void keyTyped(DKeyEvent dke) {
+
 	}
 
 	public void render(Renderer2D r) {

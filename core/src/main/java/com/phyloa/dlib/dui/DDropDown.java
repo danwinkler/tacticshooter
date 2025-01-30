@@ -3,9 +3,9 @@ package com.phyloa.dlib.dui;
 import java.util.ArrayList;
 
 import com.phyloa.dlib.math.Point2i;
-import jp.objectclub.vecmath.Vector2f;
-
 import com.phyloa.dlib.renderer.Renderer2D;
+
+import jp.objectclub.vecmath.Vector2f;
 
 public class DDropDown extends DUIElement {
 	public ArrayList<String> items = new ArrayList<String>();
@@ -244,6 +244,11 @@ public class DDropDown extends DUIElement {
 		public void mouseWheel(DMouseEvent dme) {
 
 		}
+
+		@Override
+		public void keyTyped(DKeyEvent dke) {
+
+		}
 	}
 
 	public int getSelectedOrdinal() {
@@ -253,5 +258,11 @@ public class DDropDown extends DUIElement {
 	public void clearItems() {
 		items.clear();
 		selected = 0;
+	}
+
+	@Override
+	public void keyTyped(DKeyEvent dke) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'keyTyped'");
 	}
 }

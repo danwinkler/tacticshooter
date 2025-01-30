@@ -216,6 +216,11 @@ public class HomeScreen extends DUIScreen {
 		}
 
 		@Override
+		public void keyTyped(DKeyEvent dke) {
+
+		}
+
+		@Override
 		public void mouseEntered(DMouseEvent e) {
 			// TODO Auto-generated method stub
 

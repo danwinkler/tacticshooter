@@ -4,10 +4,10 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 
-import jp.objectclub.vecmath.Vector2f;
-
 import com.danwink.tacticshooter.dal.DAL.DALTexture;
 import com.phyloa.dlib.renderer.Renderer2D;
+
+import jp.objectclub.vecmath.Vector2f;
 
 public class DButton extends DUIElement {
 	public static final int RELEASED = 0;
@@ -221,6 +221,11 @@ public class DButton extends DUIElement {
 	@Override
 	public void mouseWheel(DMouseEvent dme) {
 		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void keyTyped(DKeyEvent dke) {
 
 	}
 }

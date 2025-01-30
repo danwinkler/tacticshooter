@@ -3,10 +3,10 @@ package com.phyloa.dlib.dui;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import jp.objectclub.vecmath.Vector2f;
-
 import com.phyloa.dlib.renderer.Renderer2D;
 import com.phyloa.dlib.util.DMath;
+
+import jp.objectclub.vecmath.Vector2f;
 
 public class DLinePlot extends DUIElement {
 	ArrayList<String[]> labels = new ArrayList<String[]>();
@@ -166,5 +166,10 @@ public class DLinePlot extends DUIElement {
 		if (dist > labelShowDist * labelShowDist) {
 			labelToShow = null;
 		}
+	}
+
+	@Override
+	public void keyTyped(DKeyEvent dke) {
+
 	}
 }

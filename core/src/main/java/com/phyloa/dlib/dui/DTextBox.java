@@ -8,9 +8,11 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
-import jp.objectclub.vecmath.Vector2f;
 
+import com.badlogic.gdx.Input.Keys;
 import com.phyloa.dlib.renderer.Renderer2D;
+
+import jp.objectclub.vecmath.Vector2f;
 
 public class DTextBox extends DUIElement implements KeyListener {
 	Color bgColor = new Color(128, 128, 255);
@@ -70,26 +72,17 @@ public class DTextBox extends DUIElement implements KeyListener {
 	public void keyPressed(DKeyEvent e) {
 		if (ui.focus == this) {
 			int keyCode = e.keyCode;
-			if (keyCode == KeyEvent.VK_BACK_SPACE) {
-				if (text != null) {
-					if (text.length() > 0) {
-						text = substring(0, cursorLocation - 1) + substring(cursorLocation, text.length());
-						if (cursorLocation > 0) {
-							cursorLocation--;
-						}
-					}
-				}
-			} else if (keyCode == KeyEvent.VK_SHIFT || keyCode == KeyEvent.VK_CONTROL || keyCode == KeyEvent.VK_ALT) {
+			if (keyCode == Keys.SHIFT_LEFT || keyCode == Keys.CONTROL_LEFT || keyCode == Keys.ALT_LEFT) {
 
-			} else if (keyCode == KeyEvent.VK_RIGHT) {
+			} else if (keyCode == Keys.RIGHT) {
 				if (cursorLocation < text.length()) {
 					cursorLocation++;
 				}
-			} else if (keyCode == KeyEvent.VK_LEFT) {
+			} else if (keyCode == Keys.LEFT) {
 				if (cursorLocation > 0) {
 					cursorLocation--;
 				}
-			} else if (e.lctrl && e.keyCode == KeyEvent.VK_V) {
+			} else if (e.lctrl && e.keyCode == Keys.V) {
 				try {
 					text += (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
 				} catch (HeadlessException e1) {
@@ -99,12 +92,27 @@ public class DTextBox extends DUIElement implements KeyListener {
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
-			} else if (!e.isActionKey) {
-				text = substring(0, cursorLocation) + e.keyChar + substring(cursorLocation, text.length());
-				cursorLocation++;
 			}
 			ui.event(new DUIEvent(this, keyCode));
 		}
+	}
+
+	@Override
+	public void keyTyped(DKeyEvent e) {
+		if (e.keyChar == '\b') {
+			if (text != null) {
+				if (text.length() > 0) {
+					text = substring(0, cursorLocation - 1) + substring(cursorLocation, text.length());
+					if (cursorLocation > 0) {
+						cursorLocation--;
+					}
+				}
+			}
+			return;
+		}
+
+		text = substring(0, cursorLocation) + e.keyChar + substring(cursorLocation, text.length());
+		cursorLocation++;
 	}
 
 	private String substring(int f, int l) {
@@ -213,4 +221,5 @@ public class DTextBox extends DUIElement implements KeyListener {
 		// TODO Auto-generated method stub
 
 	}
+
 }

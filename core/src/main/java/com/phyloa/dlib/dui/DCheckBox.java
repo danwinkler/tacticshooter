@@ -69,4 +69,9 @@ public class DCheckBox extends DUIElement {
 
 	}
 
+	@Override
+	public void keyTyped(DKeyEvent dke) {
+
+	}
+
 }

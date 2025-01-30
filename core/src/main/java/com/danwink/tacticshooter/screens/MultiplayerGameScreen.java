@@ -1,7 +1,7 @@
 package com.danwink.tacticshooter.screens;
 
 import java.util.ArrayList;
-import java.awt.event.KeyEvent;
+
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.geom.Rectangle;
@@ -24,8 +24,8 @@ import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Building.BuildingType;
 import com.danwink.tacticshooter.gameobjects.Bullet;
 import com.danwink.tacticshooter.gameobjects.Level;
-import com.danwink.tacticshooter.gameobjects.Marker;
 import com.danwink.tacticshooter.gameobjects.Level.TileType;
+import com.danwink.tacticshooter.gameobjects.Marker;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.gameobjects.Team;
 import com.danwink.tacticshooter.gameobjects.Unit;
@@ -814,6 +814,11 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 	@Override
 	public void mouseWheel(DMouseEvent e) {
 		float zoomSpeed = 0.1f;
+
+		if (e.wheel == 0) {
+			return;
+		}
+
 		int dir = e.wheel > 0 ? 1 : -1;
 		float zoom = dir * zoomSpeed;
 
@@ -832,11 +837,11 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 
 	@Override
 	public void keyPressed(DKeyEvent e) {
-		if (e.keyCode == KeyEvent.VK_ESCAPE) {
+		if (e.keyCode == Keys.ESCAPE) {
 			escapeMenu.setVisible(!escapeMenu.isVisible());
 			chatPanel.setVisible(false);
 			chatBox.setText("");
-		} else if (e.keyCode == KeyEvent.VK_ENTER) {
+		} else if (e.keyCode == Keys.ENTER) {
 			if (chatPanel.isVisible()) {
 				if (chatBox.getText().trim().length() > 0) {
 					ci.sendToServer(new Message(MessageType.MESSAGE,
@@ -849,8 +854,8 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 				chatPanel.setVisible(true);
 				dui.setFocus(chatBox);
 			}
-		} else if (e.keyCode >= KeyEvent.VK_1 && e.keyCode <= KeyEvent.VK_9) {
-			ArrayList<Integer> bg = battleGroups[e.keyCode - KeyEvent.VK_1];
+		} else if (e.keyCode >= Keys.NUM_1 && e.keyCode <= Keys.NUM_9) {
+			ArrayList<Integer> bg = battleGroups[e.keyCode - Keys.NUM_1];
 			if (Gdx.input.isKeyPressed(Keys.CONTROL_LEFT)) {
 				bg.clear();
 				for (int i = 0; i < cs.selected.size(); i++) {
@@ -874,7 +879,7 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 				// Trigger recalc of selected units display
 				dui.doLayout();
 			}
-		} else if (e.keyCode == KeyEvent.VK_F8) {
+		} else if (e.keyCode == Keys.F8) {
 			if (levelAnalysis == null) {
 				levelAnalysis = new LevelAnalysis();
 				levelAnalysis.build(cs.l, new AStarPathFinder(cs.l, 500, StaticFiles.options.getB("diagonalMove")));
@@ -884,31 +889,31 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 		} else {
 			DButton b = null;
 			switch (e.keyCode) {
-				case KeyEvent.VK_Q:
+				case Keys.Q:
 					b = buttonSlots[0][0];
 					break;
-				case KeyEvent.VK_W:
+				case Keys.W:
 					b = buttonSlots[1][0];
 					break;
-				case KeyEvent.VK_E:
+				case Keys.E:
 					b = buttonSlots[2][0];
 					break;
-				case KeyEvent.VK_A:
+				case Keys.A:
 					b = buttonSlots[0][1];
 					break;
-				case KeyEvent.VK_S:
+				case Keys.S:
 					b = buttonSlots[1][1];
 					break;
-				case KeyEvent.VK_D:
+				case Keys.D:
 					b = buttonSlots[2][1];
 					break;
-				case KeyEvent.VK_Z:
+				case Keys.Z:
 					b = buttonSlots[0][2];
 					break;
-				case KeyEvent.VK_X:
+				case Keys.X:
 					b = buttonSlots[1][2];
 					break;
-				case KeyEvent.VK_C:
+				case Keys.C:
 					b = buttonSlots[2][2];
 					break;
 			}
@@ -917,6 +922,11 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 				dui.event(new DUIEvent(b, DButton.MOUSE_UP));
 			}
 		}
+	}
+
+	@Override
+	public void keyTyped(DKeyEvent dke) {
+
 	}
 
 	@Override

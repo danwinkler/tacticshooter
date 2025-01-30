@@ -1,13 +1,14 @@
 package com.danwink.tacticshooter.screens.editor;
 
+import java.awt.event.KeyEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.awt.event.KeyEvent;
-import java.io.IOException;
 
 import org.newdawn.slick.Input;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
@@ -20,10 +21,10 @@ import com.danwink.tacticshooter.dal.DAL.DALColor;
 import com.danwink.tacticshooter.dal.DAL.DALGraphics;
 import com.danwink.tacticshooter.dal.DAL.DALTexture;
 import com.danwink.tacticshooter.gameobjects.Building;
-import com.danwink.tacticshooter.gameobjects.Level;
-import com.danwink.tacticshooter.gameobjects.Team;
 import com.danwink.tacticshooter.gameobjects.Building.BuildingType;
+import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Level.TileType;
+import com.danwink.tacticshooter.gameobjects.Team;
 import com.danwink.tacticshooter.renderer.BuildingRenderer;
 import com.danwink.tacticshooter.renderer.FloorRenderer;
 import com.danwink.tacticshooter.renderer.WallRenderer;
@@ -233,6 +234,11 @@ public class EditorScreen extends DUIScreen {
         @Override
         public void keyReleased(DKeyEvent dke) {
             // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void keyTyped(DKeyEvent dke) {
 
         }
 

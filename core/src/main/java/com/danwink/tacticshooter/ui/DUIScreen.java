@@ -1,6 +1,9 @@
 package com.danwink.tacticshooter.ui;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -78,6 +81,22 @@ public abstract class DUIScreen extends DScreen<DAL> implements DUIListener {
     }
 
     public static class Gdx2DEventMapper implements DEventMapper, InputProcessor {
+        public static Set<Integer> actionKeys = new HashSet<>(
+                Arrays.asList(
+                        Keys.ENTER,
+                        Keys.ESCAPE,
+                        Keys.UP,
+                        Keys.DOWN,
+                        Keys.LEFT,
+                        Keys.RIGHT,
+                        Keys.ALT_LEFT,
+                        Keys.ALT_RIGHT,
+                        Keys.CONTROL_LEFT,
+                        Keys.CONTROL_RIGHT,
+                        Keys.SHIFT_LEFT,
+                        Keys.SHIFT_RIGHT,
+                        Keys.TAB));
+
         ArrayList<DKeyListener> keyListeners = new ArrayList<DKeyListener>();
         ArrayList<DMouseListener> mouseListeners = new ArrayList<DMouseListener>();
 
@@ -121,6 +140,9 @@ public abstract class DUIScreen extends DScreen<DAL> implements DUIListener {
             DKeyEvent e = new DKeyEvent();
             e.keyCode = keycode;
             e.lctrl = Gdx.input.isKeyPressed(Keys.CONTROL_LEFT);
+            e.keyChar = Keys.toString(keycode).charAt(0);
+            e.isActionKey = actionKeys.contains(keycode);
+            System.out.println("Key down: " + e.keyChar);
 
             for (var l : keyListeners) {
                 l.keyPressed(e);
@@ -148,6 +170,19 @@ public abstract class DUIScreen extends DScreen<DAL> implements DUIListener {
 
         @Override
         public boolean keyTyped(char character) {
+            if (!enabled) {
+                return false;
+            }
+
+            DKeyEvent e = new DKeyEvent();
+            e.keyChar = character;
+
+            System.out.println("Key typed: " + e.keyChar);
+
+            for (var l : keyListeners) {
+                l.keyTyped(e);
+            }
+
             return false;
         }
 

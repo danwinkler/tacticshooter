@@ -1,7 +1,5 @@
 package com.phyloa.dlib.dui;
 
-import org.newdawn.slick.Image;
-
 import com.danwink.tacticshooter.dal.DAL.DALTexture;
 import com.phyloa.dlib.renderer.Renderer2D;
 
@@ -19,6 +17,11 @@ public class DSpacer extends DUIElement {
     @Override
     public void keyReleased(DKeyEvent dke) {
         // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void keyTyped(DKeyEvent dke) {
 
     }
 

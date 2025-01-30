@@ -1,7 +1,5 @@
 package com.phyloa.dlib.dui;
 
-import jp.objectclub.vecmath.Vector2f;
-
 import com.phyloa.dlib.renderer.Renderer2D;
 import com.phyloa.dlib.util.DMath;
 
@@ -26,6 +24,11 @@ public class DSlider extends DUIElement {
 	@Override
 	public void keyReleased(DKeyEvent dke) {
 		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void keyTyped(DKeyEvent dke) {
 
 	}
 

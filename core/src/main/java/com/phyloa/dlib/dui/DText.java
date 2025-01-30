@@ -2,12 +2,10 @@ package com.phyloa.dlib.dui;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-
-import jp.objectclub.vecmath.Vector2f;
 
 import com.phyloa.dlib.renderer.Renderer2D;
+
+import jp.objectclub.vecmath.Vector2f;
 
 public class DText extends DUIElement {
 	String text;
@@ -83,6 +81,11 @@ public class DText extends DUIElement {
 	@Override
 	public void keyReleased(DKeyEvent dke) {
 		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void keyTyped(DKeyEvent dke) {
 
 	}
 

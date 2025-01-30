@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.dom4j.DocumentException;
+
 import com.danwink.tacticshooter.LevelFileHelper;
 import com.danwink.tacticshooter.dal.DAL.DALTexture;
 import com.danwink.tacticshooter.screens.editor.EditorScreen.LevelElement;
@@ -261,6 +262,11 @@ public class FilePane extends DColumnPanel {
             @Override
             public void keyReleased(DKeyEvent dke) {
                 // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void keyTyped(DKeyEvent dke) {
 
             }
 

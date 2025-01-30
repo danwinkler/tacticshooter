@@ -83,4 +83,9 @@ public class DPanel extends DUIElement {
 		// TODO Auto-generated method stub
 
 	}
+
+	@Override
+	public void keyTyped(DKeyEvent dke) {
+
+	}
 }
