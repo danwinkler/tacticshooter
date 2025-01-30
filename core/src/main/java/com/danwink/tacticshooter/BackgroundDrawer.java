@@ -1,7 +1,5 @@
 package com.danwink.tacticshooter;
 
-import org.newdawn.slick.SlickException;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.danwink.tacticshooter.dal.DAL;
@@ -33,11 +31,7 @@ public class BackgroundDrawer {
 
 	public void render(DAL dal) {
 		if (theme == null) {
-			try {
-				theme = Theme.getTheme(themePath.nameWithoutExtension());
-			} catch (SlickException e) {
-				e.printStackTrace();
-			}
+			theme = Theme.getTheme(themePath.nameWithoutExtension());
 		}
 
 		DALGraphics g = dal.getGraphics();

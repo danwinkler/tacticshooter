@@ -3,7 +3,6 @@ package com.danwink.tacticshooter.gameobjects;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.newdawn.slick.SlickException;
 import org.newdawn.slick.util.pathfinding.Mover;
 import org.newdawn.slick.util.pathfinding.PathFindingContext;
 import org.newdawn.slick.util.pathfinding.TileBasedMap;
@@ -108,11 +107,7 @@ public class Level implements TileBasedMap {
 	}
 
 	public void loadTextures() {
-		try {
-			theme = Theme.getTheme(themeName);
-		} catch (SlickException e) {
-			e.printStackTrace();
-		}
+		theme = Theme.getTheme(themeName);
 	}
 
 	public void drawAutoTile(DALGraphics g, int x, int y, TileType autoTile, DALTexture tileImage) {

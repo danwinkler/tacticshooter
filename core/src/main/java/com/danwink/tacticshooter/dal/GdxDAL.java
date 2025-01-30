@@ -1,14 +1,19 @@
 package com.danwink.tacticshooter.dal;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayDeque;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.zip.Deflater;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
+import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
@@ -73,7 +78,7 @@ public class GdxDAL extends DAL {
 
     @Override
     public void exit() {
-
+        Gdx.app.exit();
     }
 
     @Override
@@ -169,6 +174,12 @@ public class GdxDAL extends DAL {
         public TextureRegion getTextureRegion() {
             return region;
         }
+
+        @Override
+        public void saveToFile(FileHandle handle) {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'saveToFile'");
+        }
     }
 
     public static class GdxFboTexture implements DALTexture, PausableRender {
@@ -255,6 +266,43 @@ public class GdxDAL extends DAL {
         @Override
         public TextureRegion getTextureRegion() {
             return fboRegion;
+        }
+
+        public void saveToFile(FileHandle handle) {
+            var pausedRender = currentRenderer;
+            if (pausedRender != null) {
+                pausedRender.pauseRender();
+            }
+
+            currentRenderer = this;
+
+            HdpiUtils.setMode(HdpiMode.Pixels);
+
+            fbo.begin();
+
+            var fboPixmap = Pixmap.createFromFrameBuffer(0, 0, fbo.getWidth(), fbo.getHeight());
+            ByteBuffer fboPixels = fboPixmap.getPixels();
+
+            // This loop makes sure the whole screenshot is opaque and looks exactly like
+            // what the user is seeing
+            int fboPixelsSize = fboPixmap.getWidth() * fboPixmap.getHeight() * 4;
+            for (int i = 3; i < fboPixelsSize; i += 4) {
+                fboPixels.put(i, (byte) 255);
+            }
+
+            PixmapIO.writePNG(handle, fboPixmap, Deflater.DEFAULT_COMPRESSION, true);
+            fboPixmap.dispose();
+
+            fbo.end();
+
+            HdpiUtils.setMode(HdpiMode.Logical);
+
+            if (pausedRender != null) {
+                currentRenderer = pausedRender;
+                pausedRender.resumeRender();
+            } else {
+                pausedRender = null;
+            }
         }
     }
 

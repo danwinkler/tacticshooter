@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.dal.DAL;
-import com.danwink.tacticshooter.slick.Slick2DRenderer;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DScrollPane;
 import com.phyloa.dlib.dui.DSlider;
@@ -28,8 +27,6 @@ public class OptionsScreen extends DScreen<DAL> implements DUIListener {
 	DScrollPane scrollPane;
 
 	DButton back;
-
-	Slick2DRenderer r = new Slick2DRenderer();
 
 	ArrayList<DUIElement> boxes = new ArrayList<DUIElement>();
 

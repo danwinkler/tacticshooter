@@ -4,8 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.util.function.Consumer;
 
-import org.newdawn.slick.Graphics;
-
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.phyloa.dlib.dui.DEventMapper;
@@ -159,6 +158,8 @@ public abstract class DAL {
         public void flushPixelData();
 
         public TextureRegion getTextureRegion();
+
+        public void saveToFile(FileHandle handle);
     }
 
     public static class DALColor {

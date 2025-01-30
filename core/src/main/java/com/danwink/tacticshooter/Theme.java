@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.newdawn.slick.SlickException;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -32,11 +31,11 @@ public class Theme {
 
 	public Map<String, DALTexture> portraits = new HashMap<>();
 
-	private Theme(String name) throws SlickException {
+	private Theme(String name) {
 		this.name = name;
 	}
 
-	public void load() throws SlickException {
+	public void load() {
 		crater = load("crater");
 		grate = load("grate");
 		wall = load("wall");
@@ -59,7 +58,7 @@ public class Theme {
 		return portraits.get(portrait);
 	}
 
-	private DALTexture load(String s) throws SlickException {
+	private DALTexture load(String s) {
 		var tex = new Texture(Gdx.files.internal(
 				"data/themes" + File.separator + name + File.separator + s + ".png"));
 		tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
@@ -68,13 +67,13 @@ public class Theme {
 		return new GdxRegionTexture(tr);
 	}
 
-	private TSSpriteSheet loadSS(String s, int size) throws SlickException {
+	private TSSpriteSheet loadSS(String s, int size) {
 		return new GdxSpriteSheet(new Texture(Gdx.files.internal(
 				"data/themes" + File.separator + name + File.separator + s + ".png")), size,
 				size);
 	}
 
-	public static Theme getTheme(String name) throws SlickException {
+	public static Theme getTheme(String name) {
 		Theme t = themes.get(name);
 		if (t == null) {
 			t = new Theme(name);

@@ -5,7 +5,6 @@ import jp.objectclub.vecmath.Vector2f;
 
 import com.danwink.tacticshooter.Assets;
 import com.danwink.tacticshooter.ClientState;
-import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.TacticServer;
 import com.danwink.tacticshooter.dal.DAL.DALGraphics;
 import com.danwink.tacticshooter.screens.MultiplayerGameScreen;

@@ -328,6 +328,7 @@ public class LobbyScreen extends DUIScreen {
 				// Now create the image for the minimap and render
 				miniMap = dal.generateRenderableTexture(level.width * Level.tileSize,
 						level.height * Level.tileSize);
+				miniMap.getTextureRegion().flip(false, true);
 
 				miniMap.renderTo(mg -> {
 					mg.clear();

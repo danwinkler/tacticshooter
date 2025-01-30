@@ -2,7 +2,6 @@ package com.danwink.tacticshooter.screens;
 
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.dal.DAL;
-import com.danwink.tacticshooter.slick.Slick2DRenderer;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DUI;
 import com.phyloa.dlib.dui.DUIElement;
@@ -17,8 +16,6 @@ public class SettingsScreen extends DScreen<DAL> implements DUIListener {
 	DButton options;
 	DButton advOptions;
 	DButton back;
-
-	Slick2DRenderer r = new Slick2DRenderer();
 
 	public void onActivate(DAL gc, DScreenHandler<DAL> dsh) {
 		if (dui == null) {

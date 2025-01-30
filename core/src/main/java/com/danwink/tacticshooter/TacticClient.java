@@ -2,8 +2,6 @@ package com.danwink.tacticshooter;
 
 import java.io.File;
 
-import org.newdawn.slick.SlickException;
-
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -64,13 +62,8 @@ public class TacticClient extends ApplicationAdapter {
         lastWindowWidth = dal.getWidth();
         lastWindowHeight = dal.getHeight();
 
-        try {
-            Theme.getTheme("desertrpg").load();
-            Theme.getTheme("junglerpg").load();
-        } catch (SlickException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        Theme.getTheme("desertrpg").load();
+        Theme.getTheme("junglerpg").load();
 
         dsh.register("openload", new OpenLoadScreen());
 

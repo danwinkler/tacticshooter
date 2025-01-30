@@ -1,7 +1,5 @@
 package com.danwink.tacticshooter;
 
-import org.newdawn.slick.Font;
-
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
 public class UIHelper {

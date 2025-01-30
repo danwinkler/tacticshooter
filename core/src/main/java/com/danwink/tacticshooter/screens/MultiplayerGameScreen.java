@@ -2,14 +2,9 @@ package com.danwink.tacticshooter.screens;
 
 import java.util.ArrayList;
 import java.awt.event.KeyEvent;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
-import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Rectangle;
-import org.newdawn.slick.imageout.ImageOut;
 import org.newdawn.slick.opengl.shader.ShaderProgram;
 import org.newdawn.slick.util.pathfinding.AStarPathFinder;
 
@@ -25,7 +20,6 @@ import com.danwink.tacticshooter.ai.LevelAnalysis;
 import com.danwink.tacticshooter.dal.DAL;
 import com.danwink.tacticshooter.dal.DAL.DALColor;
 import com.danwink.tacticshooter.dal.DAL.DALTexture;
-import com.danwink.tacticshooter.dal.SlickDAL.SlickTexture;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Building.BuildingType;
 import com.danwink.tacticshooter.gameobjects.Bullet;
@@ -332,7 +326,6 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 
 		if (!chatPanel.isVisible() && !escapeMenu.isVisible()) {
 			float scrollSpeed = 20;
-			Rectangle screenBounds = getScreenBounds();
 
 			boolean scrollUp = cs.camera.y > 0 && (Gdx.input.isKeyPressed(Keys.UP)
 					|| (dal.isFullscreen() && Gdx.input.getY() < 10));
@@ -414,6 +407,7 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 			float yOffset = !xLarger ? 0 : 100 - 100 * (float) cs.l.height / cs.l.width;
 			float scale = 200.f / ((xLarger ? cs.l.width : cs.l.height) * Level.tileSize);
 			miniMap = dal.generateRenderableTexture(200, 200);
+			miniMap.getTextureRegion().flip(false, true);
 			miniMap.renderTo(mg -> {
 				mg.translate(xOffset, yOffset);
 				mg.scale(scale, scale);
@@ -602,16 +596,15 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 		boolean writeScreenFrames = false;
 		if (writeScreenFrames) {
 			if (cs.frame % 200 == 0) {
-				try {
-					DALTexture tex = gameRenderer.renderToTexture(cs.l.width * 8, cs.l.height * 8, cs, dal);
-					Image im = ((SlickTexture) tex).image;
-					FileOutputStream fos = new FileOutputStream("screenshots/tmp/" + cs.frame + ".png");
-					ImageOut.write(im.getFlippedCopy(false, false), "png", fos);
-					fos.close();
-					im.destroy();
-				} catch (SlickException | IOException e) {
-					throw new RuntimeException(e);
-				}
+				// TODO(slick2gdx): This is a little bit of code that allows for making animated
+				// gifs of games. Need to convert it over to using LibGDX
+				// DALTexture tex = gameRenderer.renderToTexture(cs.l.width * 8, cs.l.height *
+				// 8, cs, dal);
+				// FileOutputStream fos = new FileOutputStream("screenshots/tmp/" + cs.frame +
+				// ".png");
+				// ImageOut.write(im.getFlippedCopy(false, false), "png", fos);
+				// fos.close();
+				// im.destroy();
 			}
 		}
 	}

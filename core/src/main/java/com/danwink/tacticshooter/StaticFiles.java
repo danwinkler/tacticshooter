@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.stream.Stream;
 
 import org.newdawn.slick.Music;
-import org.newdawn.slick.SlickException;
 import org.newdawn.slick.Sound;
 
 import com.badlogic.gdx.Gdx;

@@ -4,19 +4,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.imageout.ImageOut;
 
+import com.badlogic.gdx.Gdx;
 import com.danwink.tacticshooter.GameStats;
 import com.danwink.tacticshooter.MusicQueuer;
 import com.danwink.tacticshooter.GameStats.TeamStats;
 import com.danwink.tacticshooter.dal.DAL;
 import com.danwink.tacticshooter.dal.DAL.DALColor;
-import com.danwink.tacticshooter.dal.SlickDAL.SlickTexture;
+import com.danwink.tacticshooter.dal.DAL.DALTexture;
 import com.danwink.tacticshooter.StaticFiles;
-import com.danwink.tacticshooter.slick.Slick2DRenderer;
 import com.danwink.tacticshooter.ui.DUIScreen;
 import com.phyloa.dlib.dui.DButton;
 import com.phyloa.dlib.dui.DColumnPanel;
@@ -36,10 +35,8 @@ public class PostGameScreen extends DUIScreen {
 	DButton rejoin;
 	DButton saveImage;
 
-	Slick2DRenderer r = new Slick2DRenderer();
-
 	GameStats stats;
-	Image endMap;
+	DALTexture endMap;
 
 	boolean rd = false;
 
@@ -168,16 +165,16 @@ public class PostGameScreen extends DUIScreen {
 		// Render UI
 		super.render(dal);
 
+		// TODO(slick2gdx): I think it's likely that doing this here it no longer
+		// necessary
 		// SO yeah I have to render here in order to get the blood to show up :/
 		if (!rd) {
-			// TODO:
-			// Graphics emg = endMap.getGraphics();
-			// MultiplayerGameScreen mgs = ((MultiplayerGameScreen)
-			// dsh.get("multiplayergame"));
-			// endMap.getGraphics().drawImage(mgs.gameRenderer.bloodExplosion.texture.slim(),
-			// 0, 0);
-			// var wallImage = ((SlickTexture) mgs.gameRenderer.wall.texture).image;
-			// endMap.getGraphics().drawImage(wallImage, 0, 0);
+			endMap.renderTo(emg -> {
+				MultiplayerGameScreen mgs = ((MultiplayerGameScreen) dsh.get("multiplayergame"));
+				emg.drawImage(mgs.gameRenderer.bloodExplosion.texture,
+						0, 0);
+				emg.drawImage(mgs.gameRenderer.wall.texture, 0, 0);
+			});
 
 			rd = true;
 		}
@@ -195,17 +192,13 @@ public class PostGameScreen extends DUIScreen {
 				if (endMap == null)
 					return;
 				saveImage.setText("Image Saved!");
-				try {
-					// We have to create the FileOutputStream ourselves, as the ImageOut utility
-					// will never close it!
-					FileOutputStream fos = new FileOutputStream("screenshots/" + System.currentTimeMillis() + ".png");
-					ImageOut.write(endMap.getFlippedCopy(false, false), "png", fos);
-					fos.close();
-					endMap.destroy();
-					endMap = null;
-				} catch (SlickException | IOException e1) {
-					e1.printStackTrace();
+				var screenshotsFolder = Gdx.files.local("screenshots");
+				if (!screenshotsFolder.exists()) {
+					screenshotsFolder.mkdirs();
 				}
+
+				endMap.saveToFile(screenshotsFolder.child(System.currentTimeMillis() + ".png"));
+
 			}
 		}
 
@@ -215,8 +208,8 @@ public class PostGameScreen extends DUIScreen {
 	public void message(Object o) {
 		if (o instanceof GameStats) {
 			stats = (GameStats) o;
-		} else if (o instanceof Image) {
-			endMap = (Image) o;
+		} else if (o instanceof DALTexture) {
+			endMap = (DALTexture) o;
 		}
 	}
 }

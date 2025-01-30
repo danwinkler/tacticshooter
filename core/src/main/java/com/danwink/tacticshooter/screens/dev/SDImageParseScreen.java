@@ -1,6 +1,5 @@
 package com.danwink.tacticshooter.screens.dev;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -9,8 +8,6 @@ import java.util.Queue;
 import java.util.stream.Collectors;
 
 import org.newdawn.slick.Color;
-import org.newdawn.slick.Image;
-import org.newdawn.slick.SlickException;
 import org.newdawn.slick.util.pathfinding.AStarPathFinder;
 
 import com.danwink.tacticshooter.ClientState;
@@ -20,7 +17,6 @@ import com.danwink.tacticshooter.Theme;
 import com.danwink.tacticshooter.dal.DAL;
 import com.danwink.tacticshooter.dal.DAL.DALColor;
 import com.danwink.tacticshooter.dal.DAL.DALTexture;
-import com.danwink.tacticshooter.dal.SlickDAL.SlickTexture;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Team;
@@ -133,7 +129,7 @@ public class SDImageParseScreen extends DUIScreen {
         } else if (event.getElement() == generate) {
             if (event.getType() == DButton.MOUSE_UP) {
                 try {
-                    genLevel();
+                    genLevel(dal);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -143,18 +139,13 @@ public class SDImageParseScreen extends DUIScreen {
 
     @Override
     public void message(Object o) {
-        try {
-            var path = (String) o;
-            image = new SlickTexture(new Image(path));
-
-            name = new File(path).getName().replace(".png", "");
-        } catch (SlickException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        var path = (String) o;
+        // TODO(slick2gdx): convert this to use libGDX
+        // image = new SlickTexture(new Image(path));
+        // name = new File(path).getName().replace(".png", "");
     }
 
-    public void genLevel() throws SlickException {
+    public void genLevel(DAL dal) {
         // STEP 1: Create "intermediate" image that includes border and thresholds
         // colors
         int width = Integer.parseInt(this.width.getText());
@@ -174,7 +165,7 @@ public class SDImageParseScreen extends DUIScreen {
             offsetY = (int) tileScaleY;
         }
 
-        intermediate = new SlickTexture(new Image(intermediateWidth, intermediateHeight));
+        intermediate = dal.generateRenderableTexture(intermediateWidth, intermediateHeight);
 
         // Recalculate tile scale to account for border (though should be the same since
         // we added 2 to width and height)

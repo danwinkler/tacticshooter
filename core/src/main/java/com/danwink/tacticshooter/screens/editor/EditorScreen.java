@@ -7,11 +7,10 @@ import java.util.List;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 
-import org.newdawn.slick.Color;
-import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
-import org.newdawn.slick.SlickException;
-
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.Input.Keys;
 import com.danwink.tacticshooter.KryoHelper;
 import com.danwink.tacticshooter.LevelFileHelper;
 import com.danwink.tacticshooter.StaticFiles;
@@ -20,7 +19,6 @@ import com.danwink.tacticshooter.dal.DAL;
 import com.danwink.tacticshooter.dal.DAL.DALColor;
 import com.danwink.tacticshooter.dal.DAL.DALGraphics;
 import com.danwink.tacticshooter.dal.DAL.DALTexture;
-import com.danwink.tacticshooter.dal.SlickDAL;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Team;
@@ -44,19 +42,14 @@ import com.phyloa.dlib.math.Point2i;
 import com.phyloa.dlib.renderer.Renderer2D;
 
 public class EditorScreen extends DUIScreen {
-
     LevelElement levelElement;
     MessagePane messagePane;
     FilePane filePane;
-
-    Input input;
 
     @Override
     public void init(DAL dal) {
         this.clearScreen = true;
 
-        var gc = ((SlickDAL) dal).gc;
-        input = gc.getInput();
         levelElement = new LevelElement();
         messagePane = new MessagePane(0, 0, 0, 0);
     }
@@ -131,11 +124,7 @@ public class EditorScreen extends DUIScreen {
         public void setLevel(Level level) {
             this.level = level;
 
-            try {
-                level.theme = Theme.getTheme("desertrpg");
-            } catch (SlickException e) {
-                e.printStackTrace();
-            }
+            level.theme = Theme.getTheme("desertrpg");
 
             camera.x = level.width * Level.tileSize / 2;
             camera.y = level.height * Level.tileSize / 2;
@@ -217,12 +206,14 @@ public class EditorScreen extends DUIScreen {
         public void keyPressed(DKeyEvent dke) {
             switch (dke.keyCode) {
                 case KeyEvent.VK_Z:
-                    if (level != null && input.isKeyDown(Input.KEY_LCONTROL)) {
+                    // if (level != null && input.isKeyDown(Input.KEY_LCONTROL)) {
+                    if (level != null && Gdx.input.isKeyPressed(Keys.CONTROL_LEFT)) {
                         undo();
                     }
                     break;
                 case KeyEvent.VK_S:
-                    if (level != null && input.isKeyDown(Input.KEY_LCONTROL)) {
+                    // if (level != null && input.isKeyDown(Input.KEY_LCONTROL)) {
+                    if (level != null && Gdx.input.isKeyPressed(Keys.CONTROL_LEFT)) {
                         if (mapName != null && !mapName.isEmpty()) {
                             try {
                                 LevelFileHelper.saveLevel(mapName, level);
@@ -267,7 +258,8 @@ public class EditorScreen extends DUIScreen {
             int tx = (int) world.x / Level.tileSize;
             int ty = (int) world.y / Level.tileSize;
 
-            if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
+            // if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
+            if (Gdx.input.isButtonPressed(Buttons.LEFT)) {
                 if (tx >= 0 && tx < level.width && ty >= 0 && ty < level.height) {
                     mirrorType.mirror.getPoints(level, tx, ty).stream()
                             .flatMap(p -> brushType.brush.getPoints(level, p.x, p.y).stream())
@@ -319,13 +311,15 @@ public class EditorScreen extends DUIScreen {
             int tx = (int) world.x / Level.tileSize;
             int ty = (int) world.y / Level.tileSize;
 
-            if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
+            // if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
+            if (Gdx.input.isButtonPressed(Buttons.LEFT)) {
                 if (tx >= 0 && tx < level.width && ty >= 0 && ty < level.height) {
                     mirrorType.mirror.getPoints(level, tx, ty).stream()
                             .flatMap(p -> brushType.brush.getPoints(level, p.x, p.y).stream())
                             .forEach(p -> placeType.placer.mouseDragged(this, p.x, p.y));
                 }
-            } else if (input.isMouseButtonDown(Input.MOUSE_MIDDLE_BUTTON)) {
+                // } else if (input.isMouseButtonDown(Input.MOUSE_MIDDLE_BUTTON)) {
+            } else if (Gdx.input.isButtonPressed(Buttons.MIDDLE)) {
                 camera.x += (lastMouseX - e.x) / camera.zoom;
                 camera.y += (lastMouseY - e.y) / camera.zoom;
             }
@@ -351,8 +345,8 @@ public class EditorScreen extends DUIScreen {
             int dir = e.wheel > 0 ? 1 : -1;
             float zoom = dir * zoomSpeed;
 
-            var mx = input.getMouseX();
-            var my = input.getMouseY();
+            var mx = Gdx.input.getX();
+            var my = Gdx.input.getY();
 
             var worldCoords = camera.screenToWorld(mx, my, dal.getGraphics());
 
