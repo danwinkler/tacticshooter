@@ -1,22 +1,33 @@
-To build:
-`gradle clean build bundleNative`
+# tacticshooter
 
-The relevant JRE needs to be in that folder
+A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
 
-You'll then need to copy over the necessary files into that folder
+This project was generated with a template including simple application launchers and an `ApplicationAdapter` extension that draws libGDX logo.
 
+## Platforms
 
-Map Review:
-battlefield1 - Against AI, not fun at all. The AI sucks.
-battleifled2 - Against AI, pretty uninteresting against AI.
-The_Complex - Against AI, I feel like the AI doesn't play this one well. I think if the AI got a bit better it would be more fun.
-map1 - Against AI, too small, deadlocky, not enough income to do anything. (Deleted)
+- `core`: Main module with the application logic shared by all platforms.
+- `lwjgl3`: Primary desktop platform using LWJGL3; was called 'desktop' in older docs.
 
+## Gradle
 
-Idea: AI should coordinate with each other to decide who should be offensive and defensive. Offensive players would be similar to current AI, but defensive players would identify the frontline and reinforce it.
+This project uses [Gradle](https://gradle.org/) to manage dependencies.
+The Gradle wrapper was included, so you can run Gradle tasks using `gradlew.bat` or `./gradlew` commands.
+Useful Gradle tasks and flags:
 
+- `--continue`: when using this flag, errors will not stop the tasks from running.
+- `--daemon`: thanks to this flag, Gradle daemon will be used to run chosen tasks.
+- `--offline`: when using this flag, cached dependency archives will be used.
+- `--refresh-dependencies`: this flag forces validation of all dependencies. Useful for snapshot versions.
+- `build`: builds sources and archives of every project.
+- `cleanEclipse`: removes Eclipse project data.
+- `cleanIdea`: removes IntelliJ project data.
+- `clean`: removes `build` folders, which store compiled classes and built archives.
+- `eclipse`: generates Eclipse project data.
+- `idea`: generates IntelliJ project data.
+- `lwjgl3:jar`: builds application's runnable jar, which can be found at `lwjgl3/build/libs`.
+- `lwjgl3:run`: starts the application.
+- `test`: runs unit tests (if any).
 
-TODO:
-- [ ] scale background correctly when zooming in and out
-- [ ] Merge StaticFiles (old) and AssetManager (new) into one
-- [ ] The server lags a bunch at the beginning of every match. Either hide this fact by preventing the units from running off in every direction, or fix the lag.
+Note that most tasks that are not specific to a single project can be run with `name:` prefix, where the `name` should be replaced with the ID of a specific project.
+For example, `core:clean` removes `build` folder only from the `core` project.

@@ -6,11 +6,16 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Launch TacticClient",
+            "name": "Launch DesktopLauncher",
             "request": "launch",
-            "mainClass": "com.danwink.tacticshooter.TacticClient",
-            "projectName": "app",
-            "cwd": "${workspaceFolder}/app"
+            "mainClass": "com.danwink.tacticshooter.lwjgl3.Lwjgl3Launcher",
+            "projectName": "lwjgl3",
+            "windows": {
+                "vmArgs": "-Xmx4G -Xms100m"
+            },
+            "osx": {
+                "vmArgs": "-Xmx4G -Xms100m -XstartOnFirstThread"
+            },
         }
     ]
 }
