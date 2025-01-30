@@ -16,6 +16,7 @@ import org.newdawn.slick.util.pathfinding.AStarPathFinder;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
+import com.danwink.tacticshooter.Assets;
 import com.danwink.tacticshooter.ClientState;
 import com.danwink.tacticshooter.MessageType;
 import com.danwink.tacticshooter.MusicQueuer;
@@ -130,14 +131,7 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 		dui.addPassthroughKeyListener(this);
 		dui.addPassthroughMouseListener(this);
 
-		// TODO:
-		// Music music;
-		// int musicChoice = DMath.randomi(1, 3);
-		// while ((music = StaticFiles.getMusic("play" + musicChoice)) == null) {
-		// }
-		// music.play();
-		// music.addListener(new MusicQueuer(DMath.randomi(0, 2), "play1", "play2",
-		// "play3"));
+		MusicQueuer.shuffleTracks("play1", "play2", "play3");
 
 		gameRenderer = new GameRenderer();
 
@@ -202,8 +196,7 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 					if (tu == null) {
 						cs.unitMap.put(u.id, u);
 						cs.units.add(u);
-						// TODO
-						// StaticFiles.getSound("ping1").play(1.f, cs.getSoundMag(u.x, u.y));
+						Assets.getSound("ping1").play(cs.getSoundMag(u.x, u.y));
 						tu = u;
 					}
 					tu.sync(u);
@@ -226,10 +219,8 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 				case BULLETUPDATE:
 					Bullet b = (Bullet) m.message;
 					cs.bullets.add(b);
-					// TODO
-					// (Math.random() > .5 ? StaticFiles.getSound("bullet1") :
-					// StaticFiles.getSound("bullet2")).play(1.f,
-					// cs.getSoundMag(b.loc.x, b.loc.y) * .2f);
+					(Math.random() > .5 ? Assets.getSound("bullet1") : Assets.getSound("bullet2")).play(
+							cs.getSoundMag(b.loc.x, b.loc.y) * .2f);
 					break;
 				case MOVESUCCESS:
 					this.waitingForMoveConfirmation = false;
@@ -277,7 +268,7 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 				case PINGMAP:
 					Point2i pingLoc = (Point2i) m.message;
 					pings.add(new Vector3f(pingLoc.x, pingLoc.y, 100));
-					StaticFiles.getSound("ping1").play(2.f, 1.f);
+					Assets.getSound("ping1").play(1.f, 2.f, 0.f);
 					break;
 				case GAMEOVER:
 					dsh.message("postgame", m.message);
@@ -384,14 +375,12 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 				// Trigger recalc of selected units display
 				dui.doLayout();
 				gameRenderer.killUnit(u);
-				// TODO:
-				// if (u.type.explodesOnDeath) {
-				// StaticFiles.getSound("explode1").play();
-				// } else {
-				// (Math.random() > .5 ? StaticFiles.getSound("death1") :
-				// StaticFiles.getSound("death2")).play(1.f,
-				// cs.getSoundMag(u.x, u.y));
-				// }
+				if (u.type.explodesOnDeath) {
+					Assets.getSound("explode1").play();
+				} else {
+					(Math.random() > .5 ? Assets.getSound("death1") : Assets.getSound("death2"))
+							.play(cs.getSoundMag(u.x, u.y));
+				}
 				i--;
 				continue;
 			}

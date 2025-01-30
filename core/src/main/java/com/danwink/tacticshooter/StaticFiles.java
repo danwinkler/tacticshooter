@@ -47,57 +47,6 @@ public class StaticFiles {
 					Gdx.files.internal("data" + File.separator + "pixelfont1_32px.png"), true);
 			fonts[2] = new BitmapFont(Gdx.files.internal("data" + File.separator + "pixelfont1_48px.fnt"),
 					Gdx.files.internal("data" + File.separator + "pixelfont1_48px.png"), true);
-
-			new Thread(new Runnable() {
-				public void run() {
-					started = true;
-					loadMusic("menu", "Deliberate Thought.ogg");
-					ready = true; // We can go to menu when menu music is done
-					loadMusic("play1", "Decisions.ogg");
-					loadMusic("play2", "Finding the Balance.ogg");
-					loadMusic("play3", "Rising.ogg");
-
-					loadSound("bullet1", "bullet1.wav");
-					loadSound("bullet2", "bullet2.wav");
-					loadSound("ping1", "ping1.wav");
-					loadSound("death1", "death1.wav");
-					loadSound("death2", "death2.wav");
-					loadSound("hit1", "hit1.wav");
-					loadSound("explode1", "explode1.wav");
-				}
-			}).start();
-		}
-	}
-
-	static void loadMusic(String name, String file) {
-		// try {
-		// status = "Loading " + file;
-		// music.put(name, new Music("data" + File.separator + "sound" + File.separator
-		// + file));
-		// } catch (SlickException e) {
-
-		// }
-	}
-
-	static void loadSound(String name, String file) {
-		// try {
-		// status = "Loading " + file;
-		// sound.put(name, new Sound("data" + File.separator + "sound" + File.separator
-		// + file));
-		// } catch (SlickException e) {
-
-		// }
-	}
-
-	static void loadImage(String name, String file) {
-
-	}
-
-	public static void loopMusic(String name) {
-		if (ready) {
-			getMusic(name).loop();
-		} else {
-			loopWhenReady(name);
 		}
 	}
 
@@ -117,14 +66,6 @@ public class StaticFiles {
 				}
 			}
 		}).start();
-	}
-
-	public static Music getMusic(String name) {
-		return music.get(name);
-	}
-
-	public static Sound getSound(String name) {
-		return sound.get(name);
 	}
 
 	public static DScreenTransition<DAL> getDownMenuOut() {

@@ -13,7 +13,7 @@ import java.util.stream.StreamSupport;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.danwink.tacticshooter.AssetManager;
+import com.danwink.tacticshooter.Assets;
 import com.danwink.tacticshooter.StaticFiles;
 import com.danwink.tacticshooter.TacticServer;
 import com.danwink.tacticshooter.UIHelper;
@@ -36,7 +36,7 @@ import com.phyloa.dlib.util.DMath;
 
 public class HomeScreen extends DUIScreen {
 	static {
-		AssetManager.defineTexture("title", "data" + File.separator + "img" + File.separator + "title.png");
+		Assets.defineTexture("title", "data" + File.separator + "img" + File.separator + "title.png");
 	}
 
 	TacticServer server;
@@ -57,7 +57,7 @@ public class HomeScreen extends DUIScreen {
 
 	@Override
 	public void init(DAL dal) {
-		title = AssetManager.getTexture("title");
+		title = Assets.getTexture("title");
 	}
 
 	public void createUIElements(DUI dui, float windowHeight) {

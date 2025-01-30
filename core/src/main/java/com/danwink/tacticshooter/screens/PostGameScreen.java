@@ -10,6 +10,7 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.imageout.ImageOut;
 
 import com.danwink.tacticshooter.GameStats;
+import com.danwink.tacticshooter.MusicQueuer;
 import com.danwink.tacticshooter.GameStats.TeamStats;
 import com.danwink.tacticshooter.dal.DAL;
 import com.danwink.tacticshooter.dal.DAL.DALColor;
@@ -43,8 +44,7 @@ public class PostGameScreen extends DUIScreen {
 	boolean rd = false;
 
 	public void init(DAL dal) {
-		// TODO:
-		// StaticFiles.getMusic("menu").loop();
+		MusicQueuer.loopTracks("menu");
 		rd = false;
 	}
 

@@ -1,28 +1,44 @@
 package com.danwink.tacticshooter;
 
-import org.newdawn.slick.Music;
-import org.newdawn.slick.MusicListener;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class MusicQueuer implements MusicListener
-{
-	String[] names;
-	int onCount;
-	public MusicQueuer( int onCount, String... names )
-	{
-		this.onCount = (onCount+1) % names.length;
-		this.names = names;
-	}
-	
-	public void musicEnded( Music arg0 )
-	{
-		arg0.removeListener( this );
-		Music m = StaticFiles.getMusic( names[onCount] );
-		m.play();
-		m.addListener( new MusicQueuer( onCount, names ) );
+import com.badlogic.gdx.audio.Music;
+
+public class MusicQueuer {
+	static List<Music> currentQueue;
+	static int currentIndex = 0;
+	static boolean currentlyPlaying = false;
+
+	public static void loopTracks(String... trackNames) {
+		if (currentlyPlaying) {
+			currentQueue.get(currentIndex).stop();
+		}
+
+		currentQueue = Stream.of(trackNames).map(Assets::getMusic).collect(Collectors.toList());
+		currentIndex = 0;
+
+		startTrack();
 	}
 
-	public void musicSwapped( Music arg0, Music arg1 )
-	{
-		
+	public static void shuffleTracks(String... trackNames) {
+		Collections.shuffle(Arrays.asList(trackNames));
+		loopTracks(trackNames);
+	}
+
+	static void startTrack() {
+		var music = currentQueue.get(currentIndex);
+		currentlyPlaying = true;
+		music.play();
+		music.setOnCompletionListener(m -> {
+			currentIndex++;
+			if (currentIndex >= currentQueue.size()) {
+				currentIndex = 0;
+			}
+			startTrack();
+		});
 	}
 }

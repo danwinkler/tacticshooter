@@ -1,17 +1,10 @@
 package com.danwink.tacticshooter.screens;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.danwink.tacticshooter.AssetManager;
-import com.danwink.tacticshooter.AssetManager.AssetLoader;
+import com.danwink.tacticshooter.Assets;
+import com.danwink.tacticshooter.MusicQueuer;
 import com.danwink.tacticshooter.StaticFiles;
-import com.danwink.tacticshooter.Theme.GdxSpriteSheet;
-import com.danwink.tacticshooter.Theme.TSSpriteSheet;
 import com.danwink.tacticshooter.dal.DAL;
 import com.danwink.tacticshooter.dal.DAL.DALColor;
-import com.danwink.tacticshooter.dal.DAL.DALTexture;
-import com.danwink.tacticshooter.dal.GdxDAL.GdxRegionTexture;
 import com.phyloa.dlib.game.DScreen;
 import com.phyloa.dlib.game.DScreenHandler;
 
@@ -21,23 +14,13 @@ public class OpenLoadScreen extends DScreen<DAL> {
 		StaticFiles.loadAll();
 		// StaticFiles.loopWhenReady("menu");
 		StaticFiles.ready = true; // DEBUG line, remove when fixed
-
-		AssetManager.configureLoader(new AssetLoader() {
-			public DALTexture loadTexture(String path) {
-				var tr = new TextureRegion(new Texture(Gdx.files.internal(path)));
-				tr.flip(false, true);
-				return new GdxRegionTexture(tr);
-			}
-
-			public TSSpriteSheet loadSpriteSheet(String path, int tw, int th) {
-				return new GdxSpriteSheet(new Texture(Gdx.files.internal(path)), tw, th);
-			}
-		});
-		AssetManager.load();
 	}
 
 	public void update(DAL dal, float delta) {
-		if (StaticFiles.ready) {
+		boolean assetManagerDone = Assets.manager.update();
+
+		if (StaticFiles.ready && assetManagerDone) {
+			MusicQueuer.loopTracks("menu");
 			dsh.activate("home", dal);
 		}
 	}

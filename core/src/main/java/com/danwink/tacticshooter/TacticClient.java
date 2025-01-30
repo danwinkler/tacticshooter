@@ -6,14 +6,10 @@ import org.newdawn.slick.SlickException;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.danwink.tacticshooter.dal.DAL;
 import com.danwink.tacticshooter.dal.GdxDAL;
-import com.danwink.tacticshooter.dal.SlickDAL;
 import com.danwink.tacticshooter.screens.HomeScreen;
 import com.danwink.tacticshooter.screens.LobbyScreen;
 import com.danwink.tacticshooter.screens.MessageScreen;
@@ -36,6 +32,21 @@ import com.phyloa.dlib.game.DScreenHandler;
  * platforms.
  */
 public class TacticClient extends ApplicationAdapter {
+    static {
+        Assets.defineMusic("menu", "data/sound/Deliberate Thought.ogg");
+        Assets.defineMusic("play1", "data/sound/Decisions.ogg");
+        Assets.defineMusic("play2", "data/sound/Finding the Balance.ogg");
+        Assets.defineMusic("play3", "data/sound/Rising.ogg");
+
+        Assets.defineSound("bullet1", "data/sound/bullet1.wav");
+        Assets.defineSound("bullet2", "data/sound/bullet2.wav");
+        Assets.defineSound("ping1", "data/sound/ping1.wav");
+        Assets.defineSound("death1", "data/sound/death1.wav");
+        Assets.defineSound("death2", "data/sound/death2.wav");
+        Assets.defineSound("hit1", "data/sound/hit1.wav");
+        Assets.defineSound("explode1", "data/sound/explode1.wav");
+    }
+
     DScreenHandler<DAL> dsh = new DScreenHandler<>();
 
     int lastWindowWidth = 0;

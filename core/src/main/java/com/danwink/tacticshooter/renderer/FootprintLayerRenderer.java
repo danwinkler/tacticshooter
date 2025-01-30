@@ -64,6 +64,7 @@ public class FootprintLayerRenderer {
 
     public void generateTexture(DAL dal, ClientState cs) {
         texture = dal.generateRenderableTexture(cs.l.width * Level.tileSize, cs.l.height * Level.tileSize);
+        texture.getTextureRegion().flip(false, true);
         texture.renderTo(tg -> {
             tg.setClearColor(new DALColor(1, 1, 1, 1f));
             tg.clear();
