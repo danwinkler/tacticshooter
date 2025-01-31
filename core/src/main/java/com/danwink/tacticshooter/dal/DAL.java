@@ -364,5 +364,9 @@ public abstract class DAL {
             return g;
         }
 
+        @Override
+        public void drawImage(DALTexture img, float x, float y, float width, float height, DALColor color) {
+            g.drawImage(img, x, y, width, height, color);
+        }
     }
 }

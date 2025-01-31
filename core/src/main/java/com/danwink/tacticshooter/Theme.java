@@ -51,9 +51,12 @@ public class Theme {
 
 	public DALTexture getPortrait(String portrait) {
 		if (!portraits.containsKey(portrait)) {
-			portraits.put(portrait, new GdxRegionTexture(new TextureRegion(new Texture(Gdx.files.internal(
+			var tex = new Texture(Gdx.files.internal(
 					"data/themes" + File.separator + name + File.separator + "portraits" + File.separator + portrait
-							+ ".png")))));
+							+ ".png"));
+			var tr = new TextureRegion(tex);
+			tr.flip(false, true);
+			portraits.put(portrait, new GdxRegionTexture(tr));
 		}
 		return portraits.get(portrait);
 	}

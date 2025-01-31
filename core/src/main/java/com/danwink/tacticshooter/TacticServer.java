@@ -773,6 +773,14 @@ public class TacticServer {
 		}
 	}
 
+	public boolean isRunning() {
+		return sl.running;
+	}
+
+	public void stop() {
+		sl.running = false;
+	}
+
 	public enum ServerState {
 		LOBBY,
 		PLAYING;

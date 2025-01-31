@@ -133,6 +133,11 @@ public class TacticClient extends ApplicationAdapter {
 
     @Override
     public void dispose() {
-
+        var server = dsh.get("home", HomeScreen.class).server;
+        if (server != null) {
+            if (server.isRunning()) {
+                server.stop();
+            }
+        }
     }
 }

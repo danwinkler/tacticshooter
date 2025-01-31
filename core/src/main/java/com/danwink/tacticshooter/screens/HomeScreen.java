@@ -39,7 +39,7 @@ public class HomeScreen extends DUIScreen {
 		Assets.defineTexture("title", "data" + File.separator + "img" + File.separator + "title.png");
 	}
 
-	TacticServer server;
+	public TacticServer server;
 
 	DButton singlePlayer;
 	DButton multiPlayer;

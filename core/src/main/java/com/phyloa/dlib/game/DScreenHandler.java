@@ -49,6 +49,10 @@ public class DScreenHandler<E> {
 		return d;
 	}
 
+	public <F extends DScreen<E>> F get(String s, Class<F> c) {
+		return c.cast(screens.get(s));
+	}
+
 	public void update(E e, float delta) {
 		synchronized (d) {
 			if (nextScreen != null) {

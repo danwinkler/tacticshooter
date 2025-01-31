@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.danwink.tacticshooter.ClientState;
+import com.danwink.tacticshooter.dal.DAL.DALColor;
 import com.danwink.tacticshooter.dal.DAL.DALTexture;
 import com.danwink.tacticshooter.gameobjects.Unit;
 import com.phyloa.dlib.dui.DButton;
@@ -148,7 +149,7 @@ public class SelectedUnitsDisplay extends DUIElement {
             r.pushMatrix();
             r.translate(x, y);
             var portraitImage = cs.l.theme.getPortrait(u.type.name);
-            r.drawImage(portraitImage, 0, 0, width, height, 0, 0, portraitImage.getWidth(), portraitImage.getHeight());
+            r.drawImage(portraitImage, 0, 0, width, height, DALColor.white);
 
             var healthBarWidth = width * (u.health / (float) u.type.health);
             int healthBarHeight = height / 12;

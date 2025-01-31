@@ -468,6 +468,8 @@ public class GdxDAL extends DAL {
 
         @Override
         public void clear() {
+            Gdx.gl.glClearColor(1, 1, 1, 0);
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         }
 
         @Override
@@ -508,6 +510,7 @@ public class GdxDAL extends DAL {
 
         @Override
         public void setLineWidth(int width) {
+            sd.setDefaultLineWidth(width);
         }
 
         @Override

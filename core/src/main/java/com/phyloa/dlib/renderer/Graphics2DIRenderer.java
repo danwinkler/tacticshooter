@@ -15,6 +15,7 @@ import org.newdawn.slick.Graphics;
 
 import jp.objectclub.vecmath.Vector2f;
 
+import com.danwink.tacticshooter.dal.DAL.DALColor;
 import com.danwink.tacticshooter.dal.DAL.DALGraphics;
 import com.phyloa.dlib.util.DGraphics;
 
@@ -235,5 +236,11 @@ public class Graphics2DIRenderer implements IRenderer {
 	public DALGraphics getGraphics() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void drawImage(Image img, float x, float y, float width, float height, DALColor color) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'drawImage'");
 	}
 }
