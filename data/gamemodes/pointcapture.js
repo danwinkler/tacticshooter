@@ -71,6 +71,6 @@ addKillListener(function (u) {
 });
 
 addBuffListener("drummer", function (u) {
-	api.giveBuff(u.id, { "healRateMod": .25 });
-	//api.giveBuff(u.id, { "fireRateMod": .25 });
+	//api.giveBuff(u, { "healRateMod": .5 });
+	api.giveBuff(u, { "name": "drummer", "fireRateMod": .5 });
 });

@@ -59,7 +59,7 @@ public class Unit {
 
 	public boolean marked = false;
 
-	transient HashMap<String, Buff> buffs = new HashMap<>();
+	transient public HashMap<String, Buff> buffs = new HashMap<>();
 
 	// CLIENT ONLY
 	transient public boolean selected = false;
@@ -202,7 +202,12 @@ public class Unit {
 								float bangle = angletoguy + DMath.randomf(-type.bulletSpread, type.bulletSpread);
 								ts.addBullet(this, bangle);
 							}
-							reloadtime = type.timeBetweenBullets;
+							var newReloadTime = type.timeBetweenBullets;
+							for (Buff b : buffs.values()) {
+								newReloadTime -= Math.floor(type.timeBetweenBullets * b.fireRateMod);
+							}
+
+							reloadtime = newReloadTime;
 							break;
 						}
 					}
@@ -225,6 +230,27 @@ public class Unit {
 
 		lastState = state;
 		return ret;
+	}
+
+	public void tick(TacticServer ts) {
+		// Provide buffs to nearby units if we do that
+		if (type.providesBuff != null) {
+			var d = (type.buffRadius * Level.tileSize);
+			var d2 = d * d;
+			for (Unit u : ts.units) {
+				if (u.owner.team.id == owner.team.id && u != this) {
+					float dx = u.x - x;
+					float dy = u.y - y;
+					float dist = dx * dx + dy * dy;
+					if (dist < d2) {
+						ts.js.buff(type.providesBuff, u);
+					}
+				}
+			}
+		}
+
+		// Remove expired buffs
+		buffs.entrySet().removeIf(e -> e.getValue().expires < System.currentTimeMillis());
 	}
 
 	public void clientUpdate(ClientState tc, float d) {
@@ -489,7 +515,9 @@ public class Unit {
 	}
 
 	public static class Buff {
-		public int fireRateMod;
+		public long expires;
+
+		public float fireRateMod;
 
 		// A percentage of the original healrate, that will be added to the original
 		// healrate

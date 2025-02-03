@@ -2,6 +2,8 @@
 
 # TODO:
 - [ ] Allow flag to disallow newlines in text boxes
+- [ ] Normalize unit dot size on minimap
+- [ ] Update server/client to use fixed timestep
 
 ## Platforms
 

@@ -3,9 +3,6 @@ package com.danwink.tacticshooter.renderer;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import jp.objectclub.vecmath.Point2f;
-import jp.objectclub.vecmath.Vector2f;
-
 import com.badlogic.gdx.Gdx;
 import com.danwink.tacticshooter.ClientState;
 import com.danwink.tacticshooter.dal.DAL;
@@ -20,6 +17,9 @@ import com.danwink.tacticshooter.gameobjects.Unit;
 import com.danwink.tacticshooter.gameobjects.Unit.UnitState;
 import com.phyloa.dlib.math.Point2i;
 import com.phyloa.dlib.util.DMath;
+
+import jp.objectclub.vecmath.Point2f;
+import jp.objectclub.vecmath.Vector2f;
 
 public class GameRenderer {
 	/*
@@ -235,6 +235,14 @@ public class GameRenderer {
 				g.drawLine(0, -16, 16, -16);
 				g.drawLine(16, 0, 16, -16);
 				g.popTransform();
+
+				if (u.type.providesBuff != null) {
+					g.setColor(new DALColor(0, 1, 0, .5f));
+					var rad = u.type.buffRadius * Level.tileSize;
+					g.fillOval(-rad, -rad, rad * 2, rad * 2);
+					g.setColor(DALColor.black);
+					g.drawOval(-rad, -rad, rad * 2, rad * 2);
+				}
 			}
 
 			int healthBarDist = 0;

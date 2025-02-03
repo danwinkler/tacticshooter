@@ -18,6 +18,7 @@ import com.danwink.tacticshooter.gameobjects.Marker;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.gameobjects.Team;
 import com.danwink.tacticshooter.gameobjects.Unit;
+import com.danwink.tacticshooter.gameobjects.Unit.Buff;
 import com.danwink.tacticshooter.gameobjects.Unit.UnitDef;
 import com.danwink.tacticshooter.network.Message;
 import com.phyloa.dlib.util.DFile;
@@ -131,6 +132,14 @@ public class JSAPI {
 	public void buttonPressed(String id, int player, boolean shiftPressed) {
 		try {
 			engine.eval("callButton( '" + id + "', " + player + ", " + shiftPressed + " );");
+		} catch (ScriptException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void buff(String id, Unit u) {
+		try {
+			engine.eval("callBuffListener( '" + id + "', " + u.id + " );");
 		} catch (ScriptException e) {
 			e.printStackTrace();
 		}
@@ -369,6 +378,19 @@ public class JSAPI {
 			}
 		}
 		return false;
+	}
+
+	public void giveBuff(int u, Map<String, Object> data) {
+		for (Unit unit : ts.units) {
+			if (unit.id == u) {
+				Buff buff = new Buff();
+				buff.expires = System.currentTimeMillis() + 1000;
+				buff.fireRateMod = getFloat(data, "fireRateMod", 0);
+				buff.healRateMod = getFloat(data, "healRateMod", 0);
+
+				unit.buffs.put((String) data.get("name"), buff);
+			}
+		}
 	}
 
 	// ---------------------------------

@@ -142,7 +142,6 @@ public abstract class DUIScreen extends DScreen<DAL> implements DUIListener {
             e.lctrl = Gdx.input.isKeyPressed(Keys.CONTROL_LEFT);
             e.keyChar = Keys.toString(keycode).charAt(0);
             e.isActionKey = actionKeys.contains(keycode);
-            System.out.println("Key down: " + e.keyChar);
 
             for (var l : keyListeners) {
                 l.keyPressed(e);

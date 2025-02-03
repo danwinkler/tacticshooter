@@ -15,9 +15,9 @@ import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Building.BuildingType;
 import com.danwink.tacticshooter.gameobjects.Bullet;
 import com.danwink.tacticshooter.gameobjects.Level;
-import com.danwink.tacticshooter.gameobjects.Marker;
 import com.danwink.tacticshooter.gameobjects.Level.SlotOption;
 import com.danwink.tacticshooter.gameobjects.Level.SlotType;
+import com.danwink.tacticshooter.gameobjects.Marker;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.gameobjects.Team;
 import com.danwink.tacticshooter.gameobjects.Unit;
@@ -209,6 +209,7 @@ public class TacticServer {
 		finder = new AStarPathFinder(l, 500, StaticFiles.advOptions.getB("diagonalMove"));
 
 		lastTick = System.currentTimeMillis();
+		tick = 0;
 		state = ServerState.PLAYING;
 	}
 
@@ -489,6 +490,10 @@ public class TacticServer {
 				if (b.update(this)) {
 					si.sendToAllClients(new Message(MessageType.BUILDINGUPDATE, b));
 				}
+			}
+
+			for (var u : units) {
+				u.tick(this);
 			}
 		}
 		while (si.hasServerMessages()) {
