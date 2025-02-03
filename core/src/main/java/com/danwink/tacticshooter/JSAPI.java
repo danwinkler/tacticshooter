@@ -282,8 +282,8 @@ public class JSAPI {
 		return -1;
 	}
 
-	public float getFloat(Map<String, Object> data, String key) {
-		Object value = data.get(key);
+	public float getFloat(Map<String, Object> data, String key, float defaultValue) {
+		Object value = data.getOrDefault(key, defaultValue);
 		if (value instanceof Integer) {
 			return (float) (int) value;
 		} else if (value instanceof Double) {
@@ -296,14 +296,17 @@ public class JSAPI {
 	public void createUnitDef(Map<String, Object> data) {
 		UnitDef ud = new UnitDef();
 		ud.name = (String) data.get("name");
-		ud.speed = getFloat(data, "speed");
-		ud.timeBetweenBullets = (int) data.get("timeBetweenBullets");
-		ud.bulletSpread = getFloat(data, "bulletSpread");
+		ud.speed = getFloat(data, "speed", 3);
+		ud.timeBetweenBullets = (int) data.getOrDefault("timeBetweenBullets", 10000);
+		ud.bulletSpread = getFloat(data, "bulletSpread", 0);
 		ud.price = (int) data.get("price");
-		ud.health = getFloat(data, "health");
-		ud.bulletsAtOnce = (int) data.get("bulletsAtOnce");
-		ud.damage = (int) data.get("damage");
-		ud.explodesOnDeath = (boolean) data.get("explodesOnDeath");
+		ud.health = getFloat(data, "health", 100);
+		ud.bulletsAtOnce = (int) data.getOrDefault("bulletsAtOnce", 0);
+		ud.damage = (int) data.getOrDefault("damage", 0);
+		ud.explodesOnDeath = (boolean) data.getOrDefault("explodesOnDeath", false);
+		ud.providesBuff = (String) data.getOrDefault("providesBuff", null);
+		ud.buffRadius = (float) getFloat(data, "buffRadius", 0);
+
 		unitDefs.put(ud.name, ud);
 	}
 

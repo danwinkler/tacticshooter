@@ -81,30 +81,6 @@ public class UnitBodyRenderer {
 			case "LIGHT":
 				drawSpriteBody(g, u, cs.l.theme.light, cs.l.theme.lightColor, color, 8);
 				break;
-			case "SCOUT":
-				// draw4DirSpriteBody( g, u, cs.l.theme.dir4, null, color, 8 );
-				// break;
-			case "SHOTGUN":
-				// draw8DirSpriteBody( g, u, cs.l.theme.dir8, null, color, 24 );
-				// break;
-			case "SABOTEUR":
-				if (player) {
-					g.setColor(DALColor.white);
-					g.fillOval(-7, -7, 14, 14);
-					g.setColor(DALColor.black);
-					g.drawOval(-7, -7, 14, 14);
-				}
-
-				g.pushTransform();
-				g.rotate(0, 0, (u.heading / DMath.PI2F * 360));
-				g.setColor(color);
-				g.fillOval(-5, -5, 10, 10);
-				g.setColor(DALColor.black);
-				g.drawOval(-5, -5, 10, 10);
-				g.drawLine(0, 0, 5, 0);
-				g.popTransform();
-
-				break;
 			case "SNIPER":
 				if (player) {
 					g.setColor(DALColor.white);
@@ -124,6 +100,24 @@ public class UnitBodyRenderer {
 				break;
 			case "HEAVY":
 				drawSpriteBody(g, u, cs.l.theme.heavy, cs.l.theme.heavyColor, color, 16);
+				break;
+			default:
+				if (player) {
+					g.setColor(DALColor.white);
+					g.fillOval(-7, -7, 14, 14);
+					g.setColor(DALColor.black);
+					g.drawOval(-7, -7, 14, 14);
+				}
+
+				g.pushTransform();
+				g.rotate(0, 0, (u.heading / DMath.PI2F * 360));
+				g.setColor(color);
+				g.fillOval(-5, -5, 10, 10);
+				g.setColor(DALColor.black);
+				g.drawOval(-5, -5, 10, 10);
+				g.drawLine(0, 0, 5, 0);
+				g.popTransform();
+
 				break;
 		}
 	}

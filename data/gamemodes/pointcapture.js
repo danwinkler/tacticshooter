@@ -28,7 +28,6 @@ function pointCaptureTick(frame) {
 	}
 
 	if (frame % 100 == 0) {
-
 		//Give players money based on points owned
 		for (var pi in players) {
 			var p = players[pi];
@@ -69,4 +68,9 @@ addKillListener(function (u) {
 	if (u.killer_owner >= 0) {
 		api.addPlayerMoney(u.killer_owner, 2);
 	}
+});
+
+addBuffListener("drummer", function (u) {
+	api.giveBuff(u.id, { "healRateMod": .25 });
+	//api.giveBuff(u.id, { "fireRateMod": .25 });
 });

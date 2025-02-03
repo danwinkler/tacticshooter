@@ -5,6 +5,7 @@ var touchMarkerListeners = [];
 var stepListeners = {};
 var stopListeners = {};
 var buttonListeners = {};
+var buffListeners = {};
 
 
 function addTickListener(f) {
@@ -69,6 +70,16 @@ function callTouchMarker(unit_id, marker_id) {
 	}
 }
 
+function addBuffListener(id, f) {
+	buffListeners[id] = f
+}
+
+function callBuffListener(id, u) {
+	if (id in buffListeners) {
+		buffListeners[id](u);
+	}
+}
+
 function callButton(id, player, shiftPressed) {
 	if (id in buttonListeners) {
 		buttonListeners[id](player, shiftPressed);
@@ -76,12 +87,13 @@ function callButton(id, player, shiftPressed) {
 }
 
 var defaultUnitTypes = {
-	"LIGHT": { name: "LIGHT", speed: 3, timeBetweenBullets: 10, bulletSpread: .05, price: 10, health: 100, bulletsAtOnce: 1, damage: 10, explodesOnDeath: false },
-	"HEAVY": { name: "HEAVY", speed: 1.5, timeBetweenBullets: 3, bulletSpread: .1, price: 20, health: 200, bulletsAtOnce: 1, damage: 10, explodesOnDeath: false },
-	"SHOTGUN": { name: "SHOTGUN", speed: 3, timeBetweenBullets: 30, bulletSpread: .3, price: 15, health: 150, bulletsAtOnce: 6, damage: 10, explodesOnDeath: false },
-	"SCOUT": { name: "SCOUT", speed: 6, timeBetweenBullets: 30, bulletSpread: .1, price: 3, health: 30, bulletsAtOnce: 1, damage: 10, explodesOnDeath: false },
-	"SNIPER": { name: "SNIPER", speed: 2.5, timeBetweenBullets: 100, bulletSpread: 0, price: 15, health: 90, bulletsAtOnce: 1, damage: 100, explodesOnDeath: false },
-	"SABOTEUR": { name: "SABOTEUR", speed: 4, timeBetweenBullets: 10000, bulletSpread: 0, price: 20, health: 150, bulletsAtOnce: 0, damage: 0, explodesOnDeath: true }
+	"LIGHT": { name: "LIGHT", speed: 3, timeBetweenBullets: 10, bulletSpread: .05, price: 10, health: 100, bulletsAtOnce: 1, damage: 10 },
+	"HEAVY": { name: "HEAVY", speed: 1.5, timeBetweenBullets: 3, bulletSpread: .1, price: 20, health: 200, bulletsAtOnce: 1, damage: 10 },
+	"SHOTGUN": { name: "SHOTGUN", speed: 3, timeBetweenBullets: 30, bulletSpread: .3, price: 15, health: 150, bulletsAtOnce: 6, damage: 10 },
+	"SCOUT": { name: "SCOUT", speed: 6, timeBetweenBullets: 30, bulletSpread: .1, price: 3, health: 30, bulletsAtOnce: 1, damage: 10 },
+	"SNIPER": { name: "SNIPER", speed: 2.5, timeBetweenBullets: 100, bulletSpread: 0, price: 15, health: 90, bulletsAtOnce: 1, damage: 100 },
+	"SABOTEUR": { name: "SABOTEUR", speed: 4, price: 20, health: 150, explodesOnDeath: true },
+	"DRUMMER": { name: "DRUMMER", speed: 3, price: 15, providesBuff: "drummer", buffRadius: 3 }
 };
 
 function setupDefaultButtons() {
@@ -108,6 +120,7 @@ function setupDefaultButtons() {
 	makeButton(defaultUnitTypes.SHOTGUN, 1, 1, "SHOTGUN");
 	makeButton(defaultUnitTypes.SNIPER, 0, 2, "SNIPER");
 	makeButton(defaultUnitTypes.SABOTEUR, 1, 2, "SABOTEUR");
+	makeButton(defaultUnitTypes.DRUMMER, 2, 2, "DRUMMER");
 }
 
 function setupDefaultUnits() {

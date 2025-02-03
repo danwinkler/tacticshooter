@@ -251,6 +251,8 @@ public class Building {
 	}
 
 	public void healFriendlies(TacticServer ts) {
+		float baseHealRate = hold / (float) HOLDMAX;
+
 		for (Unit u : ts.units) {
 			float dx = u.x - x;
 			float dy = u.y - y;
@@ -260,7 +262,13 @@ public class Building {
 				if (t != null) {
 					if (u.owner.team.id == t.id) {
 						if (u.health < u.type.health) {
-							u.health += hold / (float) HOLDMAX;
+							var healRate = baseHealRate;
+
+							for (var buff : u.buffs.values()) {
+								healRate += buff.healRateMod * baseHealRate;
+							}
+
+							u.health += healRate;
 						}
 					}
 				}

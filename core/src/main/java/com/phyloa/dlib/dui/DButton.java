@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 
+import com.danwink.tacticshooter.dal.DAL.DALColor;
 import com.danwink.tacticshooter.dal.DAL.DALTexture;
 import com.phyloa.dlib.renderer.Renderer2D;
 
@@ -75,9 +76,7 @@ public class DButton extends DUIElement {
 		r.fillRect(0, 0, width - 1, height - 1);
 
 		if (background != null) {
-
-			r.drawImage(background, 0, 0, width, height, 0, 0, background.getWidth(), background.getHeight(),
-					imageAlpha);
+			r.drawImage(background, 0, 0, width, height, new DALColor(1, 1, 1, imageAlpha));
 		}
 
 		r.color(borderColor.getRed(), borderColor.getGreen(), borderColor.getBlue(), borderColor.getAlpha());

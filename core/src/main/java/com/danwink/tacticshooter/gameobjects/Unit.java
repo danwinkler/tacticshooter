@@ -1,6 +1,7 @@
 package com.danwink.tacticshooter.gameobjects;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 import org.newdawn.slick.util.pathfinding.Path;
@@ -31,6 +32,7 @@ public class Unit {
 	public float health = 100;
 	public UnitDef type;
 	public boolean alive = true;
+	public int buffRadius = 0;
 
 	public UnitState state = UnitState.STOPPED;
 	public UnitState lastState = state;
@@ -57,12 +59,14 @@ public class Unit {
 
 	public boolean marked = false;
 
-	// CLIENT ONLY
-	public boolean selected = false;
-	public int timeSinceUpdate = 0;
+	transient HashMap<String, Buff> buffs = new HashMap<>();
 
-	public int frame = 0;
-	float timeSinceLastFrame = 0;
+	// CLIENT ONLY
+	transient public boolean selected = false;
+	transient public int timeSinceUpdate = 0;
+
+	transient public int frame = 0;
+	transient float timeSinceLastFrame = 0;
 
 	public Unit() {
 		heading = DMath.randomf(0, DMath.PI2F);
@@ -352,6 +356,7 @@ public class Unit {
 		this.owner = u.owner;
 		this.stoppedAt = u.stoppedAt;
 		this.marked = u.marked;
+		this.buffRadius = u.buffRadius;
 		timeSinceUpdate = 0;
 	}
 
@@ -429,15 +434,37 @@ public class Unit {
 	}
 
 	public static class UnitDef {
+		// Name is used as a key for when api.createKey is called.
 		public String name;
+
+		// The speed at which the unit moves across the map
 		public float speed;
+
+		// The time between bullets, as number of frames at the server framerate
 		public int timeBetweenBullets;
+
+		// Every time a bullet is shot, it's angle is equal to the units angle +
+		// randomf(-bulletSpread, bulletSpread) in radians
 		public float bulletSpread;
 		public int price;
 		public float health;
+
+		// How many bullets are shot at once. Useful for shotgun style units.
 		public int bulletsAtOnce;
+
+		// How much damage each bullet does
 		public int damage;
+
+		// If true, the unit will explode on death, causing damage to nearby enemy
+		// units.
 		public boolean explodesOnDeath;
+
+		// If non-null, calls a specified callback in the gamemode to give buffs to
+		// nearby units
+		public String providesBuff;
+
+		// The radius within which buffs are provided to other units
+		public float buffRadius;
 	}
 
 	public void renderMinimap(DALGraphics g, Player player) {
@@ -459,5 +486,13 @@ public class Unit {
 			this.heading = heading;
 			this.health = health;
 		}
+	}
+
+	public static class Buff {
+		public int fireRateMod;
+
+		// A percentage of the original healrate, that will be added to the original
+		// healrate
+		public float healRateMod;
 	}
 }
