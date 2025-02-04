@@ -100,7 +100,7 @@ public class Unit {
 		switch (state) {
 			case MOVING:
 				if (occupyX != -1) {
-					ts.unitGrid[occupyX][occupyY] = null;
+					ts.stoppedUnitGrid[occupyX][occupyY] = null;
 					occupyX = -1;
 					occupyY = -1;
 				}
@@ -138,10 +138,21 @@ public class Unit {
 						dy *= .5f;
 					}
 
-					if (l.getTile(x + dx, y).isPassable())
+					if (l.getTile(x + dx, y).isPassable()) {
 						x += dx;
-					if (l.getTile(x, y + dy).isPassable())
+					}
+					if (l.getTile(x, y + dy).isPassable()) {
 						y += dy;
+					}
+
+					int newTileX = l.getTileX(x);
+					int newTileY = l.getTileY(y);
+
+					if (newTileX != tilex || newTileY != tiley) {
+						ts.unitGrid[tilex][tiley].remove(this);
+						ts.unitGrid[newTileX][newTileY].add(this);
+					}
+
 				} else {
 					Point2i closestSpot = findClosestRestSpot(ts);
 					float txd = closestSpot.x - tilex * TacticServer.UNITS_PER_TILE;
@@ -152,7 +163,7 @@ public class Unit {
 						float tilePart = Level.tileSize / (float) TacticServer.UNITS_PER_TILE;
 						x = tilex * Level.tileSize + tilePart * .5f + tilePart * txd;
 						y = tiley * Level.tileSize + tilePart * .5f + tilePart * tyd;
-						ts.unitGrid[closestSpot.x][closestSpot.y] = this;
+						ts.stoppedUnitGrid[closestSpot.x][closestSpot.y] = this;
 						occupyX = closestSpot.x;
 						occupyY = closestSpot.y;
 						state = UnitState.STOPPED;
@@ -321,7 +332,7 @@ public class Unit {
 			for (int xx = tilex * TacticServer.UNITS_PER_TILE; xx < (tilex + 1) * (TacticServer.UNITS_PER_TILE); xx++) {
 				for (int yy = tiley * TacticServer.UNITS_PER_TILE; yy < (tiley + 1)
 						* (TacticServer.UNITS_PER_TILE); yy++) {
-					if (ts.unitGrid[xx][yy] == null) {
+					if (ts.stoppedUnitGrid[xx][yy] == null) {
 						return new Point2i(xx, yy);
 					}
 				}
@@ -339,7 +350,7 @@ public class Unit {
 				nty += dir;
 			}
 
-			if (ts.l.tiles[ntx][nty].isPassable()) {
+			if (ts.l.getTile(ntx, nty).isPassable()) {
 				tilex = ntx;
 				tiley = nty;
 			}

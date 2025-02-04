@@ -28,7 +28,7 @@ public class LevelAnalysis {
 			throws IllegalArgumentException, IllegalAccessException {
 		if (tx >= width || tx < 0 || ty >= height || ty < 0)
 			return;
-		if (l.tiles[tx][ty].isPassable() && f.get(tiles[tx][ty]) == null) {
+		if (l.getTile(tx, ty).isPassable() && f.get(tiles[tx][ty]) == null) {
 			TileAnalysis nt = new TileAnalysis(tiles[tx][ty]);
 			f.set(nt, f.get(ta));
 			changes[tx][ty] = nt;

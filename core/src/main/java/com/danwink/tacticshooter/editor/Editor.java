@@ -273,24 +273,24 @@ public class Editor {
 	}
 
 	public void internalSetTile(int x, int y, TileType t) {
-		if (l.tiles[x][y] == t)
+		if (l.getTile(x, y) == t)
 			return;
 		mapChangedDuringUndoableChange = true;
 		switch (brushPanel.drawType) {
 			case FILL:
-				TileType old = l.tiles[x][y];
-				l.tiles[x][y] = t;
-				if (x > 0 && l.tiles[x - 1][y] == old)
+				TileType old = l.getTile(x, y);
+				l.setTile(x, y, t);
+				if (x > 0 && l.getTile(x - 1, y) == old)
 					internalSetTile(x - 1, y, t);
-				if (x < l.width - 1 && l.tiles[x + 1][y] == old)
+				if (x < l.width - 1 && l.getTile(x + 1, y) == old)
 					internalSetTile(x + 1, y, t);
-				if (y > 0 && l.tiles[x][y - 1] == old)
+				if (y > 0 && l.getTile(x, y - 1) == old)
 					internalSetTile(x, y - 1, t);
-				if (y < l.height - 1 && l.tiles[x][y + 1] == old)
+				if (y < l.height - 1 && l.getTile(x, y + 1) == old)
 					internalSetTile(x, y + 1, t);
 				break;
 			case PENCIL:
-				l.tiles[x][y] = t;
+				l.setTile(x, y, t);
 				break;
 			default:
 				break;

@@ -22,7 +22,7 @@ public class Level implements TileBasedMap {
 
 	public ArrayList<Building> buildings = new ArrayList<Building>();
 
-	public TileType[][] tiles;
+	private TileType[][] tiles;
 
 	public int width;
 	public int height;

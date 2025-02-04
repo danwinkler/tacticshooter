@@ -309,7 +309,7 @@ public class GameRenderer {
 
 				for (int y = 0; y < cs.l.height; y++) {
 					for (int x = 0; x < cs.l.width; x++) {
-						if (!cs.l.tiles[x][y].isShootable()) {
+						if (!cs.l.getTile(x, y).isShootable()) {
 							fogG.fillRect(x * Level.tileSize, y * Level.tileSize, Level.tileSize, Level.tileSize);
 						}
 					}

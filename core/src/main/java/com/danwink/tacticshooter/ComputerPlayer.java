@@ -12,16 +12,16 @@ import org.newdawn.slick.util.pathfinding.Path;
 import org.newdawn.slick.util.pathfinding.PathFinder;
 
 import com.danwink.tacticshooter.ai.Aggressive;
+import com.danwink.tacticshooter.ai.DecentAI;
 import com.danwink.tacticshooter.ai.Good2;
 import com.danwink.tacticshooter.ai.Good3;
-import com.danwink.tacticshooter.ai.DecentAI;
 import com.danwink.tacticshooter.ai.Passive;
 import com.danwink.tacticshooter.gameobjects.Building;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Level.TileType;
-import com.danwink.tacticshooter.gameobjects.Unit.UnitDef;
 import com.danwink.tacticshooter.gameobjects.Player;
 import com.danwink.tacticshooter.gameobjects.Unit;
+import com.danwink.tacticshooter.gameobjects.Unit.UnitDef;
 import com.danwink.tacticshooter.network.FakeConnection;
 import com.danwink.tacticshooter.network.Message;
 import com.danwink.tacticshooter.network.ServerNetworkInterface;
@@ -116,7 +116,7 @@ public abstract class ComputerPlayer implements Runnable {
 						int tx = (Integer) arr[0];
 						int ty = (Integer) arr[1];
 						TileType change = (TileType) arr[2];
-						l.tiles[tx][ty] = change;
+						l.setTile(tx, ty, change);
 						break;
 					case GAMEOVER:
 						ci.sl.disconnected(fc);

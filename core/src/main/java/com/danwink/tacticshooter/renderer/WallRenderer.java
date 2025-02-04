@@ -72,7 +72,7 @@ public class WallRenderer {
 	}
 
 	public void drawTile(RWTile[][] rt, Level l, int x, int y, DALGraphics g) {
-		switch (l.tiles[x][y]) {
+		switch (l.getTile(x, y)) {
 			case DOOR:
 				drawAutoTile(l, g, x, y, TileType.FLOOR, l.theme.floor);
 				drawAutoTile(l, g, x, y, TileType.WALL, l.theme.wall);
@@ -92,7 +92,7 @@ public class WallRenderer {
 				 * );
 				 */
 
-				drawAutoTile(l, g, x, y, l.tiles[x][y], l.theme.wall);
+				drawAutoTile(l, g, x, y, l.getTile(x, y), l.theme.wall);
 				/*
 				 * switch( rt[x][y] )
 				 * {

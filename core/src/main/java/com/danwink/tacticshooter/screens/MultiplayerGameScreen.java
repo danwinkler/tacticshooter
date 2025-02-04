@@ -255,7 +255,7 @@ public class MultiplayerGameScreen extends DUIScreen implements DKeyListener, DM
 					int tx = (Integer) arr[0];
 					int ty = (Integer) arr[1];
 					TileType change = (TileType) arr[2];
-					cs.l.tiles[tx][ty] = change;
+					cs.l.setTile(tx, ty, change);
 					mapChanged = true;
 					break;
 				}

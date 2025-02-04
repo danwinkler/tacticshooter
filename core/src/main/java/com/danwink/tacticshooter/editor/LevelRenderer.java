@@ -37,7 +37,7 @@ public class LevelRenderer {
 	public void renderFloor(Graphics2DIRenderer g) {
 		for (int y = 0; y < l.height; y++) {
 			for (int x = 0; x < l.width; x++) {
-				if (l.tiles[x][y] != TileType.WALL) {
+				if (l.getTile(x, y) != TileType.WALL) {
 					drawAutoTile(g, x, y, TileType.FLOOR, floor);
 				} else {
 					g.drawImage(floor, x * Level.tileSize, y * Level.tileSize, x * Level.tileSize + Level.tileSize,
@@ -54,12 +54,12 @@ public class LevelRenderer {
 
 		for (int y = 0; y < l.height; y++) {
 			for (int x = 0; x < l.width; x++) {
-				if (l.tiles[x][y] == TileType.WALL) {
+				if (l.getTile(x, y) == TileType.WALL) {
 					drawAutoTile(g, x, y, TileType.WALL, wall);
-				} else if (l.tiles[x][y] == TileType.DOOR) {
+				} else if (l.getTile(x, y) == TileType.DOOR) {
 					// drawAutoTile( g, x, y, TileType.FLOOR, floor );
 					drawAutoTile(g, x, y, TileType.WALL, wall);
-				} else if (l.tiles[x][y] == TileType.GRATE) {
+				} else if (l.getTile(x, y) == TileType.GRATE) {
 					drawAutoTile(g, x, y, TileType.FLOOR, floor);
 					drawAutoTile(g, x, y, TileType.GRATE, grate);
 				}

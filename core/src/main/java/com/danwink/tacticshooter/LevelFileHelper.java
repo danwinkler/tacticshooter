@@ -14,13 +14,14 @@ import org.dom4j.Node;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
+
 import com.danwink.tacticshooter.gameobjects.Building;
+import com.danwink.tacticshooter.gameobjects.Building.BuildingType;
 import com.danwink.tacticshooter.gameobjects.Level;
 import com.danwink.tacticshooter.gameobjects.Level.SlotOption;
-import com.danwink.tacticshooter.gameobjects.Team;
-import com.danwink.tacticshooter.gameobjects.Building.BuildingType;
 import com.danwink.tacticshooter.gameobjects.Level.SlotType;
 import com.danwink.tacticshooter.gameobjects.Level.TileType;
+import com.danwink.tacticshooter.gameobjects.Team;
 
 public class LevelFileHelper {
 	public static String[] getLevelNames() {
@@ -46,7 +47,7 @@ public class LevelFileHelper {
 		for (int y = 0; y < m.height; y++) {
 			String[] vals = rows.get(y).getText().split(",");
 			for (int x = 0; x < m.width; x++) {
-				m.tiles[x][y] = TileType.getTile(Integer.parseInt(vals[x]));
+				m.setTile(x, y, TileType.getTile(Integer.parseInt(vals[x])));
 			}
 		}
 

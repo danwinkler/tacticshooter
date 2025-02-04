@@ -1,14 +1,14 @@
 package com.danwink.tacticshooter.gameobjects;
 
-import jp.objectclub.vecmath.Point2f;
-import jp.objectclub.vecmath.Vector2f;
-
 import com.danwink.tacticshooter.Assets;
 import com.danwink.tacticshooter.ClientState;
 import com.danwink.tacticshooter.TacticServer;
 import com.danwink.tacticshooter.dal.DAL.DALGraphics;
 import com.danwink.tacticshooter.screens.MultiplayerGameScreen;
 import com.phyloa.dlib.util.DMath;
+
+import jp.objectclub.vecmath.Point2f;
+import jp.objectclub.vecmath.Vector2f;
 
 public class Bullet {
 	public static float bulletSpeed = 35;
@@ -55,14 +55,26 @@ public class Bullet {
 
 		Level l = ts.l;
 
-		for (Unit u : ts.units) {
-			if (u.owner.team.id != owner.team.id && u.alive) {
-				p.x = u.x;
-				p.y = u.y;
-				if (DMath.pointToLineSegment(lastLoc, dir, p).lengthSquared() < Unit.radius * Unit.radius) {
-					u.hit(this, ts);
-					alive = false;
-					break;
+		int tx = ts.l.getTileX(loc.x);
+		int ty = ts.l.getTileY(loc.y);
+		int startX = Math.max(0, tx - 1);
+		int startY = Math.max(0, ty - 1);
+		int endX = Math.min(l.width - 1, tx + 1);
+		int endY = Math.min(l.height - 1, ty + 1);
+
+		findUnitCollision: for (int x = startX; x <= endX; x++) {
+			for (int y = startY; y <= endY; y++) {
+				var units = ts.unitGrid[x][y];
+				for (Unit u : units) {
+					if (u.owner.team.id != owner.team.id && u.alive) {
+						p.x = u.x;
+						p.y = u.y;
+						if (DMath.pointToLineSegment(lastLoc, dir, p).lengthSquared() < Unit.radius * Unit.radius) {
+							u.hit(this, ts);
+							alive = false;
+							break findUnitCollision;
+						}
+					}
 				}
 			}
 		}

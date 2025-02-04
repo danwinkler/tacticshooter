@@ -4,6 +4,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 import org.dom4j.DocumentException;
@@ -42,7 +43,8 @@ public class TacticServer {
 
 	public ArrayList<Unit> units = new ArrayList<Unit>();
 	public ArrayList<Bullet> bullets = new ArrayList<Bullet>();
-	public Unit[][] unitGrid;
+	public Unit[][] stoppedUnitGrid;
+	public List<Unit>[][] unitGrid;
 	public ArrayList<Marker> markers = new ArrayList<Marker>();
 
 	public HashMap<Integer, Player> players = new HashMap<Integer, Player>();
@@ -156,7 +158,13 @@ public class TacticServer {
 			e.printStackTrace();
 		}
 
-		unitGrid = new Unit[l.width * UNITS_PER_TILE][l.height * UNITS_PER_TILE];
+		stoppedUnitGrid = new Unit[l.width * UNITS_PER_TILE][l.height * UNITS_PER_TILE];
+		unitGrid = new List[l.width][l.height];
+		for (int x = 0; x < l.width; x++) {
+			for (int y = 0; y < l.height; y++) {
+				unitGrid[x][y] = new ArrayList<Unit>();
+			}
+		}
 
 		gs.setup(a, b);
 		comps.clear();
@@ -567,6 +575,11 @@ public class TacticServer {
 							u.setType(type);
 							u.stoppedAt = base;
 							units.add(u);
+
+							var tx = l.getTileX(u.x);
+							var ty = l.getTileY(u.y);
+							unitGrid[tx][ty].add(u);
+
 							si.sendToAllClients(new Message(MessageType.UNITUPDATE, u));
 							gs.get(u.owner.team).unitsCreated++;
 							gs.getPlayerStats(player).unitsCreated++;
@@ -685,8 +698,13 @@ public class TacticServer {
 				units.remove(i);
 				js.kill(u);
 				if (u.occupyX > -1) {
-					unitGrid[u.occupyX][u.occupyY] = null;
+					stoppedUnitGrid[u.occupyX][u.occupyY] = null;
 				}
+
+				var tx = l.getTileX(u.x);
+				var ty = l.getTileY(u.y);
+				unitGrid[tx][ty].remove(u);
+
 				i--;
 			}
 		}
